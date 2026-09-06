@@ -51,11 +51,11 @@ export default function VersionCard() {
     <Card  className="version rounded-0 border-0" >
        <Card.Body>
             <Row>
-                 <Col>JellyGlance {data.current_version}</Col>
+                 <Col>Silo Barracks {data.current_version}</Col>
              </Row>
             <Row className="version-community-row">
               <Col>
-                <a href="https://discord.gg/dMGhv8j2kx" target="_blank" rel="noreferrer">Join Discord</a>
+                <a href="https://github.com/After-Shock/silo-barracks" target="_blank" rel="noreferrer">Project repository</a>
               </Col>
             </Row>
              
@@ -63,7 +63,7 @@ export default function VersionCard() {
             {data.update_available?
               <>
                 <Row>
-                     <Col ><a href={data.releases_url || "https://github.com/Nerdy-Technician/JellyGlance/releases"} target="_blank"  rel="noreferrer"  style={{color:'var(--secondary-color)'}}>New version available: {data.latest_version}</a></Col>
+                     <Col ><a href={data.releases_url || "https://github.com/After-Shock/silo-barracks/releases"} target="_blank"  rel="noreferrer"  style={{color:'var(--secondary-color)'}}>New version available: {data.latest_version}</a></Col>
                  </Row>
               </>
                :

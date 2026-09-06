@@ -10,8 +10,7 @@ import { InputGroup } from "react-bootstrap";
 
 import EyeFillIcon from "remixicon-react/EyeFillIcon";
 import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
-import logo_dark from "./images/icon-b-512.png";
-import projectText from "./images/project-text.png";
+import logo_dark from "./images/silo-icon.png";
 import AuthArtworkBackground from "./components/AuthArtworkBackground";
 
 // import LibrarySync from "./components/settings/librarySync";
@@ -266,7 +265,7 @@ function Login() {
       <div className="form-box d-flex flex-column">
         <div className="login-brand">
           <img src={logo_dark} className="login-logo" alt="" />
-          <img src={projectText} className="login-wordmark" alt="JellyGlance" />
+          <strong className="silo-wordmark">Silo Barracks</strong>
         </div>
 
         <Form onSubmit={handleFormSubmit} className="setup-form login-form">
@@ -336,7 +335,7 @@ function Login() {
 
               <div className="quick-connect-code-panel">
                 <span className="quick-connect-code">{quickConnect.code}</span>
-                <small>Enter this code in Jellyfin Quick Connect. JellyGlance will continue automatically.</small>
+                <small>Enter this code in Jellyfin Quick Connect. Silo Barracks will continue automatically.</small>
                 {quickConnectStatus && <small className="quick-connect-status">{quickConnectStatus}</small>}
                 <Button type="submit" className="quick-connect-refresh-button" disabled={processing}>
                   {processing ? `${i18next.t("VALIDATING")}...` : "Get New Code"}

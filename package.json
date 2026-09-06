@@ -1,8 +1,8 @@
 {
-  "name": "jellyglance",
+  "name": "silo-barracks",
   "version": "1.2.3-beta.3",
   "private": true,
-  "description": "JellyGlance - a modern Jellyfin analytics and media control dashboard by Nerdy-Technician.",
+  "description": "Silo Barracks - native Silo Server activity and playback analytics, based on JellyGlance.",
   "keywords": [
     "jellyfin",
     "jellyfin-dashboard",
@@ -20,13 +20,13 @@
     "postgresql",
     "react"
   ],
-  "homepage": "https://jellyglance.com/",
+  "homepage": "https://github.com/After-Shock/silo-barracks",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Nerdy-Technician/JellyGlance.git"
+    "url": "https://github.com/After-Shock/silo-barracks.git"
   },
   "bugs": {
-    "url": "https://github.com/Nerdy-Technician/JellyGlance/issues"
+    "url": "https://github.com/After-Shock/silo-barracks/issues"
   },
   "license": "GPL-3.0",
   "type": "module",
@@ -35,6 +35,7 @@
     "docs"
   ],
   "scripts": {
+    "test": "node --test apps/api/tests/*.test.js",
     "dev": "concurrently \"npm run dev -w @jellyglance/api\" \"npm run dev -w @jellyglance/web\"",
     "dev:web": "npm run dev -w @jellyglance/web",
     "dev:api": "npm run dev -w @jellyglance/api",

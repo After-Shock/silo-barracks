@@ -4,6 +4,18 @@ import baseUrl from "./baseurl";
 let cachedSessions = null;
 const listeners = new Set();
 const preloadedImages = new Set();
+let sessionStatus = { state: 'connecting', lastSuccessAt: null };
+const statusListeners = new Set();
+
+export function getSessionStatus() { return sessionStatus; }
+export function cacheSessionStatus(value) {
+  sessionStatus = { ...sessionStatus, ...value };
+  statusListeners.forEach(listener => listener(sessionStatus));
+}
+export function subscribeSessionStatus(listener) {
+  statusListeners.add(listener);
+  return () => statusListeners.delete(listener);
+}
 
 function convertBitrate(bitrate) {
   if (!bitrate) return "N/A";
@@ -166,6 +178,9 @@ export function normalizeSessions(sessionData) {
 export function cacheActiveSessions(sessionData) {
   cachedSessions = normalizeSessions(sessionData);
   cachedSessions.forEach((session) => {
+    // Native cards use Silo's public poster URL or a bundled placeholder.
+    // Image elements cannot attach the Bearer header required by /proxy.
+    if (session.MediaServerProvider === 'silo') return;
     const itemId = session.NowPlayingItem.SeriesId || session.NowPlayingItem.Id;
     preloadImage(`${baseUrl}/proxy/Items/Images/Primary?id=${itemId}&fillHeight=240&fillWidth=160&quality=45`);
     preloadImage(`${baseUrl}/proxy/Items/Images/Backdrop?id=${itemId}&fillWidth=560&quality=38`);
@@ -187,10 +202,25 @@ export function subscribeActiveSessions(listener) {
 }
 
 export async function fetchActiveSessions(token = localStorage.getItem("token")) {
-  const response = await axios.get("/proxy/getSessions", {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  });
-  return cacheActiveSessions(response.data);
+  try {
+    const response = await axios.get("/proxy/getSessions", {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      timeout: 15000,
+    });
+    if (!Array.isArray(response.data)) throw new Error('Invalid activity response');
+    cacheSessionStatus({ state: 'connected', lastSuccessAt: new Date().toISOString(), message: '' });
+    // The independent history recorder can be unavailable while live REST works.
+    try {
+      const status = await axios.get('/proxy/sessionStatus', {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined, timeout: 5000,
+      });
+      if (status.data?.state === 'storage-unavailable') cacheSessionStatus(status.data);
+    } catch { /* Live data remains usable if the optional status request fails. */ }
+    return cacheActiveSessions(response.data);
+  } catch (error) {
+    cacheSessionStatus({ state: 'unavailable', message: 'Activity is unavailable. Showing the last successful update.' });
+    throw error;
+  }
 }
 
 export function prewarmActiveSessions(token = localStorage.getItem("token")) {

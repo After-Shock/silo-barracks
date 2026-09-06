@@ -5,15 +5,20 @@ import Task from "./Task";
 import socket from "../../../socket";
 import TaskLineIcon from "remixicon-react/TaskLineIcon";
 import LinksLineIcon from "remixicon-react/LinksLineIcon";
+import Config from '../../../lib/config';
 
 import "../../css/settings/settings.css";
 
 export default function Tasks() {
+  const [isSilo, setIsSilo] = useState(true);
+  const visibleTasks = taskList.filter(task => !isSilo || task.name !== 'JellyfinPlaybackReportingPluginSync');
   const [processing, setProcessing] = useState(false);
   const [taskIntervals, setTaskIntervals] = useState([]);
   const [taskStateList, setTaskStateList] = useState();
   const [webhookEvents, setWebhookEvents] = useState({});
   const token = localStorage.getItem("token");
+
+  useEffect(() => { Config.getConfig().then(config => setIsSilo(config.IS_SILO === true)).catch(() => {}); }, []);
 
   useEffect(() => {
     socket.on("task-list", (data) => {
@@ -125,7 +130,7 @@ export default function Tasks() {
         <div className="tasks-summary">
           <span>
             <TaskLineIcon size={18} />
-            {taskList.length} jobs
+            {visibleTasks.length} jobs
           </span>
           <span>
             <TaskLineIcon size={18} />
@@ -139,7 +144,7 @@ export default function Tasks() {
       </div>
 
       <div className="tasks-grid">
-        {taskList.map((task) => (
+        {visibleTasks.map((task) => (
           <Task
             key={task.id}
             task={task}

@@ -513,6 +513,7 @@ async function migrateArchivedActivty() {
 }
 
 async function syncPlaybackPluginData() {
+  if (API.isSilo) throw new Error('Jellyfin Playback Reporting import is not supported by Silo.');
   try {
     const uuid = randomUUID();
     PlaybacksyncTask = { loggedData: [], uuid: uuid };
@@ -1390,6 +1391,7 @@ router.post("/fetchItem", async (req, res) => {
 
 //////////////////////////////////////////////////////syncPlaybackPluginData
 router.get("/syncPlaybackPluginData", async (req, res) => {
+  if (API.isSilo) return res.status(501).json({ error: 'Jellyfin Playback Reporting import is not supported by Silo.' });
   try {
     const taskManager = new TaskManager().getInstance();
     const taskScheduler = new TaskScheduler().getInstance();

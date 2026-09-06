@@ -229,7 +229,7 @@ export function loadHomeSettings(scope = "user") {
       const parsed = JSON.parse(saved);
       const normalized = normalizeHomeSettings(parsed);
       if (scope === "kiosk" && normalized.preset === "kiosk") {
-        return normalizeHomeSettings({ ...DEFAULT_HOME_SETTINGS, ...HOME_PRESETS.kiosk, sizes: HOME_PRESETS.kiosk.sizes, preset: "kiosk", autoRotate: false, title: normalized.title || "JellyGlance Kiosk", theme: normalized.theme });
+        return normalizeHomeSettings({ ...DEFAULT_HOME_SETTINGS, ...HOME_PRESETS.kiosk, sizes: HOME_PRESETS.kiosk.sizes, preset: "kiosk", autoRotate: false, title: normalized.title || "Silo Barracks Kiosk", theme: normalized.theme });
       }
       const stillOldDefault = normalized.version < HOME_LAYOUT_VERSION && (!parsed.preset || parsed.preset === "custom") && JSON.stringify(normalizeHomeOrder(parsed.order)) === JSON.stringify(DEFAULT_HOME_ORDER);
       return stillOldDefault ? normalizeHomeSettings(DEFAULT_HOME_SETTINGS) : normalized;
@@ -244,7 +244,7 @@ export function loadHomeSettings(scope = "user") {
     return normalizeHomeSettings(DEFAULT_HOME_SETTINGS);
   }
 
-  return normalizeHomeSettings({ ...DEFAULT_HOME_SETTINGS, ...HOME_PRESETS.kiosk, sizes: HOME_PRESETS.kiosk.sizes, preset: "kiosk", autoRotate: false, title: "JellyGlance Kiosk" });
+  return normalizeHomeSettings({ ...DEFAULT_HOME_SETTINGS, ...HOME_PRESETS.kiosk, sizes: HOME_PRESETS.kiosk.sizes, preset: "kiosk", autoRotate: false, title: "Silo Barracks Kiosk" });
 }
 
 export function saveHomeSettings(settings, scope = "user") {

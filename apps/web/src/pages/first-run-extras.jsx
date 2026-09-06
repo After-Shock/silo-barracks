@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Plug2LineIcon from "remixicon-react/Plug2LineIcon";
 import Database2LineIcon from "remixicon-react/Database2LineIcon";
@@ -14,6 +14,8 @@ import SetupShell from "./components/setup/SetupShell";
 import "./css/settings/settings.css";
 
 export default function FirstRunExtras() {
+  const [isSilo, setIsSilo] = useState(true);
+  useEffect(() => { Config.getConfig().then(config => setIsSilo(config.IS_SILO === true)).catch(() => {}); }, []);
   const [activePanel, setActivePanel] = useState("integrations");
   const [activeImportSource, setActiveImportSource] = useState("jellystat");
   const [busy, setBusy] = useState(false);
@@ -47,7 +49,7 @@ export default function FirstRunExtras() {
 
   function goNext() {
     if (activePanel === "integrations") {
-      setActivePanel("imports");
+      setActivePanel(isSilo ? "sync" : "imports");
       return;
     }
 
@@ -66,7 +68,7 @@ export default function FirstRunExtras() {
     }
 
     if (activePanel === "sync") {
-      setActivePanel("imports");
+      setActivePanel(isSilo ? "integrations" : "imports");
     }
   }
 
@@ -83,10 +85,10 @@ export default function FirstRunExtras() {
       }
       description={
         activePanel === "integrations"
-          ? "Add Arr apps, Seerr request services, and download clients before JellyGlance builds its first dashboard cache."
+          ? "Connect optional media services, or skip ahead to start Silo activity monitoring."
           : activePanel === "imports"
             ? "Import Jellystat or Tautulli history and match legacy users before the initial Jellyfin sync fills the rest of the dashboard."
-            : "JellyGlance will run the first full Jellyfin sync, recently added sync, Playback Reporting import, and dashboard stat refresh."
+            : "Barracks will sync native Silo users and libraries, refresh dashboard statistics, and keep recording observed playback."
       }
     >
       <div className="setup-extras">
@@ -95,10 +97,10 @@ export default function FirstRunExtras() {
             <Plug2LineIcon size={18} />
             Integrations
           </button>
-          <button type="button" className={activePanel === "imports" ? "is-active" : ""} onClick={() => setActivePanel("imports")}>
+          {!isSilo && <button type="button" className={activePanel === "imports" ? "is-active" : ""} onClick={() => setActivePanel("imports")}>
             <Database2LineIcon size={18} />
             History Import
-          </button>
+          </button>}
           <button type="button" className={activePanel === "sync" ? "is-active" : ""} onClick={() => setActivePanel("sync")}>
             <RefreshLineIcon size={18} />
             First Sync
@@ -113,7 +115,7 @@ export default function FirstRunExtras() {
             <>
               <div className="setup-import-note">
                 <strong>Import Jellystat or Tautulli history before the first sync.</strong>
-                <span>Choose the backup source, import watch history, then match any legacy users to Jellyfin profiles.</span>
+                <span>Legacy imports need matching account and media IDs. Start with live Silo activity if you do not have a compatible backup.</span>
               </div>
               <div className="setup-import-source-tabs" role="tablist" aria-label="History import source">
                 <button
@@ -138,15 +140,15 @@ export default function FirstRunExtras() {
             <section className="setup-sync-panel">
               <RefreshLineIcon />
               <div>
-                <h3>Ready to build JellyGlance</h3>
+                <h3>Ready to start Silo Barracks</h3>
                 <p>
                   The first sync starts only after this step. You can still skip integrations or imports, then configure them later
                   from Settings.
                 </p>
                 <ul>
-                  <li>Complete Jellyfin library and user sync</li>
+                  <li>Native Silo library and user sync</li>
                   <li>Recently added media sync</li>
-                  <li>Playback Reporting Plugin import when available</li>
+                  <li>Live playback monitoring and observed history</li>
                   <li>Dashboard statistics refresh</li>
                 </ul>
               </div>

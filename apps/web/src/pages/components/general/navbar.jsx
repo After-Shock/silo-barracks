@@ -9,8 +9,7 @@ import ArrowLeftSLineIcon from "remixicon-react/ArrowLeftSLineIcon";
 import ArrowRightSLineIcon from "remixicon-react/ArrowRightSLineIcon";
 import MagicLineIcon from "remixicon-react/MagicLineIcon";
 import MenuLineIcon from "remixicon-react/MenuLineIcon";
-import logo_dark from "../../images/icon-b-512.png";
-import projectText from "../../images/project-text.png";
+import logo_dark from "../../images/silo-icon.png";
 import "../../css/navbar.css";
 import VersionCard from "./version-card";
 import { OPEN_WHATS_NEW_EVENT } from "../../../lib/events";
@@ -217,7 +216,7 @@ export default function Navbar() {
   const currentRole = config?.settings?.auth?.role || "Viewer";
   const isJellyfinAdmin = currentRole === "Owner" || currentRole === "Admin";
   const accountRole = authMode === "quick-connect" ? (isJellyfinAdmin ? "Jellyfin Admin" : "Jellyfin User") : authMode === "oidc" ? "OIDC User" : "Local User";
-  const showServerManagementNav = isJellyfinAdmin;
+  const showServerManagementNav = isJellyfinAdmin && config?.IS_SILO !== true;
   const jellyfinUserId = jellyfinUser?.id || jellyfinUser?.Id || jellyfinUser?.userId || jellyfinUser?.UserId;
   const jellyfinImageTag = jellyfinUser?.primaryImageTag || jellyfinUser?.PrimaryImageTag || jellyfinUser?.imageTags?.Primary || jellyfinUser?.ImageTags?.Primary;
   const jellyfinAvatar = jellyfinUserId
@@ -719,7 +718,7 @@ export default function Navbar() {
         </button>
         <Link className="mobile-app-brand" to="/">
           <img src={logo_dark} alt="" />
-          <img src={projectText} alt="JellyGlance" />
+          <strong className="silo-wordmark">Silo Barracks</strong>
         </Link>
         <button className="mobile-app-account" type="button" onClick={() => setShowAccount(true)} aria-label="Open account settings">
           {avatarSrc ? <img src={avatarSrc} alt="" onError={(event) => (event.currentTarget.style.display = "none")} /> : <AccountCircleLineIcon />}
@@ -787,7 +786,7 @@ export default function Navbar() {
         <div className="navbar-brand-row">
           <BootstrapNavbar.Brand as={Link} to={"/"} className="d-none d-md-inline">
           <img src={logo_dark} className="navbar-brand-icon px-2" alt="" />
-          <img src={projectText} className="navbar-wordmark" alt="JellyGlance" />
+          <strong className="silo-wordmark">Silo Barracks</strong>
         </BootstrapNavbar.Brand>
         </div>
 
@@ -903,7 +902,7 @@ export default function Navbar() {
             <MagicLineIcon size={18} />
             <span>
               <strong>What&apos;s new</strong>
-              <small>Open the latest JellyGlance update notes.</small>
+              <small>Open the latest Silo Barracks update notes.</small>
             </span>
           </button>
 
@@ -933,7 +932,7 @@ export default function Navbar() {
             <div className="profile-theme-header">
               <div>
                 <h3 id="profile-theme-heading">Custom colours</h3>
-                <span>Theme JellyGlance from this account.</span>
+                <span>Theme Silo Barracks from this account.</span>
               </div>
               <button className="profile-theme-reset" type="button" onClick={handleThemeReset}>
                 Reset

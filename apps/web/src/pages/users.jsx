@@ -25,7 +25,7 @@ import i18next from "i18next";
 
 const token = localStorage.getItem("token");
 const PERMISSION_DEFINITIONS = [
-  { key: "dashboard", label: "Dashboard", detail: "Can open JellyGlance and view dashboards." },
+  { key: "dashboard", label: "Dashboard", detail: "Can open Silo Barracks and view dashboards." },
   { key: "users", label: "Users", detail: "Can manage user roles, tracking, and local accounts." },
   { key: "settings", label: "Settings", detail: "Can change integrations, backups, imports, and maintenance settings." },
   { key: "apiKeys", label: "API Keys", detail: "Can view and manage API keys." },
@@ -168,7 +168,7 @@ export default function Users() {
         AccountId: user.UserId,
         Role: role,
         Source: "Jellyfin",
-        SourceLabel: user.IsAdministrator ? "Jellyfin admin" : "Jellyfin user",
+        SourceLabel: `${config?.IS_SILO ? 'Silo' : 'Media server'} ${user.IsAdministrator ? 'admin' : 'user'}`,
         IsRunning: activeUserIds.has(user.UserId),
         SortWatchTime: Number(user.TotalWatchTime || 0),
       };
@@ -202,7 +202,7 @@ export default function Users() {
       UserName: user.username,
       Role: user.role || "Viewer",
       Source: "Local",
-      SourceLabel: "Local JellyGlance user",
+      SourceLabel: "Local Silo Barracks user",
       LastWatched: "N/A",
       LastClient: "Local login",
       TotalWatchTime: 0,
@@ -237,7 +237,7 @@ export default function Users() {
         : [];
 
     return [...jellyfinRows, ...oidcRows, ...primaryLocalRow, ...localRows];
-  }, [access, activeUserIds, data]);
+  }, [access, activeUserIds, data, config?.IS_SILO]);
 
   const filteredRows = useMemo(() => {
     return rows
@@ -583,7 +583,7 @@ export default function Users() {
           <div>
             <p className="users-eyebrow">Access control</p>
             <h1>Users</h1>
-            <p>Manage Jellyfin role metadata, tracking, and local JellyGlance accounts.</p>
+            <p>Manage media-server role metadata, tracking, and local Silo Barracks accounts.</p>
           </div>
         </div>
         <div className="users-header-actions">
@@ -607,7 +607,7 @@ export default function Users() {
       <section className="users-stat-grid">
         <div className="users-stat-card">
           <ShieldUserLineIcon />
-          <span>Jellyfin</span>
+          <span>{config.IS_SILO ? 'Silo' : 'Media server'}</span>
           <strong>{jellyfinRows.length}</strong>
         </div>
         <div className="users-stat-card">
@@ -631,7 +631,7 @@ export default function Users() {
         <div className="users-panel users-table-panel">
           <div className="users-panel-header">
             <div>
-              <h2>JellyGlance Users</h2>
+              <h2>Silo Barracks Users</h2>
               <p>{formatWatchTime(totalWatchTime)} watched across synced users.</p>
             </div>
             <div className="users-toolbar">
@@ -657,7 +657,7 @@ export default function Users() {
               </FormSelect>
               <FormSelect value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value)}>
                 <option value="All">All accounts</option>
-                <option value="Jellyfin">Jellyfin</option>
+                <option value="Jellyfin">{config.IS_SILO ? 'Silo' : 'Media server'}</option>
                 <option value="OIDC">OIDC</option>
                 <option value="Local">Local</option>
               </FormSelect>
@@ -698,7 +698,7 @@ export default function Users() {
                   </div>
                   <div className="users-profile-badges">
                     <Badge className={`users-role-badge ${roleClass(user.Role)}`}>{user.Role}</Badge>
-                    <Badge className={`users-source-badge ${sourceClass(user.Source)}`}>{user.Source}</Badge>
+                    <Badge className={`users-source-badge ${sourceClass(user.Source)}`}>{user.Source === "Jellyfin" ? (config.IS_SILO ? "Silo" : "Media server") : user.Source}</Badge>
                     {user.Source === "Jellyfin" && !user.Tracked ? <Badge className="users-source-badge source-hidden">Hidden</Badge> : null}
                   </div>
                   <div className="users-profile-metrics">
@@ -758,7 +758,7 @@ export default function Users() {
 
                   <div className="users-row-badges">
                     <Badge className={`users-role-badge ${roleClass(user.Role)}`}>{user.Role}</Badge>
-                    <Badge className={`users-source-badge ${sourceClass(user.Source)}`}>{user.Source}</Badge>
+                    <Badge className={`users-source-badge ${sourceClass(user.Source)}`}>{user.Source === "Jellyfin" ? (config.IS_SILO ? "Silo" : "Media server") : user.Source}</Badge>
                     {user.Source === "Jellyfin" && !user.Tracked ? <Badge className="users-source-badge source-hidden">Hidden</Badge> : null}
                   </div>
 
@@ -845,7 +845,7 @@ export default function Users() {
         <Modal.Body>
           <div className="users-modal-topline">
             <div>
-              <strong>JellyGlance accounts</strong>
+              <strong>Silo Barracks accounts</strong>
               <span>{(access.localUsers?.length || 0) + (access.primaryLocalUser ? 1 : 0)} accounts</span>
             </div>
             <Button className="users-primary-action" onClick={() => setShowAddUser(true)}>
@@ -872,7 +872,7 @@ export default function Users() {
               <article className="local-user-card" key={user.id}>
                 <div>
                   <strong>{user.username}</strong>
-                  <span>Local JellyGlance user</span>
+                  <span>Local Silo Barracks user</span>
                 </div>
                 <FormSelect value={user.role} onChange={(event) => changeLocalRole(user, event.target.value)}>
                   {access.roles.map((role) => (
@@ -1063,7 +1063,7 @@ export default function Users() {
         </Modal.Header>
         <Modal.Body>
           <p className="users-modal-copy">
-            Delete {deleteTarget?.username}? This removes the local JellyGlance account only.
+            Delete {deleteTarget?.username}? This removes the local Silo Barracks account only.
           </p>
         </Modal.Body>
         <Modal.Footer>

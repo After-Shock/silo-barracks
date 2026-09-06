@@ -426,3 +426,12 @@ h2 {
     min-height: 0;
   }
 }
+.silo-wordmark {
+  font-family: inherit;
+  font-size: 1.3rem;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: inherit;
+  white-space: nowrap;
+}

@@ -1,13 +1,9 @@
-const JellyfinAPI = require("./jellyfin-api");
-const EmbyAPI = require("./emby-api");
+const { getProvider } = require('./provider');
 
 function API() {
-  const USE_EMBY_API = (process.env.IS_EMBY_API || "false").toLowerCase() === "true";
-  if (USE_EMBY_API) {
-    return new EmbyAPI();
-  } else {
-    return new JellyfinAPI();
-  }
+  const provider = getProvider();
+  const Adapter = require(provider === 'silo' ? './silo-api' : provider === 'emby' ? './emby-api' : './jellyfin-api');
+  return new Adapter();
 }
 
 module.exports = API();

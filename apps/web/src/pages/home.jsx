@@ -615,7 +615,7 @@ export default function Home({ kioskMode = false }) {
     const token = localStorage.getItem("token");
     const headers = { Authorization: `Bearer ${token}` };
     const actions = {
-      sync: { label: "Jellyfin sync", request: () => axios.get("/sync/beginSync", { headers }) },
+      sync: { label: "Media catalog sync", request: () => axios.get("/sync/beginSync", { headers }) },
       backup: { label: "Backup", request: () => axios.get("/backup/beginBackup", { headers }) },
       integrations: { label: "Integration test", request: () => axios.post("/api/integrations/test-all", {}, { headers }) },
     };
@@ -765,7 +765,7 @@ export default function Home({ kioskMode = false }) {
 
       <div className="home-order-toolbar">
         <div>
-          <strong>{homeSettings.title || (kioskMode ? "JellyGlance Kiosk" : "JellyGlance Home")}</strong>
+          <strong>{homeSettings.title || (kioskMode ? "Silo Barracks Kiosk" : "Silo Barracks Home")}</strong>
         </div>
         <button
           type="button"
@@ -832,7 +832,7 @@ export default function Home({ kioskMode = false }) {
           <div className="home-order-options">
             <label>
               <span>Title</span>
-              <input value={homeSettings.title} placeholder="JellyGlance Home" onChange={(event) => updateHomeSettings({ title: event.target.value, preset: "custom" })} />
+              <input value={homeSettings.title} placeholder="Silo Barracks Home" onChange={(event) => updateHomeSettings({ title: event.target.value, preset: "custom" })} />
             </label>
             <label>
               <span>Preset</span>
@@ -939,7 +939,7 @@ export default function Home({ kioskMode = false }) {
         <Sessions surface={kioskMode ? "kiosk" : "home"} />
       </section> : null}
 
-      {shouldRenderSection("overview") ? <section className={getHomeSectionClass("overview", "home-hero-grid")} aria-label="JellyGlance overview" style={getHomeSectionStyle("overview")}>
+      {shouldRenderSection("overview") ? <section className={getHomeSectionClass("overview", "home-hero-grid")} aria-label="Silo Barracks overview" style={getHomeSectionStyle("overview")}>
         <MetricCard
           icon={PlayCircleLineIcon}
           label="Total playbacks"
@@ -1019,7 +1019,7 @@ export default function Home({ kioskMode = false }) {
                 </article>
               ))
             ) : (
-              <article className="home-runner-empty">More playback history will appear here as JellyGlance syncs.</article>
+              <article className="home-runner-empty">More playback history will appear here as Silo Barracks observes playback.</article>
             )}
           </div>
         </div>
@@ -1280,7 +1280,7 @@ export default function Home({ kioskMode = false }) {
             <h2>Quick Actions</h2>
           </div>
           <div className="home-quick-action-grid">
-            <button type="button" disabled={Boolean(busyAction)} onClick={() => runQuickAction("sync")}>Sync Jellyfin</button>
+            <button type="button" disabled={Boolean(busyAction)} onClick={() => runQuickAction("sync")}>Sync media catalog</button>
             <button type="button" disabled={Boolean(busyAction)} onClick={() => runQuickAction("integrations")}>Test integrations</button>
             <button type="button" disabled={Boolean(busyAction)} onClick={() => runQuickAction("backup")}>Run backup</button>
             <Link to="/requests">Open Requests</Link>

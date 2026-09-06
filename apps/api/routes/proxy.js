@@ -6,6 +6,34 @@ const API = require("../classes/api-loader");
 
 const router = express.Router();
 
+async function siloImage(req, res) {
+  const id = req.query.id;
+  if (typeof id !== 'string' || !id) return res.status(400).send('Image ID is required');
+  try {
+    const imageType = req.path.includes('Backdrop') ? 'Backdrop' : 'Primary';
+    const imageUrl = req.path.startsWith('/Users/') ? null : await API.getImageUrl(id, imageType);
+    if (imageUrl) {
+      const url = new URL(imageUrl);
+      if (['http:', 'https:'].includes(url.protocol) && !url.username && !url.password) {
+        res.set('Cache-Control', 'private, no-store');
+        return res.redirect(302, url.href);
+      }
+    }
+  } catch {
+    // A missing poster must not prevent displaying a valid playback session.
+  }
+  res.type('image/svg+xml').send('<svg xmlns="http://www.w3.org/2000/svg" width="280" height="420" viewBox="0 0 280 420"><rect width="280" height="420" fill="#14202b"/><text x="140" y="218" text-anchor="middle" fill="#b8c9d6" font-family="sans-serif" font-size="28">Silo</text></svg>');
+}
+
+router.use((req, res, next) => {
+  if (!API.isSilo) return next();
+  if (/^\/(Items|Users)\/Images\/(Primary|Backdrop)\/?$/.test(req.path)) return siloImage(req, res);
+  if (req.path.startsWith('/Plugins/') || req.path.startsWith('/web/assets/img/devices')) {
+    return res.sendStatus(404);
+  }
+  next();
+});
+
 function toUnsignedInt(value, fallback) {
   const parsed = Number.parseInt(String(value || ""), 10);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
@@ -275,8 +303,12 @@ router.get("/getSessions", async (req, res) => {
     res.send(sessions);
   } catch (error) {
     res.status(503);
-    res.send(error);
+    res.json({ error: 'Activity is unavailable. Check the server connection and administrator API key.' });
   }
+});
+
+router.get('/sessionStatus', (_req, res) => {
+  res.json(API.isSilo ? require('../classes/session-status').get() : { state: 'connected', lastSuccessAt: null });
 });
 
 router.get("/getAdminUsers", async (req, res) => {

@@ -97,7 +97,7 @@ export default function SettingsAbout() {
   const [releaseMenuOpen, setReleaseMenuOpen] = useState(false);
   const [contributors, setContributors] = useState([]);
   const [contributorsMessage, setContributorsMessage] = useState("Loading GitHub profiles...");
-  const updateMessage = data.message === "JellyGlance is up to date" ? "Up to date" : data.message;
+  const updateMessage = data.message === "Silo Barracks is up to date" ? "Up to date" : data.message;
   const selectedRelease = releaseData.releases.find((release) => String(release.id) === selectedReleaseId) || releaseData.releases[0];
   const selectedReleaseSections = parseReleaseBody(selectedRelease?.body);
   const projectOwner = contributors.find((contributor) => contributor.login?.toLowerCase() === PROJECT_OWNER_LOGIN.toLowerCase()) || PROJECT_OWNER_FALLBACK;
@@ -183,8 +183,8 @@ export default function SettingsAbout() {
     <div className="about-page">
       <header className="about-header">
         <p>About</p>
-        <h1>JellyGlance</h1>
-        <span>Local Jellyfin visibility for sessions, libraries, requests, downloads, transcodes, automation health, and scheduled jobs.</span>
+        <h1>Silo Barracks</h1>
+        <span>Active Silo viewers, native server sessions, and observed playback history.</span>
       </header>
 
       <main className="about-layout">
@@ -193,12 +193,12 @@ export default function SettingsAbout() {
             <div className="about-project-copy">
               <h2>Project</h2>
               <p>
-                JellyGlance is a self-hosted dashboard for people running Jellyfin. It pulls the common admin checks into
-                one interface: current playback, recent library changes, watch history, health signals, integrations, and
-                background tasks, with customisable navigation and Home widgets for each browser.
+                Silo Barracks connects to Silo Server’s native API to show active accounts and profiles,
+                playback progress and stream information. Observed playback is stored in PostgreSQL.
+                The dashboard is derived from JellyGlance by Nerdy-Technician and contributors.
               </p>
 
-              <div className="about-feature-grid" aria-label="JellyGlance capabilities">
+              <div className="about-feature-grid" aria-label="Silo Barracks capabilities">
                 <article>
                   <PulseLineIcon />
                   <strong>Live status</strong>
@@ -254,7 +254,7 @@ export default function SettingsAbout() {
               <section className="about-note">
                 <h2>How it works</h2>
                 <p>
-                  JellyGlance runs beside your Jellyfin server and talks to the configured APIs with your saved settings. The
+                  Silo Barracks runs beside your Jellyfin server and talks to the configured APIs with your saved settings. The
                   dashboard keeps local cache and task history so pages can show useful operational context without making
                   every view feel like a raw API browser. Optional GitHub data powers release notes and project profile cards
                   on this page.

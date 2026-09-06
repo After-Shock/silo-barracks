@@ -16,6 +16,15 @@ import Tooltip from "@mui/material/Tooltip";
 import IpInfoModal from "../ip-info";
 import { Trans } from "react-i18next";
 import baseUrl from "../../../lib/baseurl";
+import siloIcon from "../../images/silo-icon.png";
+
+function publicSiloPoster(value) {
+  try {
+    const url = new URL(value);
+    if (["https:", "http:"].includes(url.protocol) && !url.username && !url.password) return url.href;
+  } catch { /* Missing artwork uses the local Silo placeholder. */ }
+  return siloIcon;
+}
 
 function ticksToTimeString(ticks) {
   // Convert ticks to seconds
@@ -89,6 +98,11 @@ function SessionCard(props) {
     : props.data.session.NowPlayingItem.Id;
   const [loadBackdrop, setLoadBackdrop] = useState(false);
   const [sessionModalVisible, setSessionModalVisible] = useState(false);
+  const isSilo = session.MediaServerProvider === "silo";
+  const posterUrl = isSilo ? publicSiloPoster(nowPlaying.SiloPosterUrl)
+    : `${baseUrl}/proxy/Items/Images/Primary?id=${encodeURIComponent(mediaItemId)}&fillHeight=420&fillWidth=280&quality=68`;
+  const backdropUrl = isSilo ? posterUrl
+    : `${baseUrl}/proxy/Items/Images/Backdrop?id=${encodeURIComponent(mediaItemId)}&fillWidth=1200&quality=58`;
 
   useEffect(() => {
     const frameId = window.requestAnimationFrame(() => setLoadBackdrop(true));
@@ -97,7 +111,7 @@ function SessionCard(props) {
 
   const cardStyle = {
     backgroundImage: loadBackdrop
-      ? `url(/proxy/Items/Images/Backdrop?id=${mediaItemId}&fillWidth=560&quality=38), linear-gradient(135deg, var(--primary-color), #0b1119)`
+      ? `url(${JSON.stringify(backdropUrl)}), linear-gradient(135deg, var(--primary-color), #0b1119)`
       : "linear-gradient(135deg, rgba(var(--primary-rgb), 0.28), #0b1119)",
     backgroundSize: "cover",
   };
@@ -207,12 +221,12 @@ function SessionCard(props) {
           <div
             className="session-popout-hero"
             style={{
-              backgroundImage: `linear-gradient(90deg, rgba(7, 9, 13, 0.96), rgba(7, 9, 13, 0.68), rgba(7, 9, 13, 0.3)), url(/proxy/Items/Images/Backdrop?id=${mediaItemId}&fillWidth=1200&quality=58)`,
+              backgroundImage: `linear-gradient(90deg, rgba(7, 9, 13, 0.96), rgba(7, 9, 13, 0.68), rgba(7, 9, 13, 0.3)), url(${JSON.stringify(backdropUrl)})`,
             }}
           >
             <img
               className="session-popout-poster"
-              src={`${baseUrl}/proxy/Items/Images/Primary?id=${mediaItemId}&fillHeight=420&fillWidth=280&quality=68`}
+              src={posterUrl}
               loading="lazy"
               decoding="async"
               alt=""
@@ -238,6 +252,7 @@ function SessionCard(props) {
           </div>
           <div className="session-popout-grid">
             <SessionDetailItem label="Viewer" value={session.UserName} />
+            {session.ProfileName && <SessionDetailItem label="Profile" value={session.ProfileName} />}
             <SessionDetailItem label="Device" value={session.DeviceName} />
             <SessionDetailItem label="Client" value={`${session.Client || "Unknown"} ${session.ApplicationVersion || ""}`.trim()} />
             {!hideIpAddress ? <SessionDetailItem label="IP address" value={session.RemoteEndPoint} /> : null}
@@ -260,12 +275,10 @@ function SessionCard(props) {
                   ? "stat-card-image-audio rounded-0 rounded-start"
                   : "session-card-item-image"
               }
-              src={
-                baseUrl +
-                "/proxy/Items/Images/Primary?id=" +
-                mediaItemId +
-                "&fillHeight=240&fillWidth=160&quality=45"
-              }
+              src={posterUrl}
+              onError={isSilo ? (event) => {
+                if (event.currentTarget.getAttribute('src') !== siloIcon) event.currentTarget.src = siloIcon;
+              } : undefined}
               loading="lazy"
               decoding="async"
             />
@@ -483,6 +496,7 @@ function SessionCard(props) {
           <Tooltip title={props.data.session.UserName}>
             <Link to={`/users/${props.data.session.UserId}`} className="item-name session-user-name">
               {props.data.session.UserName}
+              {session.ProfileName && <small> · {session.ProfileName}</small>}
             </Link>
           </Tooltip>
           {props.data.session.UserPrimaryImageTag !== undefined ? (

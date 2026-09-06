@@ -25,8 +25,8 @@ function getNotes(version) {
   return releaseNotes[version] || [
     {
       icon: MagicLineIcon,
-      title: "JellyGlance updated",
-      body: "Fresh improvements are ready. Keep an eye on Activity, Settings, and the dashboard for new polish.",
+      title: "Silo Barracks activity monitoring",
+      body: "Native Silo sessions now power live activity and observed playback history. Built on the JellyGlance dashboard.",
     },
   ];
 }
@@ -113,7 +113,7 @@ export default function WhatsNewModal({ enabled = true }) {
             <MagicLineIcon size={17} />
             What&apos;s new
           </span>
-          <h2>JellyGlance {version}</h2>
+          <h2>Silo Barracks {version}</h2>
           <p>A quick look at the newest bits before you dive back in.</p>
         </div>
         <div className="whats-new-list">

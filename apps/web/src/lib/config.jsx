@@ -9,7 +9,7 @@ class Config {
           Authorization: `Bearer ${token}`,
         },
       });
-      const { JF_HOST, APP_USER, REQUIRE_LOGIN, settings, IS_JELLYFIN } = response.data;
+      const { JF_HOST, APP_USER, REQUIRE_LOGIN, settings, IS_JELLYFIN, IS_SILO, MEDIA_SERVER_PROVIDER } = response.data;
       return {
         hostUrl: JF_HOST,
         username: APP_USER,
@@ -17,6 +17,8 @@ class Config {
         requireLogin: REQUIRE_LOGIN,
         settings: settings,
         IS_JELLYFIN: IS_JELLYFIN,
+        IS_SILO,
+        MEDIA_SERVER_PROVIDER,
       };
     } catch (error) {
       // console.log(error);

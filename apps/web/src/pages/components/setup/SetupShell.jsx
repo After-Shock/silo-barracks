@@ -6,23 +6,21 @@ import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
 import DashboardLineIcon from "remixicon-react/DashboardLineIcon";
 import Database2LineIcon from "remixicon-react/Database2LineIcon";
 import Key2LineIcon from "remixicon-react/Key2LineIcon";
-import logo from "../../images/icon-b-512.png";
-import jellyfinLogo from "../../images/jellyfin.svg";
-import projectText from "../../images/project-text.png";
+import logo from "../../images/silo-icon.png";
 import AuthArtworkBackground from "../AuthArtworkBackground";
 
 const steps = [
   {
     id: 1,
-    title: "Jellyfin server",
+    title: "Silo Server",
     hint: "Connect analytics",
     icon: ServerLineIcon,
-    logo: jellyfinLogo,
+    logo,
   },
   {
     id: 2,
     title: "Admin access",
-    hint: "Quick Connect or OIDC",
+    hint: "Local login or OIDC",
     icon: AdminLineIcon,
   },
   {
@@ -48,7 +46,7 @@ const steps = [
 const features = [
   {
     title: "Playback intelligence",
-    text: "Turn Jellyfin activity into fast, useful library and user insights.",
+    text: "See active Silo viewers and turn observed playback into user insights.",
     icon: DashboardLineIcon,
   },
   {
@@ -92,8 +90,8 @@ export default function SetupShell({ step, eyebrow, title, description, children
             </div>
             <div>
               <p className="setup-brand-kicker">Initial Setup</p>
-              <img className="setup-brand-wordmark" src={projectText} alt="JellyGlance" />
-              <p className="setup-brand-author">by Nerdy-Technician</p>
+              <strong className="silo-wordmark">Silo Barracks</strong>
+              <p className="setup-brand-author">Activity for Silo Server</p>
             </div>
           </div>
 

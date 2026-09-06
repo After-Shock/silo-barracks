@@ -1,5 +1,6 @@
 import { Tabs, Tab } from "react-bootstrap";
 import { lazy, Suspense, useEffect, useState } from "react";
+import Config from "../lib/config";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import "./css/settings/settings.css";
@@ -235,6 +236,8 @@ function getSettingsPath(tabName, integrationTab = "") {
 }
 
 export default function Settings() {
+  const [isSilo, setIsSilo] = useState(true);
+  useEffect(() => { Config.getConfig().then(value => setIsSilo(value.IS_SILO)).catch(() => {}); }, []);
   const location = useLocation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(() => getSettingsInitialTab(location));
@@ -317,12 +320,14 @@ export default function Settings() {
           </SettingsPane>
         );
       case "tabJellyfinDevices":
+        if (isSilo) return <p>Device management is not supported by Silo Barracks.</p>;
         return (
           <SettingsPane>
             <JellyfinAdminSettings view="devices" />
           </SettingsPane>
         );
       case "tabJellyfinPlugins":
+        if (isSilo) return <p>Jellyfin plugins are not supported by Silo Barracks.</p>;
         return (
           <SettingsPane>
             <JellyfinAdminSettings view="plugins" />
@@ -417,7 +422,7 @@ export default function Settings() {
     <div className="settings has-mobile-settings-menu">
       <div className="settings-mobile-menu">
         <div className="settings-mobile-menu-list" role="tablist" aria-label="Settings sections">
-          {settingsTabItems.map(({ key, Icon, label }) => (
+          {settingsTabItems.filter(({ key }) => !isSilo || !['tabJellyfinDevices', 'tabJellyfinPlugins'].includes(key)).map(({ key, Icon, label }) => (
             <button
               key={key}
               type="button"
@@ -436,7 +441,7 @@ export default function Settings() {
         {settingsTabGroups.map((group) => (
           <div className="settings-sidebar-group" key={group.label}>
             <span className="settings-sidebar-category">{group.label}</span>
-            {group.items.map(({ key }) => (
+            {group.items.filter(({ key }) => !isSilo || !['tabJellyfinDevices', 'tabJellyfinPlugins'].includes(key)).map(({ key }) => (
               <button
                 key={key}
                 type="button"

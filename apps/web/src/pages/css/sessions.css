@@ -773,3 +773,13 @@
     display: none !important;
   }
 }
+.session-connection-status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid #ba9457;
+  border-radius: 0.75rem;
+  background: rgba(186, 148, 87, 0.12);
+}

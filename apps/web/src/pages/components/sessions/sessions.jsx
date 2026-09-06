@@ -12,6 +12,9 @@ import {
   fetchActiveSessions,
   getCachedActiveSessions,
   subscribeActiveSessions,
+  getSessionStatus,
+  cacheSessionStatus,
+  subscribeSessionStatus,
 } from "../../../lib/session-cache";
 import {
   ACTIVE_SESSION_IP_PRIVACY_EVENT,
@@ -22,6 +25,7 @@ import {
 
 function Sessions({ surface = "home" }) {
   const [data, setData] = useState(() => getCachedActiveSessions());
+  const [status, setStatus] = useState(getSessionStatus);
   const [ipPrivacy, setIpPrivacy] = useState(() => getActiveSessionIpPrivacy());
   const [config, setConfig] = useState(() => {
     try {
@@ -50,6 +54,7 @@ function Sessions({ surface = "home" }) {
 
   useEffect(() => {
     const unsubscribe = subscribeActiveSessions(setData);
+    const unsubscribeStatus = subscribeSessionStatus(setStatus);
     const handleSessions = (sessionData) => {
       if (typeof sessionData === "object" && Array.isArray(sessionData)) {
         cacheActiveSessions(sessionData);
@@ -57,12 +62,22 @@ function Sessions({ surface = "home" }) {
     };
 
     socket.on("sessions", handleSessions);
+    socket.on('session-status', cacheSessionStatus);
+    const disconnected = () => cacheSessionStatus({ state: 'unavailable', message: 'Live updates disconnected. Retrying…' });
+    socket.on('disconnect', disconnected);
 
-    fetchActiveSessions().catch((error) => console.log(error));
+    const refresh = () => fetchActiveSessions().catch(() => {});
+    refresh();
+    // REST fallback also recovers when the dashboard socket is unavailable.
+    const timer = setInterval(refresh, 15000);
 
     return () => {
       unsubscribe();
+      unsubscribeStatus();
+      clearInterval(timer);
       socket.off("sessions", handleSessions);
+      socket.off('session-status', cacheSessionStatus);
+      socket.off('disconnect', disconnected);
     };
   }, []);
 
@@ -83,7 +98,16 @@ function Sessions({ surface = "home" }) {
     }
   }, [config]);
 
-  if (!config && !data) {
+  const unavailable = ['unavailable', 'unconfigured', 'storage-unavailable'].includes(status.state);
+  const statusNotice = unavailable ? (
+    <div className="session-connection-status" role="status">
+      <strong>{status.state === 'unconfigured' ? 'Connect Silo Server to see activity.' : status.state === 'storage-unavailable' ? 'Activity history unavailable' : 'Activity connection unavailable'}</strong>
+      {status.message && <span>{status.message}</span>}
+      {status.lastSuccessAt && <small>Last update: {new Date(status.lastSuccessAt).toLocaleTimeString()}</small>}
+    </div>
+  ) : null;
+
+  if (!data && !unavailable) {
     return (
       <div className="sessions-widget sessions-widget-loading">
         <h1 className="my-3">
@@ -97,21 +121,23 @@ function Sessions({ surface = "home" }) {
     );
   }
 
-  if ((!data && config) || data.length === 0) {
+  if (!data || data.length === 0) {
     return (
       <div className="sessions-widget sessions-widget-empty">
         <h1 className="my-3">
           Active Sessions
         </h1>
-        <div className="sessions-empty-state">
+        {statusNotice}
+        {!unavailable && <div className="sessions-empty-state">
           No Active Sessions Found
-        </div>
+        </div>}
       </div>
     );
   }
 
   return (
     <div className="sessions-widget">
+      {statusNotice}
       <h1 className="my-3">
         Active Sessions
       </h1>

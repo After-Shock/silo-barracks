@@ -1,6 +1,6 @@
 {
-  "short_name": "JellyGlance",
-  "name": "JellyGlance",
+  "short_name": "Barracks",
+  "name": "Silo Barracks",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,12 +8,12 @@
       "type": "image/x-icon"
     },
     {
-      "src": "icon-b-192.png",
+      "src": "silo-icon-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "icon-b-512.png",
+      "src": "silo-icon-512.png",
       "type": "image/png",
       "sizes": "512x512"
     }

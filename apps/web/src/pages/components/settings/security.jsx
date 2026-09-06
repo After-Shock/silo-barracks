@@ -39,12 +39,13 @@ const authModes = [
   {
     id: "local",
     title: "Local",
-    text: "Use a JellyGlance username and password.",
+    text: "Use a Silo Barracks username and password.",
     Icon: UserSettingsLineIcon,
   },
 ];
 
 export default function SecuritySettings() {
+  const [isSilo, setIsSilo] = useState(true);
   const [authMode, setAuthMode] = useState("quick-connect");
   const [showOidcSecret, setShowOidcSecret] = useState(false);
   const [oidcValues, setOidcValues] = useState({});
@@ -60,6 +61,7 @@ export default function SecuritySettings() {
     const fetchConfig = async () => {
       try {
         const newConfig = await Config.getConfig(true);
+        setIsSilo(newConfig.IS_SILO === true);
         const nextAuth = newConfig.settings?.auth || {};
         const nextMode = nextAuth.mode || (newConfig.requireLogin ? "local" : "quick-connect");
 
@@ -172,7 +174,7 @@ export default function SecuritySettings() {
         <div className="security-auth-header">
           <div>
             <h2>Active Sessions privacy</h2>
-            <p>Choose where JellyGlance hides viewer IP addresses in Active Sessions cards and details.</p>
+            <p>Choose where Silo Barracks hides viewer IP addresses in Active Sessions cards and details.</p>
           </div>
           <strong>{activePrivacyMode.title}</strong>
         </div>
@@ -199,13 +201,13 @@ export default function SecuritySettings() {
         <div className="security-auth-header">
           <div>
             <h2>Authentication</h2>
-            <p>Choose how JellyGlance signs users in after Jellyfin setup.</p>
+            <p>Choose how Silo Barracks signs users in after Jellyfin setup.</p>
           </div>
           <strong>{activeAuthMode.title}</strong>
         </div>
 
         <div className="security-auth-grid" role="radiogroup" aria-label="Authentication mode">
-          {authModes.map(({ id, title, text, Icon }) => (
+          {authModes.filter(mode => !isSilo || mode.id !== 'quick-connect').map(({ id, title, text, Icon }) => (
             <button
               key={id}
               type="button"
@@ -225,7 +227,7 @@ export default function SecuritySettings() {
           <div className="security-auth-panel">
             <strong>Jellyfin Login / Quick Connect selected</strong>
             <p>
-              JellyGlance will send users through Jellyfin Quick Connect. No local admin username or password is needed for
+              Silo Barracks will send users through Jellyfin Quick Connect. No local admin username or password is needed for
               this mode.
             </p>
           </div>
@@ -284,7 +286,7 @@ export default function SecuritySettings() {
           <div className="security-auth-panel">
             <strong>Local login selected</strong>
             <p>
-              Local JellyGlance accounts are created and managed on the Users page. Add users there, assign them Admin,
+              Local Silo Barracks accounts are created and managed on the Users page. Add users there, assign them Admin,
               Manager, Viewer, or Disabled roles, and reset passwords without changing the authentication mode here.
             </p>
             <Link className="security-users-link" to="/users">

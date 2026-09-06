@@ -34,6 +34,16 @@ const {
 const dayjs = require("dayjs");
 
 const router = express.Router();
+
+router.use((req, res, next) => {
+  if (!require('../classes/provider').isSupportedTask(req.query.task || req.body?.task)) {
+    return res.status(501).json({ error: 'Jellyfin Playback Reporting import is not supported by Silo.' });
+  }
+  if (API.isSilo && (req.path.startsWith('/jellyfin/') || req.path.startsWith('/server-management/'))) {
+    return res.status(501).json({ error: 'Jellyfin management is not available for Silo Server.' });
+  }
+  next();
+});
 const DEFAULT_ACCESS_ROLES = ["Owner", "Admin", "Manager", "Viewer", "Disabled"];
 const REQUEST_CACHE_TTL_MS = 45000;
 const SEERR_MEDIA_DETAIL_CACHE_TTL_MS = 10 * 60 * 1000;
@@ -79,7 +89,8 @@ function normalizeNotificationSettings(value = {}) {
 
 function queueFirstRunJellyfinTasks() {
   const taskManager = new TaskManager().getInstance();
-  const taskQueue = ["JellyfinSync", "PartialJellyfinSync", "JellyfinPlaybackReportingPluginSync", "RefreshDashboardStats"];
+  const taskQueue = ["JellyfinSync", "PartialJellyfinSync", "JellyfinPlaybackReportingPluginSync", "RefreshDashboardStats"]
+    .filter(task => require('../classes/provider').isSupportedTask(task));
   let index = 0;
 
   const startNextTask = () => {
@@ -3820,6 +3831,8 @@ router.get("/getconfig", async (req, res) => {
       settings,
       REQUIRE_LOGIN: config.REQUIRE_LOGIN,
       IS_JELLYFIN: config.IS_JELLYFIN,
+      IS_SILO: config.IS_SILO,
+      MEDIA_SERVER_PROVIDER: config.MEDIA_SERVER_PROVIDER,
     };
 
     res.send(payload);
@@ -4289,6 +4302,9 @@ router.post("/setRequireLogin", async (req, res) => {
 router.post("/setAuthMode", async (req, res) => {
   try {
     const { mode, username, password, issuerUrl, clientId, clientSecret, redirectUri } = req.body;
+    if (API.isSilo && mode === 'quick-connect') {
+      return res.status(400).json({ errorMessage: 'Use local login or OIDC for Silo Barracks.' });
+    }
     const config = await new configClass().getConfig();
 
     if (config.error) {

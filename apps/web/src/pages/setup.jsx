@@ -6,7 +6,7 @@ import { InputGroup } from "react-bootstrap";
 
 import EyeFillIcon from "remixicon-react/EyeFillIcon";
 import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
-import jellyfinLogo from "./images/jellyfin.svg";
+import jellyfinLogo from "./images/silo-icon.png";
 
 import "./css/setup.css";
 import i18next from "i18next";
@@ -28,10 +28,10 @@ function Setup() {
 
   async function testConnection() {
     setProcessing(true);
-    setConnectionTest({ status: "testing", message: "Testing Jellyfin connection..." });
+    setConnectionTest({ status: "testing", message: "Testing Silo administrator access..." });
 
     try {
-      const response = await axios.post("/auth/test-jellyfin", formValues, {
+      const response = await axios.post("/auth/test-silo", formValues, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -47,7 +47,7 @@ function Setup() {
         testedKey: formValues.JF_API_KEY,
         message: `Connected to ${response.data.cleanedUrl || formValues.JF_HOST}`,
       });
-      setsubmitButtonText("Save Jellyfin Details");
+      setsubmitButtonText("Save Silo Details");
     } catch (error) {
       const errorMessage =
         error.response?.data?.errorMessage ||
@@ -69,7 +69,7 @@ function Setup() {
     const testedKey = connectionTest.testedKey;
 
     if (connectionTest.status !== "success" || testedHost !== currentHost || testedKey !== formValues.JF_API_KEY) {
-      setConnectionTest({ status: "error", message: "Test the Jellyfin connection before saving." });
+      setConnectionTest({ status: "error", message: "Test the Silo connection before saving." });
       setsubmitButtonText("Test connection first");
       setProcessing(false);
       return;
@@ -106,8 +106,8 @@ function Setup() {
     <SetupShell
       step={1}
       eyebrow="Media server connection"
-      title="Connect Jellyfin"
-      description="Add your Jellyfin URL and API key. JellyGlance will validate the connection, save the settings, and start the first sync."
+      title="Connect Silo Server"
+      description="Enter your Silo server URL and an administrator API key (sa_…). Barracks uses Silo’s native API to show active viewers and record playback activity."
     >
         <div className="setup-jellyfin-logo" aria-hidden="true">
           <img src={jellyfinLogo} alt="" />

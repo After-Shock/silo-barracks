@@ -1,4 +1,5 @@
 const db = require("../db");
+const { connectionConfig } = require('./provider');
 
 class Config {
   async getConfig() {
@@ -18,16 +19,14 @@ class Config {
       const _config = config[0];
 
       return {
-        JF_HOST: process.env.JF_HOST ?? _config.JF_HOST,
+        ...connectionConfig(_config),
         JF_EXTERNAL_HOST: _config.settings?.EXTERNAL_URL,
-        JF_API_KEY: process.env.JF_API_KEY ?? _config.JF_API_KEY,
         APP_USER: _config.APP_USER,
         APP_PASSWORD: _config.APP_PASSWORD,
         REQUIRE_LOGIN: _config.REQUIRE_LOGIN,
         settings: _config.settings,
         api_keys: _config.api_keys,
         state: state,
-        IS_JELLYFIN: (process.env.IS_EMBY_API || "false").toLowerCase() === "false",
       };
     } catch (error) {
       console.log("Error fetching config:", error);
@@ -53,9 +52,8 @@ class Config {
       //state 2 = Jellyfin configured and admin access configured
 
       if (Configured.length > 0) {
-        const hasJellyfinApiKey =
-          Configured[0].JF_API_KEY !== null &&
-          !(typeof Configured[0].JF_API_KEY === "string" && Configured[0].JF_API_KEY.trim() === "");
+        const key = connectionConfig(Configured[0]).JF_API_KEY;
+        const hasJellyfinApiKey = typeof key === 'string' && key.trim() !== '';
         const hasAdminUser = Configured[0].APP_USER !== null && Configured[0].APP_USER !== "";
 
         if (hasJellyfinApiKey && hasAdminUser) state = 2;

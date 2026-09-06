@@ -95,7 +95,7 @@ function App() {
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorFlag, seterrorFlag] = useState(false);
-  const [startupErrorMessage, setStartupErrorMessage] = useState("Error: Unable to connect to JellyGlance Backend");
+  const [startupErrorMessage, setStartupErrorMessage] = useState("Error: Unable to connect to Silo Barracks Backend");
   const [notificationSettings, setNotificationSettings] = useState(getStoredNotificationSettings);
   const token = localStorage.getItem("token");
   const shouldShowFirstRunExtras =
@@ -160,19 +160,19 @@ function App() {
         } else if (message && message.type === "Update") {
           toast.update(toastId, {
             render: message?.message || message,
-            type: toast.TYPE.INFO,
+            type: "info",
             ...options,
           });
         } else if (message && message.type === "Error") {
           toast.update(toastId, {
             render: message?.message || message,
-            type: toast.TYPE.ERROR,
+            type: "error",
             ...toastOptions(notificationSettings),
           });
         } else if (message && message.type === "Success") {
           toast.update(toastId, {
             render: message?.message || message,
-            type: toast.TYPE.SUCCESS,
+            type: "success",
             ...toastOptions(notificationSettings),
           });
         }
@@ -243,7 +243,7 @@ function App() {
         .catch((error) => {
           console.log(error);
           const message = error.response?.data?.message || error.response?.data?.error || error.message;
-          setStartupErrorMessage(error.response?.status ? `Error ${error.response.status}: ${message}` : "Error: Unable to connect to JellyGlance Backend");
+          setStartupErrorMessage(error.response?.status ? `Error ${error.response.status}: ${message}` : "Error: Unable to connect to Silo Barracks Backend");
           seterrorFlag(true);
         });
     }

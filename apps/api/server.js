@@ -674,7 +674,11 @@ try {
       setupWebSocketServer(server, BASE_NAME);
       server.listen(PORT, LISTEN_IP, async () => {
         console.log(`[JellyGlance] Server listening on http://${LISTEN_IP}:${PORT}`);
-        ActivityMonitor.ActivityMonitor(1000);
+        if (require('./classes/provider').getProvider() === 'silo') {
+          require('./tasks/SiloActivityMonitor').startSiloActivityMonitor();
+        } else {
+          ActivityMonitor.ActivityMonitor(1000);
+        }
         new TaskManager();
         new TaskScheduler();
         // new WebhookScheduler();
