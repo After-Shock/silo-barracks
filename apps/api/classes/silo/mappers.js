@@ -133,7 +133,7 @@ function itemType(type) {
 function itemToJellyfin(row, serverId) {
   const type = itemType(row.type);
   const release = row.release_date || row.first_air_date || row.air_date;
-  return {
+  const item = {
     Id: String(row.content_id), Name: row.title || '', ServerId: serverId || '', Type: type,
     IsFolder: ['Series', 'Season'].includes(type), PremiereDate: release || undefined,
     DateCreated: row.added_at || release || undefined, ProductionYear: row.year || undefined,
@@ -143,6 +143,14 @@ function itemToJellyfin(row, serverId) {
     ImageTags: {}, BackdropImageTags: [], MediaSources: [], SiloPosterUrl: row.poster_url || row.still_url || undefined,
     SiloBackdropUrl: row.backdrop_url || undefined,
   };
+  if (type === 'Episode') {
+    item.SeriesId = row.series_id ? String(row.series_id) : undefined;
+    item.SeriesName = row.series_title || row.series_name || undefined;
+    item.IndexNumber = row.episode_number ?? undefined;
+    item.ParentIndexNumber = row.season_number ?? undefined;
+    item.IsFolder = false;
+  }
+  return item;
 }
 
 function seasonToJellyfin(row, seriesId, seriesName, serverId) {

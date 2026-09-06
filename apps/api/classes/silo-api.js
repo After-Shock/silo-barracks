@@ -208,7 +208,7 @@ class SiloAPI {
       limit: params.increment ?? params.limit ?? 100 });
     const result = items.map(row => itemToJellyfin(row, serverId));
     for (const row of items.filter(item => String(item.type).toLowerCase() === 'series')) {
-      const seasons = await this.getSeasons(row.content_id, false);
+      const seasons = await this.getSeasons(row.content_id, false, row.title);
       result.push(...seasons);
       for (const season of seasons) result.push(...await this.getEpisodes({ SeriesId: row.content_id, SeasonId: season.Id }, false));
     }
@@ -233,7 +233,7 @@ class SiloAPI {
     return result;
   }
 
-  async getSeasons(SeriesId, refreshConfig = true) {
+  async getSeasons(SeriesId, refreshConfig = true, seriesName) {
       if (refreshConfig) await this._configured(true);
       const cached = this.seasonCache.get(String(SeriesId));
       if (cached && cached.expiresAt > Date.now()) return cached.value;
@@ -241,7 +241,7 @@ class SiloAPI {
       if (!body || !Array.isArray(body.seasons)) throw new SiloRequestError('Invalid Silo season response');
       const detail = this._cachedDetail(SeriesId);
       const serverId = await this._serverId();
-      const seasons = body.seasons.map(row => seasonToJellyfin(row, SeriesId, detail?.title, serverId));
+      const seasons = body.seasons.map(row => seasonToJellyfin(row, SeriesId, seriesName || detail?.title, serverId));
       this.seasonCache.set(String(SeriesId), { value: seasons, expiresAt: Date.now() + DETAIL_CACHE_TTL_MS });
       while (this.seasonCache.size > DETAIL_CACHE_MAX) this.seasonCache.delete(this.seasonCache.keys().next().value);
       return seasons;
@@ -256,7 +256,7 @@ class SiloAPI {
       if (!body || !Array.isArray(body.episodes)) throw new SiloRequestError('Invalid Silo episode response');
       const detail = this._cachedDetail(SeriesId);
       const serverId = await this._serverId();
-      return body.episodes.map(row => episodeToJellyfin(row, SeriesId, season.Id, detail?.title, serverId));
+      return body.episodes.map(row => episodeToJellyfin(row, SeriesId, season.Id, season.SeriesName || detail?.title, serverId));
   }
 
   async getRecentlyAdded({ libraryid, limit = 20 } = {}) {

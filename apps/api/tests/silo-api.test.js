@@ -342,11 +342,35 @@ test('maps native catalog pagination and traverses native season and episode ide
     ['movie-1', 'Movie'], ['series-1', 'Series'], ['season-native-1', 'Season'], ['episode-native-1', 'Episode'],
   ]);
   assert.equal(rows[2].SeriesId, 'series-1');
+  assert.equal(rows[2].SeriesName, 'Series');
   assert.equal(rows[3].SeriesId, 'series-1');
   assert.equal(rows[3].SeasonId, 'season-native-1');
+  assert.equal(rows[3].SeriesName, 'Series');
   assert.equal(rows[3].RunTimeTicks, 26_400_000_000);
   assert.equal(rows[0].MediaSources[0].Id, '11');
   assert.equal(rows[3].MediaSources[0].ItemId, 'episode-native-1');
+});
+
+test('maps direct native episode details with series metadata and episode indexes', async t => {
+  const fixture = await fixtureServer((req, res) => {
+    if (req.url === '/proxy/api/v1/health') return json(res, 200, { status: 'ok', server_id: 'server' });
+    if (req.url === '/proxy/api/v1/catalog/items/episode-detail-1') return json(res, 200, {
+      content_id: 'episode-detail-1', type: 'episode', title: 'Pilot', runtime: 42,
+      series_id: 'series-detail-1', series_title: 'Detail Series',
+      season_number: 1, episode_number: 3,
+      versions: [{ file_id: 33, duration: 2520, bitrate: 2800 }],
+    });
+    json(res, 404, {});
+  });
+  t.after(fixture.close);
+
+  const [item] = await apiFor(fixture.url).getItemsByID({ ids: ['episode-detail-1'] });
+  assert.equal(item.Type, 'Episode');
+  assert.equal(item.SeriesId, 'series-detail-1');
+  assert.equal(item.SeriesName, 'Detail Series');
+  assert.equal(item.ParentIndexNumber, 1);
+  assert.equal(item.IndexNumber, 3);
+  assert.equal(item.MediaSources[0].ItemId, 'episode-detail-1');
 });
 
 test('maps detail versions for item info and resolves only catalog-owned image URLs', async t => {
