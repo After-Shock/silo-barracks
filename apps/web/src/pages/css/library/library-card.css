@@ -2,7 +2,7 @@
 
 .lib-card {
   overflow: hidden;
-  border: 1px solid var(--barracks-border-subtle) !important;
+  border: 1px solid var(--barracks-border-raised) !important;
   border-radius: 16px !important;
   background: var(--barracks-surface-raised) !important;
   color: var(--barracks-text-raised);
@@ -12,7 +12,7 @@
 
 .lib-card:hover {
   transform: translateY(-3px);
-  border-color: var(--barracks-border-strong) !important;
+  border-color: var(--barracks-border-raised) !important;
   box-shadow: 0 30px 70px var(--barracks-scrim);
 }
 
@@ -72,7 +72,7 @@
   flex: 0 0 46px;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--barracks-border-strong);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 14px;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
@@ -181,7 +181,7 @@
 .library-card-stat-grid > div,
 .library-card-readout > div {
   min-width: 0;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 12px;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
@@ -296,14 +296,11 @@
   
 .form-switch .form-check-input:checked {
   background-color: var(--barracks-action);
+  border-color: var(--barracks-action) !important;
 }
 
-.form-switch .form-check-input:hover {
+.form-switch .form-check-input:hover:not(:checked) {
   box-shadow: none;
-  border-color: var(--barracks-border-strong) !important;
-}
-
-.form-switch .form-check-input:focus-visible {
   border-color: var(--barracks-border-strong) !important;
 }
 
@@ -314,7 +311,7 @@
   gap: 14px;
   min-height: 86px;
   padding: 10px 14px 10px 10px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 14px;
   background: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
@@ -353,7 +350,7 @@
   height: 42px;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--barracks-border-strong);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 12px;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
@@ -404,7 +401,7 @@
 .library-list-stats > div {
   min-width: 0;
   padding: 9px 10px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 10px;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
@@ -483,7 +480,7 @@
 
 .selector-library-card {
   min-height: 0;
-  border-color: var(--barracks-border-strong) !important;
+  border-color: var(--barracks-border-inset) !important;
   background: var(--barracks-surface-inset) !important;
   color: var(--barracks-text-inset);
   box-shadow: none;

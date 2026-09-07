@@ -28,7 +28,7 @@
   gap: 22px;
   min-height: 138px;
   padding: 26px;
-  border: 1px solid var(--barracks-border-strong);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 20px;
   background: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
@@ -82,7 +82,7 @@
   align-items: center;
   gap: 8px;
   margin: 0 !important;
-  border: 1px solid var(--barracks-border-strong) !important;
+  border: 1px solid var(--barracks-border-inset) !important;
   border-radius: 12px !important;
   color: var(--barracks-text-inset) !important;
   background: var(--barracks-surface-inset) !important;
@@ -126,7 +126,7 @@
   height: 3px;
   margin-top: 9px;
   border-radius: 99px;
-  background: var(--barracks-border-strong);
+  background: var(--barracks-border-raised);
 }
 
 .library-detail-overview .global-stats-container {
@@ -134,7 +134,7 @@
   grid-auto-rows: auto;
   gap: 14px;
   padding: 16px;
-  border: 1px solid var(--barracks-border-strong);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 16px;
   background: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
@@ -147,7 +147,7 @@
   height: auto;
   min-height: 108px;
   padding: 16px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 14px;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
@@ -181,7 +181,7 @@
   height: auto;
   min-height: 440px;
   padding: 20px;
-  border: 1px solid var(--barracks-border-strong);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 18px;
   background: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
@@ -204,7 +204,7 @@
   width: 100%;
   height: 380px;
   padding: 16px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 16px;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
@@ -228,7 +228,7 @@
 .library-options-panel {
   margin-top: 26px;
   padding: 22px;
-  border: 1px solid var(--barracks-border-strong);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 18px;
   background: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
@@ -273,7 +273,7 @@
   align-items: center;
   gap: 22px;
   padding: 16px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 14px;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
@@ -299,7 +299,7 @@
   min-width: 132px;
   border: 0;
   border-radius: 12px;
-  border: 1px solid var(--barracks-border-strong);
+  border: 1px solid var(--barracks-state-danger-interactive);
   background: var(--barracks-surface-interactive);
   color: var(--barracks-text-interactive);
   box-shadow: var(--barracks-shadow);
@@ -308,7 +308,7 @@
 
 .library-option-row .btn-danger:hover,
 .library-option-row .btn-danger:focus-visible {
-  border-color: var(--barracks-border-strong);
+  border-color: var(--barracks-state-danger-interactive);
   background: var(--barracks-surface-interactive);
   color: var(--barracks-text-interactive);
 }

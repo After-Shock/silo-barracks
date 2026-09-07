@@ -46,7 +46,7 @@
 }
 
 .item-crumb {
-  border: 1px solid var(--barracks-border-strong);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   padding: 6px 10px;
   color: var(--barracks-text-inset);
@@ -75,7 +75,7 @@
   aspect-ratio: 2 / 3;
   width: min(250px, 21vw);
   min-width: 170px;
-  border: 8px solid var(--barracks-border-subtle);
+  border: 8px solid var(--barracks-border-inset);
   border-radius: 0;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
@@ -170,7 +170,7 @@
 }
 
 .item-age-rating {
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-overlay);
   border-radius: 4px;
   padding: 3px 5px;
   font-size: 0.92rem;
@@ -281,7 +281,7 @@
 }
 
 .item-snapshot-row > div:nth-child(2) strong {
-  border-left: 4px solid var(--barracks-border-strong);
+  border-left: 4px solid var(--barracks-border-overlay);
   padding-left: 6px;
 }
 
@@ -296,7 +296,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid var(--barracks-border-strong);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 7px;
   padding: 8px 11px;
   color: var(--barracks-text-inset);
@@ -315,14 +315,14 @@
 }
 
 .item-reference-link {
-  border-color: var(--barracks-border-strong);
+  border-color: var(--barracks-border-inset);
   color: var(--barracks-text-inset);
   background: var(--barracks-surface-inset);
 }
 
 .item-technical-panel {
   margin-top: 16px;
-  border: 1px solid var(--barracks-border-strong);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 16px;
   padding: 18px;
   background: var(--barracks-surface-raised);
@@ -347,7 +347,7 @@
 }
 
 .item-technical-grid > div {
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 12px;
   padding: 12px 14px;
   background: var(--barracks-surface-inset);

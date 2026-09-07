@@ -6,7 +6,7 @@
   grid-auto-rows: auto;
   background: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 16px;
   padding: 18px;
   box-shadow: 0 18px 60px var(--barracks-scrim);
@@ -17,7 +17,7 @@
     width: 100%;
     min-height: 184px;
     overflow: hidden;
-    border: 1px solid var(--barracks-border-subtle);
+    border: 1px solid var(--barracks-border-raised);
     border-radius: 14px !important;
     display: flex;
     color: var(--barracks-text-raised);

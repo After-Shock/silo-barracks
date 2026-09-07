@@ -38,7 +38,7 @@
   {
     color: var(--barracks-text-interactive) !important;
     background-color: var(--barracks-surface-interactive) !important;
-    border-color: var(--barracks-border-subtle) !important;
+    border-color: var(--barracks-border-strong) !important;
   }
 
   .library-items > div>div> .form-control::placeholder

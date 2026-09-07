@@ -1,7 +1,7 @@
 .Activity > div > div > .form-control {
   color: var(--barracks-text-interactive) !important;
   background-color: var(--barracks-surface-interactive) !important;
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-strong) !important;
 }
 
 .Activity > div > div > .form-control::placeholder {
