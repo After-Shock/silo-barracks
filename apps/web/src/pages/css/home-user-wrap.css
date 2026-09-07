@@ -14,7 +14,7 @@
 .home-user-wrap-header p,
 .account-dashboard p {
   margin: 0 0 6px;
-  color: var(--barracks-accent-secondary);
+  color: var(--barracks-action-foreground);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.22em;
@@ -44,8 +44,8 @@
   padding: 8px 14px;
   border: 1px solid var(--barracks-state-live);
   border-radius: 999px;
-  background: var(--barracks-surface-interactive);
-  color: var(--barracks-accent-secondary);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 950;
 }
@@ -101,10 +101,10 @@
   height: 116px;
   place-items: center;
   overflow: hidden;
-  border: 3px solid var(--barracks-action-foreground);
+  border: 3px solid var(--barracks-border-strong);
   border-radius: 50%;
-  background: var(--barracks-surface-interactive);
-  color: var(--barracks-action-foreground);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-muted-raised);
   box-shadow: 0 18px 44px var(--barracks-state-live);
 }
 
@@ -116,7 +116,7 @@
 
 .user-wrap-hero p {
   margin: 0 0 4px;
-  color: var(--barracks-accent-secondary);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.22em;
@@ -138,8 +138,8 @@
   padding: 5px 12px;
   border: 1px solid var(--barracks-state-live);
   border-radius: 999px;
-  background: var(--barracks-surface-interactive);
-  color: var(--barracks-accent-secondary);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 950;
   text-transform: uppercase;
@@ -167,7 +167,7 @@
 }
 
 .user-wrap-title-row span {
-  color: var(--barracks-action-foreground);
+  color: var(--barracks-text-muted-raised);
   font-size: 13px;
   font-weight: 950;
 }
@@ -226,7 +226,7 @@
 }
 
 .wrap-metric-card svg {
-  color: var(--barracks-action-foreground);
+  color: var(--barracks-border-strong);
   margin-bottom: 10px;
   filter: drop-shadow(0 0 12px var(--barracks-action));
 }
@@ -254,7 +254,7 @@
 
 .wrap-metric-card small {
   margin-top: 4px;
-  color: var(--barracks-action-foreground);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 950;
   text-shadow: 0 2px 12px var(--barracks-scrim);
@@ -281,7 +281,7 @@
 
 .wrap-heatmap-header span {
   display: block;
-  color: var(--barracks-accent-secondary);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.16em;
@@ -382,7 +382,7 @@
   min-width: var(--heatmap-cell-size);
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 3px;
-  background: var(--barracks-surface-interactive);
+  background: var(--barracks-surface-inset);
   box-shadow: inset 0 1px 0 var(--barracks-border-subtle);
 }
 
@@ -393,18 +393,18 @@
 }
 
 .heat-1 {
-  border-color: var(--barracks-accent-secondary);
-  background: var(--barracks-accent-secondary);
+  border-color: var(--barracks-chart-1);
+  background: var(--barracks-chart-1);
 }
 
 .heat-2 {
-  border-color: var(--barracks-accent-secondary);
-  background: var(--barracks-accent-secondary);
+  border-color: var(--barracks-chart-2);
+  background: var(--barracks-chart-2);
 }
 
 .heat-3 {
-  border-color: var(--barracks-accent-secondary);
-  background: var(--barracks-accent-secondary);
+  border-color: var(--barracks-chart-3);
+  background: var(--barracks-chart-3);
 }
 
 .heat-4 {
@@ -450,7 +450,7 @@
 
 .wrap-achievements-header span {
   display: block;
-  color: var(--barracks-accent-secondary);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.16em;
@@ -517,7 +517,7 @@
 
 .wrap-achievement-card.is-unlocked .wrap-achievement-icon {
   border-color: var(--barracks-state-warning);
-  background: var(--barracks-surface-interactive);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-warning);
 }
 
@@ -750,7 +750,7 @@
   padding: 0 7px;
   border-radius: 999px;
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-action-foreground);
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 950;
 }
@@ -770,7 +770,7 @@
   justify-content: space-between;
   gap: 14px;
   padding: 14px 16px;
-  border: 1px solid var(--barracks-accent-secondary);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 14px;
   background: var(--barracks-surface-raised);
 }
@@ -818,7 +818,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(220px, 360px);
   align-items: end;
   gap: 14px;
-  border-color: var(--barracks-accent-secondary);
+  border-color: var(--barracks-border-strong);
   background: var(--barracks-surface-raised);
 }
 
@@ -1066,7 +1066,7 @@
 }
 
 .user-profile-empty a {
-  color: var(--barracks-action-foreground);
+  color: var(--barracks-text-muted-raised);
   font-weight: 900;
 }
 

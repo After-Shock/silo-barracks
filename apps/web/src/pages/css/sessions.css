@@ -39,7 +39,7 @@
 }
 
 .session-details-title {
-  color: var(--barracks-action-foreground) !important;
+  color: var(--barracks-text-muted-raised) !important;
   min-width: 0;
   padding: 0 8px 0 0 !important;
   font-size: 9px;
@@ -102,7 +102,7 @@
   overflow: hidden;
   border: 1px solid var(--barracks-border-subtle) !important;
   border-radius: 16px !important;
-  background: var(--barracks-surface-raised) !important;
+  background-color: var(--barracks-surface-raised) !important;
   color: var(--barracks-text);
   width: min(496px, 100%);
   max-width: none;
@@ -219,7 +219,7 @@
 }
 
 .card-username:hover a {
-  color: var(--barracks-action-foreground);
+  color: var(--barracks-text);
 }
 
 .card-device {
@@ -282,7 +282,7 @@
 }
 
 .card-text a:hover {
-  color: var(--barracks-accent-secondary) !important;
+  color: var(--barracks-text-muted-raised) !important;
 }
 
 .ellipse {
@@ -388,7 +388,7 @@
   display: block;
   max-width: 100%;
   overflow: hidden;
-  color: var(--barracks-action-foreground);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 800;
   line-height: 1.35;
@@ -497,7 +497,7 @@
   padding: 0 10px;
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 999px;
-  background: var(--barracks-surface-interactive);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-text);
   font-size: 11px;
   font-weight: 900;
@@ -515,7 +515,7 @@
 
 .session-popout-status .is-transcoding {
   border-color: var(--barracks-action);
-  color: var(--barracks-action-foreground);
+  color: var(--barracks-text-muted-raised);
 }
 
 .session-popout-copy h2 {
@@ -588,7 +588,7 @@
 .session-popout-detail span {
   display: block;
   margin-bottom: 5px;
-  color: var(--barracks-action-foreground);
+  color: var(--barracks-text-muted-raised);
   font-size: 10px;
   font-weight: 950;
   text-transform: uppercase;

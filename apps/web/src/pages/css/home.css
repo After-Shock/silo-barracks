@@ -49,7 +49,7 @@
   overflow: hidden;
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 8px;
-  background: var(--barracks-overlay);
+  background: var(--barracks-surface-raised);
   box-shadow: 0 14px 34px var(--barracks-scrim);
   backdrop-filter: blur(14px);
 }
@@ -223,7 +223,7 @@
 
 .home-order-options button.is-enabled {
   border-color: var(--barracks-state-success);
-  background: var(--barracks-surface-interactive);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-success);
 }
 
@@ -567,7 +567,7 @@
   border: 1px solid var(--barracks-state-live);
   border-radius: 14px;
   color: var(--barracks-action);
-  background: var(--barracks-surface-interactive);
+  background: var(--barracks-surface-raised);
   box-shadow: var(--barracks-shadow);
 }
 
@@ -752,7 +752,7 @@
   border-color: var(--barracks-state-warning);
   background:
     radial-gradient(circle at 8% 18%, var(--barracks-state-warning), transparent 34%),
-    linear-gradient(145deg, var(--barracks-border-subtle), var(--barracks-border-subtle));
+    var(--barracks-surface-raised);
 }
 
 .home-week-grid span {
@@ -825,7 +825,7 @@
   padding: 0 11px;
   border: 1px solid var(--barracks-state-danger);
   border-radius: 999px;
-  background: var(--barracks-surface-interactive);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-danger);
   font-size: 12px;
   font-weight: 900;
@@ -835,7 +835,7 @@
   height: 22px;
   border: 1px solid var(--barracks-state-danger);
   border-radius: 999px;
-  background: var(--barracks-scrim);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-danger);
   font-size: 10px;
   font-weight: 950;
@@ -967,12 +967,12 @@
   border: 1px solid var(--barracks-action);
   border-radius: 12px;
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-action-foreground);
+  color: var(--barracks-text-muted-raised);
 }
 
 .home-milestone-card.is-unlocked .home-milestone-icon {
   border-color: var(--barracks-state-warning);
-  background: var(--barracks-surface-interactive);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-warning);
 }
 
@@ -1015,7 +1015,7 @@
   height: 4px;
   overflow: hidden;
   border-radius: 999px;
-  background: var(--barracks-surface-interactive);
+  background: var(--barracks-surface-raised);
 }
 
 .home-milestone-progress i {
@@ -1153,7 +1153,7 @@
 
 .home-integration-widget-head p {
   margin: 0 0 4px;
-  color: var(--barracks-action-foreground);
+  color: var(--barracks-text-muted-raised);
   font-size: 10px;
   font-weight: 950;
   letter-spacing: 0.12em;
@@ -1337,8 +1337,8 @@
   padding: 0 9px;
   border: 1px solid var(--barracks-action);
   border-radius: 999px;
-  background: var(--barracks-surface-interactive);
-  color: var(--barracks-action-foreground);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 950;
 }
@@ -1346,7 +1346,7 @@
 .home-request-status.is-available,
 .home-request-status.is-approved {
   border-color: var(--barracks-state-success);
-  background: var(--barracks-surface-interactive);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-success);
 }
 
@@ -1354,7 +1354,7 @@
 .home-request-status.is-error,
 .home-request-status.is-declined {
   border-color: var(--barracks-state-danger);
-  background: var(--barracks-surface-interactive);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-danger);
 }
 
@@ -1394,10 +1394,7 @@
   padding: 16px;
   border: 1px solid var(--barracks-action);
   border-radius: 10px;
-  background:
-    radial-gradient(circle at 12% 0%, var(--barracks-state-warning), transparent 30%),
-    linear-gradient(135deg, var(--barracks-action), var(--barracks-overlay)),
-    var(--barracks-overlay);
+  background: var(--barracks-surface-raised);
 }
 
 .home-podium {
@@ -1419,10 +1416,7 @@
   padding: 32px 14px 17px;
   border: 1px solid var(--barracks-action);
   border-radius: 12px;
-  background:
-    radial-gradient(circle at 50% 10%, var(--barracks-action), transparent 38%),
-    linear-gradient(160deg, var(--barracks-overlay), var(--barracks-overlay)),
-    var(--barracks-overlay);
+  background: var(--barracks-surface-raised);
   box-shadow: 0 16px 34px var(--barracks-scrim), inset 0 1px var(--barracks-border-subtle);
   text-align: center;
 }
@@ -1441,26 +1435,20 @@
 .home-podium-card.rank-1 {
   min-height: 204px;
   border-color: var(--barracks-state-warning);
-  background:
-    radial-gradient(circle at 50% 10%, var(--barracks-state-warning), transparent 36%),
-    linear-gradient(160deg, var(--barracks-overlay), var(--barracks-overlay));
+  background: var(--barracks-surface-raised);
   box-shadow: 0 0 0 1px var(--barracks-state-warning), 0 20px 42px var(--barracks-scrim);
 }
 
 .home-podium-card.rank-2 {
   min-height: 174px;
   border-color: var(--barracks-border-subtle);
-  background:
-    radial-gradient(circle at 50% 10%, var(--barracks-border-subtle), transparent 38%),
-    linear-gradient(160deg, var(--barracks-overlay), var(--barracks-overlay));
+  background: var(--barracks-surface-raised);
 }
 
 .home-podium-card.rank-3 {
   min-height: 160px;
   border-color: var(--barracks-state-warning);
-  background:
-    radial-gradient(circle at 50% 10%, var(--barracks-state-warning), transparent 38%),
-    linear-gradient(160deg, var(--barracks-overlay), var(--barracks-overlay));
+  background: var(--barracks-surface-raised);
 }
 
 .home-rank-medal {
@@ -1473,8 +1461,8 @@
   place-items: center;
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 16px;
-  color: var(--barracks-text);
-  background: linear-gradient(135deg, var(--barracks-action), var(--barracks-action));
+  color: var(--barracks-action-text);
+  background: var(--barracks-action);
   font-size: 12px;
   font-weight: 950;
   box-shadow: 0 10px 22px var(--barracks-scrim);
@@ -1496,18 +1484,21 @@
 }
 
 .rank-1 .home-rank-medal {
-  background: linear-gradient(135deg, var(--barracks-state-warning), var(--barracks-state-warning));
-  color: var(--barracks-surface-inset);
+  border-color: var(--barracks-state-warning);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-state-warning);
 }
 
 .rank-2 .home-rank-medal {
-  background: linear-gradient(135deg, var(--barracks-text), var(--barracks-text-muted-raised));
-  color: var(--barracks-surface-inset);
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-muted-raised);
 }
 
 .rank-3 .home-rank-medal {
-  background: linear-gradient(135deg, var(--barracks-state-warning), var(--barracks-state-warning));
-  color: var(--barracks-surface-inset);
+  border-color: var(--barracks-state-warning);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-state-warning);
 }
 
 .home-avatar {
@@ -1545,7 +1536,7 @@
   height: 5px;
   overflow: hidden;
   border-radius: 999px;
-  background: var(--barracks-surface-interactive);
+  background: var(--barracks-surface-inset);
 }
 
 .home-podium-share::before {
@@ -1559,7 +1550,7 @@
 }
 
 .rank-1 .home-podium-share::before {
-  background: linear-gradient(90deg, var(--barracks-state-warning), var(--barracks-state-warning));
+  background: var(--barracks-chart-3);
 }
 
 .home-runner-list {
@@ -1832,6 +1823,7 @@
 .home-order-toolbar button[aria-pressed="true"] {
   border-color: var(--barracks-action);
   background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
 .home-order-panel {
@@ -1842,7 +1834,7 @@
 }
 
 .home-order-panel.home-glass-card {
-  background: var(--barracks-overlay);
+  background: var(--barracks-surface-raised);
   box-shadow: 0 12px 28px var(--barracks-scrim);
   backdrop-filter: none;
 }
