@@ -90,6 +90,45 @@ test("detects case-insensitive CSS named colors", () => {
   }
 });
 
+test("only reports hashes and names in CSS declarations or embedded style and SVG contexts", () => {
+  const fixture = createFixture();
+  try {
+    const css = fixture.write("apps/web/src/context.css", `
+#abc { background-image: url(#abcdef); }
+.card { color: #fff; background-image: url(http://cdn.example/red.svg); font-family: red; content: "red"; }
+`);
+    const jsx = fixture.write("apps/web/src/context.jsx", `
+const privateValue = this.#abc;
+const text = "ticket #abc and red";
+const asset = "url(red.svg)";
+const arbitrary = "red";
+const style = { color: "#def", backgroundColor: "ReD" };
+element.style.color = "orange";
+const css = "background: #123; color: rgb(1, 2, 3)";
+const svg = '<svg fill="#456" stroke="blue"></svg>';
+`);
+    const result = fixture.audit([css, jsx]);
+    assert.deepEqual(values(result), ["#fff", "#def", "ReD", "orange", "#123", "rgb(1, 2, 3)", "#456", "blue"]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("masks comments according to source language without breaking URLs or regexes", () => {
+  const fixture = createFixture();
+  try {
+    const css = fixture.write("apps/web/src/comments-language.css", ".asset { background: url(http://cdn.example/red.svg); color: #abc; }");
+    const js = fixture.write("apps/web/src/comments-language.js", `
+const pattern = /https?:\\/\\/cdn\\/red/;
+const style = "color: #def";
+`);
+    const result = fixture.audit([css, js]);
+    assert.deepEqual(values(result), ["#abc", "#def"]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
 test("allows CSS keywords, custom properties, and token-only gradients", () => {
   const fixture = createFixture();
   try {
@@ -112,6 +151,17 @@ test("allows CSS keywords, custom properties, and token-only gradients", () => {
   }
 });
 
+test("reports literal fallbacks inside semantic var-backed functions", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/fallback.css", ".card { color: rgba(var(--barracks-action-rgb, #fff), .5); }");
+    const result = fixture.audit([source]);
+    assert.deepEqual(values(result), ["#fff"]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
 test("detects literal gradient stops alongside semantic tokens", () => {
   const fixture = createFixture();
   try {
@@ -129,6 +179,29 @@ test("rejects gradients that reference non-Barracks custom properties", () => {
     const source = fixture.write("apps/web/src/gradient-vars.css", ".hero { background: linear-gradient(var(--brand-start), var(--barracks-action)); }");
     const result = fixture.audit([source]);
     assert.deepEqual(values(result), ["linear-gradient(var(--brand-start), var(--barracks-action))"]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("enforces gradient token rules independently from literal exceptions and variables allowlists", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/gradient-independent.css", `
+.card { background: linear-gradient(var(--brand-start), #fff); }
+`);
+    const variables = fixture.write("apps/web/src/pages/css/variables.css", `
+:root { --barracks-shadow: linear-gradient(var(--brand-start), var(--barracks-action)); }
+`);
+    const result = fixture.audit([source, variables], [{
+      path: "apps/web/src/gradient-independent.css",
+      values: ["#fff"],
+      reason: "Official embedded provider artwork.",
+    }]);
+    assert.deepEqual(values(result), [
+      "linear-gradient(var(--brand-start), #fff)",
+      "linear-gradient(var(--brand-start), var(--barracks-action))",
+    ]);
   } finally {
     fixture.cleanup();
   }
@@ -249,6 +322,24 @@ test("rejects exceptions with missing reasons", () => {
   }
 });
 
+test("rejects malformed exception documents and non-color exception values", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/provider-logo.css", ".provider { color: #abc; }");
+    const malformed = fixture.audit([source], { exceptions: "not-an-array" });
+    assert.ok(malformed.violations.some((violation) => violation.kind === "exception" && /schema/i.test(violation.message)));
+    const invalidValue = fixture.audit([source], [{
+      path: "apps/web/src/provider-logo.css",
+      values: ["not-a-color"],
+      reason: "Official provider logo.",
+    }]);
+    assert.deepEqual(values(invalidValue), ["#abc"]);
+    assert.ok(invalidValue.violations.some((violation) => violation.kind === "exception" && /color literal/i.test(violation.message)));
+  } finally {
+    fixture.cleanup();
+  }
+});
+
 test("does not suppress mismatched exception paths or values", () => {
   const fixture = createFixture();
   try {
@@ -291,13 +382,31 @@ test("directory and exact-file arguments constrain recursive scans", () => {
       "apps/web/src/nested/one.css",
       "apps/web/src/nested/two.jsx",
     ]);
-    assert.deepEqual(values(result), ["#abc", "#def"]);
+    assert.deepEqual(values(result), ["#abc"]);
     assert.ok(!result.scannedFiles.includes(path.relative(fixture.root, outside).replaceAll(path.sep, "/")));
     const exactResult = fixture.audit([exactFile]);
     assert.deepEqual(exactResult.scannedFiles, ["apps/web/src/nested/two.jsx"]);
-    assert.deepEqual(values(exactResult), ["#def"]);
+    assert.deepEqual(values(exactResult), []);
   } finally {
     fixture.cleanup();
+  }
+});
+
+test("rejects explicit paths whose symlink target escapes the audit root", () => {
+  const fixture = createFixture();
+  const outside = fs.mkdtempSync(path.join(os.tmpdir(), "barracks-theme-colors-outside-"));
+  try {
+    fixture.write("apps/web/src/placeholder.css", ".placeholder { color: transparent; }");
+    const outsideFile = path.join(outside, "outside.css");
+    fs.writeFileSync(outsideFile, ".outside { color: #abc; }");
+    const link = path.join(fixture.root, "apps/web/src/outside-link.css");
+    fs.symlinkSync(outsideFile, link);
+    const result = fixture.audit([link]);
+    assert.deepEqual(result.scannedFiles, []);
+    assert.ok(result.violations.some((violation) => violation.kind === "input" && /symlink|root/i.test(violation.message)));
+  } finally {
+    fixture.cleanup();
+    fs.rmSync(outside, { recursive: true, force: true });
   }
 });
 
@@ -317,6 +426,17 @@ test("sorts diagnostics and exposes stable file, line, and value fields", () => 
   }
 });
 
+test("counts CR-only line endings when reporting positions", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/cr-only.css", ".a { color: #abc; }\r.b { color: red; }");
+    const result = fixture.audit([source]);
+    assert.deepEqual(colorViolations(result).map((violation) => violation.line), [1, 2]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
 test("CLI exits one and prints actionable diagnostics for violations", () => {
   const fixture = createFixture();
   try {
@@ -325,6 +445,36 @@ test("CLI exits one and prints actionable diagnostics for violations", () => {
     const run = spawnSync(process.execPath, [script], { cwd: fixture.root, encoding: "utf8" });
     assert.equal(run.status, 1);
     assert.match(run.stderr, /apps\/web\/src\/app\.css:1:.*#abc/);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("CLI exits one with actionable diagnostics for invalid roots and paths", () => {
+  const fixture = createFixture();
+  try {
+    const script = path.resolve(__dirname, "check-theme-colors.cjs");
+    const missingRoot = spawnSync(process.execPath, [script, "--root", path.join(fixture.root, "missing")], { encoding: "utf8" });
+    assert.equal(missingRoot.status, 1);
+    assert.match(missingRoot.stderr, /invalid root/i);
+    const missingPath = spawnSync(process.execPath, [script, "missing.css"], { cwd: fixture.root, encoding: "utf8" });
+    assert.equal(missingPath.status, 1);
+    assert.match(missingPath.stderr, /does not exist|missing/i);
+    const outsidePath = path.join(os.tmpdir(), `barracks-theme-colors-outside-${process.pid}.css`);
+    fs.writeFileSync(outsidePath, ".outside { color: #abc; }");
+    try {
+      const outside = spawnSync(process.execPath, [script, outsidePath], { cwd: fixture.root, encoding: "utf8" });
+      assert.equal(outside.status, 1);
+      assert.match(outside.stderr, /outside the audit root/i);
+    } finally {
+      fs.rmSync(outsidePath, { force: true });
+    }
+    const unsupported = path.join(fixture.root, "apps/web/src/app.txt");
+    fs.mkdirSync(path.dirname(unsupported), { recursive: true });
+    fs.writeFileSync(unsupported, "plain text");
+    const unsupportedPath = spawnSync(process.execPath, [script, unsupported], { cwd: fixture.root, encoding: "utf8" });
+    assert.equal(unsupportedPath.status, 1);
+    assert.match(unsupportedPath.stderr, /unsupported/i);
   } finally {
     fixture.cleanup();
   }
