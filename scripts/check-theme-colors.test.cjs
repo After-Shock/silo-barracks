@@ -352,6 +352,7 @@ test("allows literals only on approved variables.css declarations", () => {
     const source = fixture.write("apps/web/src/pages/css/variables.css", `
 :root {
   --barracks-canvas: #161410;
+  --barracks-action-text: #fff;
   --barracks-shadow: 0 12px 32px rgba(22, 20, 16, .28);
   --barracks-action-rgb: 111, 155, 207;
   --primary-light-color: hsl(210 40% 75%);

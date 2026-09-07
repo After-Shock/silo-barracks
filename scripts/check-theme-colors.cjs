@@ -55,6 +55,7 @@ const APPROVED_VARIABLE_DECLARATIONS = new Set([
   "--barracks-focus-light",
   "--barracks-focus-dark",
   "--barracks-action",
+  "--barracks-action-text",
   "--barracks-accent-secondary",
   "--barracks-state-live",
   "--barracks-state-success",
