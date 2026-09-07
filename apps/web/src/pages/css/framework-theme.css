@@ -363,7 +363,7 @@ fieldset:disabled .btn {
 
 .MuiButton-root,
 .MuiIconButton-root {
-  color: var(--barracks-text-interactive) !important;
+  color: var(--barracks-action-foreground) !important;
 }
 
 .MuiButton-contained {
