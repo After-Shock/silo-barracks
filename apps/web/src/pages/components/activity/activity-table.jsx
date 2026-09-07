@@ -17,6 +17,7 @@ import IpInfoModal from "../ip-info";
 import BusyLoader from "../general/busyLoader.jsx";
 import { MRT_ShowHideColumnsButton, MRT_TablePagination, MaterialReactTable, useMaterialReactTable } from "material-react-table";
 import { Box, ThemeProvider, Typography, createTheme } from "@mui/material";
+import { grey } from "@mui/material/colors";
 
 import { Link } from "react-router-dom";
 import { Button, Modal } from "react-bootstrap";
@@ -52,7 +53,6 @@ const colors = {
   primary: "var(--barracks-action)",
   secondary: "var(--barracks-accent-secondary)",
   backgroundColor: "var(--barracks-canvas)",
-  secondaryBackgroundColor: "var(--barracks-surface-raised)",
   tertiaryBackgroundColor: "var(--barracks-surface-interactive)",
 };
 const token = localStorage.getItem("token");
@@ -149,6 +149,7 @@ export default function ActivityTable(props) {
     () => ({
       primary: getCssVariableColor("--barracks-action", colors.primary),
       secondary: getCssVariableColor("--barracks-accent-secondary", colors.secondary),
+      surfaceRaised: getCssVariableColor("--barracks-surface-raised", grey[900]),
       tertiaryBackgroundColor: colors.tertiaryBackgroundColor,
     }),
     [themeTick]
@@ -687,7 +688,7 @@ export default function ActivityTable(props) {
     },
 
     mrtTheme: () => ({
-      baseBackgroundColor: colors.secondaryBackgroundColor,
+      baseBackgroundColor: muiColors.surfaceRaised,
     }),
   });
   const theme = useMemo(

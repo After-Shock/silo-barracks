@@ -328,7 +328,7 @@
   "SOURCE_DETAILS": "Détails de la source",
   "DIRECT": "Direct",
   "TRANSCODE": "Transcodage",
-  "DIRECT_STREAM": "",
+  "DIRECT_STREAM": "Flux direct",
   "USERNAME": "Nom d'utilisateur",
   "PASSWORD": "Mot de passe",
   "LOGIN": "Connexion",
@@ -353,5 +353,17 @@
   "TRANSCODE_REASONS": "Raisons du transcodage",
   "SUBTITLES": "Sous-titres",
   "UNAVAILABLE": "Indisponible",
+  "ACTIVITY_STATES": {
+    "CONFIG_ERROR": "Impossible de charger la configuration de l'activité.",
+    "HISTORY_ERROR": "Impossible de charger l'historique d'activité.",
+    "FILTERS_PARTIAL": "Certains filtres d'activité sont indisponibles.",
+    "TIMELINE_CONFIG_ERROR": "Impossible de charger la configuration de la chronologie.",
+    "TIMELINE_USERS_ERROR": "Impossible de charger les utilisateurs de la chronologie.",
+    "TIMELINE_LIBRARIES_ERROR": "Impossible de charger les bibliothèques de la chronologie.",
+    "TIMELINE_ACTIVITY_ERROR": "Impossible de charger l'activité de la chronologie.",
+    "TIMELINE_EMPTY": "Aucune activité n'est disponible pour cette chronologie.",
+    "TIMELINE_FILTERS_EMPTY": "Aucun utilisateur ni aucune bibliothèque n'est disponible pour la chronologie.",
+    "TIMELINE_SELECTION_EMPTY": "Sélectionnez un utilisateur et au moins une bibliothèque pour afficher la chronologie."
+  },
   "GENRES": "Genres"
 }

@@ -353,5 +353,17 @@
   "TRANSCODE_REASONS": "Transkodierungsgründe",
   "SUBTITLES": "Untertitel",
   "UNAVAILABLE": "Nicht verfügbar",
+  "ACTIVITY_STATES": {
+    "CONFIG_ERROR": "Die Aktivitätskonfiguration konnte nicht geladen werden.",
+    "HISTORY_ERROR": "Der Aktivitätsverlauf konnte nicht geladen werden.",
+    "FILTERS_PARTIAL": "Einige Aktivitätsfilter sind nicht verfügbar.",
+    "TIMELINE_CONFIG_ERROR": "Die Zeitleistenkonfiguration konnte nicht geladen werden.",
+    "TIMELINE_USERS_ERROR": "Die Zeitleistenbenutzer konnten nicht geladen werden.",
+    "TIMELINE_LIBRARIES_ERROR": "Die Mediatheken der Zeitleiste konnten nicht geladen werden.",
+    "TIMELINE_ACTIVITY_ERROR": "Die Zeitleistenaktivität konnte nicht geladen werden.",
+    "TIMELINE_EMPTY": "Für diese Zeitleiste sind keine Aktivitäten verfügbar.",
+    "TIMELINE_FILTERS_EMPTY": "Für die Zeitleiste sind keine Benutzer oder Mediatheken verfügbar.",
+    "TIMELINE_SELECTION_EMPTY": "Wählen Sie einen Benutzer und mindestens eine Mediathek aus, um die Zeitleiste anzuzeigen."
+  },
   "GENRES": "Genres"
 }

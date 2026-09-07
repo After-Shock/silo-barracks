@@ -1,6 +1,8 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
 import axios from "../../../lib/axios_instance";
+import i18next from "i18next";
+import { Trans } from "react-i18next";
 
 import Timeline from "@mui/lab/Timeline";
 
@@ -33,7 +35,7 @@ export default function ActivityTimelineComponent(props) {
       } catch (fetchError) {
         console.log(fetchError);
         if (!cancelled) {
-          setError("Unable to load timeline configuration.");
+          setError(i18next.t("ACTIVITY_STATES.TIMELINE_CONFIG_ERROR"));
           reportState(hasGoodContent.current ? "partial" : "error");
         }
       }
@@ -65,7 +67,7 @@ export default function ActivityTimelineComponent(props) {
         .catch((fetchError) => {
           console.log(fetchError);
           if (!cancelled) {
-            setError("Unable to load timeline activity.");
+            setError(i18next.t("ACTIVITY_STATES.TIMELINE_ACTIVITY_ERROR"));
             reportState(hasGoodContent.current ? "partial" : "error");
           }
         });
@@ -88,7 +90,7 @@ export default function ActivityTimelineComponent(props) {
   }
 
   if (timelineEntries.length === 0) {
-    return <section className="timeline-state is-empty"><p>No activity is available for this timeline.</p></section>;
+    return <section className="timeline-state is-empty"><p><Trans i18nKey="ACTIVITY_STATES.TIMELINE_EMPTY" /></p></section>;
   }
 
   return (

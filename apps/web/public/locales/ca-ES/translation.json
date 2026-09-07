@@ -328,7 +328,7 @@
   "SOURCE_DETAILS": "Detalls de la font",
   "DIRECT": "Directe",
   "TRANSCODE": "Transcodificar",
-  "DIRECT_STREAM": "",
+  "DIRECT_STREAM": "Transmissió directa",
   "USERNAME": "Nom d'usuari",
   "PASSWORD": "Contrasenya",
   "LOGIN": "Iniciar sessió",
@@ -353,5 +353,17 @@
   "TRANSCODE_REASONS": "",
   "SUBTITLES": "Subtítols",
   "UNAVAILABLE": "No disponible",
+  "ACTIVITY_STATES": {
+    "CONFIG_ERROR": "No s'ha pogut carregar la configuració de l'activitat.",
+    "HISTORY_ERROR": "No s'ha pogut carregar l'historial d'activitat.",
+    "FILTERS_PARTIAL": "Alguns filtres d'activitat no estan disponibles.",
+    "TIMELINE_CONFIG_ERROR": "No s'ha pogut carregar la configuració de la cronologia.",
+    "TIMELINE_USERS_ERROR": "No s'han pogut carregar els usuaris de la cronologia.",
+    "TIMELINE_LIBRARIES_ERROR": "No s'han pogut carregar les biblioteques de la cronologia.",
+    "TIMELINE_ACTIVITY_ERROR": "No s'ha pogut carregar l'activitat de la cronologia.",
+    "TIMELINE_EMPTY": "No hi ha cap activitat disponible per a aquesta cronologia.",
+    "TIMELINE_FILTERS_EMPTY": "No hi ha usuaris o biblioteques disponibles per a la cronologia.",
+    "TIMELINE_SELECTION_EMPTY": "Seleccioneu un usuari i almenys una biblioteca per veure la cronologia."
+  },
   "GENRES": "Gèneres"
 }

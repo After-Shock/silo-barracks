@@ -353,5 +353,17 @@
   "TRANSCODE_REASONS": "Powody transkodowania",
   "SUBTITLES": "Napisy",
   "UNAVAILABLE": "Niedostępne",
+  "ACTIVITY_STATES": {
+    "CONFIG_ERROR": "Nie można wczytać konfiguracji aktywności.",
+    "HISTORY_ERROR": "Nie można wczytać historii aktywności.",
+    "FILTERS_PARTIAL": "Niektóre filtry aktywności są niedostępne.",
+    "TIMELINE_CONFIG_ERROR": "Nie można wczytać konfiguracji osi czasu.",
+    "TIMELINE_USERS_ERROR": "Nie można wczytać użytkowników osi czasu.",
+    "TIMELINE_LIBRARIES_ERROR": "Nie można wczytać bibliotek osi czasu.",
+    "TIMELINE_ACTIVITY_ERROR": "Nie można wczytać aktywności osi czasu.",
+    "TIMELINE_EMPTY": "Brak aktywności dostępnej dla tej osi czasu.",
+    "TIMELINE_FILTERS_EMPTY": "Brak użytkowników lub bibliotek dostępnych dla osi czasu.",
+    "TIMELINE_SELECTION_EMPTY": "Wybierz użytkownika i co najmniej jedną bibliotekę, aby wyświetlić oś czasu."
+  },
   "GENRES": "Gatunki"
 }

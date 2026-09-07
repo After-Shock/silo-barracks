@@ -353,5 +353,17 @@
   "TRANSCODE_REASONS": "转码原因",
   "SUBTITLES": "字幕",
   "UNAVAILABLE": "不可用",
+  "ACTIVITY_STATES": {
+    "CONFIG_ERROR": "无法加载活动配置。",
+    "HISTORY_ERROR": "无法加载活动历史记录。",
+    "FILTERS_PARTIAL": "部分活动筛选器不可用。",
+    "TIMELINE_CONFIG_ERROR": "无法加载时间线配置。",
+    "TIMELINE_USERS_ERROR": "无法加载时间线用户。",
+    "TIMELINE_LIBRARIES_ERROR": "无法加载时间线媒体库。",
+    "TIMELINE_ACTIVITY_ERROR": "无法加载时间线活动。",
+    "TIMELINE_EMPTY": "没有可用于此时间线的活动。",
+    "TIMELINE_FILTERS_EMPTY": "没有可用于时间线的用户或媒体库。",
+    "TIMELINE_SELECTION_EMPTY": "请选择一个用户和至少一个媒体库以查看时间线。"
+  },
   "GENRES": "类型"
 }

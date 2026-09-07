@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Trans } from "react-i18next";
+import i18next from "i18next";
 import ActivityTimelineComponent from "./components/activity-timeline/activity-timeline";
 
 import { Button, FormSelect, Modal } from "react-bootstrap";
@@ -70,7 +71,7 @@ function ActivityTimeline(props) {
         setConfig(newConfig);
         setConfigError("");
       } catch (error) {
-        setConfigError("Unable to load timeline configuration.");
+        setConfigError(i18next.t("ACTIVITY_STATES.TIMELINE_CONFIG_ERROR"));
         if (error.code === "ERR_NETWORK") {
           console.log(error);
         }
@@ -101,7 +102,7 @@ function ActivityTimeline(props) {
         })
         .catch((error) => {
           console.log(error);
-          setUserError("Unable to load timeline users.");
+          setUserError(i18next.t("ACTIVITY_STATES.TIMELINE_USERS_ERROR"));
         });
     }
   }, [config, preselectedUser]);
@@ -129,7 +130,7 @@ function ActivityTimeline(props) {
         })
         .catch((error) => {
           console.log(error);
-          setLibraryError("Unable to load timeline libraries.");
+          setLibraryError(i18next.t("ACTIVITY_STATES.TIMELINE_LIBRARIES_ERROR"));
         });
     }
   }, [config]);
@@ -160,7 +161,7 @@ function ActivityTimeline(props) {
       <div className="activity-timeline-screen" data-theme-screen={preselectedUser ? undefined : "timeline"}>
         <section className="timeline-state is-empty">
           <h1><Trans i18nKey={"TIMELINE_PAGE.TIMELINE"} /></h1>
-          <p>No timeline users or libraries are available.</p>
+          <p><Trans i18nKey="ACTIVITY_STATES.TIMELINE_FILTERS_EMPTY" /></p>
         </section>
       </div>
     );
@@ -247,7 +248,7 @@ function ActivityTimeline(props) {
             onStateChange={setTimelineDataState}
           />
         )}
-        {!hasSelection ? <section className="timeline-state is-empty"><p>Select a user and at least one library to view the timeline.</p></section> : null}
+        {!hasSelection ? <section className="timeline-state is-empty"><p><Trans i18nKey="ACTIVITY_STATES.TIMELINE_SELECTION_EMPTY" /></p></section> : null}
       </div>
     </div>
   );

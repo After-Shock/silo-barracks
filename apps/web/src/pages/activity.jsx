@@ -181,7 +181,7 @@ function Activity() {
         const newConfig = await Config.getConfig();
         setConfig(newConfig);
       } catch (error) {
-        setHistoryError("Unable to load activity configuration.");
+        setHistoryError(i18next.t("ACTIVITY_STATES.CONFIG_ERROR"));
         if (error.code === "ERR_NETWORK") {
           console.log(error);
         }
@@ -238,7 +238,7 @@ function Activity() {
         })
         .catch((error) => {
           console.log(error);
-          setHistoryError("Unable to load activity history.");
+          setHistoryError(i18next.t("ACTIVITY_STATES.HISTORY_ERROR"));
           setIsBusy(false);
         });
     };
@@ -272,7 +272,7 @@ function Activity() {
         })
         .catch((error) => {
           console.log(error);
-          setLibraryError("Some activity filters are unavailable.");
+          setLibraryError(i18next.t("ACTIVITY_STATES.FILTERS_PARTIAL"));
         });
     };
 

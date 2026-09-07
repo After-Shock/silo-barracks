@@ -328,7 +328,7 @@
   "SOURCE_DETAILS": "Dettagli sorgente",
   "DIRECT": "Diretto",
   "TRANSCODE": "Transcodifica",
-  "DIRECT_STREAM": "",
+  "DIRECT_STREAM": "Streaming diretto",
   "USERNAME": "Nome utente",
   "PASSWORD": "Password",
   "LOGIN": "Accedi",
@@ -353,5 +353,17 @@
   "TRANSCODE_REASONS": "Motivo della transcodifica",
   "SUBTITLES": "Sottotitoli",
   "UNAVAILABLE": "Non disponibile",
+  "ACTIVITY_STATES": {
+    "CONFIG_ERROR": "Impossibile caricare la configurazione delle attività.",
+    "HISTORY_ERROR": "Impossibile caricare la cronologia delle attività.",
+    "FILTERS_PARTIAL": "Alcuni filtri delle attività non sono disponibili.",
+    "TIMELINE_CONFIG_ERROR": "Impossibile caricare la configurazione della sequenza temporale.",
+    "TIMELINE_USERS_ERROR": "Impossibile caricare gli utenti della sequenza temporale.",
+    "TIMELINE_LIBRARIES_ERROR": "Impossibile caricare le librerie della sequenza temporale.",
+    "TIMELINE_ACTIVITY_ERROR": "Impossibile caricare le attività della sequenza temporale.",
+    "TIMELINE_EMPTY": "Nessuna attività è disponibile per questa sequenza temporale.",
+    "TIMELINE_FILTERS_EMPTY": "Non sono disponibili utenti o librerie per la sequenza temporale.",
+    "TIMELINE_SELECTION_EMPTY": "Seleziona un utente e almeno una libreria per visualizzare la sequenza temporale."
+  },
   "GENRES": "Generi"
 }

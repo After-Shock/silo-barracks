@@ -353,5 +353,17 @@
   "TRANSCODE_REASONS": "Transcode Reasons",
   "SUBTITLES": "Subtitles",
   "UNAVAILABLE": "Unavailable",
+  "ACTIVITY_STATES": {
+    "CONFIG_ERROR": "Unable to load activity configuration.",
+    "HISTORY_ERROR": "Unable to load activity history.",
+    "FILTERS_PARTIAL": "Some activity filters are unavailable.",
+    "TIMELINE_CONFIG_ERROR": "Unable to load timeline configuration.",
+    "TIMELINE_USERS_ERROR": "Unable to load timeline users.",
+    "TIMELINE_LIBRARIES_ERROR": "Unable to load timeline libraries.",
+    "TIMELINE_ACTIVITY_ERROR": "Unable to load timeline activity.",
+    "TIMELINE_EMPTY": "No activity is available for this timeline.",
+    "TIMELINE_FILTERS_EMPTY": "No timeline users or libraries are available.",
+    "TIMELINE_SELECTION_EMPTY": "Select a user and at least one library to view the timeline."
+  },
   "GENRES": "Genres"
 }

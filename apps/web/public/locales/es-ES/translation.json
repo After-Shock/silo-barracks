@@ -353,5 +353,17 @@
   "TRANSCODE_REASONS": "Razones de transcodificación",
   "SUBTITLES": "Subtítulos",
   "UNAVAILABLE": "No disponible",
+  "ACTIVITY_STATES": {
+    "CONFIG_ERROR": "No se pudo cargar la configuración de actividad.",
+    "HISTORY_ERROR": "No se pudo cargar el historial de actividad.",
+    "FILTERS_PARTIAL": "Algunos filtros de actividad no están disponibles.",
+    "TIMELINE_CONFIG_ERROR": "No se pudo cargar la configuración de la cronología.",
+    "TIMELINE_USERS_ERROR": "No se pudieron cargar los usuarios de la cronología.",
+    "TIMELINE_LIBRARIES_ERROR": "No se pudieron cargar las bibliotecas de la cronología.",
+    "TIMELINE_ACTIVITY_ERROR": "No se pudo cargar la actividad de la cronología.",
+    "TIMELINE_EMPTY": "No hay actividad disponible para esta cronología.",
+    "TIMELINE_FILTERS_EMPTY": "No hay usuarios ni bibliotecas disponibles para la cronología.",
+    "TIMELINE_SELECTION_EMPTY": "Selecciona un usuario y al menos una biblioteca para ver la cronología."
+  },
   "GENRES": "Géneros"
 }
