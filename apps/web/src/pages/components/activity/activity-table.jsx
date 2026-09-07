@@ -564,8 +564,14 @@ export default function ActivityTable(props) {
           borderBottom: "1px solid var(--barracks-border-inset)",
           color: "var(--barracks-text-inset)",
         },
-        "& .MuiTableCell-body :is(a:not(.activity-method-pill):not(.activity-client-link), .activity-title-copy strong, .activity-title-copy small, .activity-device-cell, .activity-ip-cell, .activity-ip-link, .activity-date-cell, .activity-duration-cell, .activity-user-link, .MuiIconButton-root, .MuiCheckbox-root, .MuiSvgIcon-root)": {
+        "& .MuiTableCell-body :is(a:not(.activity-method-pill):not(.activity-client-link), .activity-title-copy strong, .activity-title-copy small, .activity-device-cell, .activity-ip-cell, .activity-ip-link, .activity-date-cell, .activity-duration-cell, .activity-user-link, .MuiIconButton-root, .MuiSvgIcon-root)": {
           color: "inherit !important",
+        },
+        "&:nth-of-type(odd) .MuiTableCell-body .MuiCheckbox-root, &:nth-of-type(odd) .MuiTableCell-body .MuiCheckbox-root .MuiSvgIcon-root": {
+          color: "var(--barracks-text-raised) !important",
+        },
+        "&:nth-of-type(even) .MuiTableCell-body .MuiCheckbox-root, &:nth-of-type(even) .MuiTableCell-body .MuiCheckbox-root .MuiSvgIcon-root": {
+          color: "var(--barracks-text-inset) !important",
         },
         "& .MuiTableCell-body:first-of-type": {
           borderTopLeftRadius: "0",
@@ -580,9 +586,9 @@ export default function ActivityTable(props) {
           borderBottomColor: "var(--barracks-border-strong)",
           color: "var(--barracks-text-interactive)",
         },
-        "&:hover .MuiCheckbox-root": {
+        "&:hover .MuiTableCell-body .MuiCheckbox-root, &:hover .MuiTableCell-body .MuiCheckbox-root .MuiSvgIcon-root": {
           opacity: 1,
-          color: "var(--barracks-text-interactive)",
+          color: "var(--barracks-text-interactive) !important",
         },
       },
     },
@@ -725,6 +731,7 @@ export default function ActivityTable(props) {
       <IpInfoModal show={ipModalVisible} onHide={() => setIPModalVisible(false)} ipAddress={ipAddressLookup} />
       <Modal
         show={confirmDeleteShow}
+        dialogClassName="activity-delete-modal"
         onHide={() => {
           setDeleteShow(false);
         }}

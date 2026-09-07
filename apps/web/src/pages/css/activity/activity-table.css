@@ -64,24 +64,22 @@
 }
 
 .activity-table-actions .MuiIconButton-root:hover {
-  background: var(--barracks-surface-inset) !important;
-}
-
-.activity-mrt-paper .MuiCheckbox-root {
-  color: var(--barracks-action) !important;
+  border-color: var(--barracks-action) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .activity-mrt-paper .MuiTableHead-root .MuiCheckbox-root {
   color: var(--barracks-text-inset) !important;
 }
 
-.activity-mrt-paper a,
-.activity-table-link {
+.activity-mrt-paper :where(a:not(.activity-client-link):not(.activity-method-pill)),
+.activity-table-link:not(.activity-client-link):not(.activity-method-pill) {
   color: inherit !important;
   text-decoration: none !important;
 }
 
-.activity-table-link:hover,
+.activity-table-link:not(.activity-client-link):not(.activity-method-pill):hover,
 .activity-title-link:hover {
   color: inherit !important;
   text-decoration: underline !important;
@@ -392,16 +390,16 @@
   color: var(--barracks-text-inset) !important;
 }
 
-.activity-table-shell ~ .modal .modal-header {
+.activity-delete-modal .modal-header {
   color: var(--barracks-text-overlay);
   border-bottom: none !important;
 }
 
-.activity-table-shell ~ .modal .modal-footer {
+.activity-delete-modal .modal-footer {
   border-top: none !important;
 }
 
-.activity-table-shell ~ .modal .modal-content {
+.activity-delete-modal .modal-content {
   background-color: var(--barracks-overlay) !important;
   color: var(--barracks-text-overlay);
 }

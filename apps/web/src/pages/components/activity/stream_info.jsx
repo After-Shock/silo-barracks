@@ -31,21 +31,44 @@ function formatUpper(value) {
   return formattedValue === UNKNOWN_VALUE ? UNKNOWN_VALUE : String(formattedValue).toUpperCase();
 }
 
-function streamMode(data, type) {
-  if (data.PlayMethod === "DirectStream") {
-    return i18next.t("DIRECT_STREAM");
-  }
+function normalizeModeKey(rawMode) {
+  const mode = String(rawMode ?? "")
+    .toLowerCase()
+    .replace(/[^a-z]/g, "");
 
-  if (!data.TranscodingInfo) {
-    return i18next.t("DIRECT");
-  }
-
-  const isDirect = type === "video" ? data.TranscodingInfo?.IsVideoDirect : data.TranscodingInfo?.IsAudioDirect;
-  return isDirect ? i18next.t("DIRECT") : i18next.t("TRANSCODE");
+  if (mode === "directplay" || mode === "direct") return "direct";
+  if (mode === "directstream" || mode === "remux") return "direct-stream";
+  if (mode === "transcode" || mode === "transcoding") return "transcode";
+  return "unavailable";
 }
 
-function modeClass(mode) {
-  return `is-${String(mode).toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+function modeLabel(key) {
+  if (key === "direct") return i18next.t("DIRECT");
+  if (key === "direct-stream") return i18next.t("DIRECT_STREAM");
+  if (key === "transcode") return i18next.t("TRANSCODE");
+  return i18next.t("UNAVAILABLE");
+}
+
+function modeDescriptor(rawMode) {
+  const key = normalizeModeKey(rawMode);
+  return { key, label: modeLabel(key) };
+}
+
+function streamMode(data, type) {
+  const decisionKey = type === "video" ? "VideoDecision" : "AudioDecision";
+  const rawDecision = data[decisionKey] ?? data.TranscodingInfo?.[decisionKey];
+  if (rawDecision) return modeDescriptor(rawDecision);
+
+  if (data.TranscodingInfo) {
+    const isDirect = type === "video" ? data.TranscodingInfo.IsVideoDirect : data.TranscodingInfo.IsAudioDirect;
+    if (isDirect === false) return modeDescriptor("Transcode");
+    if (isDirect === true) {
+      const playMethod = normalizeModeKey(data.PlayMethod);
+      return modeDescriptor(playMethod === "direct-stream" ? "DirectStream" : "DirectPlay");
+    }
+  }
+
+  return modeDescriptor(data.PlayMethod);
 }
 
 function DetailRow({ label, stream, source }) {
@@ -63,7 +86,7 @@ function DetailSection({ title, mode, rows }) {
     <section className="stream-info-section">
       <div className="stream-info-section-header">
         <h3>{title}</h3>
-        {mode ? <span className={`stream-info-mode ${modeClass(mode)}`}>{mode}</span> : null}
+        {mode ? <span className={`stream-info-mode is-${mode.key}`}>{mode.label}</span> : null}
       </div>
       <div className="stream-info-row stream-info-columns" aria-hidden="true">
         <span />
@@ -115,6 +138,7 @@ function StreamDetails({ data }) {
       : convertBitrate(videoStream?.BitRate);
   const videoMode = streamMode(data, "video");
   const audioMode = streamMode(data, "audio");
+  const playbackMode = modeDescriptor(data.PlayMethod);
   const transcodeReasons = data.TranscodingInfo?.TranscodeReasons || [];
 
   return (
@@ -122,7 +146,7 @@ function StreamDetails({ data }) {
       <div className="stream-info-summary">
         <div>
           <span>Playback</span>
-          <strong>{data.PlayMethod || i18next.t("DIRECT")}</strong>
+          <strong>{playbackMode.label}</strong>
         </div>
         <div>
           <span>Stream</span>

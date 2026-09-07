@@ -141,6 +141,12 @@
   color: var(--barracks-state-warning);
 }
 
+.stream-info-mode.is-unavailable {
+  border-color: var(--barracks-state-unavailable);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-state-unavailable);
+}
+
 .stream-info-row {
   display: grid;
   grid-template-columns: minmax(110px, 0.85fr) repeat(2, minmax(0, 1fr));

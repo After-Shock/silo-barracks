@@ -147,6 +147,42 @@
   border-radius: 8px;
 }
 
+.activity-state,
+.activity-notice {
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: 10px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+}
+
+.activity-state {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  padding: 24px;
+}
+
+.activity-state h1,
+.activity-state h2,
+.activity-state p,
+.activity-notice {
+  margin: 0;
+}
+
+.activity-state.is-error,
+.activity-notice.is-error {
+  border-color: var(--barracks-state-danger);
+}
+
+.activity-state.is-error p {
+  color: var(--barracks-state-danger);
+}
+
+.activity-notice {
+  padding: 10px 12px;
+  color: var(--barracks-text-raised);
+}
+
 .library-filter-modal {
   color: var(--barracks-text-overlay);
 }

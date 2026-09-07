@@ -31,6 +31,8 @@ function Activity() {
   const [sorting, setSorting] = useState({ column: "ActivityDateInserted", desc: true });
   const [filterParams, setFilterParams] = useState([]);
   const [isBusy, setIsBusy] = useState(false);
+  const [historyError, setHistoryError] = useState("");
+  const [libraryError, setLibraryError] = useState("");
 
   const handlePageChange = (newPage) => {
     setCurrentPage((currentPage) => (currentPage === newPage ? currentPage : newPage));
@@ -179,6 +181,7 @@ function Activity() {
         const newConfig = await Config.getConfig();
         setConfig(newConfig);
       } catch (error) {
+        setHistoryError("Unable to load activity configuration.");
         if (error.code === "ERR_NETWORK") {
           console.log(error);
         }
@@ -230,10 +233,12 @@ function Activity() {
         })
         .then((data) => {
           setData(data.data);
+          setHistoryError("");
           setIsBusy(false);
         })
         .catch((error) => {
           console.log(error);
+          setHistoryError("Unable to load activity history.");
           setIsBusy(false);
         });
     };
@@ -256,6 +261,7 @@ function Activity() {
             };
           });
           setLibraries(fetchedLibraryFilters);
+          setLibraryError("");
           if (libraryFilters.length == 0) {
             setLibraryFilters(fetchedLibraryFilters.map((library) => library.Id));
             localStorage.setItem(
@@ -266,6 +272,7 @@ function Activity() {
         })
         .catch((error) => {
           console.log(error);
+          setLibraryError("Some activity filters are unavailable.");
         });
     };
 
@@ -278,29 +285,41 @@ function Activity() {
     return () => clearInterval(intervalId);
   }, [config, itemCount, currentPage, debouncedSearchQuery, sorting, filterParams, libraries.length, libraryFilters, allLibrariesSelected, streamTypeFilter]);
 
-  if (!data) {
-    return <div data-theme-screen="activity" aria-busy="true"><Loading /></div>;
+  const activityRows = Array.isArray(data) ? data : data?.results;
+  const activityError = historyError || libraryError;
+
+  if (!data && !historyError) {
+    return <div aria-busy="true"><Loading /></div>;
   }
 
-  if (data.length === 0) {
+  if (!data && historyError) {
     return (
       <div className="Activity" data-theme-screen="activity">
-        <div className="Heading">
-          <h1>
-            <Trans i18nKey="MENU_TABS.ACTIVITY" />
-          </h1>
-        </div>
-        <div className="Activity">
-          <h1>
+        <section className="activity-state is-error" role="alert">
+          <h1><Trans i18nKey="MENU_TABS.ACTIVITY" /></h1>
+          <p>{historyError}</p>
+        </section>
+      </div>
+    );
+  }
+
+  if (Array.isArray(activityRows) && activityRows.length === 0) {
+    return (
+      <div className="Activity" data-theme-screen="activity">
+        {activityError ? <p className="activity-notice is-error" role="alert">{activityError}</p> : null}
+        <section className="activity-state is-empty">
+          <h1><Trans i18nKey="MENU_TABS.ACTIVITY" /></h1>
+          <h2>
             <Trans i18nKey="ERROR_MESSAGES.NO_ACTIVITY" />
-          </h1>
-        </div>
+          </h2>
+        </section>
       </div>
     );
   }
 
   return (
     <div className="Activity" data-theme-screen="activity">
+      {activityError ? <p className="activity-notice is-error" role="alert">{activityError}</p> : null}
       <Modal show={showLibraryFilters} onHide={() => setShowLibraryFilters(false)}>
         <Modal.Header>
           <Modal.Title>
@@ -383,12 +402,12 @@ function Activity() {
       </header>
       <div className="Activity activity-table-shell">
         <ActivityTable
-          data={data.results}
+          data={activityRows ?? []}
           itemCount={itemCount}
           onPageChange={handlePageChange}
           onSortChange={onSortChange}
           onFilterChange={onFilterChange}
-          pageCount={data.pages}
+          pageCount={data.pages ?? 1}
           isBusy={isBusy}
         />
       </div>

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "../../../lib/axios_instance";
 
 import Timeline from "@mui/lab/Timeline";
@@ -13,58 +13,87 @@ import ActivityTimelineItem from "./activity-timeline-item.jsx";
 import { groupAdjacentSeasons } from "./helpers.jsx";
 
 export default function ActivityTimelineComponent(props) {
-  const { userId, libraries } = props;
-
+  const { userId, libraries, onStateChange } = props;
   const [timelineEntries, setTimelineEntries] = useState();
   const [config, setConfig] = useState(null);
+  const [error, setError] = useState("");
+  const hasGoodContent = useRef(false);
 
   useEffect(() => {
+    let cancelled = false;
+
+    const reportState = (state) => {
+      if (!cancelled) onStateChange?.(state);
+    };
+
     const fetchConfig = async () => {
       try {
         const newConfig = await Config.getConfig();
-        setConfig(newConfig);
-      } catch (error) {
-        if (error.code === "ERR_NETWORK") {
-          console.log(error);
+        if (!cancelled) setConfig(newConfig);
+      } catch (fetchError) {
+        console.log(fetchError);
+        if (!cancelled) {
+          setError("Unable to load timeline configuration.");
+          reportState(hasGoodContent.current ? "partial" : "error");
         }
       }
     };
 
-    const fetchLibraries = () => {
-      if (config) {
-        const url = `/api/getActivityTimeLine`;
-        axios
-          .post(
-            url,
-            { userId: userId, libraries: libraries },
-            {
-              headers: {
-                Authorization: `Bearer ${config.token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          )
-          .then((timelineEntries) => {
-            const groupedAdjacentSeasons = groupAdjacentSeasons([
-              ...timelineEntries.data,
-            ]);
-            setTimelineEntries(groupedAdjacentSeasons);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
+    const fetchTimeline = () => {
+      if (!config) return;
+
+      reportState(hasGoodContent.current ? "refreshing" : "loading");
+      setError("");
+      axios
+        .post(
+          "/api/getActivityTimeLine",
+          { userId, libraries },
+          {
+            headers: {
+              Authorization: `Bearer ${config.token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .then((response) => {
+          if (cancelled) return;
+          const groupedEntries = groupAdjacentSeasons([...(response.data || [])]);
+          setTimelineEntries(groupedEntries);
+          hasGoodContent.current = groupedEntries.length > 0;
+          reportState(groupedEntries.length > 0 ? "ready" : "empty");
+        })
+        .catch((fetchError) => {
+          console.log(fetchError);
+          if (!cancelled) {
+            setError("Unable to load timeline activity.");
+            reportState(hasGoodContent.current ? "partial" : "error");
+          }
+        });
     };
 
-    if (!config) {
-      fetchConfig();
-    }
+    if (!config) fetchConfig();
+    fetchTimeline();
 
-    fetchLibraries();
-  }, [userId, libraries, config]);
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, libraries, config, onStateChange]);
 
-  return timelineEntries?.length > 0 ? (
-    <div>
+  if (timelineEntries === undefined && !error) {
+    return <div className="timeline-loading" aria-busy="true"><Loading /></div>;
+  }
+
+  if (timelineEntries === undefined && error) {
+    return <section className="timeline-state is-error" role="alert"><p>{error}</p></section>;
+  }
+
+  if (timelineEntries.length === 0) {
+    return <section className="timeline-state is-empty"><p>No activity is available for this timeline.</p></section>;
+  }
+
+  return (
+    <div className="timeline-results">
+      {error ? <p className="timeline-notice is-error" role="alert">{error}</p> : null}
       <Timeline position="alternate">
         {timelineEntries.map((entry) => (
           <ActivityTimelineItem
@@ -74,7 +103,5 @@ export default function ActivityTimelineComponent(props) {
         ))}
       </Timeline>
     </div>
-  ) : (
-    <Loading />
   );
 }
