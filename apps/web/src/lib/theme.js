@@ -233,13 +233,18 @@ export function resolveTheme(theme) {
   const surfaceInset = mixHex(input.surface, canvas, 0.38);
   const surfaceInteractive = mixHex(input.surface, text, 0.06);
   const overlay = mixHex(input.surface, canvas, 0.18);
-  const borderSubtle = mixHex(input.surface, text, 0.18);
-  const borderStrong = ensureContrast(mixHex(surfaceInteractive, text, 0.42), surfaceInteractive, 3);
   const textRaised = strongestTextEndpoint(surfaceRaised);
   const textInset = strongestTextEndpoint(surfaceInset);
   const textInteractive = strongestTextEndpoint(surfaceInteractive);
   const textNav = strongestTextEndpoint(nav);
   const textOverlay = strongestTextEndpoint(overlay);
+  const borderSubtle = mixHex(surfaceRaised, textRaised, 0.18);
+  const borderCanvas = ensureContrast(mixHex(canvas, text, 0.42), canvas, 3);
+  const borderRaised = ensureContrast(mixHex(surfaceRaised, textRaised, 0.42), surfaceRaised, 3);
+  const borderInset = ensureContrast(mixHex(surfaceInset, textInset, 0.42), surfaceInset, 3);
+  const borderStrong = ensureContrast(mixHex(surfaceInteractive, textInteractive, 0.42), surfaceInteractive, 3);
+  const borderNav = ensureContrast(mixHex(nav, textNav, 0.42), nav, 3);
+  const borderOverlay = ensureContrast(mixHex(overlay, textOverlay, 0.42), overlay, 3);
   const textMuted = closestMixToward(text, canvas);
   const textMutedRaised = closestMixToward(textRaised, surfaceRaised);
   const focus = ensureContrast(input.primary, surfaceRaised, 3);
@@ -256,6 +261,7 @@ export function resolveTheme(theme) {
   const success = ensureContrast(statusCandidates.success, surfaceRaised, 3);
   const warning = ensureContrast(statusCandidates.warning, surfaceRaised, 3);
   const danger = ensureContrast(statusCandidates.danger, surfaceRaised, 3);
+  const dangerInteractive = ensureContrast(statusCandidates.danger, surfaceInteractive, 3);
   const unavailable = ensureContrast(statusCandidates.unavailable, surfaceRaised, 3);
   const chartCandidates = [input.primary, live, warning, input.secondary, success, danger];
   const charts = chartCandidates.map((candidate) => ensureContrast(candidate, surfaceInset, 3));
@@ -269,7 +275,12 @@ export function resolveTheme(theme) {
     surfaceInteractive,
     overlay,
     borderSubtle,
+    borderCanvas,
+    borderRaised,
+    borderInset,
     borderStrong,
+    borderNav,
+    borderOverlay,
     text,
     textRaised,
     textInset,
@@ -290,6 +301,7 @@ export function resolveTheme(theme) {
     success,
     warning,
     danger,
+    dangerInteractive,
     unavailable,
     chartGrid: borderSubtle,
     chartTooltip: overlay,
@@ -399,7 +411,12 @@ const semanticPropertyMap = [
   ["--barracks-surface-interactive", "surfaceInteractive"],
   ["--barracks-overlay", "overlay"],
   ["--barracks-border-subtle", "borderSubtle"],
+  ["--barracks-border-canvas", "borderCanvas"],
+  ["--barracks-border-raised", "borderRaised"],
+  ["--barracks-border-inset", "borderInset"],
   ["--barracks-border-strong", "borderStrong"],
+  ["--barracks-border-nav", "borderNav"],
+  ["--barracks-border-overlay", "borderOverlay"],
   ["--barracks-text", "text"],
   ["--barracks-text-raised", "textRaised"],
   ["--barracks-text-inset", "textInset"],
@@ -420,6 +437,7 @@ const semanticPropertyMap = [
   ["--barracks-state-success", "success"],
   ["--barracks-state-warning", "warning"],
   ["--barracks-state-danger", "danger"],
+  ["--barracks-state-danger-interactive", "dangerInteractive"],
   ["--barracks-state-unavailable", "unavailable"],
   ["--barracks-chart-grid", "chartGrid"],
   ["--barracks-chart-tooltip", "chartTooltip"],

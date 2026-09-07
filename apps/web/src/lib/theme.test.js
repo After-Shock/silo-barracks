@@ -26,7 +26,12 @@ const SEMANTIC_KEYS = [
   "surfaceInteractive",
   "overlay",
   "borderSubtle",
+  "borderCanvas",
+  "borderRaised",
+  "borderInset",
   "borderStrong",
+  "borderNav",
+  "borderOverlay",
   "text",
   "textRaised",
   "textInset",
@@ -47,6 +52,7 @@ const SEMANTIC_KEYS = [
   "success",
   "warning",
   "danger",
+  "dangerInteractive",
   "unavailable",
   "chartGrid",
   "chartTooltip",
@@ -148,7 +154,18 @@ function assertAccessibleTokens(tokens) {
   }
   assert.ok(contrastRatio(tokens.textMuted, tokens.canvas) >= 4.5);
   assert.ok(contrastRatio(tokens.textMutedRaised, tokens.surfaceRaised) >= 4.5);
-  assert.ok(contrastRatio(tokens.borderStrong, tokens.surfaceInteractive) >= 3);
+  for (const [borderKey, surfaceKey] of [
+    ["borderCanvas", "canvas"],
+    ["borderRaised", "surfaceRaised"],
+    ["borderInset", "surfaceInset"],
+    ["borderStrong", "surfaceInteractive"],
+    ["borderNav", "nav"],
+    ["borderOverlay", "overlay"],
+  ]) {
+    assert.ok(contrastRatio(tokens[borderKey], tokens[surfaceKey]) >= 3, `${borderKey} is visible on ${surfaceKey}`);
+  }
+  assert.ok(contrastRatio(tokens.danger, tokens.surfaceRaised) >= 3);
+  assert.ok(contrastRatio(tokens.dangerInteractive, tokens.surfaceInteractive) >= 3);
   assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3);
   assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5);
   assert.ok(contrastRatio(tokens.actionForeground, tokens.canvas) >= 4.5);
@@ -233,6 +250,12 @@ test("resolveTheme derives every semantic token for the default palette", () => 
   assert.equal(tokens.surfaceInteractive, "#2f2921");
   assert.equal(tokens.overlay, "#201b13");
   assert.equal(tokens.borderSubtle, "#48423a");
+  assert.equal(tokens.borderCanvas, "#74706a");
+  assert.equal(tokens.borderRaised, "#7b756d");
+  assert.equal(tokens.borderInset, "#78736b");
+  assert.equal(tokens.borderStrong, "#827d74");
+  assert.equal(tokens.borderNav, "#78736c");
+  assert.equal(tokens.borderOverlay, "#79746c");
   assert.equal(tokens.text, "#f5f0e7");
   assert.equal(tokens.textRaised, "#f5f0e7");
   assert.equal(tokens.textInset, "#f5f0e7");
@@ -247,6 +270,7 @@ test("resolveTheme derives every semantic token for the default palette", () => 
   assert.equal(tokens.action, DEFAULT_THEME.primary);
   assert.equal(tokens.actionText, "#10100f");
   assert.equal(tokens.actionForeground, "#6f9bcf");
+  assert.equal(tokens.dangerInteractive, "#e45f55");
   assert.equal(tokens.accentSecondary, DEFAULT_THEME.secondary);
   assert.equal(tokens.chartGrid, tokens.borderSubtle);
   assert.equal(tokens.chartTooltip, tokens.overlay);
@@ -284,8 +308,24 @@ test("resolveTheme preserves the four public inputs and all token relationships"
     const surface = tokens[surfaceKey];
     assert.equal(tokens[textKey], expectedNormalText(surface), `${textKey} uses strongest endpoint for ${surfaceKey}`);
   }
-  assert.equal(tokens.borderSubtle, mixHex(normalized.surface, tokens.text, 0.18));
-  assert.equal(tokens.borderStrong, ensureContrast(mixHex(tokens.surfaceInteractive, tokens.text, 0.42), tokens.surfaceInteractive, 3));
+  assert.equal(tokens.borderSubtle, mixHex(tokens.surfaceRaised, tokens.textRaised, 0.18));
+  for (const [borderKey, surfaceKey, textKey] of [
+    ["borderCanvas", "canvas", "text"],
+    ["borderRaised", "surfaceRaised", "textRaised"],
+    ["borderInset", "surfaceInset", "textInset"],
+    ["borderStrong", "surfaceInteractive", "textInteractive"],
+    ["borderNav", "nav", "textNav"],
+    ["borderOverlay", "overlay", "textOverlay"],
+  ]) {
+    assert.equal(
+      tokens[borderKey],
+      ensureContrast(mixHex(tokens[surfaceKey], tokens[textKey], 0.42), tokens[surfaceKey], 3),
+      `${borderKey} starts from its named surface/text pair`,
+    );
+  }
+  assert.equal(tokens.dangerInteractive, ensureContrast("#e45f55", tokens.surfaceInteractive, 3));
+  assert.ok(contrastRatio(tokens.danger, tokens.surfaceRaised) >= 3);
+  assert.ok(contrastRatio(tokens.dangerInteractive, tokens.surfaceInteractive) >= 3);
   assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3);
   assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5);
   assert.equal(tokens.actionForeground, ensureContrast(normalized.primary, normalized.background, 4.5));
@@ -348,7 +388,6 @@ test("resolveTheme adjusts only inaccessible fixed status and chart candidates",
   }
   assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3);
   assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5);
-  assert.ok(contrastRatio(tokens.borderStrong, tokens.surfaceInteractive) >= 3);
   assertAccessibleTokens(tokens);
 });
 
@@ -478,6 +517,18 @@ test("resolveTheme keeps normal and muted text readable for seeded saturated pal
     }
     assert.ok(contrastRatio(tokens.textMuted, tokens.canvas) >= 4.5, `${palette.name}: textMuted`);
     assert.ok(contrastRatio(tokens.textMutedRaised, tokens.surfaceRaised) >= 4.5, `${palette.name}: textMutedRaised`);
+    for (const [borderKey, surfaceKey] of [
+      ["borderCanvas", "canvas"],
+      ["borderRaised", "surfaceRaised"],
+      ["borderInset", "surfaceInset"],
+      ["borderStrong", "surfaceInteractive"],
+      ["borderNav", "nav"],
+      ["borderOverlay", "overlay"],
+    ]) {
+      assert.ok(contrastRatio(tokens[borderKey], tokens[surfaceKey]) >= 3, `${palette.name}: ${borderKey}`);
+    }
+    assert.ok(contrastRatio(tokens.danger, tokens.surfaceRaised) >= 3, `${palette.name}: danger`);
+    assert.ok(contrastRatio(tokens.dangerInteractive, tokens.surfaceInteractive) >= 3, `${palette.name}: dangerInteractive`);
   }
 });
 
@@ -593,7 +644,12 @@ test("applyTheme writes semantic tokens, RGB companions, and legacy aliases as o
     "--barracks-surface-interactive": tokens.surfaceInteractive,
     "--barracks-overlay": tokens.overlay,
     "--barracks-border-subtle": tokens.borderSubtle,
+    "--barracks-border-canvas": tokens.borderCanvas,
+    "--barracks-border-raised": tokens.borderRaised,
+    "--barracks-border-inset": tokens.borderInset,
     "--barracks-border-strong": tokens.borderStrong,
+    "--barracks-border-nav": tokens.borderNav,
+    "--barracks-border-overlay": tokens.borderOverlay,
     "--barracks-text": tokens.text,
     "--barracks-text-raised": tokens.textRaised,
     "--barracks-text-inset": tokens.textInset,
@@ -614,6 +670,7 @@ test("applyTheme writes semantic tokens, RGB companions, and legacy aliases as o
     "--barracks-state-success": tokens.success,
     "--barracks-state-warning": tokens.warning,
     "--barracks-state-danger": tokens.danger,
+    "--barracks-state-danger-interactive": tokens.dangerInteractive,
     "--barracks-state-unavailable": tokens.unavailable,
     "--barracks-chart-grid": tokens.chartGrid,
     "--barracks-chart-tooltip": tokens.chartTooltip,

@@ -6,7 +6,12 @@
     --barracks-surface-interactive: #2f2921;
     --barracks-overlay: #201b13;
     --barracks-border-subtle: #48423a;
+    --barracks-border-canvas: #74706a;
+    --barracks-border-raised: #7b756d;
+    --barracks-border-inset: #78736b;
     --barracks-border-strong: #827d74;
+    --barracks-border-nav: #78736c;
+    --barracks-border-overlay: #79746c;
     --barracks-text: #f5f0e7;
     --barracks-text-raised: #f5f0e7;
     --barracks-text-inset: #f5f0e7;
@@ -27,6 +32,7 @@
     --barracks-state-success: #70b981;
     --barracks-state-warning: #ffa64f;
     --barracks-state-danger: #e45f55;
+    --barracks-state-danger-interactive: #e45f55;
     --barracks-state-unavailable: #a0977f;
     --barracks-chart-grid: #48423a;
     --barracks-chart-tooltip: #201b13;
