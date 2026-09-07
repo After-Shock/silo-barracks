@@ -143,7 +143,7 @@
   height: 40px;
   flex: 0 0 28px;
   margin-top: 5px;
-  background: var(--barracks-action-foreground);
+  background: var(--barracks-border-strong);
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
 }
 
