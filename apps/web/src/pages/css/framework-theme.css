@@ -146,8 +146,8 @@ fieldset:disabled .btn {
   color: var(--barracks-text-muted-raised) !important;
 }
 
-:is(.card, .modal-content, .dropdown-menu) :is(a, .text-primary-custom, .text-secondary-custom),
-:is(.card, .modal-content, .dropdown-menu) :is(a, .text-primary-custom, .text-secondary-custom):hover {
+:is(.card, .modal-content, .dropdown-menu) :is(a:not(.MuiButton-contained), .text-primary-custom, .text-secondary-custom),
+:is(.card, .modal-content, .dropdown-menu) :is(a:not(.MuiButton-contained), .text-primary-custom, .text-secondary-custom):hover {
   color: var(--barracks-text-muted-raised) !important;
 }
 
@@ -288,7 +288,7 @@ fieldset:disabled .btn {
   .MuiTimeClock-root,
   .MuiDayCalendar-header,
   .MuiPickersCalendarHeader-root
-) a,
+) a:not(.MuiButton-contained),
 :is(
   .MuiPaper-root,
   .MuiDialog-paper,
@@ -306,7 +306,7 @@ fieldset:disabled .btn {
   color: var(--barracks-text-raised) !important;
 }
 
-.MuiPopover-paper:not(.MuiMenu-paper) a,
+.MuiPopover-paper:not(.MuiMenu-paper) a:not(.MuiButton-contained),
 .MuiPopover-paper:not(.MuiMenu-paper) :is(.MuiButton-root:not(.MuiButton-contained), .MuiIconButton-root) {
   color: var(--barracks-text-overlay) !important;
 }
@@ -401,7 +401,7 @@ fieldset:disabled .btn {
   color: var(--barracks-text-interactive) !important;
 }
 
-.MuiTableRow-root:is(:hover, .Mui-selected) .MuiTableCell-root :is(a, .MuiButton-root:not(.MuiButton-contained):not(.Mui-disabled), .MuiIconButton-root:not(.Mui-disabled)),
+.MuiTableRow-root:is(:hover, .Mui-selected) .MuiTableCell-root :is(a:not(.MuiButton-contained), .MuiButton-root:not(.MuiButton-contained):not(.Mui-disabled), .MuiIconButton-root:not(.Mui-disabled)),
 .MuiTableRow-root:is(:hover, .Mui-selected) .MuiTableCell-root > .MuiSvgIcon-root {
   color: var(--barracks-text-interactive) !important;
 }
@@ -440,7 +440,7 @@ fieldset:disabled .btn {
   color: var(--barracks-text-interactive) !important;
 }
 
-.MuiDataGrid-row:is(:hover, .Mui-selected) .MuiDataGrid-cell :is(a, .MuiButton-root:not(.MuiButton-contained):not(.Mui-disabled), .MuiIconButton-root:not(.Mui-disabled)),
+.MuiDataGrid-row:is(:hover, .Mui-selected) .MuiDataGrid-cell :is(a:not(.MuiButton-contained), .MuiButton-root:not(.MuiButton-contained):not(.Mui-disabled), .MuiIconButton-root:not(.Mui-disabled)),
 .MuiDataGrid-row:is(:hover, .Mui-selected) .MuiDataGrid-cell > .MuiSvgIcon-root {
   color: var(--barracks-text-interactive) !important;
 }
