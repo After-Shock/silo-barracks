@@ -68,11 +68,11 @@ a plain object of CSS color strings keyed by the following stable contract, then
 | `surfaceInset` | `--barracks-surface-inset` | Tables/code/inset regions |
 | `surfaceInteractive` | `--barracks-surface-interactive` | Inputs/menus/hover targets |
 | `overlay` | `--barracks-overlay` | Popovers/tooltips |
-| `borderSubtle`, `borderStrong` | `--barracks-border-subtle`, `--barracks-border-strong` | Boundaries |
+| `borderSubtle`, `borderCanvas`, `borderRaised`, `borderInset`, `borderStrong`, `borderNav`, `borderOverlay` | matching `--barracks-border-*` properties | Decorative boundary plus surface-specific meaningful boundaries (`borderStrong` is interactive) |
 | `text`, `textRaised`, `textInset`, `textInteractive`, `textNav`, `textOverlay` | `--barracks-text`, `--barracks-text-raised`, `--barracks-text-inset`, `--barracks-text-interactive`, `--barracks-text-nav`, `--barracks-text-overlay` | Surface-specific normal text |
 | `textMuted`, `textMutedRaised`, `textInverse` | `--barracks-text-muted`, `--barracks-text-muted-raised`, `--barracks-text-inverse` | Muted canvas/raised text and inverse typography |
 | `focus`, `focusLight`, `focusDark`, `action`, `actionText`, `actionForeground`, `accentSecondary` | `--barracks-focus`, `--barracks-focus-light`, `--barracks-focus-dark`, `--barracks-action`, `--barracks-action-text`, `--barracks-action-foreground`, `--barracks-accent-secondary` | Keyboard focus/action fills/action labels/canvas action links/theme personality |
-| `live`, `success`, `warning`, `danger`, `unavailable` | matching `--barracks-state-*` properties | Status semantics |
+| `live`, `success`, `warning`, `danger`, `dangerInteractive`, `unavailable` | matching `--barracks-state-*` properties | Raised-surface status semantics plus an interactive-surface danger marker |
 | `chartGrid`, `chartTooltip` | matching `--barracks-chart-*` properties | Chart structure |
 | `chart1` through `chart6` | `--barracks-chart-1` through `--barracks-chart-6` | Ordered series palette |
 | `scrim`, `shadow` | `--barracks-scrim`, `--barracks-shadow` | Layer depth |
@@ -111,10 +111,12 @@ smallest change from `primary`. `actionForeground` is independently adjusted
 from `primary` to reach 4.5:1 against `canvas` and is used for links/accent text,
 never as a fill. Links inside raised surfaces use the guaranteed raised-surface
 text role rather than assuming the canvas foreground also contrasts there.
-Focus is a ring color only and is never used as an action fill. `borderStrong`
-reaches 3:1 against its associated interactive
-surface and is used for controls and meaningful boundaries; `borderSubtle` is
-decorative only. Charts resolve series against `surfaceInset`, and retain labels,
+Focus is a ring color only and is never used as an action fill. Each meaningful
+boundary token reaches 3:1 against its named surface; the legacy name
+`borderStrong` is the interactive-surface boundary. `borderSubtle` is decorative
+only. `dangerInteractive` independently adjusts the danger candidate to 3:1
+against `surfaceInteractive`, for destructive controls that retain a neutral
+interactive fill. Charts resolve series against `surfaceInset`, and retain labels,
 legends, markers, or existing patterns so color is not their sole distinction.
 Focus never relies on a single custom color: every focus-visible rule renders
 the adjusted `focus` ring together with one-pixel `focusLight` (`#f5f0e7`) and
