@@ -1,4 +1,20 @@
 /* Route-owned rules extracted from integrations.css. */
+.wizarr-refresh-button,
+.wizarr-create-card > button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.36);
+  border-radius: 8px;
+  background: rgba(var(--barracks-action-rgb), 0.34);
+  color: var(--barracks-text-raised);
+  font-weight: 950;
+  text-decoration: none;
+}
+
 .wizarr-dashboard {
   display: grid;
   grid-template-columns: repeat(4, minmax(160px, 1fr));
@@ -459,18 +475,8 @@
 }
 
 @media (max-width: 720px) {
-  .integration-link-panel,
-  .integration-page-header {
-    grid-template-columns: 1fr;
-  }
-
-  .integration-link-actions {
-    justify-content: flex-start;
-  }
-
   .wizarr-dashboard,
   .wizarr-form-grid {
     grid-template-columns: 1fr;
   }
 }
-

@@ -1,4 +1,47 @@
 /* Route-owned rules extracted from integrations.css. */
+.integrations-page.is-compact-page {
+  grid-auto-rows: max-content;
+}
+
+.integrations-page.is-compact-page > * {
+  align-self: start;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.calendar-toolbar,
+.calendar-shell {
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
+  box-shadow: 0 22px 60px color-mix(in srgb, var(--barracks-surface-inset) 28%, transparent);
+}
+
+.calendar-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.calendar-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.42);
+  border-radius: 10px;
+  background: rgba(var(--barracks-action-rgb), 0.2);
+  color: var(--barracks-action);
+  font-weight: 950;
+}
+
+.calendar-toolbar button:hover {
+  background: var(--barracks-action);
+  color: var(--barracks-text-raised);
+}
+
 .calendar-toolbar {
   padding: 10px;
 }
@@ -789,3 +832,68 @@
   font-weight: 850;
 }
 
+@media (max-width: 900px) {
+  .calendar-shell,
+  .calendar-layout,
+  .calendar-source-strip,
+  .calendar-lower-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-month-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-weekday {
+    display: none;
+  }
+
+  .calendar-month-cell {
+    height: auto;
+    min-height: 110px;
+  }
+
+  .calendar-preview-modal {
+    grid-template-columns: 1fr;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+  }
+
+  .calendar-preview-art {
+    max-height: 360px;
+  }
+
+  .calendar-preview-copy {
+    padding-right: 0;
+  }
+
+  .calendar-preview-copy dl {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-feature-card {
+    position: static;
+  }
+}
+
+.calendar-toolbar,
+.calendar-shell {
+  border-color: var(--barracks-border-subtle);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--barracks-surface-inset) 18%, transparent);
+}
+
+.calendar-toolbar button {
+  border-color: var(--barracks-border-subtle);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
+  color: var(--barracks-action);
+  font-weight: 680;
+}
+
+.calendar-toolbar button:hover {
+  background: var(--barracks-action);
+  color: var(--barracks-text-raised);
+  box-shadow: none;
+}

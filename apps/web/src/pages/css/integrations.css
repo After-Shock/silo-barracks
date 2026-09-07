@@ -16,22 +16,11 @@
     linear-gradient(180deg, var(--barracks-surface-inset), var(--barracks-surface-inset) 58%);
 }
 
-.integrations-page > *,
-.downloads-page > * {
+.integrations-page > * {
   width: 100%;
   min-height: 0;
   align-self: start;
   justify-self: stretch;
-}
-
-.integrations-page.is-compact-page {
-  grid-auto-rows: max-content;
-}
-
-.integrations-page.is-compact-page > * {
-  align-self: start;
-  height: auto !important;
-  min-height: 0 !important;
 }
 
 .integrations-page.is-embedded {
@@ -54,11 +43,7 @@
 .integration-section,
 .integration-events,
 .jellyfin-integration-card,
-.integration-subtabs,
-.calendar-toolbar,
-.calendar-shell,
-.downloads-summary,
-.downloads-board article {
+.integration-subtabs {
   border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
   border-radius: 16px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
@@ -349,8 +334,7 @@
 }
 
 .integration-section-title h2,
-.integration-events h2,
-.downloads-board h2 {
+.integration-events h2 {
   margin: 0;
   font-size: 24px;
   font-weight: 950;
@@ -400,9 +384,7 @@
   gap: 8px;
 }
 
-.integration-link-panel a,
-.wizarr-refresh-button,
-.wizarr-create-card > button {
+.integration-link-panel a {
   display: inline-flex;
   min-height: 38px;
   align-items: center;
@@ -604,8 +586,7 @@
 }
 
 .integration-actions,
-.client-adder,
-.calendar-toolbar {
+.client-adder {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -619,9 +600,7 @@
 
 .integration-actions button,
 .client-adder button,
-.integration-events button,
-.calendar-toolbar button,
-.downloads-board button {
+.integration-events button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -823,21 +802,6 @@
   justify-content: flex-start;
 }
 
-@media (max-width: 1280px) {
-  .requests-board {
-    grid-template-columns: 1fr;
-  }
-
-  .requests-board article {
-    grid-template-columns: 132px minmax(0, 1fr) 132px;
-    min-height: 218px;
-  }
-
-  .requests-card-poster {
-    width: 132px;
-  }
-}
-
 @media (max-width: 900px) {
   .integrations-hero,
   .integration-page-header,
@@ -846,189 +810,27 @@
     flex-direction: column;
   }
 
-  .integrations-page.is-embedded .jellyfin-integration-card.is-compact,
-  .calendar-shell,
-  .calendar-layout,
-  .downloads-summary,
-  .downloads-board {
+  .integrations-page.is-embedded .jellyfin-integration-card.is-compact {
     grid-template-columns: 1fr;
-  }
-
-  .requests-hero,
-  .requests-discovery-head,
-  .requests-board article {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .requests-media-search {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-
-  .requests-media-search button {
-    grid-column: 1 / -1;
-    width: 100%;
-  }
-
-  .requests-discovery-actions {
-    grid-template-columns: 1fr auto;
-  }
-
-  .requests-discovery-results article {
-    grid-template-columns: 72px minmax(0, 1fr);
-  }
-
-  .requests-discovery-poster {
-    width: 72px;
-  }
-
-  .requests-control-bar {
-    grid-template-columns: 1fr;
-  }
-
-  .requests-control-bar > strong {
-    justify-content: flex-start;
-  }
-
-  .requests-board article {
-    min-height: auto;
-  }
-
-  .requests-card-poster {
-    grid-row: auto;
-    justify-self: start;
-    width: min(112px, 100%);
-  }
-
-  .requests-card-actions {
-    grid-column: auto;
-    grid-row: auto;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    justify-self: start;
-    width: 100%;
-  }
-
-  .requests-card-title,
-  .requests-card-meta,
-  .requests-card-footer,
-  .requests-card-tags,
-  .requests-card-overview {
-    grid-column: auto;
-  }
-
-  .requests-card-meta {
-    align-items: flex-start;
-  }
-
-  .requests-detail {
-    grid-template-columns: 1fr;
-  }
-
-  .requests-detail-art {
-    width: min(220px, 100%);
-    justify-self: center;
-  }
-
-  .requests-detail-copy dl {
-    grid-template-columns: 1fr;
-  }
-
-  .requests-detail-title-row {
-    grid-template-columns: 1fr;
-  }
-
-  .requests-rating-row-title {
-    justify-self: stretch;
-    width: 100%;
-  }
-
-  .requests-edit-panel {
-    grid-template-columns: 1fr;
-  }
-
-  .requests-edit-heading {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .requests-edit-actions,
-  .requests-edit-actions button {
-    width: 100%;
-  }
-
-  .requests-rating-row {
-    grid-template-columns: 1fr;
-  }
-
-  .requests-board strong,
-  .requests-board b,
-  .requests-board span,
-  .requests-board small,
-  .requests-board time {
-    white-space: normal;
   }
 
   .integration-fields {
     grid-template-columns: 1fr;
   }
+}
 
-  .download-add-bar,
-  .download-page-header,
-  .calendar-source-strip,
-  .calendar-lower-grid,
-  .download-console-grid,
-  .download-count-grid {
+@media (max-width: 720px) {
+  .integration-link-panel,
+  .integration-page-header {
     grid-template-columns: 1fr;
   }
 
-  .calendar-month-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .calendar-weekday {
-    display: none;
-  }
-
-  .calendar-month-cell {
-    height: auto;
-    min-height: 110px;
-  }
-
-  .calendar-preview-modal {
-    grid-template-columns: 1fr;
-    max-height: calc(100vh - 32px);
-    overflow-y: auto;
-  }
-
-  .calendar-preview-art {
-    max-height: 360px;
-  }
-
-  .calendar-preview-copy {
-    padding-right: 0;
-  }
-
-  .calendar-preview-copy dl {
-    grid-template-columns: 1fr;
-  }
-
-  .calendar-feature-card {
-    position: static;
-  }
-
-  .download-add-bar label:first-child {
-    grid-column: auto;
-  }
-
-  .download-row-main,
-  .download-row-meta {
-    align-items: flex-start;
-    flex-direction: column;
+  .integration-link-actions {
+    justify-content: flex-start;
   }
 }
 
-.integrations-page,
-.requests-page {
+.integrations-page {
   background: transparent;
 }
 
@@ -1038,16 +840,6 @@
 .integration-events,
 .jellyfin-integration-card,
 .integration-subtabs,
-.calendar-toolbar,
-.calendar-shell,
-.downloads-summary,
-.downloads-board article,
-.requests-hero,
-.requests-summary-grid article,
-.requests-discovery,
-.requests-board,
-.requests-control-bar,
-.requests-filter-strip,
 .integration-card {
   border-color: var(--barracks-border-subtle);
   border-radius: 8px;
@@ -1058,9 +850,7 @@
 .integration-page-header p,
 .integrations-hero p,
 .integration-card p,
-.integration-section-title span,
-.requests-hero p,
-.requests-summary-grid span {
+.integration-section-title span {
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -1069,7 +859,6 @@
 .integrations-hero h1,
 .integration-section-title h2,
 .integration-events h2,
-.downloads-board h2,
 .integration-card h2 {
   font-weight: 760;
   line-height: 1.08;
@@ -1107,9 +896,7 @@
 .client-adder .integration-import-button,
 .integration-actions button,
 .client-adder button,
-.integration-events button,
-.calendar-toolbar button,
-.downloads-board button {
+.integration-events button {
   border-color: var(--barracks-border-subtle);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
@@ -1122,9 +909,7 @@
 .integration-toolbar button:hover,
 .integration-toolbar label:hover,
 .client-adder button:hover,
-.integration-events button:hover,
-.calendar-toolbar button:hover,
-.downloads-board button:hover {
+.integration-events button:hover {
   background: var(--barracks-action);
   color: var(--barracks-text-raised);
   box-shadow: none;

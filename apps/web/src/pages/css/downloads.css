@@ -1,4 +1,44 @@
 /* Route-owned rules extracted from integrations.css. */
+.downloads-page > * {
+  width: 100%;
+  min-height: 0;
+  align-self: start;
+  justify-self: stretch;
+}
+
+.downloads-summary,
+.downloads-board article {
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
+  box-shadow: 0 22px 60px color-mix(in srgb, var(--barracks-surface-inset) 28%, transparent);
+}
+
+.downloads-board h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 950;
+}
+
+.downloads-board button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.42);
+  border-radius: 10px;
+  background: rgba(var(--barracks-action-rgb), 0.2);
+  color: var(--barracks-action);
+  font-weight: 950;
+}
+
+.downloads-board button:hover {
+  background: var(--barracks-action);
+  color: var(--barracks-text-raised);
+}
+
 .downloads-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -492,4 +532,52 @@
   color: var(--barracks-state-danger);
   letter-spacing: 0;
   text-transform: none;
+}
+
+@media (max-width: 900px) {
+  .downloads-summary,
+  .downloads-board,
+  .download-add-bar,
+  .download-page-header,
+  .download-console-grid,
+  .download-count-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .download-add-bar label:first-child {
+    grid-column: auto;
+  }
+
+  .download-row-main,
+  .download-row-meta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+.downloads-summary,
+.downloads-board article {
+  border-color: var(--barracks-border-subtle);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--barracks-surface-inset) 18%, transparent);
+}
+
+.downloads-board h2 {
+  font-weight: 760;
+  line-height: 1.08;
+}
+
+.downloads-board button {
+  border-color: var(--barracks-border-subtle);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
+  color: var(--barracks-action);
+  font-weight: 680;
+}
+
+.downloads-board button:hover {
+  background: var(--barracks-action);
+  color: var(--barracks-text-raised);
+  box-shadow: none;
 }
