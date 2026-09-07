@@ -351,8 +351,23 @@ test("applyTheme(undefined) loads the injected stored theme and emits no event",
   const root = createRoot();
   const eventLog = [];
   const eventTarget = createEventTarget(eventLog);
+  const previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    enumerable: previousWindow?.enumerable ?? false,
+    writable: true,
+    value: eventTarget,
+  });
 
-  applyTheme(undefined, { storage, root });
+  try {
+    applyTheme(undefined, { storage, root });
+  } finally {
+    if (previousWindow) {
+      Object.defineProperty(globalThis, "window", previousWindow);
+    } else {
+      delete globalThis.window;
+    }
+  }
 
   assert.deepEqual(getThemeTokens(), resolveTheme(theme).tokens);
   assert.equal(eventLog.length, 0);
