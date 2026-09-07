@@ -117,7 +117,7 @@ h2 {
 }
 
 .App-link {
-  color: var(--barracks-action);
+  color: var(--barracks-action-foreground);
 }
 
 @keyframes App-logo-spin {
@@ -166,11 +166,11 @@ h2 {
 }
 
 .text-primary-custom {
-  color: var(--barracks-action) !important;
+  color: var(--barracks-action-foreground) !important;
 }
 
 .text-secondary-custom {
-  color: var(--barracks-accent-secondary) !important;
+  color: var(--barracks-action-foreground) !important;
 }
 
 .jellyglance-toast-container {
@@ -199,11 +199,11 @@ h2 {
   width: 38px;
   min-width: 38px;
   margin-inline-end: 14px;
-  color: var(--barracks-action);
+  color: var(--barracks-text);
 }
 
 .jellyglance-toast.Toastify__toast--info .Toastify__toast-icon {
-  color: var(--barracks-action);
+  color: var(--barracks-text);
 }
 
 .jellyglance-toast.Toastify__toast--success .Toastify__toast-icon {
@@ -297,7 +297,7 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 760;
   letter-spacing: 0.08em;
@@ -342,7 +342,7 @@ h2 {
 }
 
 .whats-new-list svg {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
 }
 
 .whats-new-list strong,

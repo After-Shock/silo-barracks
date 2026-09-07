@@ -6,11 +6,11 @@ body {
 }
 
 a {
-  color: var(--barracks-action);
+  color: var(--barracks-action-foreground);
 }
 
 a:hover {
-  color: var(--barracks-action);
+  color: var(--barracks-action-foreground);
 }
 
 button,
@@ -146,6 +146,11 @@ fieldset:disabled .btn {
   color: var(--barracks-text-muted-raised) !important;
 }
 
+:is(.card, .modal-content, .dropdown-menu) :is(a, .text-primary-custom, .text-secondary-custom),
+:is(.card, .modal-content, .dropdown-menu) :is(a, .text-primary-custom, .text-secondary-custom):hover {
+  color: var(--barracks-text-muted-raised) !important;
+}
+
 .modal-header,
 .modal-footer,
 .dropdown-divider {
@@ -263,6 +268,11 @@ fieldset:disabled .btn {
   color: var(--barracks-text-muted-raised) !important;
 }
 
+:is(.MuiPaper-root, .MuiDialog-paper, .MuiMenu-paper, .MuiPopover-paper) a,
+:is(.MuiPaper-root, .MuiDialog-paper, .MuiMenu-paper, .MuiPopover-paper) :is(.MuiButton-root:not(.MuiButton-contained), .MuiIconButton-root) {
+  color: var(--barracks-text-muted-raised) !important;
+}
+
 .MuiMenuItem-root,
 .MuiListItemText-primary,
 .MuiSvgIcon-root {
@@ -303,7 +313,7 @@ fieldset:disabled .btn {
 
 .MuiButton-root,
 .MuiIconButton-root {
-  color: var(--barracks-action) !important;
+  color: var(--barracks-action-foreground) !important;
 }
 
 .MuiButton-contained {

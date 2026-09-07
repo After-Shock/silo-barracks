@@ -482,8 +482,7 @@
 
 .logout
 {
-
-  color: var(--barracks-accent-secondary) !important;
+  color: var(--barracks-text) !important;
 }
 
 .navbar-inline-footer {

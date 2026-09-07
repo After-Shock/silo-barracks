@@ -36,8 +36,13 @@ html body :is(.navbar-brand-icon, .setup-logo-mark, .setup-jellyfin-logo, .login
   filter: none;
 }
 
-html body :is(.session-details-title, .setup-brand-kicker) {
-  color: var(--barracks-action) !important;
+html body .session-details-title {
+  color: var(--barracks-text-muted-raised) !important;
+  text-shadow: none;
+}
+
+html body .setup-brand-kicker {
+  color: var(--barracks-action-foreground) !important;
   text-shadow: none;
 }
 
