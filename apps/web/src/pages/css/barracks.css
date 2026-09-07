@@ -59,7 +59,7 @@ html body .setup-button:not(:disabled):not(.disabled):hover {
 }
 
 html body :is(.setup-button, .profile-logout-button):is(:disabled, .disabled) {
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-inset) !important;
   background: var(--barracks-surface-inset) !important;
   color: var(--barracks-text-inset) !important;
 }
@@ -82,7 +82,7 @@ html body .silo-wordmark {
 html body :is(.home-icon-bubble, .home-accent-purple .home-icon-bubble) {
   color: var(--barracks-action);
   background: var(--barracks-surface-interactive);
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-strong);
   border-radius: 4px;
   box-shadow: none;
 }
@@ -94,6 +94,6 @@ html body :is(.home-hour span, .session-popout-progress div) {
 
 html body :is(.home-hall-grid, .home-podium-card, .home-runner-row, .home-runner-empty, .session-popout-modal .modal-content) {
   background: var(--barracks-surface-raised);
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-raised);
   color: var(--barracks-text-raised);
 }

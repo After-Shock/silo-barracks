@@ -131,7 +131,7 @@ h2 {
 
 .form-select {
   background-color: var(--barracks-surface-interactive) !important;
-  border-color: var(--barracks-border-subtle) !important ;
+  border-color: var(--barracks-border-strong) !important ;
   color: var(--barracks-text-interactive) !important;
   border-radius: 8px !important;
 }
@@ -145,7 +145,7 @@ h2 {
   background-color: var(--barracks-surface-raised) !important;
   padding: 0 !important;
   border-radius: 8px !important;
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-raised) !important;
 }
 
 .form-select option:hover {
@@ -180,7 +180,7 @@ h2 {
 .jellyglance-toast {
   min-height: 74px;
   overflow: hidden;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-overlay);
   border-radius: 10px !important;
   background: var(--barracks-overlay) !important;
   color: var(--barracks-text-overlay) !important;
@@ -258,7 +258,7 @@ h2 {
 
 .whats-new-modal .modal-content {
   overflow: hidden;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 12px;
   background: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
@@ -281,7 +281,7 @@ h2 {
   height: 34px;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-overlay);
   border-radius: 999px;
   background: var(--barracks-overlay);
   color: var(--barracks-text-overlay);
@@ -335,7 +335,7 @@ h2 {
   align-items: start;
   min-width: 0;
   min-height: 112px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 8px;
   padding: 12px;
   background: var(--barracks-surface-interactive);

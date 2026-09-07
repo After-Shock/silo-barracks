@@ -7,7 +7,7 @@
   position: relative;
   background: var(--barracks-nav);
   color: var(--barracks-text-nav);
-  border-right: 1px solid var(--barracks-border-subtle) !important;
+  border-right: 1px solid var(--barracks-border-nav) !important;
   box-shadow: var(--barracks-shadow);
 }
 
@@ -29,7 +29,7 @@
     height: 125vh;
     width: var(--jg-sidebar-width, 250px);
     overflow: visible;
-    border-bottom: 1px solid var(--barracks-border-subtle) !important;
+    border-bottom: 1px solid var(--barracks-border-nav) !important;
 
   }
 
@@ -63,7 +63,7 @@
     gap: 10px;
     margin: 0 0 10px;
     padding: calc(env(safe-area-inset-top, 0px) + 10px) 12px 10px;
-    border-bottom: 1px solid var(--barracks-border-subtle);
+    border-bottom: 1px solid var(--barracks-border-nav);
     background: var(--barracks-nav);
     backdrop-filter: blur(14px);
   }
@@ -83,7 +83,7 @@
     width: 46px;
     height: 46px;
     place-items: center;
-    border: 1px solid var(--barracks-border-subtle);
+    border: 1px solid var(--barracks-border-strong);
     border-radius: 12px;
     background: var(--barracks-surface-interactive);
     color: var(--barracks-text-interactive);
@@ -117,7 +117,7 @@
     flex: 0 0 clamp(36px, 10vw, 46px);
     place-items: center;
     overflow: hidden;
-    border: 1px solid var(--barracks-border-subtle);
+    border: 1px solid var(--barracks-border-strong);
     border-radius: 999px;
     background: var(--barracks-surface-interactive);
     color: var(--barracks-action);
@@ -190,7 +190,7 @@
     width: 62px;
     height: 62px;
     place-items: center;
-    border: 1px solid var(--barracks-border-subtle);
+    border: 1px solid var(--barracks-border-strong);
     border-radius: 16px;
     background: var(--barracks-surface-interactive);
     color: var(--barracks-text-interactive);
@@ -215,7 +215,7 @@
   }
 
   .mobile-app-menu-tile.active .mobile-app-menu-icon {
-    border-color: var(--barracks-border-strong);
+    border-color: var(--barracks-action);
     background: var(--barracks-action);
     color: var(--barracks-action-text);
     box-shadow: var(--barracks-shadow);
@@ -230,7 +230,7 @@
     height: 22px;
     place-items: center;
     padding: 0 6px;
-    border: 1px solid var(--barracks-border-strong);
+    border: 1px solid var(--barracks-action);
     border-radius: 999px;
     background: var(--barracks-action);
     color: var(--barracks-action-text);
@@ -251,7 +251,7 @@
     width: 100%;
     min-width: 0;
     align-items: center;
-    border: 1px solid var(--barracks-border-subtle);
+    border: 1px solid var(--barracks-border-strong);
     background: var(--barracks-surface-interactive);
     color: var(--barracks-text-interactive);
     font: inherit;
@@ -273,6 +273,11 @@
     border-radius: 18px;
     font-size: 15px;
     font-weight: 900;
+    border-color: var(--barracks-state-danger-interactive);
+  }
+
+  .mobile-app-menu-logout svg {
+    color: var(--barracks-state-danger-interactive);
   }
 
   .mobile-app-menu-version .version {
@@ -369,7 +374,7 @@
   }
 
   .navitem:not(:disabled):not(.disabled).active {
-    border-color: var(--barracks-border-strong);
+    border-color: var(--barracks-action);
     background: var(--barracks-action) !important;
     box-shadow: var(--barracks-shadow);
   }
@@ -440,7 +445,7 @@
   justify-content: center;
   margin: 0 !important;
   padding: 0 !important;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 12px !important;
   background: var(--barracks-surface-interactive);
   color: var(--barracks-text-interactive);
@@ -524,7 +529,7 @@
 
 .account-navitem:not(:disabled):not(.disabled):hover {
   color: var(--barracks-text-interactive) !important;
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-strong);
   background-color: var(--barracks-surface-interactive) !important;
 }
 
@@ -590,7 +595,7 @@
   display: block;
   width: 90%;
   margin: 0 auto;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 12px;
   background: var(--barracks-surface-interactive);
   box-shadow: none;
@@ -656,7 +661,7 @@
 
 .navitem:not(:disabled):not(.disabled):hover {
   color: var(--barracks-text-interactive) !important;
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-strong);
   background-color: var(--barracks-surface-interactive) !important;
 }
 
@@ -709,7 +714,7 @@
   align-items: center;
   justify-content: center;
   padding: 0 7px;
-  border: 1px solid var(--barracks-border-strong);
+  border: 1px solid var(--barracks-action);
   border-radius: 999px;
   background: var(--barracks-action);
   color: var(--barracks-action-text);
@@ -803,7 +808,7 @@
     align-items: center;
     justify-content: center;
     padding: 0 5px;
-    border: 1px solid var(--barracks-border-strong);
+    border: 1px solid var(--barracks-action);
     border-radius: 999px;
     background: var(--barracks-action);
     color: var(--barracks-action-text);
@@ -854,7 +859,7 @@
     height: 32px;
     flex: 0 0 32px;
     border-radius: 999px !important;
-    border-color: var(--barracks-border-subtle);
+    border-color: var(--barracks-border-strong);
     background: var(--barracks-surface-interactive);
     color: var(--barracks-text-interactive);
     transform: none;
@@ -862,7 +867,7 @@
 }
 
 .profile-modal .modal-content {
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 28px;
   background: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
@@ -946,12 +951,12 @@
 }
 
 .profile-modal-secondary-actions .btn {
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-strong) !important;
   background: var(--barracks-surface-interactive) !important;
 }
 
 .profile-modal-secondary-actions .btn:not(:disabled):not(.disabled):hover {
-  border-color: var(--barracks-border-strong) !important;
+  border-color: var(--barracks-border-inset) !important;
   background: var(--barracks-surface-inset) !important;
   color: var(--barracks-text-inset) !important;
 }
@@ -967,7 +972,7 @@
   align-items: center;
   gap: 8px;
   padding: 13px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 22px;
   background: var(--barracks-surface-interactive);
   text-align: center;
@@ -1029,7 +1034,7 @@
   gap: 6px;
   margin-top: 10px;
   padding: 10px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 12px;
   background: var(--barracks-surface-interactive);
 }
@@ -1053,7 +1058,7 @@
   width: 100%;
   margin-top: 10px;
   padding: 10px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 12px;
   background: var(--barracks-surface-interactive);
   color: var(--barracks-text-interactive);
@@ -1085,7 +1090,7 @@
 }
 
 .profile-whats-new-button:not(:disabled):not(.disabled):hover {
-  border-color: var(--barracks-border-strong);
+  border-color: var(--barracks-border-inset);
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
 }
@@ -1095,7 +1100,7 @@
   gap: 10px;
   margin-top: 10px;
   padding: 11px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 14px;
   background: var(--barracks-surface-interactive);
 }
@@ -1126,7 +1131,7 @@
   gap: 3px;
   min-height: 82px;
   padding: 10px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 12px;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
@@ -1158,7 +1163,7 @@
   gap: 11px;
   margin-top: 10px;
   padding: 11px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 14px;
   background: var(--barracks-surface-interactive);
 }
@@ -1187,7 +1192,7 @@
 
 .profile-theme-reset {
   flex: 0 0 auto;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 10px;
   background: var(--barracks-surface-interactive);
   color: var(--barracks-text-interactive);
@@ -1221,7 +1226,7 @@
   gap: 8px;
   width: 100%;
   min-height: 38px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 10px;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
@@ -1269,7 +1274,7 @@
   gap: 5px;
   overflow-y: auto;
   padding: 6px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-overlay);
   border-radius: 12px;
   background: var(--barracks-overlay);
 }
@@ -1318,7 +1323,7 @@
   height: 34px;
   flex: 0 0 34px;
   padding: 2px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 10px;
   background: var(--barracks-surface-interactive);
 }
@@ -1327,7 +1332,7 @@
   width: 100%;
   min-width: 0;
   height: 34px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 10px;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
@@ -1583,7 +1588,7 @@
 }
 
 html body :is(.navitem, .mobile-app-menu, .mobile-app-account, .mobile-app-menu-account, .mobile-app-menu-logout, .navbar-collapse-toggle, .profile-logout-button):is(:disabled, .disabled) {
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-inset) !important;
   background: var(--barracks-surface-inset) !important;
   color: var(--barracks-text-inset) !important;
   opacity: 1;

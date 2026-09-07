@@ -17,7 +17,7 @@ button,
 input,
 select,
 textarea {
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-strong);
   background-color: var(--barracks-surface-interactive);
   color: var(--barracks-text-interactive);
 }
@@ -36,10 +36,10 @@ html body :where(a, button, input, select, textarea, [tabindex]):focus-visible {
 .form-select {
   --bs-body-color: var(--barracks-text-interactive);
   --bs-body-bg: var(--barracks-surface-interactive);
-  --bs-border-color: var(--barracks-border-subtle);
+  --bs-border-color: var(--barracks-border-strong);
   --bs-secondary-color: var(--barracks-text-interactive);
   --bs-secondary-bg: var(--barracks-surface-inset);
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-strong) !important;
   background-color: var(--barracks-surface-interactive) !important;
   color: var(--barracks-text-interactive) !important;
 }
@@ -61,7 +61,7 @@ html body :where(a, button, input, select, textarea, [tabindex]):focus-visible {
 
 .form-control:disabled,
 .form-select:disabled {
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-inset) !important;
   background-color: var(--barracks-surface-inset) !important;
   color: var(--barracks-text-inset) !important;
 }
@@ -69,16 +69,16 @@ html body :where(a, button, input, select, textarea, [tabindex]):focus-visible {
 .btn {
   --bs-btn-color: var(--barracks-text-interactive);
   --bs-btn-bg: var(--barracks-surface-interactive);
-  --bs-btn-border-color: var(--barracks-border-subtle);
+  --bs-btn-border-color: var(--barracks-border-strong);
   --bs-btn-hover-color: var(--barracks-text-inset);
   --bs-btn-hover-bg: var(--barracks-surface-inset);
-  --bs-btn-hover-border-color: var(--barracks-border-strong);
+  --bs-btn-hover-border-color: var(--barracks-border-inset);
   --bs-btn-active-color: var(--barracks-text-inset);
   --bs-btn-active-bg: var(--barracks-surface-inset);
-  --bs-btn-active-border-color: var(--barracks-border-strong);
+  --bs-btn-active-border-color: var(--barracks-border-inset);
   --bs-btn-disabled-color: var(--barracks-text-inset);
   --bs-btn-disabled-bg: var(--barracks-surface-inset);
-  --bs-btn-disabled-border-color: var(--barracks-border-subtle);
+  --bs-btn-disabled-border-color: var(--barracks-border-inset);
   border-color: var(--bs-btn-border-color);
   background-color: var(--bs-btn-bg);
   color: var(--bs-btn-color);
@@ -102,19 +102,19 @@ html body :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   --bs-btn-border-color: var(--barracks-action);
   --bs-btn-hover-color: var(--barracks-action-text);
   --bs-btn-hover-bg: var(--barracks-action);
-  --bs-btn-hover-border-color: var(--barracks-border-strong);
+  --bs-btn-hover-border-color: var(--barracks-action);
   --bs-btn-active-color: var(--barracks-action-text);
   --bs-btn-active-bg: var(--barracks-action);
-  --bs-btn-active-border-color: var(--barracks-border-strong);
+  --bs-btn-active-border-color: var(--barracks-action);
 }
 
 .btn-outline-primary {
   --bs-btn-color: var(--barracks-text-interactive);
   --bs-btn-bg: var(--barracks-surface-interactive);
-  --bs-btn-border-color: var(--barracks-border-subtle);
+  --bs-btn-border-color: var(--barracks-border-strong);
   --bs-btn-hover-color: var(--barracks-text-inset);
   --bs-btn-hover-bg: var(--barracks-surface-inset);
-  --bs-btn-hover-border-color: var(--barracks-border-strong);
+  --bs-btn-hover-border-color: var(--barracks-border-inset);
   --bs-btn-active-color: var(--barracks-action-text);
   --bs-btn-active-bg: var(--barracks-action);
   --bs-btn-active-border-color: var(--barracks-action);
@@ -125,8 +125,8 @@ html body :where(a, button, input, select, textarea, [tabindex]):focus-visible {
 fieldset:disabled .btn {
   --bs-btn-disabled-color: var(--barracks-text-inset);
   --bs-btn-disabled-bg: var(--barracks-surface-inset);
-  --bs-btn-disabled-border-color: var(--barracks-border-subtle);
-  border-color: var(--barracks-border-subtle) !important;
+  --bs-btn-disabled-border-color: var(--barracks-border-inset);
+  border-color: var(--barracks-border-inset) !important;
   background-color: var(--barracks-surface-inset) !important;
   color: var(--barracks-text-inset) !important;
 }
@@ -134,7 +134,7 @@ fieldset:disabled .btn {
 .card,
 .modal-content,
 .dropdown-menu {
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-raised);
   background-color: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
 }
@@ -200,17 +200,17 @@ fieldset:disabled .btn {
 .table {
   --bs-table-bg: var(--barracks-surface-raised);
   --bs-table-color: var(--barracks-text-raised);
-  --bs-table-border-color: var(--barracks-border-subtle);
+  --bs-table-border-color: var(--barracks-border-raised);
   --bs-table-striped-bg: var(--barracks-surface-inset);
   --bs-table-striped-color: var(--barracks-text-inset);
   --bs-table-hover-bg: var(--barracks-surface-interactive);
   --bs-table-hover-color: var(--barracks-text-interactive);
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-raised);
   color: var(--barracks-text-raised);
 }
 
 .nav-tabs {
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-canvas);
 }
 
 .nav-tabs .nav-link {
@@ -220,20 +220,20 @@ fieldset:disabled .btn {
 
 .nav-tabs .nav-link:hover,
 .nav-tabs .nav-link:focus {
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-canvas);
   color: var(--barracks-text);
 }
 
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-item.show .nav-link {
-  border-color: var(--barracks-border-subtle) var(--barracks-border-subtle) var(--barracks-surface-raised);
+  border-color: var(--barracks-border-raised) var(--barracks-border-raised) var(--barracks-surface-raised);
   background-color: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
 }
 
 .pagination {
   --bs-pagination-bg: var(--barracks-surface-raised);
-  --bs-pagination-border-color: var(--barracks-border-subtle);
+  --bs-pagination-border-color: var(--barracks-border-raised);
   --bs-pagination-color: var(--barracks-text-muted-raised);
   --bs-pagination-hover-bg: var(--barracks-surface-interactive);
   --bs-pagination-hover-border-color: var(--barracks-border-strong);
@@ -244,7 +244,7 @@ fieldset:disabled .btn {
   --bs-pagination-active-border-color: var(--barracks-action);
   --bs-pagination-active-color: var(--barracks-action-text);
   --bs-pagination-disabled-bg: var(--barracks-surface-inset);
-  --bs-pagination-disabled-border-color: var(--barracks-border-subtle);
+  --bs-pagination-disabled-border-color: var(--barracks-border-inset);
   --bs-pagination-disabled-color: var(--barracks-text-inset);
 }
 
@@ -256,14 +256,14 @@ fieldset:disabled .btn {
 .MuiPaper-root,
 .MuiDialog-paper,
 .MuiMenu-paper {
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-raised) !important;
   background-color: var(--barracks-surface-raised) !important;
   background-image: none !important;
   color: var(--barracks-text-raised) !important;
 }
 
 .MuiPopover-paper:not(.MuiMenu-paper) {
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-overlay) !important;
   background-color: var(--barracks-overlay) !important;
   background-image: none !important;
   color: var(--barracks-text-overlay) !important;
@@ -352,7 +352,7 @@ fieldset:disabled .btn {
 .MuiOutlinedInput-notchedOutline,
 .MuiInput-root::before,
 .MuiFilledInput-root::before {
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-strong) !important;
 }
 
 .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline,
@@ -372,7 +372,7 @@ fieldset:disabled .btn {
 }
 
 .MuiButton-contained.Mui-disabled {
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-inset) !important;
   background-color: var(--barracks-surface-inset) !important;
   color: var(--barracks-text-inset) !important;
 }
@@ -387,7 +387,7 @@ fieldset:disabled .btn {
 .MuiTableBody-root,
 .MuiTableRow-root,
 .MuiTableCell-root {
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-raised) !important;
   background-color: var(--barracks-surface-raised) !important;
   color: var(--barracks-text-raised) !important;
 }
@@ -408,8 +408,8 @@ fieldset:disabled .btn {
 
 .MuiDataGrid-root {
   --DataGrid-containerBackground: var(--barracks-surface-raised);
-  --DataGrid-t-color-border-base: var(--barracks-border-subtle);
-  border-color: var(--barracks-border-subtle) !important;
+  --DataGrid-t-color-border-base: var(--barracks-border-raised);
+  border-color: var(--barracks-border-raised) !important;
   background-color: var(--barracks-surface-raised) !important;
   color: var(--barracks-text-raised) !important;
 }
@@ -419,7 +419,7 @@ fieldset:disabled .btn {
 .MuiDataGrid-cell,
 .MuiDataGrid-footerContainer,
 .MuiDataGrid-withBorderColor {
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-raised) !important;
 }
 
 .MuiDataGrid-columnHeaderTitle,
