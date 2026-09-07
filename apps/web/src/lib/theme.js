@@ -1,14 +1,14 @@
-export const THEME_STORAGE_KEY = "jellyglance_custom_theme";
+export const THEME_STORAGE_KEY = "silo_barracks_theme";
 
 export const DEFAULT_THEME = {
-  primary: "#9b6ac8",
-  secondary: "#4aa8bc",
-  background: "#0b0d12",
-  surface: "#131820",
+  primary: "#6f9bcf",
+  secondary: "#a0977f",
+  background: "#161410",
+  surface: "#221c14",
 };
 
 export const THEME_PRESETS = [
-  { name: "JellyGlance", primary: "#9b6ac8", secondary: "#4aa8bc", background: "#0b0d12", surface: "#131820" },
+  { name: "Silo Barracks", ...DEFAULT_THEME },
   { name: "Ocean", primary: "#2dd4bf", secondary: "#38bdf8", background: "#071015", surface: "#10212a" },
   { name: "Ember", primary: "#f97316", secondary: "#f43f5e", background: "#120b08", surface: "#1f1512" },
   { name: "Forest", primary: "#22c55e", secondary: "#eab308", background: "#08110d", surface: "#111d17" },
@@ -48,6 +48,16 @@ function normalizeHexColor(value, fallback) {
   return HEX_COLOR_PATTERN.test(nextValue) ? nextValue : fallback;
 }
 
+export function normalizeThemeInput(theme = {}) {
+  const source = theme && typeof theme === "object" ? theme : {};
+  return {
+    primary: normalizeHexColor(source.primary, DEFAULT_THEME.primary),
+    secondary: normalizeHexColor(source.secondary, DEFAULT_THEME.secondary),
+    background: normalizeHexColor(source.background, DEFAULT_THEME.background),
+    surface: normalizeHexColor(source.surface, DEFAULT_THEME.surface),
+  };
+}
+
 function hexToRgb(hexColor) {
   const normalized = normalizeHexColor(hexColor, "#000000").slice(1);
   return {
@@ -63,13 +73,181 @@ function darkenHex(hexColor, amount = 0.28) {
   return `#${[channel(r), channel(g), channel(b)].map((value) => value.toString(16).padStart(2, "0")).join("")}`;
 }
 
-function mixHex(firstHexColor, secondHexColor, weight = 0.42) {
+export function mixHex(firstHexColor, secondHexColor, weight = 0.42) {
   const first = hexToRgb(firstHexColor);
   const second = hexToRgb(secondHexColor);
-  const channel = (firstValue, secondValue) => Math.max(0, Math.min(255, Math.round(firstValue * (1 - weight) + secondValue * weight)));
+  const numericWeight = Number(weight);
+  const normalizedWeight = Number.isFinite(numericWeight) ? Math.max(0, Math.min(1, numericWeight)) : 0.42;
+  const channel = (firstValue, secondValue) => Math.max(0, Math.min(255, Math.round(firstValue * (1 - normalizedWeight) + secondValue * normalizedWeight)));
   return `#${[channel(first.r, second.r), channel(first.g, second.g), channel(first.b, second.b)]
     .map((value) => value.toString(16).padStart(2, "0"))
     .join("")}`;
+}
+
+export function relativeLuminance(hexColor) {
+  const { r, g, b } = hexToRgb(hexColor);
+  const linearize = (channel) => {
+    const normalized = channel / 255;
+    return normalized <= 0.03928 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * linearize(r) + 0.7152 * linearize(g) + 0.0722 * linearize(b);
+}
+
+export function contrastRatio(foreground, background) {
+  const foregroundLuminance = relativeLuminance(foreground);
+  const backgroundLuminance = relativeLuminance(background);
+  const lighter = Math.max(foregroundLuminance, backgroundLuminance);
+  const darker = Math.min(foregroundLuminance, backgroundLuminance);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+const TEXT_LIGHT = "#f5f0e7";
+const TEXT_DARK = "#10100f";
+
+function contrastAdjustment(candidate, endpoint, background, minimum) {
+  if (contrastRatio(endpoint, background) < minimum) {
+    return null;
+  }
+
+  let low = 0;
+  let high = 1;
+  for (let index = 0; index < 32; index += 1) {
+    const weight = (low + high) / 2;
+    if (contrastRatio(mixHex(candidate, endpoint, weight), background) >= minimum) {
+      high = weight;
+    } else {
+      low = weight;
+    }
+  }
+
+  let weight = high;
+  let color = mixHex(candidate, endpoint, weight);
+  let attempts = 0;
+  while (contrastRatio(color, background) < minimum && weight < 1 && attempts < 10001) {
+    weight = Math.min(1, weight + 0.0001);
+    color = mixHex(candidate, endpoint, weight);
+    attempts += 1;
+  }
+  return contrastRatio(color, background) >= minimum ? { color, weight } : null;
+}
+
+export function ensureContrast(foreground, background, minimum = 3) {
+  const candidate = normalizeHexColor(foreground, "#000000");
+  const backdrop = normalizeHexColor(background, "#000000");
+  const threshold = Number.isFinite(Number(minimum)) ? Math.max(1, Number(minimum)) : 3;
+
+  if (contrastRatio(candidate, backdrop) >= threshold) {
+    return candidate;
+  }
+
+  const adjustments = [TEXT_LIGHT, TEXT_DARK]
+    .map((endpoint) => contrastAdjustment(candidate, endpoint, backdrop, threshold))
+    .filter(Boolean)
+    .sort((first, second) => first.weight - second.weight);
+  if (adjustments.length > 0) {
+    return adjustments[0].color;
+  }
+
+  const lightContrast = contrastRatio(TEXT_LIGHT, backdrop);
+  const darkContrast = contrastRatio(TEXT_DARK, backdrop);
+  return lightContrast >= darkContrast ? TEXT_LIGHT : TEXT_DARK;
+}
+
+function mutedTextColor(text, canvas, surfaceRaised) {
+  let closestColor = text;
+  let closestWeight = 0;
+  const steps = 4096;
+  for (let index = 0; index <= steps; index += 1) {
+    const weight = index / steps;
+    const color = mixHex(text, canvas, weight);
+    if (contrastRatio(color, canvas) >= 4.5 && contrastRatio(color, surfaceRaised) >= 4.5) {
+      closestColor = color;
+      closestWeight = weight;
+    }
+  }
+
+  if (closestWeight > 0 || (contrastRatio(closestColor, canvas) >= 4.5 && contrastRatio(closestColor, surfaceRaised) >= 4.5)) {
+    return closestColor;
+  }
+
+  return ensureContrast(text, surfaceRaised, 4.5);
+}
+
+function isDefaultThemeInput(input) {
+  return Object.keys(DEFAULT_THEME).every((key) => input[key].toLowerCase() === DEFAULT_THEME[key].toLowerCase());
+}
+
+export function resolveTheme(theme) {
+  const input = normalizeThemeInput(theme);
+  const canvas = input.background;
+  const nav = mixHex(input.surface, canvas, 0.35);
+  const surfaceRaised = input.surface;
+  const lightContrast = contrastRatio(TEXT_LIGHT, canvas);
+  const darkContrast = contrastRatio(TEXT_DARK, canvas);
+  const text = lightContrast >= darkContrast ? TEXT_LIGHT : TEXT_DARK;
+  const textInverse = text === TEXT_LIGHT ? TEXT_DARK : TEXT_LIGHT;
+  const surfaceInset = mixHex(input.surface, canvas, 0.38);
+  const surfaceInteractive = mixHex(input.surface, text, 0.06);
+  const overlay = mixHex(input.surface, canvas, 0.18);
+  const borderSubtle = mixHex(input.surface, text, 0.18);
+  const borderStrong = ensureContrast(mixHex(surfaceInteractive, text, 0.42), surfaceInteractive, 3);
+  const textMuted = mutedTextColor(text, canvas, surfaceRaised);
+  const focus = ensureContrast(input.primary, surfaceRaised, 3);
+  const action = ensureContrast(input.primary, surfaceInteractive, 3);
+  const statusCandidates = {
+    live: "#ff6f63",
+    success: "#70b981",
+    warning: "#ffa64f",
+    danger: "#e45f55",
+    unavailable: "#a0977f",
+  };
+  const live = ensureContrast(statusCandidates.live, surfaceRaised, 3);
+  const success = ensureContrast(statusCandidates.success, surfaceRaised, 3);
+  const warning = ensureContrast(statusCandidates.warning, surfaceRaised, 3);
+  const danger = ensureContrast(statusCandidates.danger, surfaceRaised, 3);
+  const unavailable = ensureContrast(statusCandidates.unavailable, surfaceRaised, 3);
+  const chartCandidates = [input.primary, live, warning, input.secondary, success, danger];
+  const charts = chartCandidates.map((candidate) => ensureContrast(candidate, surfaceInset, 3));
+  const rgb = (hexColor) => rgbString(hexColor);
+  const scrim = isDefaultThemeInput(input) ? "rgba(8, 7, 5, 0.72)" : `rgba(${rgb(canvas)}, 0.72)`;
+  const tokens = {
+    canvas,
+    nav,
+    surfaceRaised,
+    surfaceInset,
+    surfaceInteractive,
+    overlay,
+    borderSubtle,
+    borderStrong,
+    text,
+    textMuted,
+    textInverse,
+    focus,
+    focusLight: TEXT_LIGHT,
+    focusDark: TEXT_DARK,
+    action,
+    accentSecondary: input.secondary,
+    live,
+    success,
+    warning,
+    danger,
+    unavailable,
+    chartGrid: borderSubtle,
+    chartTooltip: overlay,
+    chart1: charts[0],
+    chart2: charts[1],
+    chart3: charts[2],
+    chart4: charts[3],
+    chart5: charts[4],
+    chart6: charts[5],
+    scrim,
+    shadow: `0 12px 32px rgba(${rgb(canvas)}, 0.28)`,
+    actionRgb: rgb(action),
+    accentSecondaryRgb: rgb(input.secondary),
+    surfaceRaisedRgb: rgb(surfaceRaised),
+  };
+
+  return { input, tokens };
 }
 
 function rgbString(hexColor) {
