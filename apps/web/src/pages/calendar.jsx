@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import axios from "../lib/axios_instance";
 import { loadSavedIntegrations } from "../lib/integrations-storage";
 import "./css/integrations.css";
+import "./css/calendar.css";
 
 const iconUrl = (slug) => `https://cdn.jsdelivr.net/gh/selfhst/icons/svg/${slug}.svg`;
 const calendarSourceDefaults = [

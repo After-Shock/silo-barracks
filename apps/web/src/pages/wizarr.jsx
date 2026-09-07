@@ -9,6 +9,7 @@ import SearchLineIcon from "remixicon-react/SearchLineIcon";
 import UserAddLineIcon from "remixicon-react/UserAddLineIcon";
 import axios from "../lib/axios_instance";
 import "./css/integrations.css";
+import "./css/wizarr.css";
 
 const emptyForm = {
   serverIds: [],

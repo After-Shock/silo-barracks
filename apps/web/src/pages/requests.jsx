@@ -13,6 +13,7 @@ import SearchLineIcon from "remixicon-react/SearchLineIcon";
 import { Modal } from "react-bootstrap";
 import axios from "../lib/axios_instance";
 import "./css/integrations.css";
+import "./css/requests.css";
 
 function formatDate(value) {
   if (!value) return "Unknown";
