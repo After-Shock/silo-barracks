@@ -70,7 +70,7 @@ a plain object of CSS color strings keyed by the following stable contract, then
 | `overlay` | `--barracks-overlay` | Popovers/tooltips |
 | `borderSubtle`, `borderStrong` | `--barracks-border-subtle`, `--barracks-border-strong` | Boundaries |
 | `text`, `textMuted`, `textInverse` | `--barracks-text`, `--barracks-text-muted`, `--barracks-text-inverse` | Typography |
-| `focus`, `action` | `--barracks-focus`, `--barracks-action` | Keyboard focus/primary actions |
+| `focus`, `focusLight`, `focusDark`, `action` | matching `--barracks-focus*` properties and `--barracks-action` | Keyboard focus/primary actions |
 | `live`, `success`, `warning`, `danger`, `unavailable` | matching `--barracks-state-*` properties | Status semantics |
 | `chartGrid`, `chartTooltip` | matching `--barracks-chart-*` properties | Chart structure |
 | `chart1` through `chart6` | `--barracks-chart-1` through `--barracks-chart-6` | Ordered series palette |
@@ -88,6 +88,19 @@ action use `primary`; theme personality uses `secondary`; state colors use the
 accessible fixed status values above; chart series are `[primary, live, warning,
 secondary, success, danger]`. The resolver and storage adapter are exported pure
 units and can be tested without rendering React.
+
+Non-text contrast uses WCAG's 3:1 threshold. Primary/action and each state/chart
+candidate are mixed toward whichever of warm light or near-black reaches 3:1
+against its specified surface with the smallest change; action text is then
+chosen at 4.5:1. `borderStrong` reaches 3:1 against its associated interactive
+surface and is used for controls and meaningful boundaries; `borderSubtle` is
+decorative only. Charts resolve series against `surfaceInset`, and retain labels,
+legends, markers, or existing patterns so color is not their sole distinction.
+Focus never relies on a single custom color: every focus-visible rule renders
+the adjusted `focus` ring together with one-pixel `focusLight` (`#f5f0e7`) and
+`focusDark` (`#10100f`) boundaries. This light/dark pair ensures at least one
+visible 3:1 boundary even for degenerate custom palettes with opposing canvas
+and surface colors.
 
 For each background/surface, the resolver chooses the higher-contrast of warm
 light `#f5f0e7` and near-black `#10100f` for normal text. Muted text is mixed
@@ -182,6 +195,10 @@ Kiosk settings therefore continue to load without preserving JellyGlance styling
   error states; existing text/icons remain or are added where absent.
 - Reduced-motion preferences continue to suppress nonessential transitions.
 - Small viewports must not gain horizontal overflow from compatibility rules.
+- Tests include degenerate valid custom inputs where primary equals background,
+  all four inputs are identical, and background/surface are black/white opposites.
+  Focus, meaningful boundaries, state icons, controls, and graphical chart
+  objects must retain the contrast behavior defined above.
 
 ## Verification
 
@@ -190,8 +207,13 @@ Kiosk settings therefore continue to load without preserving JellyGlance styling
 - Unit tests cover theme resolution, selection/persistence, derived semantic
   values, theme-change behavior, and malformed-input fallback.
 - `scripts/check-theme-colors.cjs` scans application-owned `.css`, `.js`, and
-  `.jsx` under `apps/web/src`. It flags every hex/rgb/hsl color literal outside
-  `theme.js` unless the exact file/value pair is allowlisted. It also flags every
+  `.jsx` under `apps/web/src`. It flags every CSS color literal outside
+  `theme.js` unless the exact file/value pair is allowlisted. Color literals
+  include hex, `rgb()`/`rgba()`, `hsl()`/`hsla()`, `hwb()`, `lab()`, `lch()`,
+  `oklab()`, `oklch()`, `color()`, and CSS named colors such as `white`, `black`,
+  and `grey`; matching is case-insensitive and syntax-aware. The non-palette
+  keywords `transparent`, `currentColor`, `inherit`, `initial`, and `unset` are
+  permitted. It also flags every
   `linear-gradient`, `radial-gradient`, or `conic-gradient` whose color stops
   contain literals or do not exclusively reference `--barracks-*` tokens.
   Generated assets, `apps/web/public`, and dependencies are outside its scan.
