@@ -120,6 +120,8 @@ test("masks comments according to source language without breaking URLs or regex
     const css = fixture.write("apps/web/src/comments-language.css", ".asset { background: url(http://cdn.example/red.svg); color: #abc; }");
     const js = fixture.write("apps/web/src/comments-language.js", `
 const pattern = /https?:\\/\\/cdn\\/red/;
+const colorPattern = /color: #abc/;
+const svgPattern = /fill="#def"/;
 const style = "color: #def";
 `);
     const result = fixture.audit([css, js]);
@@ -280,6 +282,8 @@ test("suppresses only an approved exact file and literal exception", () => {
   const fixture = createFixture();
   try {
     const source = fixture.write("apps/web/src/provider-logo.css", ".provider { background-image: url(data:image/svg+xml,<svg fill='#ABC'/>); }");
+    const baseline = fixture.audit([source]);
+    assert.deepEqual(values(baseline), ["#ABC"]);
     const result = fixture.audit([source], [{
       path: "apps/web/src/provider-logo.css",
       values: ["#abc"],
@@ -354,6 +358,52 @@ test("does not suppress mismatched exception paths or values", () => {
   }
 });
 
+test("scans data SVG URL colors while ignoring external URL fragments", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/embedded-images.css", `
+.external { background: url(https://cdn.example/logo.svg#abcdef); }
+.embedded { background: url("data:image/svg+xml,<svg fill='#abc'><path stroke='red'/></svg>"); }
+`);
+    const result = fixture.audit([source]);
+    assert.deepEqual(values(result), ["#abc", "red"]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("keeps quoted CSS content strings out of the color audit", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/content.css", `
+.label {
+  content: "#abc";
+  content: "rgb(1, 2, 3)";
+  color: #def;
+}
+`);
+    const result = fixture.audit([source]);
+    assert.deepEqual(values(result), ["#def"]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("reports non-Barracks variables independently from excepted fallbacks", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/non-barracks-fallback.css", ".card { color: rgba(var(--brand, #fff), .5); }");
+    const result = fixture.audit([source], [{
+      path: "apps/web/src/non-barracks-fallback.css",
+      values: ["#fff"],
+      reason: "Official provider logo fallback.",
+    }]);
+    assert.deepEqual(values(result), ["rgba(var(--brand, #fff), .5)"]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
 test("excludes public, generated, dependency, and theme resolver sources by default", () => {
   const fixture = createFixture();
   try {
@@ -407,6 +457,20 @@ test("rejects explicit paths whose symlink target escapes the audit root", () =>
   } finally {
     fixture.cleanup();
     fs.rmSync(outside, { recursive: true, force: true });
+  }
+});
+
+test("rejects invalid files entries without falling back to the default scan", () => {
+  const fixture = createFixture();
+  try {
+    fixture.write("apps/web/src/app.css", ".app { color: #abc; }");
+    for (const files of [[null], [""]]) {
+      const result = fixture.audit(files);
+      assert.deepEqual(result.scannedFiles, []);
+      assert.ok(result.violations.some((violation) => violation.kind === "input" && /files entry/i.test(violation.message)));
+    }
+  } finally {
+    fixture.cleanup();
   }
 });
 

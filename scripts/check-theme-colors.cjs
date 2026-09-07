@@ -146,6 +146,13 @@ function inputViolation(message, value = "") {
 
 function collectFiles(root, realRoot, requestedFiles) {
   const requested = requestedFiles == null ? [] : Array.isArray(requestedFiles) ? requestedFiles : [requestedFiles];
+  const invalidRequest = requested.findIndex((file) => typeof file !== "string" || !file.trim());
+  if (invalidRequest >= 0) {
+    return {
+      entries: [],
+      errors: [inputViolation(`Invalid files entry at index ${invalidRequest}; each entry must be a nonempty string path.`, String(requested[invalidRequest] ?? ""))],
+    };
+  }
   const roots = requested.length > 0
     ? requested.map((file) => path.resolve(root, file))
     : [path.join(root, "apps/web/src")];
@@ -245,6 +252,11 @@ function maskComments(source, extension = ".css") {
       continue;
     }
     if (mode === "regex") {
+      if (current === "\n" || current === "\r") {
+        mode = "normal";
+        continue;
+      }
+      blank(index);
       if (escaped) escaped = false;
       else if (current === "\\") escaped = true;
       else if (current === "[") regexClass = true;
@@ -284,6 +296,7 @@ function maskComments(source, extension = ".css") {
     } else if (javascript && current === "/" && looksLikeRegexStart(source, index)) {
       regexClass = false;
       escaped = false;
+      blank(index);
       mode = "regex";
     } else if (current === "'" || current === '"' || current === "`") {
       quote = current;
@@ -363,7 +376,7 @@ function findDeclarationProperty(source, offset, { lineDelimited = false } = {})
   return property ? property[1] : null;
 }
 
-function isInsideFunction(source, offset, functionName) {
+function findContainingFunction(source, offset) {
   let depth = 0;
   for (let index = offset - 1; index >= 0; index -= 1) {
     const current = source[index];
@@ -377,11 +390,43 @@ function isInsideFunction(source, offset, functionName) {
         while (end >= 0 && /\s/.test(source[end])) end -= 1;
         let start = end;
         while (start >= 0 && /[A-Za-z-]/.test(source[start])) start -= 1;
-        return source.slice(start + 1, end + 1).toLowerCase() === functionName;
+        return {
+          name: source.slice(start + 1, end + 1).toLowerCase(),
+          openIndex: index,
+        };
       }
     }
   }
-  return false;
+  return null;
+}
+
+function isInsideFunction(source, offset, functionName) {
+  const containing = findContainingFunction(source, offset);
+  return Boolean(containing && containing.name === functionName);
+}
+
+function isDataSvgUrl(source, offset) {
+  const containing = findContainingFunction(source, offset);
+  if (!containing || containing.name !== "url") return false;
+  const end = findBalancedFunctionEnd(source, containing.openIndex);
+  const body = source.slice(containing.openIndex + 1, end);
+  return /^\s*["']?\s*data:image\/svg\+xml(?:;[^,]*)?,/i.test(body);
+}
+
+function isInsideQuotedString(source, offset) {
+  let quote = "";
+  let escaped = false;
+  for (let index = 0; index < offset; index += 1) {
+    const current = source[index];
+    if (quote) {
+      if (escaped) escaped = false;
+      else if (current === "\\") escaped = true;
+      else if (current === quote) quote = "";
+    } else if (current === "'" || current === '"' || current === "`") {
+      quote = current;
+    }
+  }
+  return Boolean(quote);
 }
 
 function isColorProperty(property) {
@@ -391,9 +436,14 @@ function isColorProperty(property) {
 
 function isColorContext(source, original, start, extension, contextRequired = true) {
   if (!contextRequired) return true;
-  if (isInsideFunction(source, start, "url")) return false;
+  if (isInsideFunction(source, start, "url")) {
+    return isDataSvgUrl(source, start);
+  }
   const declaration = findDeclarationProperty(source, start, { lineDelimited: extension !== ".css" });
-  if (extension === ".css") return Boolean(declaration);
+  if (extension === ".css") {
+    if (isInsideQuotedString(source, start) && !isColorProperty(declaration) && !declaration?.startsWith("--")) return false;
+    return Boolean(declaration);
+  }
   if (declaration && isColorProperty(declaration)) return true;
   const before = source.slice(Math.max(0, start - 120), start);
   const embeddedProperty = before.match(/([A-Za-z_-][A-Za-z0-9_-]*)\s*:\s*$/);
@@ -561,10 +611,15 @@ function scanColors(source, extension, { contextRequired = true, baseOffset = 0 
       const end = findBalancedFunctionEnd(masked, next);
       const body = masked.slice(next + 1, end);
       const fallback = variableFallbackOccurrences(source.slice(next + 1, end), body, extension, baseOffset + next + 1);
+      const variables = [...body.matchAll(/var\s*\(\s*(--[A-Za-z0-9_-]+)/gi)].map((match) => match[1]);
+      const nonBarracksVariable = variables.some((variable) => !variable.toLowerCase().startsWith("--barracks-"));
+      const colorContext = isColorContext(masked, source, index, extension, contextRequired);
       if (fallback.length) {
         occurrences.push(...fallback);
-      } else if (!isSemanticVariableColorBody(body)
-        && isColorContext(masked, source, index, extension, contextRequired)) {
+      }
+      if (nonBarracksVariable && colorContext) {
+        addColorOccurrence(occurrences, source, index, end);
+      } else if (!fallback.length && !isSemanticVariableColorBody(body) && colorContext) {
         addColorOccurrence(occurrences, source, index, end);
       }
       index = end;
@@ -572,10 +627,10 @@ function scanColors(source, extension, { contextRequired = true, baseOffset = 0 
     }
     const declaration = findDeclarationProperty(masked, index);
     const namedContext = !contextRequired ? true : extension === ".css"
-      ? Boolean(declaration && (isColorProperty(declaration) || declaration.startsWith("--")))
+      ? Boolean((declaration && (isColorProperty(declaration) || declaration.startsWith("--"))) || isDataSvgUrl(masked, index))
       : isColorContext(masked, source, index, extension, contextRequired);
     if (CSS_NAMED_COLORS.has(lower) && !ALLOWED_COLOR_KEYWORDS.has(lower)
-      && namedContext && (contextRequired ? !isInsideFunction(masked, index, "url") : true)) {
+      && namedContext && (contextRequired ? (!isInsideFunction(masked, index, "url") || isDataSvgUrl(masked, index)) : true)) {
       addColorOccurrence(occurrences, source, index, identifier.end - 1);
       index = identifier.end - 1;
     } else {
