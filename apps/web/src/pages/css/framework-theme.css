@@ -396,8 +396,13 @@ fieldset:disabled .btn {
   color: var(--barracks-text-muted-raised) !important;
 }
 
-.MuiTableRow-root:hover .MuiTableCell-root {
+.MuiTableRow-root:is(:hover, .Mui-selected) .MuiTableCell-root {
   background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
+}
+
+.MuiTableRow-root:is(:hover, .Mui-selected) .MuiTableCell-root :is(a, .MuiButton-root:not(.MuiButton-contained):not(.Mui-disabled), .MuiIconButton-root:not(.Mui-disabled)),
+.MuiTableRow-root:is(:hover, .Mui-selected) .MuiTableCell-root > .MuiSvgIcon-root {
   color: var(--barracks-text-interactive) !important;
 }
 
@@ -432,6 +437,11 @@ fieldset:disabled .btn {
 
 .MuiDataGrid-row:is(:hover, .Mui-selected) .MuiDataGrid-cell {
   background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
+}
+
+.MuiDataGrid-row:is(:hover, .Mui-selected) .MuiDataGrid-cell :is(a, .MuiButton-root:not(.MuiButton-contained):not(.Mui-disabled), .MuiIconButton-root:not(.Mui-disabled)),
+.MuiDataGrid-row:is(:hover, .Mui-selected) .MuiDataGrid-cell > .MuiSvgIcon-root {
   color: var(--barracks-text-interactive) !important;
 }
 
