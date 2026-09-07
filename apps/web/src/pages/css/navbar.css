@@ -216,7 +216,7 @@
   .mobile-app-menu-tile.active .mobile-app-menu-icon {
     border-color: var(--barracks-border-strong);
     background: var(--barracks-action);
-    color: var(--barracks-text-inverse);
+    color: var(--barracks-action-text);
     box-shadow: var(--barracks-shadow);
   }
 
@@ -232,7 +232,7 @@
     border: 1px solid var(--barracks-border-strong);
     border-radius: 999px;
     background: var(--barracks-action);
-    color: var(--barracks-text-inverse);
+    color: var(--barracks-action-text);
     font-size: 11px;
     font-weight: 950;
     line-height: 1;
@@ -366,7 +366,7 @@
     box-shadow: none;
   }
 
-  .navitem.active {
+  .navitem:not(:disabled):not(.disabled).active {
     border-color: var(--barracks-border-strong);
     background: var(--barracks-action) !important;
     box-shadow: var(--barracks-shadow);
@@ -447,7 +447,7 @@
   transform: translateY(-50%);
 }
 
-.navbar-collapse-toggle:hover {
+.navbar-collapse-toggle:not(:disabled):not(.disabled):hover {
   border-color: var(--barracks-border-strong);
   background: var(--barracks-surface-interactive);
   color: var(--barracks-text);
@@ -521,7 +521,7 @@
   text-align: left;
 }
 
-.account-navitem:hover {
+.account-navitem:not(:disabled):not(.disabled):hover {
   color: var(--barracks-text) !important;
   border-color: var(--barracks-border-subtle);
   background-color: var(--barracks-surface-interactive) !important;
@@ -653,15 +653,15 @@
   }
 }
 
-.navitem:hover {
+.navitem:not(:disabled):not(.disabled):hover {
   color: var(--barracks-text) !important;
   border-color: var(--barracks-border-subtle);
   background-color: var(--barracks-surface-interactive) !important;
 }
 
-.navitem.active
+.navitem:not(:disabled):not(.disabled).active
 {
-  color: var(--barracks-text-inverse) !important;
+  color: var(--barracks-action-text) !important;
   border-color: var(--barracks-action);
   background: var(--barracks-action) !important;
   box-shadow: none;
@@ -697,6 +697,10 @@
   white-space: nowrap;
 }
 
+.navitem:not(:disabled):not(.disabled).active .nav-text {
+  color: var(--barracks-action-text);
+}
+
 .nav-live-count {
   display: inline-flex;
   min-width: 22px;
@@ -707,7 +711,7 @@
   border: 1px solid var(--barracks-border-strong);
   border-radius: 999px;
   background: var(--barracks-action);
-  color: var(--barracks-text-inverse);
+  color: var(--barracks-action-text);
   font-size: 12px;
   font-weight: 950;
   line-height: 1;
@@ -801,7 +805,7 @@
     border: 1px solid var(--barracks-border-strong);
     border-radius: 999px;
     background: var(--barracks-action);
-    color: var(--barracks-text-inverse);
+    color: var(--barracks-action-text);
     font-size: 10px;
     font-weight: 950;
     line-height: 1;
@@ -939,7 +943,7 @@
   background: var(--barracks-surface-interactive) !important;
 }
 
-.profile-modal-secondary-actions .btn:hover {
+.profile-modal-secondary-actions .btn:not(:disabled):not(.disabled):hover {
   border-color: var(--barracks-border-strong) !important;
   background: var(--barracks-surface-inset) !important;
 }
@@ -1072,7 +1076,7 @@
   font-weight: 750;
 }
 
-.profile-whats-new-button:hover {
+.profile-whats-new-button:not(:disabled):not(.disabled):hover {
   border-color: var(--barracks-border-strong);
   background: var(--barracks-surface-inset);
 }
@@ -1120,7 +1124,7 @@
   text-align: left;
 }
 
-.profile-font-options button.is-active {
+.profile-font-options button:not(:disabled):not(.disabled).is-active {
   border-color: var(--barracks-border-strong);
   background: var(--barracks-surface-interactive);
   box-shadow: inset 0 0 0 1px var(--barracks-action);
@@ -1182,7 +1186,7 @@
   padding: 5px 8px;
 }
 
-.profile-theme-reset:hover {
+.profile-theme-reset:not(:disabled):not(.disabled):hover {
   border-color: var(--barracks-border-strong);
   color: var(--barracks-text);
 }
@@ -1266,8 +1270,8 @@
   border-color: transparent;
 }
 
-.profile-theme-select-menu button.is-active,
-.profile-theme-select-menu button:hover {
+.profile-theme-select-menu button:not(:disabled):not(.disabled).is-active,
+.profile-theme-select-menu button:not(:disabled):not(.disabled):hover {
   border-color: var(--barracks-border-strong);
   background: var(--barracks-surface-interactive);
 }
@@ -1324,7 +1328,7 @@
 .profile-logout-button {
   border: 0 !important;
   background: var(--barracks-action) !important;
-  color: var(--barracks-text-inverse) !important;
+  color: var(--barracks-action-text) !important;
   font-weight: 900 !important;
 }
 
@@ -1459,7 +1463,7 @@
     text-align: center !important;
   }
 
-  .navitem.active {
+  .navitem:not(:disabled):not(.disabled).active {
     border-color: var(--barracks-action) !important;
     background: var(--barracks-action) !important;
     box-shadow: var(--barracks-shadow) !important;
@@ -1564,4 +1568,15 @@
     height: 30px;
     font-size: 11px;
   }
+}
+
+html body :is(.navitem, .mobile-app-menu, .mobile-app-account, .mobile-app-menu-account, .mobile-app-menu-logout, .navbar-collapse-toggle, .profile-logout-button):is(:disabled, .disabled) {
+  border-color: var(--barracks-border-subtle) !important;
+  background: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text) !important;
+  opacity: 1;
+}
+
+html body .navitem:is(:disabled, .disabled) .nav-text {
+  color: var(--barracks-text) !important;
 }

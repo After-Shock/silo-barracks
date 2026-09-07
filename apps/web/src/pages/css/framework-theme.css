@@ -10,7 +10,7 @@ a {
 }
 
 a:hover {
-  color: var(--barracks-focus);
+  color: var(--barracks-action);
 }
 
 button,
@@ -84,18 +84,51 @@ html body :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   color: var(--bs-btn-color);
 }
 
-.btn:hover {
+.btn:not(:disabled):not(.disabled):hover {
   border-color: var(--bs-btn-hover-border-color);
   background-color: var(--bs-btn-hover-bg);
   color: var(--bs-btn-hover-color);
 }
 
+.btn:not(:disabled):not(.disabled):is(:active, .active, .show) {
+  border-color: var(--bs-btn-active-border-color);
+  background-color: var(--bs-btn-active-bg);
+  color: var(--bs-btn-active-color);
+}
+
+.btn-primary {
+  --bs-btn-color: var(--barracks-action-text);
+  --bs-btn-bg: var(--barracks-action);
+  --bs-btn-border-color: var(--barracks-action);
+  --bs-btn-hover-color: var(--barracks-action-text);
+  --bs-btn-hover-bg: var(--barracks-action);
+  --bs-btn-hover-border-color: var(--barracks-border-strong);
+  --bs-btn-active-color: var(--barracks-action-text);
+  --bs-btn-active-bg: var(--barracks-action);
+  --bs-btn-active-border-color: var(--barracks-border-strong);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--barracks-text);
+  --bs-btn-bg: var(--barracks-surface-interactive);
+  --bs-btn-border-color: var(--barracks-border-subtle);
+  --bs-btn-hover-color: var(--barracks-text);
+  --bs-btn-hover-bg: var(--barracks-surface-inset);
+  --bs-btn-hover-border-color: var(--barracks-border-strong);
+  --bs-btn-active-color: var(--barracks-action-text);
+  --bs-btn-active-bg: var(--barracks-action);
+  --bs-btn-active-border-color: var(--barracks-action);
+}
+
 .btn:disabled,
 .btn.disabled,
 fieldset:disabled .btn {
-  border-color: var(--bs-btn-disabled-border-color);
-  background-color: var(--bs-btn-disabled-bg);
-  color: var(--bs-btn-disabled-color);
+  --bs-btn-disabled-color: var(--barracks-text);
+  --bs-btn-disabled-bg: var(--barracks-surface-inset);
+  --bs-btn-disabled-border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-subtle) !important;
+  background-color: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text) !important;
 }
 
 .card,
@@ -203,7 +236,7 @@ fieldset:disabled .btn {
   --bs-pagination-focus-color: var(--barracks-text);
   --bs-pagination-active-bg: var(--barracks-action);
   --bs-pagination-active-border-color: var(--barracks-action);
-  --bs-pagination-active-color: var(--barracks-text-inverse);
+  --bs-pagination-active-color: var(--barracks-action-text);
   --bs-pagination-disabled-bg: var(--barracks-surface-inset);
   --bs-pagination-disabled-border-color: var(--barracks-border-subtle);
   --bs-pagination-disabled-color: var(--barracks-text);
@@ -275,7 +308,13 @@ fieldset:disabled .btn {
 
 .MuiButton-contained {
   background-color: var(--barracks-action) !important;
-  color: var(--barracks-text-inverse) !important;
+  color: var(--barracks-action-text) !important;
+}
+
+.MuiButton-contained.Mui-disabled {
+  border-color: var(--barracks-border-subtle) !important;
+  background-color: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text) !important;
 }
 
 .MuiButton-outlined {
@@ -346,9 +385,14 @@ fieldset:disabled .btn {
   color: var(--barracks-text) !important;
 }
 
-.MuiPickersDay-root:hover,
-.MuiPickersDay-root.Mui-selected,
-.MuiPickersDay-root.Mui-selected:hover {
+.MuiPickersDay-root:not(.Mui-disabled):hover,
+.MuiPickersDay-root.Mui-selected:not(.Mui-disabled),
+.MuiPickersDay-root.Mui-selected:not(.Mui-disabled):hover {
   background-color: var(--barracks-action) !important;
-  color: var(--barracks-text-inverse) !important;
+  color: var(--barracks-action-text) !important;
+}
+
+.MuiPickersDay-root.Mui-disabled {
+  background-color: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text) !important;
 }

@@ -129,48 +129,6 @@ h2 {
   }
 }
 
-.btn-outline-primary {
-  color: var(--barracks-text) !important;
-  border-color: var(--barracks-border-subtle) !important;
-  background-color: var(--barracks-surface-interactive) !important;
-  border-radius: 8px !important;
-}
-
-.btn-outline-primary:hover {
-  border-color: var(--barracks-border-strong) !important;
-  background-color: var(--barracks-surface-raised) !important;
-}
-
-.btn-outline-primary.active {
-  background-color: var(--barracks-action) !important;
-  color: var(--barracks-text-inverse) !important;
-}
-
-.btn-outline-primary:focus {
-  background-color: var(--barracks-action) !important;
-  color: var(--barracks-text-inverse) !important;
-}
-
-.btn-primary {
-  color: var(--barracks-text-inverse) !important;
-  border-color: var(--barracks-action) !important;
-  background: var(--barracks-action) !important;
-  border-radius: 8px !important;
-}
-
-.btn-primary:hover {
-  border-color: var(--barracks-focus) !important;
-  background: var(--barracks-focus) !important;
-}
-
-.btn-primary.active {
-  background-color: var(--barracks-action) !important;
-}
-
-.btn-primary:focus {
-  background-color: var(--barracks-action) !important;
-}
-
 .form-select {
   background-color: var(--barracks-surface-interactive) !important;
   border-color: var(--barracks-border-subtle) !important ;
@@ -179,7 +137,7 @@ h2 {
 }
 
 .form-select:focus {
-  border-color: var(--barracks-focus) !important;
+  border-color: var(--barracks-border-strong) !important;
   color: var(--barracks-text) !important;
 }
 
@@ -192,7 +150,7 @@ h2 {
 
 .form-select option:hover {
   background-color: var(--barracks-action) !important;
-  color: var(--barracks-text-inverse) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .bg-primary-1 {
@@ -241,7 +199,7 @@ h2 {
   width: 38px;
   min-width: 38px;
   margin-inline-end: 14px;
-  color: var(--barracks-focus);
+  color: var(--barracks-action);
 }
 
 .jellyglance-toast.Toastify__toast--info .Toastify__toast-icon {
@@ -339,7 +297,7 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: var(--barracks-focus);
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 760;
   letter-spacing: 0.08em;
@@ -384,7 +342,7 @@ h2 {
 }
 
 .whats-new-list svg {
-  color: var(--barracks-focus);
+  color: var(--barracks-action);
 }
 
 .whats-new-list strong,

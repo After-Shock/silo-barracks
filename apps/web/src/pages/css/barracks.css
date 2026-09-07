@@ -20,12 +20,12 @@ html body .home-dashboard-backdrop {
   background: none;
 }
 
-html body .navitem.active {
-  background: var(--barracks-surface-interactive) !important;
+html body .navitem:not(:disabled):not(.disabled).active {
+  background: var(--barracks-action) !important;
   border-left: 3px solid var(--barracks-action);
   border-radius: 0 3px 3px 0;
   box-shadow: none;
-  color: var(--barracks-text) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 html body :is(.navbar-brand-icon, .setup-logo-mark, .setup-jellyfin-logo, .login-logo) {
@@ -43,13 +43,20 @@ html body :is(.session-details-title, .setup-brand-kicker) {
 
 html body :is(.setup-button, .profile-logout-button) {
   background: var(--barracks-action) !important;
-  color: var(--barracks-text-inverse) !important;
+  color: var(--barracks-action-text) !important;
   border-color: var(--barracks-action);
   box-shadow: none;
 }
 
-html body .setup-button:hover {
-  background: var(--barracks-focus) !important;
+html body .setup-button:not(:disabled):not(.disabled):hover {
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
+}
+
+html body :is(.setup-button, .profile-logout-button):is(:disabled, .disabled) {
+  border-color: var(--barracks-border-subtle) !important;
+  background: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text) !important;
 }
 
 html body :is(.setup-shell, .setup-stage, .setup-background, .auth-artwork-background) {
