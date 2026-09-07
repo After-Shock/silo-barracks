@@ -168,6 +168,38 @@ function closestMixToward(color, background, minimum = 4.5) {
   return ensureContrast(color, background, minimum);
 }
 
+function resolveActionPair(candidate, background) {
+  const endpoints = [TEXT_LIGHT, TEXT_DARK];
+  const steps = 4096;
+  const pairs = [];
+
+  for (const mixEndpoint of endpoints) {
+    for (let index = 0; index <= steps; index += 1) {
+      const weight = index / steps;
+      const action = mixHex(candidate, mixEndpoint, weight);
+      if (contrastRatio(action, background) < 3) {
+        continue;
+      }
+
+      const textCandidates = endpoints
+        .map((actionText) => ({ actionText, contrast: contrastRatio(actionText, action) }))
+        .filter(({ contrast }) => contrast >= 4.5)
+        .sort((first, second) => second.contrast - first.contrast);
+      if (textCandidates.length > 0) {
+        pairs.push({ action, actionText: textCandidates[0].actionText, weight });
+        break;
+      }
+    }
+  }
+
+  if (pairs.length > 0) {
+    return pairs.sort((first, second) => first.weight - second.weight)[0];
+  }
+
+  const action = ensureContrast(candidate, background, 3);
+  return { action, actionText: strongestTextEndpoint(action), weight: 1 };
+}
+
 function strongestTextEndpoint(background) {
   return contrastRatio(TEXT_LIGHT, background) >= contrastRatio(TEXT_DARK, background) ? TEXT_LIGHT : TEXT_DARK;
 }
@@ -191,7 +223,7 @@ export function resolveTheme(theme) {
   const textMuted = closestMixToward(text, canvas);
   const textMutedRaised = closestMixToward(strongestTextEndpoint(surfaceRaised), surfaceRaised);
   const focus = ensureContrast(input.primary, surfaceRaised, 3);
-  const action = ensureContrast(input.primary, surfaceInteractive, 3);
+  const { action, actionText } = resolveActionPair(input.primary, surfaceInteractive);
   const statusCandidates = {
     live: "#ff6f63",
     success: "#70b981",
@@ -225,6 +257,7 @@ export function resolveTheme(theme) {
     focusLight: TEXT_LIGHT,
     focusDark: TEXT_DARK,
     action,
+    actionText,
     accentSecondary: input.secondary,
     live,
     success,
@@ -348,6 +381,7 @@ const semanticPropertyMap = [
   ["--barracks-focus-light", "focusLight"],
   ["--barracks-focus-dark", "focusDark"],
   ["--barracks-action", "action"],
+  ["--barracks-action-text", "actionText"],
   ["--barracks-accent-secondary", "accentSecondary"],
   ["--barracks-state-live", "live"],
   ["--barracks-state-success", "success"],

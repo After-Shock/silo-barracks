@@ -35,6 +35,7 @@ const SEMANTIC_KEYS = [
   "focusLight",
   "focusDark",
   "action",
+  "actionText",
   "accentSecondary",
   "live",
   "success",
@@ -117,6 +118,8 @@ function assertAccessibleTokens(tokens) {
   assert.ok(contrastRatio(tokens.textMuted, tokens.canvas) >= 4.5);
   assert.ok(contrastRatio(tokens.textMutedRaised, tokens.surfaceRaised) >= 4.5);
   assert.ok(contrastRatio(tokens.borderStrong, tokens.surfaceInteractive) >= 3);
+  assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3);
+  assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5);
   for (const key of STATE_KEYS) {
     assert.ok(contrastRatio(tokens[key], tokens.surfaceRaised) >= 3, `${key} is accessible on raised surface`);
   }
@@ -204,6 +207,8 @@ test("resolveTheme derives every semantic token for the default palette", () => 
   assert.equal(tokens.textInverse, "#10100f");
   assert.equal(tokens.focusLight, "#f5f0e7");
   assert.equal(tokens.focusDark, "#10100f");
+  assert.equal(tokens.action, DEFAULT_THEME.primary);
+  assert.equal(tokens.actionText, "#10100f");
   assert.equal(tokens.accentSecondary, DEFAULT_THEME.secondary);
   assert.equal(tokens.chartGrid, tokens.borderSubtle);
   assert.equal(tokens.chartTooltip, tokens.overlay);
@@ -233,7 +238,8 @@ test("resolveTheme preserves the four public inputs and all token relationships"
   assert.equal(tokens.overlay, mixHex(normalized.surface, normalized.background, 0.18));
   assert.equal(tokens.borderSubtle, mixHex(normalized.surface, tokens.text, 0.18));
   assert.equal(tokens.borderStrong, ensureContrast(mixHex(tokens.surfaceInteractive, tokens.text, 0.42), tokens.surfaceInteractive, 3));
-  assert.equal(tokens.action, ensureContrast(normalized.primary, tokens.surfaceInteractive, 3));
+  assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3);
+  assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5);
   assert.equal(tokens.focus, ensureContrast(normalized.primary, tokens.surfaceRaised, 3));
   assert.equal(tokens.accentSecondary, normalized.secondary);
   assert.equal(tokens.chartGrid, tokens.borderSubtle);
@@ -267,6 +273,7 @@ test("resolveTheme adjusts only inaccessible fixed status and chart candidates",
     }
   }
   assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3);
+  assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5);
   assert.ok(contrastRatio(tokens.borderStrong, tokens.surfaceInteractive) >= 3);
   assertAccessibleTokens(tokens);
 });
@@ -303,7 +310,50 @@ test("resolveTheme keeps contrast guarantees for degenerate custom palettes", ()
     assert.equal(tokens.focus, ensureContrast(palette.primary, tokens.surfaceRaised, 3), `${palette.name}: focus`);
     assert.equal(tokens.focusLight, "#f5f0e7", `${palette.name}: focus light`);
     assert.equal(tokens.focusDark, "#10100f", `${palette.name}: focus dark`);
-    assert.equal(tokens.action, ensureContrast(palette.primary, tokens.surfaceInteractive, 3), `${palette.name}: action`);
+    assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3, `${palette.name}: action`);
+    assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5, `${palette.name}: action text`);
+  }
+});
+
+test("resolveTheme chooses accessible action pairs for opposing and deterministic random palettes", () => {
+  const palettes = [
+    {
+      name: "opposing black and white surfaces",
+      primary: "#222222",
+      secondary: "#d9b36c",
+      background: "#000000",
+      surface: "#ffffff",
+    },
+    {
+      name: "dark action on light interactive",
+      primary: "#101010",
+      secondary: "#d06b5e",
+      background: "#101010",
+      surface: "#ffffff",
+    },
+    {
+      name: "light action on dark interactive",
+      primary: "#eeeeee",
+      secondary: "#d06b5e",
+      background: "#000000",
+      surface: "#101010",
+    },
+  ];
+  const channel = (seed) => ((seed * 73 + 41) % 256).toString(16).padStart(2, "0");
+  for (let index = 0; index < 24; index += 1) {
+    palettes.push({
+      name: `seeded palette ${index}`,
+      primary: `#${channel(index + 1)}${channel(index + 11)}${channel(index + 23)}`,
+      secondary: `#${channel(index + 31)}${channel(index + 43)}${channel(index + 59)}`,
+      background: `#${channel(index + 71)}${channel(index + 83)}${channel(index + 97)}`,
+      surface: `#${channel(index + 101)}${channel(index + 127)}${channel(index + 149)}`,
+    });
+  }
+
+  for (const palette of palettes) {
+    const { tokens } = resolveTheme(palette);
+    assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3, `${palette.name}: action contrast`);
+    assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5, `${palette.name}: action text contrast`);
   }
 });
 
@@ -427,6 +477,7 @@ test("applyTheme writes semantic tokens, RGB companions, and legacy aliases as o
     "--barracks-focus-light": tokens.focusLight,
     "--barracks-focus-dark": tokens.focusDark,
     "--barracks-action": tokens.action,
+    "--barracks-action-text": tokens.actionText,
     "--barracks-accent-secondary": tokens.accentSecondary,
     "--barracks-state-live": tokens.live,
     "--barracks-state-success": tokens.success,
