@@ -1,0 +1,265 @@
+/* Shared semantic theme bridge for vendor frameworks and application controls. */
+html,
+body {
+  background-color: var(--barracks-canvas);
+  color: var(--barracks-text);
+}
+
+body {
+  color-scheme: dark;
+}
+
+a {
+  color: var(--barracks-action);
+}
+
+a:hover {
+  color: var(--barracks-focus);
+}
+
+button,
+input,
+select,
+textarea {
+  border-color: var(--barracks-border-subtle);
+  background-color: var(--barracks-surface-interactive);
+  color: var(--barracks-text);
+}
+
+::placeholder {
+  color: var(--barracks-text-muted-raised) !important;
+  opacity: 1;
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--barracks-focus);
+  box-shadow: 0 0 0 3px var(--barracks-focus-light), 0 0 0 4px var(--barracks-focus-dark);
+}
+
+.card,
+.modal-content,
+.dropdown-menu {
+  border-color: var(--barracks-border-subtle);
+  background-color: var(--barracks-surface-raised);
+  color: var(--barracks-text);
+}
+
+.card :is(.text-muted, small),
+.modal-content :is(.text-muted, small),
+.dropdown-menu :is(.text-muted, small),
+.dropdown-item-text {
+  color: var(--barracks-text-muted-raised) !important;
+}
+
+.modal-header,
+.modal-footer,
+.dropdown-divider {
+  border-color: var(--barracks-border-subtle);
+}
+
+.dropdown-item {
+  color: var(--barracks-text);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus,
+.dropdown-item.active,
+.dropdown-item:active {
+  background-color: var(--barracks-surface-interactive);
+  color: var(--barracks-text);
+}
+
+.table {
+  --bs-table-bg: var(--barracks-surface-raised);
+  --bs-table-color: var(--barracks-text);
+  --bs-table-border-color: var(--barracks-border-subtle);
+  --bs-table-striped-bg: var(--barracks-surface-inset);
+  --bs-table-striped-color: var(--barracks-text);
+  --bs-table-hover-bg: var(--barracks-surface-interactive);
+  --bs-table-hover-color: var(--barracks-text);
+  border-color: var(--barracks-border-subtle);
+  color: var(--barracks-text);
+}
+
+.nav-tabs {
+  border-color: var(--barracks-border-subtle);
+}
+
+.nav-tabs .nav-link {
+  border-color: transparent;
+  color: var(--barracks-text-muted);
+}
+
+.nav-tabs .nav-link:hover,
+.nav-tabs .nav-link:focus {
+  border-color: var(--barracks-border-subtle);
+  color: var(--barracks-text);
+}
+
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+  border-color: var(--barracks-border-subtle) var(--barracks-border-subtle) var(--barracks-surface-raised);
+  background-color: var(--barracks-surface-raised);
+  color: var(--barracks-text);
+}
+
+.pagination {
+  --bs-pagination-bg: var(--barracks-surface-raised);
+  --bs-pagination-border-color: var(--barracks-border-subtle);
+  --bs-pagination-color: var(--barracks-text-muted-raised);
+  --bs-pagination-hover-bg: var(--barracks-surface-interactive);
+  --bs-pagination-hover-border-color: var(--barracks-border-strong);
+  --bs-pagination-hover-color: var(--barracks-text);
+  --bs-pagination-focus-bg: var(--barracks-surface-interactive);
+  --bs-pagination-focus-color: var(--barracks-text);
+  --bs-pagination-active-bg: var(--barracks-action);
+  --bs-pagination-active-border-color: var(--barracks-action);
+  --bs-pagination-active-color: var(--barracks-text-inverse);
+  --bs-pagination-disabled-bg: var(--barracks-surface-inset);
+  --bs-pagination-disabled-border-color: var(--barracks-border-subtle);
+  --bs-pagination-disabled-color: var(--barracks-state-unavailable);
+}
+
+.tooltip {
+  --bs-tooltip-bg: var(--barracks-overlay);
+  --bs-tooltip-color: var(--barracks-text);
+}
+
+.MuiPaper-root,
+.MuiDialog-paper,
+.MuiMenu-paper,
+.MuiPopover-paper {
+  border-color: var(--barracks-border-subtle) !important;
+  background-color: var(--barracks-surface-raised) !important;
+  background-image: none !important;
+  color: var(--barracks-text) !important;
+}
+
+.MuiPaper-root :is(.MuiTypography-colorTextSecondary, .MuiFormHelperText-root),
+.MuiDialog-paper :is(.MuiDialogContentText-root, .MuiTypography-colorTextSecondary),
+.MuiMenu-paper .MuiListSubheader-root {
+  color: var(--barracks-text-muted-raised) !important;
+}
+
+.MuiMenuItem-root,
+.MuiListItemText-primary,
+.MuiSvgIcon-root {
+  color: var(--barracks-text) !important;
+}
+
+.MuiMenuItem-root:hover,
+.MuiMenuItem-root.Mui-selected,
+.MuiMenuItem-root.Mui-selected:hover {
+  background-color: var(--barracks-surface-interactive) !important;
+}
+
+.MuiInputBase-root,
+.MuiInput-root,
+.MuiFilledInput-root,
+.MuiOutlinedInput-root {
+  background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text) !important;
+}
+
+.MuiInputBase-input::placeholder,
+.MuiInputLabel-root,
+.MuiFormLabel-root {
+  color: var(--barracks-text-muted-raised) !important;
+}
+
+.MuiOutlinedInput-notchedOutline,
+.MuiInput-root::before,
+.MuiFilledInput-root::before {
+  border-color: var(--barracks-border-subtle) !important;
+}
+
+.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline,
+.MuiInput-root:hover::before,
+.MuiFilledInput-root:hover::before {
+  border-color: var(--barracks-border-strong) !important;
+}
+
+.MuiButton-root,
+.MuiIconButton-root {
+  color: var(--barracks-action) !important;
+}
+
+.MuiButton-contained {
+  background-color: var(--barracks-action) !important;
+  color: var(--barracks-text-inverse) !important;
+}
+
+.MuiButton-outlined {
+  border-color: var(--barracks-border-strong) !important;
+}
+
+.MuiTable-root,
+.MuiTableContainer-root,
+.MuiTableHead-root,
+.MuiTableBody-root,
+.MuiTableRow-root,
+.MuiTableCell-root {
+  border-color: var(--barracks-border-subtle) !important;
+  background-color: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text) !important;
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+  color: var(--barracks-text-muted-raised) !important;
+}
+
+.MuiTableRow-root:hover .MuiTableCell-root {
+  background-color: var(--barracks-surface-interactive) !important;
+}
+
+.MuiDataGrid-root {
+  --DataGrid-containerBackground: var(--barracks-surface-raised);
+  --DataGrid-t-color-border-base: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-subtle) !important;
+  background-color: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text) !important;
+}
+
+.MuiDataGrid-columnHeaders,
+.MuiDataGrid-columnHeader,
+.MuiDataGrid-cell,
+.MuiDataGrid-footerContainer,
+.MuiDataGrid-withBorderColor {
+  border-color: var(--barracks-border-subtle) !important;
+}
+
+.MuiDataGrid-columnHeaderTitle,
+.MuiDataGrid-cell,
+.MuiDataGrid-footerContainer {
+  color: var(--barracks-text) !important;
+}
+
+.MuiDataGrid-row:hover,
+.MuiDataGrid-row.Mui-selected,
+.MuiDataGrid-row.Mui-selected:hover {
+  background-color: var(--barracks-surface-interactive) !important;
+}
+
+.MuiPickersPopper-root .MuiPaper-root,
+.MuiPickersLayout-root,
+.MuiDateCalendar-root,
+.MuiTimeClock-root,
+.MuiDayCalendar-header,
+.MuiPickersCalendarHeader-root {
+  background-color: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text) !important;
+}
+
+.MuiPickersDay-root,
+.MuiPickersCalendarHeader-label,
+.MuiDayCalendar-weekDayLabel,
+.MuiClockNumber-root {
+  color: var(--barracks-text) !important;
+}
+
+.MuiPickersDay-root:hover,
+.MuiPickersDay-root.Mui-selected,
+.MuiPickersDay-root.Mui-selected:hover {
+  background-color: var(--barracks-action) !important;
+  color: var(--barracks-text-inverse) !important;
+}

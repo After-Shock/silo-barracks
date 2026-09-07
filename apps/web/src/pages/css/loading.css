@@ -6,7 +6,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--background-color);
+  background-color: var(--barracks-canvas);
+  color: var(--barracks-text);
   transition: opacity 800ms ease-in;
   opacity: 1;
 }
@@ -21,7 +22,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  background-color: var(--barracks-scrim); /* Semi-transparent background */
   z-index: 9999; /* High z-index to be above other elements */
 }
 
@@ -32,8 +33,8 @@
 .loading__spinner {
   width: 50px;
   height: 50px;
-  border: 5px solid #ccc;
-  border-top-color: #333;
+  border: 5px solid var(--barracks-border-subtle);
+  border-top-color: var(--barracks-action);
   border-radius: 50%;
   animation: spin 1s ease-in-out infinite;
 }

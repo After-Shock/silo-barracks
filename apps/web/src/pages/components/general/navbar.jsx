@@ -9,7 +9,7 @@ import ArrowLeftSLineIcon from "remixicon-react/ArrowLeftSLineIcon";
 import ArrowRightSLineIcon from "remixicon-react/ArrowRightSLineIcon";
 import MagicLineIcon from "remixicon-react/MagicLineIcon";
 import MenuLineIcon from "remixicon-react/MenuLineIcon";
-import logo_dark from "../../images/silo-icon.png";
+import logo_dark from "../../../../public/brand/barracks-mark.svg";
 import "../../css/navbar.css";
 import VersionCard from "./version-card";
 import { OPEN_WHATS_NEW_EVENT } from "../../../lib/events";
@@ -720,7 +720,13 @@ export default function Navbar() {
           <img src={logo_dark} alt="" />
           <strong className="silo-wordmark">Silo Barracks</strong>
         </Link>
-        <button className="mobile-app-account" type="button" onClick={() => setShowAccount(true)} aria-label="Open account settings">
+        <button
+          className="mobile-app-account"
+          type="button"
+          onClick={() => setShowAccount(true)}
+          aria-label="Open account settings"
+          data-testid="theme-account-mobile"
+        >
           {avatarSrc ? <img src={avatarSrc} alt="" onError={(event) => (event.currentTarget.style.display = "none")} /> : <AccountCircleLineIcon />}
         </button>
       </div>
@@ -844,7 +850,12 @@ export default function Navbar() {
           })}
           <div className="navbar-inline-footer">
             <div className="navbar-footer-account-row">
-              <button className="navitem account-navitem p-2" type="button" onClick={() => setShowAccount(true)}>
+              <button
+                className="navitem account-navitem p-2"
+                type="button"
+                onClick={() => setShowAccount(true)}
+                data-testid="theme-account-desktop"
+              >
                 <span className="account-nav-avatar">
                   {avatarSrc ? (
                     <img src={avatarSrc} alt="" onError={(event) => (event.currentTarget.style.display = "none")} />
@@ -946,6 +957,7 @@ export default function Navbar() {
                 type="button"
                 onClick={() => setIsThemeMenuOpen((open) => !open)}
                 aria-expanded={isThemeMenuOpen}
+                data-testid="theme-menu"
               >
                 <span className="profile-theme-preset-swatches" aria-hidden="true">
                   <i style={{ backgroundColor: activeThemePreset?.primary || customTheme.primary }} />
@@ -967,6 +979,7 @@ export default function Navbar() {
                       onClick={() => handleThemePreset(preset)}
                       role="option"
                       aria-selected={activeThemePreset?.name === preset.name}
+                      data-testid={preset.name === "Ocean" ? "theme-preset-ocean" : preset.name === "Mono" ? "theme-preset-mono" : undefined}
                     >
                       <span className="profile-theme-preset-swatches" aria-hidden="true">
                         <i style={{ backgroundColor: preset.primary }} />
@@ -995,6 +1008,7 @@ export default function Navbar() {
                       value={customTheme[key] || DEFAULT_THEME[key]}
                       onChange={(event) => handleThemeChange(key, event.target.value)}
                       aria-label={`${label} colour`}
+                      data-testid={key === "primary" ? "theme-color-primary" : undefined}
                     />
                     <input
                       type="text"

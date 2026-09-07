@@ -1,0 +1,86 @@
+/* Silo's warm console palette and printed, three-colour identity. */
+html body, html body * {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+html body :is(code, pre, .session-details-title, .setup-brand-kicker) {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+
+html body :is(.home-glass-card, .setup-card, .form-box, .activity-sessions-panel, .session-card) {
+  border-radius: 4px;
+}
+
+html body :is(.home-dashboard-backdrop, .home-glass-card)::before,
+html body .home-dashboard-backdrop::after {
+  background: none;
+}
+
+html body .home-dashboard-backdrop {
+  background: none;
+}
+
+html body .navitem.active {
+  background: var(--barracks-surface-interactive) !important;
+  border-left: 3px solid var(--barracks-action);
+  border-radius: 0 3px 3px 0;
+  box-shadow: none;
+  color: var(--barracks-text) !important;
+}
+
+html body :is(.navbar-brand-icon, .setup-logo-mark, .setup-jellyfin-logo, .login-logo) {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  filter: none;
+}
+
+html body :is(.session-details-title, .setup-brand-kicker) {
+  color: var(--barracks-action) !important;
+  text-shadow: none;
+}
+
+html body :is(.setup-button, .profile-logout-button) {
+  background: var(--barracks-action) !important;
+  color: var(--barracks-text-inverse) !important;
+  border-color: var(--barracks-action);
+  box-shadow: none;
+}
+
+html body .setup-button:hover {
+  background: var(--barracks-focus) !important;
+}
+
+html body :is(.setup-shell, .setup-stage, .setup-background, .auth-artwork-background) {
+  background: var(--barracks-canvas);
+}
+
+html body .auth-artwork-grid {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+html body .silo-wordmark {
+  color: var(--barracks-text);
+  letter-spacing: -0.04em;
+  font-weight: 800;
+}
+
+html body :is(.home-icon-bubble, .home-accent-purple .home-icon-bubble) {
+  color: var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  border-color: var(--barracks-border-subtle);
+  border-radius: 4px;
+  box-shadow: none;
+}
+
+html body :is(.home-hour span, .session-popout-progress div) {
+  background: var(--barracks-action);
+  box-shadow: none;
+}
+
+html body :is(.home-podium-card, .home-hall-of-fame, .session-popout) {
+  background: var(--barracks-surface-raised);
+  border-color: var(--barracks-border-subtle);
+}
