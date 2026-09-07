@@ -70,14 +70,20 @@ a plain object of CSS color strings keyed by the following stable contract, then
 | `overlay` | `--barracks-overlay` | Popovers/tooltips |
 | `borderSubtle`, `borderStrong` | `--barracks-border-subtle`, `--barracks-border-strong` | Boundaries |
 | `text`, `textMuted`, `textInverse` | `--barracks-text`, `--barracks-text-muted`, `--barracks-text-inverse` | Typography |
-| `focus`, `focusLight`, `focusDark`, `action` | matching `--barracks-focus*` properties and `--barracks-action` | Keyboard focus/primary actions |
+| `focus`, `focusLight`, `focusDark`, `action`, `accentSecondary` | `--barracks-focus`, `--barracks-focus-light`, `--barracks-focus-dark`, `--barracks-action`, `--barracks-accent-secondary` | Keyboard focus/actions/theme personality |
 | `live`, `success`, `warning`, `danger`, `unavailable` | matching `--barracks-state-*` properties | Status semantics |
 | `chartGrid`, `chartTooltip` | matching `--barracks-chart-*` properties | Chart structure |
 | `chart1` through `chart6` | `--barracks-chart-1` through `--barracks-chart-6` | Ordered series palette |
 | `scrim`, `shadow` | `--barracks-scrim`, `--barracks-shadow` | Layer depth |
 
-Legacy aliases such as `--primary-color`, `--background-color`, and
-`--secondary-background-color` remain mapped to the semantic values during this
+RGB companions `--barracks-action-rgb`, `--barracks-accent-secondary-rgb`, and
+`--barracks-surface-raised-rgb` contain comma-separated decimal channels for
+opacity consumers. Legacy aliases `--primary-color`, `--primary-rgb`,
+`--primary-light-color`, `--primary-light-rgb`, `--primary-dark-color`,
+`--secondary-color`, `--secondary-rgb`, `--background-color`,
+`--secondary-background-color`, `--tertiary-background-color`, `--surface-color`,
+`--surface-border-color`, `--text-color`, `--muted-text-color`, and
+`--subtle-text-color` remain mapped to resolved semantic values during this
 migration so unchanged third-party/library rules do not break. New or migrated
 application styles use only `--barracks-*` names.
 
@@ -208,7 +214,9 @@ Kiosk settings therefore continue to load without preserving JellyGlance styling
   values, theme-change behavior, and malformed-input fallback.
 - `scripts/check-theme-colors.cjs` scans application-owned `.css`, `.js`, and
   `.jsx` under `apps/web/src`. It flags every CSS color literal outside
-  `theme.js` unless the exact file/value pair is allowlisted. Color literals
+  the central definitions in `theme.js` and `pages/css/variables.css` unless the
+  exact file/value pair is allowlisted. `variables.css` may contain literals only
+  as fallback declarations for the semantic contract. Color literals
   include hex, `rgb()`/`rgba()`, `hsl()`/`hsla()`, `hwb()`, `lab()`, `lch()`,
   `oklab()`, `oklch()`, `color()`, and CSS named colors such as `white`, `black`,
   and `grey`; matching is case-insensitive and syntax-aware. The non-palette
