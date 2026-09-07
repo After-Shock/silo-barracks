@@ -87,6 +87,12 @@ opacity consumers. Legacy aliases `--primary-color`, `--primary-rgb`,
 migration so unchanged third-party/library rules do not break. New or migrated
 application styles use only `--barracks-*` names.
 
+Theme persistence uses `silo_barracks_theme`. For upgrade compatibility, when
+that key is absent the adapter reads the former `jellyglance_custom_theme` key,
+normalizes its four fields, and best-effort writes the result to the Barracks
+key. An existing Barracks value always takes precedence, and a failed migration
+write must not prevent the legacy theme from being applied.
+
 Derivation is deterministic: `canvas` uses `background`; `nav` and
 `surfaceRaised` use `surface`; inset/interactive/overlay and borders are fixed
 linear RGB mixes of `surface`, `background`, and the chosen text color; focus and
