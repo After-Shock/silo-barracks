@@ -9,7 +9,7 @@
 .session-details {
   margin: 0px !important;
   padding: 10px 10px 0 10px !important;
-  color: var(--barracks-text);
+  color: var(--barracks-text-overlay);
   font-size: 11px;
   line-height: 1.28;
   min-width: 0;
@@ -39,7 +39,7 @@
 }
 
 .session-details-title {
-  color: var(--barracks-text-muted-raised) !important;
+  color: var(--barracks-text-overlay) !important;
   min-width: 0;
   padding: 0 8px 0 0 !important;
   font-size: 9px;
@@ -49,7 +49,7 @@
 }
 
 .session-details-title + .session-details-value {
-  color: var(--barracks-text);
+  color: var(--barracks-text-overlay);
   font-size: 11px;
   font-weight: 750;
   text-shadow: 0 1px 12px var(--barracks-scrim);
@@ -103,7 +103,7 @@
   border: 1px solid var(--barracks-border-subtle) !important;
   border-radius: 16px !important;
   background-color: var(--barracks-surface-raised) !important;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   width: min(496px, 100%);
   max-width: none;
   max-height: none;
@@ -174,6 +174,7 @@
   background:
     linear-gradient(90deg, var(--barracks-scrim), var(--barracks-overlay)),
     var(--barracks-scrim);
+  color: var(--barracks-text-overlay);
   border-radius: 0 16px 0 0;
 }
 
@@ -215,11 +216,11 @@
 
 .card-username a {
   text-decoration: none;
-  color: var(--barracks-text);
+  color: var(--barracks-text-overlay);
 }
 
 .card-username:hover a {
-  color: var(--barracks-text);
+  color: var(--barracks-text-overlay);
 }
 
 .card-device {
@@ -278,11 +279,11 @@
 
 .card-text > a {
   text-decoration: none !important;
-  color: var(--barracks-text) !important;
+  color: var(--barracks-text-overlay) !important;
 }
 
 .card-text a:hover {
-  color: var(--barracks-text-muted-raised) !important;
+  color: var(--barracks-text-overlay) !important;
 }
 
 .ellipse {
@@ -311,11 +312,12 @@
   background:
     linear-gradient(180deg, var(--barracks-overlay), var(--barracks-overlay)),
     var(--barracks-overlay);
+  color: var(--barracks-text-overlay);
 }
 
 .session-timecode {
   margin: 4px 0 0 !important;
-  color: var(--barracks-text);
+  color: var(--barracks-text-overlay);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0;
@@ -376,7 +378,7 @@
   display: block;
   max-width: 100%;
   overflow: hidden;
-  color: var(--barracks-text) !important;
+  color: var(--barracks-text-overlay) !important;
   font-size: 14px;
   font-weight: 900;
   line-height: 1.25;
@@ -388,7 +390,7 @@
   display: block;
   max-width: 100%;
   overflow: hidden;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-overlay);
   font-size: 12px;
   font-weight: 800;
   line-height: 1.35;
@@ -416,7 +418,7 @@
   min-width: 0;
   max-width: 82px;
   overflow: hidden;
-  color: var(--barracks-text-muted-raised) !important;
+  color: var(--barracks-text-overlay) !important;
   font-size: 12px;
   font-weight: 800;
   text-overflow: ellipsis;
@@ -432,7 +434,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 18px;
   background: var(--barracks-surface-raised);
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   box-shadow: 0 30px 90px var(--barracks-scrim);
 }
 
@@ -454,7 +456,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 999px;
   background: var(--barracks-surface-raised);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-raised);
   font-size: 24px;
   line-height: 1;
 }
@@ -485,7 +487,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
   background: var(--barracks-surface-raised);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-raised);
   box-shadow: 0 16px 38px var(--barracks-scrim);
 }
 
@@ -504,7 +506,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 999px;
   background: var(--barracks-surface-raised);
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 11px;
   font-weight: 900;
 }
@@ -521,12 +523,12 @@
 
 .session-popout-status .is-transcoding {
   border-color: var(--barracks-action);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-raised);
 }
 
 .session-popout-copy h2 {
   margin: 0;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-raised);
   font-size: 32px;
   font-weight: 950;
   line-height: 1.05;
@@ -567,7 +569,7 @@
 }
 
 .session-popout-time strong {
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-variant-numeric: tabular-nums;
 }
 
@@ -585,6 +587,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 8px;
   background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .session-popout-detail.is-wide {
@@ -594,7 +597,7 @@
 .session-popout-detail span {
   display: block;
   margin-bottom: 5px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-size: 10px;
   font-weight: 950;
   text-transform: uppercase;
@@ -603,7 +606,7 @@
 .session-popout-detail strong {
   display: block;
   overflow: hidden;
-  color: var(--barracks-text);
+  color: var(--barracks-text-interactive);
   font-size: 13px;
   font-weight: 850;
   line-height: 1.35;

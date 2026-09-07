@@ -43,14 +43,19 @@
 
 .fleet-totals strong {
   display: block;
+  color: var(--barracks-text-raised);
   font-size: 34px;
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
 }
 
-.fleet-totals span,
-.fleet-footnote {
+.fleet-totals span {
   color: var(--barracks-text-muted-raised);
+  font-size: 12px;
+}
+
+.fleet-footnote {
+  color: var(--barracks-text);
   font-size: 12px;
 }
 
@@ -69,7 +74,7 @@
   border-top: 3px solid var(--barracks-action);
   border-radius: 4px;
   background: var(--barracks-surface-raised);
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   text-align: left;
 }
 
@@ -101,6 +106,7 @@
   padding: 10px 12px;
   border-left: 3px solid var(--barracks-state-warning);
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   font-size: 13px;
 }
 
@@ -188,7 +194,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 4px;
   background: var(--barracks-surface-raised);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-raised);
 }
 
 .server-settings button[type="submit"] {
@@ -223,7 +229,7 @@
 
 .server-settings-row small {
   display: block;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   overflow-wrap: anywhere;
 }
 

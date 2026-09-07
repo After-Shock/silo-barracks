@@ -7,7 +7,7 @@
   padding: 18px;
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 16px;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   margin-bottom: 20px;
   min-height: 326px;
   box-shadow: 0 18px 60px var(--barracks-scrim);
@@ -30,7 +30,7 @@
 }
 
 .last-played-container::-webkit-scrollbar-thumb:hover {
-  background-color: var(--barracks-text-muted-raised); /* set thumb color */
+  background-color: var(--barracks-border-strong); /* set thumb color */
 }
 
 .last-card {
@@ -42,6 +42,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
   box-shadow: 0 14px 34px var(--barracks-scrim);
   scroll-snap-align: start;
   transition: transform 170ms ease, border-color 170ms ease, box-shadow 170ms ease;
@@ -79,7 +80,7 @@
   right: 0;
   border: 1px solid var(--barracks-border-strong);
   background-color: var(--barracks-surface-raised);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-raised);
   padding: 2px;
   border-radius: 8px 0px 0px 0px;
   font-size: 0.9rem;
@@ -105,17 +106,17 @@
 
 .last-item-details a {
   text-decoration: none !important;
-  color: var(--barracks-text) !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .last-item-details a:hover {
-  color: var(--barracks-text-muted-raised) !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .last-item-name {
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--barracks-text);
+  color: var(--barracks-text-inset);
   font-size: 14px;
   font-weight: 750;
   line-height: 1.35;
@@ -124,7 +125,7 @@
 .last-item-episode {
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 0.8em;
 }
 
@@ -136,6 +137,6 @@
 .last-last-played {
   font-size: 11px;
   margin-bottom: 5px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-weight: 800;
 }

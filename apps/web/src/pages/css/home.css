@@ -50,6 +50,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 8px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   box-shadow: 0 14px 34px var(--barracks-scrim);
   backdrop-filter: blur(14px);
 }
@@ -114,7 +115,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 8px;
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-size: 12px;
   font-weight: 720;
   transition: border-color 160ms ease, background 160ms ease, opacity 160ms ease, transform 160ms ease;
@@ -159,7 +160,7 @@
 
 .home-order-panel-heading strong {
   display: block;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 14px;
   font-weight: 720;
 }
@@ -167,7 +168,7 @@
 .home-order-panel-heading span {
   display: block;
   margin-top: 5px;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 650;
 }
@@ -206,7 +207,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 8px;
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-size: 12px;
   font-weight: 650;
 }
@@ -250,6 +251,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 8px;
   background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .home-order-list article.is-hidden-widget {
@@ -279,7 +281,7 @@
   display: grid;
   min-width: 0;
   overflow: hidden;
-  color: var(--barracks-text);
+  color: var(--barracks-text-interactive);
   font-size: 13px;
   font-weight: 720;
   text-overflow: ellipsis;
@@ -288,7 +290,7 @@
 
 .home-order-list strong small {
   overflow: hidden;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-size: 10px;
   font-weight: 650;
   text-overflow: ellipsis;
@@ -296,7 +298,7 @@
 }
 
 .home-order-list strong.is-hidden-section {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   text-decoration: line-through;
 }
 
@@ -313,7 +315,7 @@
   border: 1px solid var(--barracks-action);
   border-radius: 8px;
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-size: 11px;
   font-weight: 720;
 }
@@ -407,13 +409,13 @@
 }
 
 .home-theme-highContrast {
-  color: var(--barracks-text);
+  color: var(--barracks-text-inset);
   background: var(--barracks-surface-inset);
 }
 
 .home-theme-highContrast .home-glass-card {
   border-color: var(--barracks-border-subtle);
-  background: var(--barracks-surface-inset) !important;
+  background: var(--barracks-surface-raised) !important;
 }
 
 .home-theme-wall {
@@ -491,7 +493,7 @@
 
 .home-active-sessions h1 {
   margin: 0 0 14px !important;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: clamp(26px, 2.1vw, 38px);
   font-weight: 950;
   line-height: 1;
@@ -566,14 +568,14 @@
   place-items: center;
   border: 1px solid var(--barracks-state-live);
   border-radius: 14px;
-  color: var(--barracks-action);
+  color: var(--barracks-border-strong);
   background: var(--barracks-surface-raised);
   box-shadow: var(--barracks-shadow);
 }
 
 .home-accent-purple .home-icon-bubble {
   border-color: var(--barracks-action);
-  color: var(--barracks-action);
+  color: var(--barracks-text-interactive);
   background: var(--barracks-surface-interactive);
   box-shadow: var(--barracks-shadow);
 }
@@ -593,7 +595,7 @@
 .home-balance-card strong,
 .home-catalog-card strong {
   display: block;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: clamp(23px, 1.9vw, 31px);
   font-weight: 950;
   line-height: 1;
@@ -657,7 +659,7 @@
 }
 
 .home-card-label svg {
-  color: var(--barracks-action);
+  color: var(--barracks-border-strong);
 }
 
 .home-hour-bars {
@@ -702,7 +704,7 @@
 }
 
 .home-balance-card strong {
-  color: var(--barracks-action);
+  color: var(--barracks-text-raised);
   font-size: 22px;
 }
 
@@ -714,7 +716,7 @@
   width: 40px;
   height: 40px;
   flex: 0 0 auto;
-  color: var(--barracks-action);
+  color: var(--barracks-border-strong);
   filter: drop-shadow(0 0 16px var(--barracks-action));
 }
 
@@ -770,7 +772,7 @@
 }
 
 .home-week-grid strong {
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 24px;
   font-weight: 950;
   line-height: 1.08;
@@ -898,7 +900,7 @@
 }
 
 .home-watch-party-list strong {
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 15px;
   font-weight: 950;
 }
@@ -956,7 +958,7 @@
   border: 1px solid var(--barracks-action);
   border-radius: 12px;
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
 }
 
 .home-milestone-card.is-unlocked .home-milestone-icon {
@@ -976,7 +978,7 @@
 }
 
 .home-milestone-card strong {
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 14px;
   font-weight: 950;
 }
@@ -990,7 +992,7 @@
 
 .home-milestone-card em {
   justify-self: end;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 18px;
   font-style: normal;
   font-weight: 950;
@@ -1040,7 +1042,7 @@
   border: 1px solid var(--barracks-action) !important;
   border-radius: 10px !important;
   background: var(--barracks-surface-inset) !important;
-  color: var(--barracks-text) !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .home-detail-modal .modal-header {
@@ -1057,6 +1059,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 9px;
   background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .home-detail-row strong,
@@ -1064,8 +1067,12 @@
   display: block;
 }
 
+.home-detail-row strong {
+  color: var(--barracks-text-interactive);
+}
+
 .home-detail-row small {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-size: 12px;
   font-weight: 800;
 }
@@ -1111,7 +1118,7 @@
 .home-ops-card strong,
 .home-request-preview-heading strong {
   display: block;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 24px;
   font-weight: 950;
   line-height: 1;
@@ -1152,7 +1159,7 @@
 .home-integration-widget-head h2 {
   margin: 0;
   overflow: hidden;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 20px;
   font-weight: 950;
   text-overflow: ellipsis;
@@ -1176,7 +1183,7 @@
 
 .home-integration-status {
   display: block;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 28px;
   font-weight: 950;
   line-height: 1;
@@ -1204,6 +1211,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 8px;
   background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .home-integration-stat-grid b,
@@ -1215,7 +1223,7 @@
 }
 
 .home-integration-stat-grid b {
-  color: var(--barracks-text);
+  color: var(--barracks-text-interactive);
   font-size: 18px;
   font-style: normal;
   font-weight: 950;
@@ -1223,7 +1231,7 @@
 
 .home-integration-stat-grid em {
   margin-top: 4px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-size: 10px;
   font-style: normal;
   font-weight: 900;
@@ -1287,6 +1295,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 9px;
   background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .home-request-list strong,
@@ -1300,7 +1309,7 @@
 }
 
 .home-request-list strong {
-  color: var(--barracks-text);
+  color: var(--barracks-text-interactive);
   font-size: 14px;
   font-weight: 950;
 }
@@ -1308,7 +1317,7 @@
 .home-request-list small,
 .home-request-list em,
 .home-request-empty {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-size: 12px;
   font-weight: 800;
 }
@@ -1352,6 +1361,7 @@
   border: 1px dashed var(--barracks-action);
   border-radius: 9px;
   text-align: center;
+  background: var(--barracks-surface-interactive);
 }
 
 .home-section-title {
@@ -1363,7 +1373,7 @@
 }
 
 .home-section-title svg {
-  color: var(--barracks-action);
+  color: var(--barracks-action-foreground);
 }
 
 .home-section-title h2 {
@@ -1373,6 +1383,15 @@
   font-weight: 950;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+.home-glass-card .home-section-title,
+.home-glass-card .home-section-title h2 {
+  color: var(--barracks-text-raised);
+}
+
+.home-glass-card :where(.home-section-title svg) {
+  color: var(--barracks-border-strong);
 }
 
 .home-hall-grid {
@@ -1505,7 +1524,7 @@
 .home-runner-row strong {
   overflow: hidden;
   max-width: 100%;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 15px;
   font-weight: 950;
   text-overflow: ellipsis;
@@ -1803,7 +1822,7 @@
   min-height: 34px;
   border-color: var(--barracks-border-subtle);
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-weight: 650;
 }
 
@@ -1845,7 +1864,7 @@
 }
 
 .home-order-panel-heading strong {
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-weight: 680;
 }
 
@@ -1865,7 +1884,7 @@
   height: 36px;
   border-color: var(--barracks-border-subtle);
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-weight: 560;
 }
 
@@ -1887,7 +1906,7 @@
   height: 20px;
   border-radius: 6px;
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-text);
+  color: var(--barracks-text-interactive);
   font-size: 10px;
   font-weight: 680;
 }
@@ -1903,7 +1922,7 @@
   min-height: 28px;
   border-color: var(--barracks-border-subtle);
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
 }
 
 .home-order-list select {

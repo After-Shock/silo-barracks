@@ -21,7 +21,7 @@
 }
 
 .recently-added-page-header span {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   font-size: 14px;
   font-weight: 750;
 }
@@ -36,6 +36,7 @@
   border: 1px solid var(--barracks-action);
   border-radius: 12px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
 }
 
 .recently-added-search,
@@ -46,6 +47,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 8px;
   background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .recently-added-search {
@@ -53,7 +55,7 @@
   align-items: center;
   gap: 9px;
   padding: 0 12px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
 }
 
 .recently-added-search input,
@@ -62,14 +64,14 @@
   min-width: 0;
   border: 0;
   outline: 0;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   background: transparent;
   font-size: 13px;
   font-weight: 760;
 }
 
 .recently-added-search input::placeholder {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
 }
 
 .recently-added-control {
@@ -104,7 +106,7 @@
 }
 
 .recently-added-control span {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-size: 9px;
   font-weight: 950;
   letter-spacing: 0.14em;
@@ -122,14 +124,14 @@
 }
 
 .recently-added-control select option {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   background-color: var(--barracks-surface-inset);
   font-weight: 760;
 }
 
 .recently-added-clear {
   padding: 0 16px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-size: 13px;
   font-weight: 850;
   transition:
@@ -148,7 +150,7 @@
   display: grid;
   place-items: center;
   padding: 0 14px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-size: 12px;
   font-weight: 900;
   white-space: nowrap;
@@ -212,7 +214,7 @@
 .recent-library-shelf-title span {
   display: block;
   margin-top: 4px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   font-size: 12px;
   font-weight: 850;
 }
@@ -230,7 +232,7 @@
   place-items: center;
   border: 1px solid var(--barracks-action);
   border-radius: 12px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   background: var(--barracks-surface-interactive);
   transition:
     border-color 160ms ease,
@@ -313,8 +315,8 @@
   padding: 0 18px;
   border: 1px dashed var(--barracks-action);
   border-radius: 14px;
-  color: var(--barracks-text-muted-raised);
   background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-size: 13px;
   font-weight: 850;
 }
@@ -327,7 +329,7 @@
   min-height: 220px;
   border: 1px solid var(--barracks-action);
   border-radius: 16px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-raised);
   background: var(--barracks-surface-raised);
   font-weight: 850;
 }
@@ -335,7 +337,7 @@
 .recently-added-empty {
   flex-direction: column;
   gap: 12px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-raised);
 }
 
 .recently-added-error {

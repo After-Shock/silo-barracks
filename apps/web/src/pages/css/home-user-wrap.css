@@ -29,8 +29,7 @@
   text-transform: uppercase;
 }
 
-.home-user-wrap-header h1,
-.account-dashboard h2 {
+.home-user-wrap-header h1 {
   margin: 0 !important;
   color: var(--barracks-text);
   font-size: clamp(28px, 3vw, 42px);
@@ -39,7 +38,23 @@
   line-height: 1;
 }
 
-.home-user-wrap-header span,
+.account-dashboard h2 {
+  margin: 0 !important;
+  color: var(--barracks-text-raised);
+  font-size: clamp(28px, 3vw, 42px);
+  font-weight: 950;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.home-user-wrap-header span {
+  display: block;
+  margin-top: 8px;
+  color: var(--barracks-text);
+  font-size: 14px;
+  font-weight: 750;
+}
+
 .account-dashboard > div:first-child span {
   display: block;
   margin-top: 8px;
@@ -53,7 +68,7 @@
   border: 1px solid var(--barracks-state-live);
   border-radius: 999px;
   background: var(--barracks-surface-raised);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-raised);
   font-size: 12px;
   font-weight: 950;
 }
@@ -69,6 +84,7 @@
   border: 1px solid var(--barracks-action);
   border-radius: 16px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   box-shadow: 0 24px 70px var(--barracks-scrim);
 }
 
@@ -181,7 +197,7 @@
 
 .user-wrap-title-row h3 {
   margin: 0;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 20px;
   font-weight: 950;
 }
@@ -211,6 +227,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 10px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   text-align: center;
   overflow: hidden;
   box-shadow: inset 0 1px 0 var(--barracks-border-subtle);
@@ -252,7 +269,7 @@
 }
 
 .wrap-metric-card span {
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 11px;
   font-weight: 950;
   letter-spacing: 0.14em;
@@ -263,7 +280,7 @@
 .wrap-metric-card strong {
   max-width: 100%;
   overflow: hidden;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: clamp(22px, 1.9vw, 32px);
   font-weight: 950;
   line-height: 1.05;
@@ -326,7 +343,7 @@
   border: 1px solid var(--barracks-action);
   border-radius: 8px;
   padding: 0 10px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   background: var(--barracks-surface-interactive);
   font-size: 12px;
   font-weight: 850;
@@ -480,7 +497,7 @@
 .wrap-achievements-header strong {
   display: block;
   margin-top: 4px;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 18px;
   font-weight: 950;
 }
@@ -513,6 +530,7 @@
   border: 1px solid var(--barracks-action);
   border-radius: 12px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
 }
 
 .wrap-achievement-card.is-unlocked {
@@ -548,7 +566,7 @@
 }
 
 .wrap-achievement-card strong {
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 14px;
   font-weight: 950;
 }
@@ -562,7 +580,7 @@
 
 .wrap-achievement-card em {
   justify-self: end;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 17px;
   font-style: normal;
   font-weight: 950;
@@ -594,6 +612,7 @@
   border: 1px solid var(--barracks-action);
   border-radius: 16px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
 }
 
 .account-dashboard-grid {
@@ -610,17 +629,18 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 10px;
   background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .account-dashboard-grid strong {
-  color: var(--barracks-text);
+  color: var(--barracks-text-interactive);
   font-size: 22px;
   font-weight: 950;
 }
 
 .account-dashboard-grid span,
 .account-user-strip small {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-size: 12px;
   font-weight: 850;
 }
@@ -634,7 +654,7 @@
 .account-user-strip span {
   grid-template-columns: auto auto;
   align-items: center;
-  color: var(--barracks-text);
+  color: var(--barracks-text-interactive);
   font-weight: 900;
 }
 
@@ -725,6 +745,7 @@
   border: 1px solid var(--barracks-action);
   border-radius: 14px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   box-shadow: 0 16px 38px var(--barracks-scrim);
   backdrop-filter: blur(18px);
 }
@@ -740,7 +761,7 @@
   border: 1px solid transparent;
   border-radius: 10px;
   background: transparent;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-raised);
   font: inherit;
   font-size: 13px;
   font-weight: 900;
@@ -762,7 +783,7 @@
   padding: 0 7px;
   border-radius: 999px;
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-size: 11px;
   font-weight: 950;
 }
@@ -785,11 +806,12 @@
   border: 1px solid var(--barracks-border-strong);
   border-radius: 14px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
 }
 
 .user-profile-overview-note h2 {
   margin: 0;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 20px;
   font-weight: 950;
 }
@@ -822,6 +844,7 @@
   border: 1px solid var(--barracks-action);
   border-radius: 18px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   box-shadow: 0 22px 58px var(--barracks-scrim);
 }
 
@@ -837,7 +860,7 @@
 .user-media-toolbar h2,
 .user-media-taste h2 {
   margin: 0;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: clamp(22px, 2.2vw, 34px);
   font-weight: 950;
 }
@@ -857,14 +880,14 @@
   border: 1px solid var(--barracks-action);
   border-radius: 11px;
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
   font-weight: 850;
   outline: none;
 }
 
 .user-media-message {
   padding: 12px 14px;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-weight: 900;
 }
 
@@ -878,7 +901,7 @@
 
 .user-media-rail-heading h2 {
   margin: 0;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: clamp(20px, 1.8vw, 28px);
   font-weight: 950;
 }
@@ -923,7 +946,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
   background: var(--barracks-surface-interactive);
-  color: inherit;
+  color: var(--barracks-text-interactive);
   text-decoration: none;
   transition:
     border-color 160ms ease,
@@ -957,7 +980,7 @@
   border: 1px solid var(--barracks-action);
   border-radius: 8px;
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-text);
+  color: var(--barracks-text-interactive);
   font-size: 34px;
   font-weight: 950;
 }
@@ -979,13 +1002,18 @@
 }
 
 .user-media-card strong {
-  color: var(--barracks-text);
+  color: var(--barracks-text-interactive);
   font-size: 14px;
   font-weight: 950;
 }
 
 .user-media-card span,
-.user-media-card small,
+.user-media-card small {
+  color: var(--barracks-text-interactive);
+  font-size: 11px;
+  font-weight: 850;
+}
+
 .user-media-empty,
 .user-media-more {
   color: var(--barracks-text-muted-raised);
@@ -1035,6 +1063,7 @@
   border: 1px solid var(--barracks-action);
   border-radius: 18px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   box-shadow: 0 22px 58px var(--barracks-scrim);
 }
 
@@ -1066,6 +1095,7 @@
   border: 1px solid var(--barracks-action);
   border-radius: 16px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
 }
 
 .user-profile-empty h1 {
