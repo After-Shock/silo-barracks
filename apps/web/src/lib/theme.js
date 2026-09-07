@@ -224,6 +224,7 @@ export function resolveTheme(theme) {
   const textMutedRaised = closestMixToward(strongestTextEndpoint(surfaceRaised), surfaceRaised);
   const focus = ensureContrast(input.primary, surfaceRaised, 3);
   const { action, actionText } = resolveActionPair(input.primary, surfaceInteractive);
+  const actionForeground = ensureContrast(input.primary, canvas, 4.5);
   const statusCandidates = {
     live: "#ff6f63",
     success: "#70b981",
@@ -258,6 +259,7 @@ export function resolveTheme(theme) {
     focusDark: TEXT_DARK,
     action,
     actionText,
+    actionForeground,
     accentSecondary: input.secondary,
     live,
     success,
@@ -382,6 +384,7 @@ const semanticPropertyMap = [
   ["--barracks-focus-dark", "focusDark"],
   ["--barracks-action", "action"],
   ["--barracks-action-text", "actionText"],
+  ["--barracks-action-foreground", "actionForeground"],
   ["--barracks-accent-secondary", "accentSecondary"],
   ["--barracks-state-live", "live"],
   ["--barracks-state-success", "success"],

@@ -36,6 +36,7 @@ const SEMANTIC_KEYS = [
   "focusDark",
   "action",
   "actionText",
+  "actionForeground",
   "accentSecondary",
   "live",
   "success",
@@ -120,6 +121,7 @@ function assertAccessibleTokens(tokens) {
   assert.ok(contrastRatio(tokens.borderStrong, tokens.surfaceInteractive) >= 3);
   assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3);
   assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5);
+  assert.ok(contrastRatio(tokens.actionForeground, tokens.canvas) >= 4.5);
   for (const key of STATE_KEYS) {
     assert.ok(contrastRatio(tokens[key], tokens.surfaceRaised) >= 3, `${key} is accessible on raised surface`);
   }
@@ -209,6 +211,7 @@ test("resolveTheme derives every semantic token for the default palette", () => 
   assert.equal(tokens.focusDark, "#10100f");
   assert.equal(tokens.action, DEFAULT_THEME.primary);
   assert.equal(tokens.actionText, "#10100f");
+  assert.equal(tokens.actionForeground, "#6f9bcf");
   assert.equal(tokens.accentSecondary, DEFAULT_THEME.secondary);
   assert.equal(tokens.chartGrid, tokens.borderSubtle);
   assert.equal(tokens.chartTooltip, tokens.overlay);
@@ -240,6 +243,7 @@ test("resolveTheme preserves the four public inputs and all token relationships"
   assert.equal(tokens.borderStrong, ensureContrast(mixHex(tokens.surfaceInteractive, tokens.text, 0.42), tokens.surfaceInteractive, 3));
   assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3);
   assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5);
+  assert.equal(tokens.actionForeground, ensureContrast(normalized.primary, normalized.background, 4.5));
   assert.equal(tokens.focus, ensureContrast(normalized.primary, tokens.surfaceRaised, 3));
   assert.equal(tokens.accentSecondary, normalized.secondary);
   assert.equal(tokens.chartGrid, tokens.borderSubtle);
@@ -312,6 +316,8 @@ test("resolveTheme keeps contrast guarantees for degenerate custom palettes", ()
     assert.equal(tokens.focusDark, "#10100f", `${palette.name}: focus dark`);
     assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3, `${palette.name}: action`);
     assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5, `${palette.name}: action text`);
+    assert.equal(tokens.actionForeground, ensureContrast(palette.primary, palette.background, 4.5), `${palette.name}: action foreground`);
+    assert.ok(contrastRatio(tokens.actionForeground, tokens.canvas) >= 4.5, `${palette.name}: action foreground contrast`);
   }
 });
 
@@ -341,11 +347,13 @@ test("resolveTheme chooses accessible action pairs for opposing and deterministi
   ];
   const channel = (seed) => ((seed * 73 + 41) % 256).toString(16).padStart(2, "0");
   for (let index = 0; index < 24; index += 1) {
+    const canvasTone = index % 2 === 0 ? 16 + ((index * 37) % 48) : 192 + ((index * 37) % 48);
+    const canvas = canvasTone.toString(16).padStart(2, "0");
     palettes.push({
       name: `seeded palette ${index}`,
       primary: `#${channel(index + 1)}${channel(index + 11)}${channel(index + 23)}`,
       secondary: `#${channel(index + 31)}${channel(index + 43)}${channel(index + 59)}`,
-      background: `#${channel(index + 71)}${channel(index + 83)}${channel(index + 97)}`,
+      background: `#${canvas}${canvas}${canvas}`,
       surface: `#${channel(index + 101)}${channel(index + 127)}${channel(index + 149)}`,
     });
   }
@@ -354,6 +362,7 @@ test("resolveTheme chooses accessible action pairs for opposing and deterministi
     const { tokens } = resolveTheme(palette);
     assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3, `${palette.name}: action contrast`);
     assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5, `${palette.name}: action text contrast`);
+    assert.ok(contrastRatio(tokens.actionForeground, tokens.canvas) >= 4.5, `${palette.name}: action foreground contrast`);
   }
 });
 
@@ -478,6 +487,7 @@ test("applyTheme writes semantic tokens, RGB companions, and legacy aliases as o
     "--barracks-focus-dark": tokens.focusDark,
     "--barracks-action": tokens.action,
     "--barracks-action-text": tokens.actionText,
+    "--barracks-action-foreground": tokens.actionForeground,
     "--barracks-accent-secondary": tokens.accentSecondary,
     "--barracks-state-live": tokens.live,
     "--barracks-state-success": tokens.success,
