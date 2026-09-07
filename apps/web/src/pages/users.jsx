@@ -570,11 +570,11 @@ export default function Users() {
   }
 
   if (!data || !config || !access) {
-    return <Loading />;
+    return <div data-theme-screen="users" aria-busy="true"><Loading /></div>;
   }
 
   return (
-    <div className="Users users-page">
+    <div className="Users users-page" data-theme-screen="users">
       <section className="users-hero">
         <div className="users-title-block">
           <div className="users-title-icon">

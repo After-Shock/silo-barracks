@@ -1,11 +1,8 @@
 .library-detail-page {
   min-height: 100vh;
   padding: 28px clamp(18px, 2.4vw, 38px) 56px;
-  color: #f8fafc;
-  background:
-    radial-gradient(circle at 12% 0%, rgba(var(--secondary-rgb), 0.12), transparent 28%),
-    radial-gradient(circle at 80% 6%, rgba(var(--primary-light-rgb), 0.2), transparent 32%),
-    linear-gradient(180deg, rgba(12, 15, 22, 0.98), rgba(7, 9, 13, 1) 48%);
+  color: var(--barracks-text);
+  background: var(--barracks-canvas);
 }
 
 .library-detail-page::before {
@@ -14,10 +11,10 @@
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.026) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(var(--barracks-border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--barracks-border-subtle) 1px, transparent 1px);
   background-size: 52px 52px;
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent 72%);
+  mask-image: linear-gradient(to bottom, var(--barracks-scrim), transparent 72%);
 }
 
 .library-detail-page > * {
@@ -31,12 +28,11 @@
   gap: 22px;
   min-height: 138px;
   padding: 26px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.18);
+  border: 1px solid var(--barracks-action);
   border-radius: 20px;
-  background:
-    radial-gradient(circle at 8% 22%, rgba(var(--primary-light-rgb), 0.18), transparent 34%),
-    linear-gradient(135deg, rgba(13, 19, 29, 0.92), rgba(10, 11, 17, 0.96));
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.34);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+  box-shadow: 0 20px 60px var(--barracks-scrim);
 }
 
 .library-detail-icon {
@@ -45,13 +41,11 @@
   width: 82px;
   height: 82px;
   place-items: center;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.46);
+  border: 1px solid var(--barracks-action);
   border-radius: 22px;
-  color: #f0d6ff;
-  background:
-    radial-gradient(circle at 50% 34%, rgba(var(--primary-light-rgb), 0.36), transparent 54%),
-    rgba(var(--primary-light-rgb), 0.12);
-  box-shadow: 0 18px 42px rgba(var(--primary-light-rgb), 0.14);
+  color: var(--barracks-action-text);
+  background: var(--barracks-action);
+  box-shadow: 0 18px 42px var(--barracks-action);
 }
 
 .library-detail-title {
@@ -61,7 +55,7 @@
 .library-detail-title > span {
   display: block;
   margin-bottom: 4px;
-  color: var(--primary-light-color);
+  color: var(--barracks-focus);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.18em;
@@ -71,7 +65,7 @@
 .library-detail-title h1 {
   margin: 0 0 14px;
   overflow-wrap: anywhere;
-  color: #ffffff;
+  color: var(--barracks-text-raised);
   font-size: clamp(30px, 3vw, 52px);
   font-weight: 950;
   line-height: 0.98;
@@ -88,10 +82,10 @@
   align-items: center;
   gap: 8px;
   margin: 0 !important;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.34) !important;
+  border: 1px solid var(--barracks-action) !important;
   border-radius: 12px !important;
-  color: #dbe5f2 !important;
-  background: rgba(255, 255, 255, 0.035) !important;
+  color: var(--barracks-text-muted-raised) !important;
+  background: var(--barracks-surface-inset) !important;
   box-shadow: none !important;
   font-size: 13px;
   font-weight: 850;
@@ -99,14 +93,15 @@
 
 .library-detail-tabs.btn-group > .btn:hover,
 .library-detail-tabs.btn-group > .btn:focus-visible {
-  border-color: rgba(var(--primary-light-rgb), 0.78) !important;
-  background: rgba(var(--primary-light-rgb), 0.16) !important;
+  border-color: var(--barracks-action) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .library-detail-tabs.btn-group > .btn.active {
-  color: #130819 !important;
+  color: var(--barracks-action-text) !important;
   border-color: transparent !important;
-  background: linear-gradient(135deg, var(--primary-light-color), #b75ac8) !important;
+  background: var(--barracks-action) !important;
 }
 
 .library-detail-overview {
@@ -118,7 +113,7 @@
 
 .library-detail-overview h1 {
   margin: 0 0 14px !important;
-  color: #ffffff;
+  color: var(--barracks-text-raised);
   font-size: clamp(24px, 2vw, 34px);
   font-weight: 950;
   line-height: 1.08;
@@ -131,7 +126,7 @@
   height: 3px;
   margin-top: 9px;
   border-radius: 99px;
-  background: linear-gradient(90deg, var(--primary-light-color), var(--secondary-color));
+  background: linear-gradient(90deg, var(--barracks-action-foreground), var(--barracks-accent-secondary));
 }
 
 .library-detail-overview .global-stats-container {
@@ -139,11 +134,9 @@
   grid-auto-rows: auto;
   gap: 14px;
   padding: 16px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.14);
+  border: 1px solid var(--barracks-action);
   border-radius: 16px;
-  background:
-    linear-gradient(135deg, rgba(var(--primary-light-rgb), 0.07), transparent 34%),
-    rgba(9, 12, 18, 0.78);
+  background: var(--barracks-surface-raised);
 }
 
 .library-detail-overview .global-stats {
@@ -153,13 +146,14 @@
   height: auto;
   min-height: 108px;
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018));
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .library-detail-overview .stats-header {
-  color: #d8e2f2;
+  color: var(--barracks-text-muted-raised);
   font-size: 13px;
   font-weight: 900;
 }
@@ -170,14 +164,14 @@
 }
 
 .library-detail-overview .stat-value {
-  color: var(--primary-light-color);
+  color: var(--barracks-text-inset);
   font-size: 20px;
   font-weight: 950;
 }
 
 .library-detail-overview .stat-unit {
   align-self: center;
-  color: #e9f0fa;
+  color: var(--barracks-text-raised);
   font-size: 15px;
   font-weight: 850;
 }
@@ -186,11 +180,9 @@
   height: auto;
   min-height: 440px;
   padding: 20px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.14);
+  border: 1px solid var(--barracks-action);
   border-radius: 18px;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(var(--primary-light-rgb), 0.08), transparent 38%),
-    rgba(9, 12, 18, 0.8);
+  background: var(--barracks-surface-raised);
 }
 
 .library-detail-overview .genre-container .row {
@@ -210,9 +202,10 @@
   width: 100%;
   height: 380px;
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 16px;
-  background: rgba(0, 0, 0, 0.22);
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .library-detail-overview .genre-stats h1 {
@@ -233,12 +226,10 @@
 .library-options-panel {
   margin-top: 26px;
   padding: 22px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.16);
+  border: 1px solid var(--barracks-action);
   border-radius: 18px;
-  background:
-    linear-gradient(135deg, rgba(var(--primary-light-rgb), 0.08), transparent 38%),
-    rgba(9, 12, 18, 0.82);
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.28);
+  background: var(--barracks-surface-raised);
+  box-shadow: 0 18px 46px var(--barracks-scrim);
 }
 
 .library-options-heading {
@@ -252,7 +243,7 @@
 .library-options-heading span {
   display: block;
   margin-bottom: 5px;
-  color: var(--primary-light-color);
+  color: var(--barracks-focus);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.18em;
@@ -261,7 +252,7 @@
 
 .library-options-heading h1 {
   margin: 0 !important;
-  color: #ffffff;
+  color: var(--barracks-text-raised);
   font-size: clamp(24px, 2vw, 34px);
   font-weight: 950;
   line-height: 1.05;
@@ -279,14 +270,14 @@
   align-items: center;
   gap: 22px;
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.035);
+  background: var(--barracks-surface-inset);
 }
 
 .library-option-row strong {
   display: block;
-  color: #ffffff;
+  color: var(--barracks-text-raised);
   font-size: 15px;
   font-weight: 900;
 }
@@ -294,7 +285,7 @@
 .library-option-row span {
   display: block;
   margin-top: 4px;
-  color: #9fb0c7;
+  color: var(--barracks-text-muted-raised);
   font-size: 13px;
   font-weight: 750;
   line-height: 1.35;
@@ -304,14 +295,23 @@
   min-width: 132px;
   border: 0;
   border-radius: 12px;
-  background: linear-gradient(135deg, #f43f5e, #d7264f);
-  box-shadow: 0 12px 26px rgba(244, 63, 94, 0.18);
+  border: 1px solid var(--barracks-state-danger);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+  box-shadow: var(--barracks-shadow);
   font-weight: 900;
 }
 
 .library-option-row .btn-danger:hover,
 .library-option-row .btn-danger:focus-visible {
-  background: linear-gradient(135deg, #fb7185, #e11d48);
+  border-color: var(--barracks-state-danger);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+}
+
+.library-detail-page :is(button, input, select, textarea, a):focus-visible {
+  outline: 3px solid var(--barracks-focus);
+  outline-offset: 2px;
 }
 
 @media (max-width: 900px) {

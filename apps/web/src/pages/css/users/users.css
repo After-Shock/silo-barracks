@@ -2,11 +2,8 @@
   min-height: auto;
   margin: 0;
   padding: 10px clamp(12px, 2vw, 24px) 28px;
-  background:
-    radial-gradient(circle at 14% 0%, rgba(var(--primary-rgb), 0.18), transparent 30%),
-    radial-gradient(circle at 88% 8%, rgba(var(--primary-light-rgb), 0.1), transparent 30%),
-    #050910;
-  color: #f8fafc;
+  background: var(--barracks-canvas);
+  color: var(--barracks-text);
 }
 
 .Users.users-page > section {
@@ -26,9 +23,9 @@
   align-items: center;
   margin-bottom: 10px;
   padding: 10px 12px !important;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 14px;
-  background: rgba(8, 11, 17, 0.62) !important;
+  background: var(--barracks-surface-inset) !important;
 }
 
 .users-title-block {
@@ -45,12 +42,10 @@
   flex: 0 0 46px;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.38);
+  border: 1px solid var(--barracks-action);
   border-radius: 14px;
-  background:
-    radial-gradient(circle at 35% 20%, rgba(var(--primary-light-rgb), 0.28), transparent 48%),
-    rgba(var(--primary-rgb), 0.16);
-  color: var(--primary-light-color);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
 .users-header-actions {
@@ -72,7 +67,7 @@
 
 .users-eyebrow {
   margin: 0 0 2px;
-  color: var(--primary-light-color);
+  color: var(--barracks-action-foreground);
   font-size: 10px;
   font-weight: 950;
   letter-spacing: 0.16em;
@@ -89,7 +84,7 @@
 .users-hero p,
 .users-panel-header p {
   margin: 6px 0 0;
-  color: #9aa7bb;
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 750;
 }
@@ -104,10 +99,10 @@
   padding: 0 13px !important;
   border: 0 !important;
   border-radius: 12px !important;
-  background: linear-gradient(90deg, var(--primary-color), var(--primary-light-color)) !important;
-  color: #070a10 !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
   font-weight: 950 !important;
-  box-shadow: 0 18px 42px rgba(var(--primary-rgb), 0.2);
+  box-shadow: 0 18px 42px var(--barracks-action);
 }
 
 .users-stat-grid {
@@ -122,11 +117,9 @@
 .users-row-card,
 .local-user-card,
 .users-modal {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background:
-    linear-gradient(145deg, rgba(var(--primary-rgb), 0.07), rgba(255, 255, 255, 0.025)),
-    rgba(8, 11, 17, 0.9);
-  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--barracks-border-subtle);
+  background: var(--barracks-surface-raised);
+  box-shadow: 0 22px 58px var(--barracks-scrim);
 }
 
 .users-stat-card {
@@ -141,11 +134,11 @@
 
 .users-stat-card svg {
   grid-row: span 2;
-  color: var(--primary-light-color);
+  color: var(--barracks-focus);
 }
 
 .users-stat-card span {
-  color: #9aa7bb;
+  color: var(--barracks-text-muted-raised);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -189,7 +182,7 @@
 
 .users-panel-header h2 {
   margin: 0;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: clamp(20px, 2vw, 30px);
   font-weight: 950;
 }
@@ -206,16 +199,16 @@
   grid-template-columns: repeat(2, minmax(74px, 1fr));
   min-height: 42px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
-  background: rgba(5, 8, 13, 0.72);
+  background: var(--barracks-surface-inset);
 }
 
 .users-view-toggle button {
   border: 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid var(--barracks-border-subtle);
   background: transparent;
-  color: #cbd5e1;
+  color: var(--barracks-text-muted-raised);
   font-size: 13px;
   font-weight: 900;
 }
@@ -225,8 +218,8 @@
 }
 
 .users-view-toggle button.is-active {
-  background: rgba(var(--primary-rgb), 0.24);
-  color: #fff;
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
 .users-search {
@@ -235,23 +228,23 @@
   gap: 8px;
   min-height: 42px;
   padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
-  background: rgba(5, 8, 13, 0.72);
+  background: var(--barracks-surface-inset);
 }
 
 .users-search svg {
-  color: var(--primary-light-color);
+  color: var(--barracks-text-inset);
 }
 
 .users-page .form-control,
 .users-page .form-select,
 .users-modal .form-control,
 .users-modal .form-select {
-  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  border: 1px solid var(--barracks-border-subtle) !important;
   border-radius: 11px !important;
-  background-color: rgba(5, 8, 13, 0.74) !important;
-  color: white !important;
+  background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
   min-height: 36px;
 }
 
@@ -259,8 +252,8 @@
 .users-page .form-select:focus,
 .users-modal .form-control:focus,
 .users-modal .form-select:focus {
-  border-color: rgba(var(--primary-light-rgb), 0.62) !important;
-  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.18) !important;
+  border-color: var(--barracks-action) !important;
+  box-shadow: 0 0 0 3px var(--barracks-action) !important;
 }
 
 .users-search .form-control {
@@ -287,19 +280,15 @@
   gap: 14px;
   min-width: 0;
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 16px;
-  background:
-    linear-gradient(145deg, rgba(var(--primary-rgb), 0.09), rgba(255, 255, 255, 0.026)),
-    rgba(8, 11, 17, 0.9);
-  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.25);
+  background: var(--barracks-surface-raised);
+  box-shadow: 0 22px 58px var(--barracks-scrim);
 }
 
 .users-profile-card.is-account-card {
-  border-color: rgba(var(--primary-light-rgb), 0.16);
-  background:
-    linear-gradient(145deg, rgba(var(--primary-rgb), 0.13), rgba(var(--secondary-rgb), 0.035)),
-    rgba(8, 11, 17, 0.9);
+  border-color: var(--barracks-action);
+  background: var(--barracks-surface-raised);
 }
 
 .users-profile-card.is-hidden-user,
@@ -329,7 +318,7 @@
 .users-profile-name strong {
   display: block;
   overflow: hidden;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 22px;
   font-weight: 950;
   line-height: 1.16;
@@ -341,7 +330,7 @@
 .users-profile-name span {
   display: block;
   margin-top: 7px;
-  color: #9aa7bb;
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 850;
   letter-spacing: 0.08em;
@@ -355,7 +344,7 @@
 }
 
 .source-hidden {
-  background: rgba(148, 163, 184, 0.18) !important;
+  background: var(--barracks-surface-inset) !important;
 }
 
 .users-profile-metrics {
@@ -367,9 +356,9 @@
 .users-profile-metrics span {
   min-width: 0;
   padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.055);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--barracks-surface-inset);
 }
 
 .users-profile-metrics small,
@@ -379,7 +368,7 @@
 }
 
 .users-profile-metrics small {
-  color: #9aa7bb;
+  color: var(--barracks-text-muted-raised);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -390,7 +379,7 @@
 
 .users-profile-metrics strong {
   margin-top: 6px;
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
   font-size: 14px;
   font-weight: 850;
   line-height: 1.25;
@@ -412,10 +401,8 @@
 }
 
 .users-row-card.is-account-row {
-  border-color: rgba(var(--primary-light-rgb), 0.16);
-  background:
-    linear-gradient(145deg, rgba(var(--primary-rgb), 0.12), rgba(var(--secondary-rgb), 0.03)),
-    rgba(8, 11, 17, 0.9);
+  border-color: var(--barracks-action);
+  background: var(--barracks-surface-raised);
 }
 
 .users-row-person {
@@ -429,7 +416,7 @@
 
 .users-avatar {
   flex: 0 0 auto;
-  border: 2px solid rgba(var(--primary-light-rgb), 0.42);
+  border: 2px solid var(--barracks-action);
   border-radius: 50%;
   object-fit: cover;
   overflow: hidden;
@@ -439,10 +426,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background:
-    radial-gradient(circle at 35% 25%, rgba(var(--primary-light-rgb), 0.28), transparent 42%),
-    rgba(var(--primary-rgb), 0.18);
-  color: var(--primary-light-color);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
 .users-avatar-empty svg {
@@ -456,7 +441,7 @@
   display: block;
   max-width: min(280px, 100%);
   overflow: hidden;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 14px;
   font-weight: 950;
   text-decoration: none;
@@ -468,7 +453,7 @@
 .users-row-meta span,
 .local-user-card span {
   display: block;
-  color: #9aa7bb;
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 850;
   letter-spacing: 0.08em;
@@ -485,15 +470,15 @@
 .users-row-meta {
   min-width: 0;
   padding: 7px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.055);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--barracks-surface-inset);
 }
 
 .users-row-meta strong {
   display: block;
   overflow: hidden;
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
   font-size: 13px;
   font-weight: 850;
   text-overflow: ellipsis;
@@ -504,32 +489,36 @@
   flex: 0 0 auto;
   border-radius: 999px !important;
   padding: 7px 9px !important;
-  color: #fff !important;
+  color: var(--barracks-text-interactive) !important;
   font-size: 11px !important;
   font-weight: 950 !important;
 }
 
 .role-owner,
 .role-admin {
-  background: rgba(var(--primary-light-rgb), 0.28) !important;
+  border: 1px solid var(--barracks-action) !important;
+  background: var(--barracks-surface-interactive) !important;
 }
 
 .role-manager {
-  background: rgba(14, 165, 233, 0.24) !important;
+  border: 1px solid var(--barracks-chart-1) !important;
+  background: var(--barracks-surface-interactive) !important;
 }
 
 .role-viewer {
-  background: rgba(34, 197, 94, 0.2) !important;
+  border: 1px solid var(--barracks-state-success) !important;
+  background: var(--barracks-surface-interactive) !important;
 }
 
 .role-disabled {
-  background: rgba(148, 163, 184, 0.18) !important;
+  border: 1px solid var(--barracks-state-unavailable) !important;
+  background: var(--barracks-surface-inset) !important;
 }
 
 .users-source-badge {
   border-radius: 999px !important;
   padding: 7px 9px !important;
-  color: #fff !important;
+  color: var(--barracks-text-interactive) !important;
   font-size: 11px !important;
   font-weight: 950 !important;
 }
@@ -543,19 +532,24 @@
 }
 
 .source-jellyfin {
-  background: rgba(var(--secondary-rgb), 0.22) !important;
+  border: 1px solid var(--barracks-action) !important;
+  background: var(--barracks-surface-interactive) !important;
 }
 
 .source-local {
-  background: rgba(var(--primary-light-rgb), 0.26) !important;
+  border: 1px solid var(--barracks-accent-secondary) !important;
+  background: var(--barracks-surface-interactive) !important;
 }
 
 .source-oidc {
-  background: rgba(34, 197, 94, 0.2) !important;
+  border: 1px solid var(--barracks-state-success) !important;
+  background: var(--barracks-surface-interactive) !important;
 }
 
 .role-chip[class*="role-"] {
-  background: rgba(var(--primary-rgb), 0.2);
+  border: 1px solid var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .users-track-button {
@@ -569,7 +563,7 @@
   border: 0 !important;
   border-radius: 0 !important;
   background: transparent !important;
-  color: #9aa7bb !important;
+  color: var(--barracks-text-muted-raised) !important;
   box-shadow: none !important;
 }
 
@@ -578,7 +572,7 @@
 .users-page .users-track-button.btn:active {
   border: 0 !important;
   background: transparent !important;
-  color: #9aa7bb !important;
+  color: var(--barracks-text-muted-raised) !important;
   box-shadow: none !important;
 }
 
@@ -586,7 +580,7 @@
 .users-track-button:focus-visible,
 .users-page .users-track-button.btn:hover,
 .users-page .users-track-button.btn:focus-visible {
-  color: var(--primary-light-color) !important;
+  color: var(--barracks-focus) !important;
   background: transparent !important;
 }
 
@@ -604,29 +598,29 @@
   height: 36px;
   min-height: 36px;
   padding: 0 !important;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.32) !important;
+  border: 1px solid var(--barracks-action) !important;
   border-radius: 12px !important;
-  background: rgba(var(--primary-light-rgb), 0.12) !important;
-  color: #f5d2ff !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
   box-shadow: none !important;
 }
 
 .users-row-action-button:hover,
 .users-row-action-button:focus-visible {
-  border-color: rgba(var(--primary-light-rgb), 0.7) !important;
-  background: rgba(var(--primary-light-rgb), 0.22) !important;
+  border-color: var(--barracks-action) !important;
+  background: var(--barracks-action) !important;
 }
 
 .users-row-action-button.is-danger {
-  border-color: rgba(248, 113, 113, 0.28) !important;
-  background: rgba(248, 113, 113, 0.1) !important;
-  color: #fecaca !important;
+  border-color: var(--barracks-state-danger) !important;
+  background: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
 }
 
 .users-row-action-button.is-danger:hover,
 .users-row-action-button.is-danger:focus-visible {
-  border-color: rgba(248, 113, 113, 0.62) !important;
-  background: rgba(248, 113, 113, 0.18) !important;
+  border-color: var(--barracks-state-danger) !important;
+  background: var(--barracks-surface-interactive) !important;
 }
 
 .users-row-card > .form-select,
@@ -646,10 +640,10 @@
   align-items: center;
   justify-content: center;
   padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 11px;
-  background: rgba(5, 8, 13, 0.52);
-  color: #cbd5e1;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-muted-raised);
   font-weight: 900;
 }
 
@@ -659,7 +653,7 @@
 }
 
 .users-track-button.is-tracked {
-  color: var(--primary-light-color) !important;
+  color: var(--barracks-focus) !important;
 }
 
 .users-hidden-toggle {
@@ -670,10 +664,10 @@
   min-height: 42px;
   margin: 0;
   padding: 0 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
-  background: rgba(5, 8, 13, 0.72);
-  color: #dbe6f7;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-muted-raised);
   font-size: 13px;
   font-weight: 900;
   white-space: nowrap;
@@ -690,8 +684,8 @@
   height: 22px;
   place-items: center;
   border-radius: 999px;
-  background: rgba(var(--primary-rgb), 0.22);
-  color: #fff;
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
   font-size: 11px;
   font-weight: 950;
 }
@@ -702,7 +696,7 @@
   gap: 12px;
   align-items: center;
   margin-top: 16px;
-  color: #9aa7bb;
+  color: var(--barracks-text-muted-raised);
   font-weight: 850;
 }
 
@@ -724,8 +718,8 @@
 .local-user-card .btn,
 .users-panel-header .btn,
 .users-modal .btn {
-  border-color: rgba(var(--primary-light-rgb), 0.35) !important;
-  color: #f8fafc !important;
+  border-color: var(--barracks-action) !important;
+  color: var(--barracks-text-raised) !important;
 }
 
 .users-role-selector {
@@ -733,13 +727,13 @@
   gap: 7px;
   margin: 10px 0;
   padding: 10px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.16);
+  border: 1px solid var(--barracks-action);
   border-radius: 14px;
-  background: rgba(5, 8, 13, 0.42);
+  background: var(--barracks-surface-inset);
 }
 
 .users-role-selector span {
-  color: #9aa7bb;
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -758,16 +752,14 @@
   align-items: center;
   margin: 0;
   padding: 11px;
-  border: 1px solid rgba(255, 255, 255, 0.075);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 13px;
-  background: rgba(5, 8, 13, 0.38);
+  background: var(--barracks-surface-inset);
 }
 
 .users-permission-row.is-enabled {
-  border-color: rgba(34, 197, 94, 0.22);
-  background:
-    linear-gradient(90deg, rgba(34, 197, 94, 0.09), transparent 66%),
-    rgba(5, 8, 13, 0.38);
+  border-color: var(--barracks-state-success);
+  background: var(--barracks-surface-inset);
 }
 
 .users-permission-row strong,
@@ -776,14 +768,14 @@
 }
 
 .users-permission-row strong {
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 13px;
   font-weight: 950;
 }
 
 .users-permission-row small {
   margin-top: 3px;
-  color: #95a3b7;
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 720;
   line-height: 1.35;
@@ -797,15 +789,15 @@
 .users-permission-row .form-check-input,
 .users-page .form-check-input,
 .users-modal .form-check-input {
-  border-color: rgba(var(--primary-light-rgb), 0.35);
-  background-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--barracks-action);
+  background-color: var(--barracks-surface-interactive);
 }
 
 .users-permission-row .form-check-input:checked,
 .users-page .form-check-input:checked,
 .users-modal .form-check-input:checked {
-  border-color: var(--primary-light-color);
-  background-color: var(--primary-color);
+  border-color: var(--barracks-border-strong);
+  background-color: var(--barracks-action);
 }
 
 .users-permission-row .form-check-input:disabled {
@@ -815,9 +807,9 @@
 .users-permission-note {
   margin: 10px 0 0;
   padding: 10px;
-  border: 1px dashed rgba(var(--primary-light-rgb), 0.22);
+  border: 1px dashed var(--barracks-action);
   border-radius: 12px;
-  color: #aebbd0;
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 780;
   line-height: 1.45;
@@ -851,9 +843,9 @@
 .roles-manager {
   margin-bottom: 10px;
   padding: 10px 14px 10px 10px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.16);
+  border: 1px solid var(--barracks-action);
   border-radius: 15px;
-  background: rgba(255, 255, 255, 0.032);
+  background: var(--barracks-surface-inset);
 }
 
 .users-manager-modal {
@@ -876,14 +868,14 @@
   align-items: center;
   margin-bottom: 12px;
   padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 14px;
-  background: rgba(5, 8, 13, 0.42);
+  background: var(--barracks-surface-inset);
 }
 
 .users-modal-topline strong {
   display: block;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 17px;
   font-weight: 950;
 }
@@ -891,7 +883,7 @@
 .users-modal-topline span {
   display: block;
   margin-top: 2px;
-  color: #9aa7bb;
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -905,15 +897,15 @@
   align-items: center;
   margin-bottom: 12px;
   padding: 12px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.16);
+  border: 1px solid var(--barracks-action);
   border-radius: 14px;
-  background: rgba(var(--primary-rgb), 0.08);
+  background: var(--barracks-surface-inset);
 }
 
 .role-preview-panel strong {
   display: block;
   margin-bottom: 6px;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 13px;
   font-weight: 950;
 }
@@ -932,18 +924,18 @@
   min-height: 34px;
   min-width: 0;
   padding: 0 8px;
-  border: 1px solid rgba(248, 113, 113, 0.28);
+  border: 1px solid var(--barracks-state-danger);
   border-radius: 10px;
-  background: rgba(127, 29, 29, 0.16);
-  color: #fecaca;
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-size: 12px;
   font-weight: 900;
 }
 
 .role-preview-grid span.is-allowed {
-  border-color: rgba(34, 197, 94, 0.28);
-  background: rgba(22, 101, 52, 0.16);
-  color: #bbf7d0;
+  border-color: var(--barracks-state-success);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .local-users-modal-list {
@@ -962,14 +954,14 @@
 
 .roles-manager-header strong,
 .local-section-title strong {
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 15px;
   font-weight: 950;
 }
 
 .roles-manager-header span,
 .local-section-title span {
-  color: #9aa7bb;
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -985,9 +977,9 @@
   display: grid;
   gap: 9px;
   padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 13px;
-  background: rgba(5, 8, 13, 0.38);
+  background: var(--barracks-surface-inset);
 }
 
 .role-permission-title {
@@ -1006,8 +998,9 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: rgba(248, 113, 113, 0.16);
-  color: #fecaca;
+  border: 1px solid var(--barracks-state-danger);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .permission-toggle-grid {
@@ -1022,7 +1015,7 @@
   align-items: center;
   min-height: 28px;
   margin: 0;
-  color: #cbd5e1;
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 850;
 }
@@ -1030,13 +1023,13 @@
 .permission-toggle-grid .form-check-input {
   flex: 0 0 auto;
   margin: 0;
-  border-color: rgba(var(--primary-light-rgb), 0.35);
-  background-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--barracks-action);
+  background-color: var(--barracks-surface-interactive);
 }
 
 .permission-toggle-grid .form-check-input:checked {
-  border-color: var(--primary-light-color);
-  background-color: var(--primary-color);
+  border-color: var(--barracks-border-strong);
+  background-color: var(--barracks-action);
 }
 
 .local-user-card {
@@ -1063,7 +1056,7 @@
 
 .local-user-card strong {
   display: block;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 15px;
   font-weight: 950;
 }
@@ -1077,29 +1070,33 @@
 .users-empty-state {
   margin-top: 12px;
   padding: 28px;
-  border: 1px dashed rgba(var(--primary-light-rgb), 0.26);
+  border: 1px dashed var(--barracks-action);
   border-radius: 15px;
-  color: #9aa7bb;
+  color: var(--barracks-text-muted-raised);
   text-align: center;
   font-weight: 850;
 }
 
 .users-modal {
   border-radius: 18px !important;
-  background:
-    linear-gradient(145deg, rgba(var(--primary-rgb), 0.12), rgba(255, 255, 255, 0.035)),
-    #11131b !important;
-  color: #fff !important;
+  background: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text-raised) !important;
 }
 
 .users-modal .modal-header,
 .users-modal .modal-footer {
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--barracks-border-subtle) !important;
 }
 
 .users-modal-copy {
-  color: #a9b5c7;
+  color: var(--barracks-text-muted-raised);
   font-weight: 750;
+}
+
+.Users.users-page :is(button, input, select, textarea, a):focus-visible,
+.users-modal :is(button, input, select, textarea, a):focus-visible {
+  outline: 3px solid var(--barracks-focus);
+  outline-offset: 2px;
 }
 
 @media (max-width: 1280px) {

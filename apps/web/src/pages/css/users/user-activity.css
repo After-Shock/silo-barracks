@@ -1,14 +1,14 @@
 .Activity > div > div > .form-control {
-  color: white !important;
-  background-color: var(--secondary-background-color) !important;
-  border-color: var(--secondary-background-color) !important;
+  color: var(--barracks-text-interactive) !important;
+  background-color: var(--barracks-surface-interactive) !important;
+  border-color: var(--barracks-border-subtle) !important;
 }
 
 .Activity > div > div > .form-control::placeholder {
-  color: white !important;
+  color: var(--barracks-text-muted-raised) !important;
 }
 
 .Activity > div > div > .form-control:focus {
-  box-shadow: none !important;
-  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px var(--barracks-focus) !important;
+  border-color: var(--barracks-focus) !important;
 }
