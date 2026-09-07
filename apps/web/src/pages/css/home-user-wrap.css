@@ -11,10 +11,18 @@
   gap: 16px;
 }
 
-.home-user-wrap-header p,
-.account-dashboard p {
+.home-user-wrap-header p {
   margin: 0 0 6px;
   color: var(--barracks-action-foreground);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.account-dashboard p {
+  margin: 0 0 6px;
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.22em;
@@ -90,9 +98,21 @@
   gap: 18px;
   min-height: 188px;
   padding: 28px;
-  background: linear-gradient(90deg, var(--barracks-overlay), var(--barracks-overlay));
+  background: var(--barracks-surface-raised);
   background-position: center;
   background-size: cover;
+}
+
+.user-wrap-hero > div:last-child {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  padding: 16px 18px;
+  border: 1px solid var(--barracks-border-subtle);
+  border-radius: 12px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-muted-raised);
+  box-shadow: 0 14px 34px var(--barracks-scrim);
 }
 
 .user-wrap-avatar {
@@ -125,7 +145,7 @@
 
 .user-wrap-hero h2 {
   margin: 0;
-  color: var(--barracks-text);
+  color: var(--barracks-text-muted-raised);
   font-size: clamp(34px, 4vw, 56px);
   font-weight: 950;
   letter-spacing: 0;
@@ -190,9 +210,7 @@
   padding: 14px;
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 10px;
-  background:
-    linear-gradient(180deg, var(--barracks-scrim), var(--barracks-scrim)),
-    var(--barracks-overlay);
+  background: var(--barracks-surface-raised);
   text-align: center;
   overflow: hidden;
   box-shadow: inset 0 1px 0 var(--barracks-border-subtle);
@@ -201,7 +219,7 @@
 .wrap-metric-card::before {
   position: absolute;
   inset: 0;
-  z-index: -2;
+  z-index: 0;
   background-image: var(--metric-art);
   background-position: center;
   background-size: cover;
@@ -213,12 +231,14 @@
 .wrap-metric-card::after {
   position: absolute;
   inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(circle at 50% 28%, var(--barracks-action), transparent 42%),
-    linear-gradient(180deg, var(--barracks-overlay), var(--barracks-overlay)),
-    var(--barracks-scrim);
+  z-index: 1;
+  background: linear-gradient(180deg, var(--barracks-scrim), var(--barracks-scrim));
   content: "";
+}
+
+.wrap-metric-card > * {
+  position: relative;
+  z-index: 2;
 }
 
 .wrap-metric-card.has-artwork::before {
@@ -306,8 +326,8 @@
   border: 1px solid var(--barracks-action);
   border-radius: 8px;
   padding: 0 10px;
-  color: var(--barracks-text);
-  background: var(--barracks-overlay);
+  color: var(--barracks-text-muted-raised);
+  background: var(--barracks-surface-interactive);
   font-size: 12px;
   font-weight: 850;
   outline: none;
@@ -492,16 +512,12 @@
   padding: 13px;
   border: 1px solid var(--barracks-action);
   border-radius: 12px;
-  background:
-    radial-gradient(circle at 8% 12%, var(--barracks-action), transparent 36%),
-    var(--barracks-surface-raised);
+  background: var(--barracks-surface-raised);
 }
 
 .wrap-achievement-card.is-unlocked {
   border-color: var(--barracks-state-warning);
-  background:
-    radial-gradient(circle at 8% 12%, var(--barracks-state-warning), transparent 38%),
-    var(--barracks-surface-raised);
+  background: var(--barracks-surface-raised);
 }
 
 .wrap-achievement-icon {
@@ -577,9 +593,7 @@
   padding: 18px;
   border: 1px solid var(--barracks-action);
   border-radius: 16px;
-  background:
-    radial-gradient(circle at 10% 0%, var(--barracks-action), transparent 34%),
-    var(--barracks-overlay);
+  background: var(--barracks-surface-raised);
 }
 
 .account-dashboard-grid {
@@ -710,9 +724,7 @@
   padding: 8px;
   border: 1px solid var(--barracks-action);
   border-radius: 14px;
-  background:
-    linear-gradient(135deg, var(--barracks-overlay), var(--barracks-overlay)),
-    var(--barracks-overlay);
+  background: var(--barracks-surface-raised);
   box-shadow: 0 16px 38px var(--barracks-scrim);
   backdrop-filter: blur(18px);
 }
@@ -844,8 +856,8 @@
   padding: 0 12px;
   border: 1px solid var(--barracks-action);
   border-radius: 11px;
-  background: var(--barracks-overlay);
-  color: var(--barracks-text);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-muted-raised);
   font-weight: 850;
   outline: none;
 }
@@ -1053,7 +1065,7 @@
   padding: 24px;
   border: 1px solid var(--barracks-action);
   border-radius: 16px;
-  background: var(--barracks-overlay);
+  background: var(--barracks-surface-raised);
 }
 
 .user-profile-empty h1 {

@@ -453,8 +453,8 @@
   justify-content: center;
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 999px;
-  background: var(--barracks-overlay);
-  color: var(--barracks-text);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-muted-raised);
   font-size: 24px;
   line-height: 1;
 }
@@ -481,6 +481,12 @@
 
 .session-popout-copy {
   min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--barracks-border-subtle);
+  border-radius: 12px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-muted-raised);
+  box-shadow: 0 16px 38px var(--barracks-scrim);
 }
 
 .session-popout-status {
@@ -520,7 +526,7 @@
 
 .session-popout-copy h2 {
   margin: 0;
-  color: var(--barracks-text);
+  color: var(--barracks-text-muted-raised);
   font-size: 32px;
   font-weight: 950;
   line-height: 1.05;
@@ -570,7 +576,7 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   padding: 18px;
-  background: var(--barracks-overlay);
+  background: var(--barracks-surface-raised);
 }
 
 .session-popout-detail {

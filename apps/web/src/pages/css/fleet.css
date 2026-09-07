@@ -188,7 +188,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 4px;
   background: var(--barracks-surface-raised);
-  color: var(--barracks-text);
+  color: var(--barracks-text-muted-raised);
 }
 
 .server-settings button[type="submit"] {

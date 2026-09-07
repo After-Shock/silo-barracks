@@ -35,7 +35,7 @@
   padding: 12px;
   border: 1px solid var(--barracks-action);
   border-radius: 12px;
-  background: var(--barracks-overlay);
+  background: var(--barracks-surface-raised);
 }
 
 .recently-added-search,
@@ -45,7 +45,7 @@
   min-height: 42px;
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 8px;
-  background: var(--barracks-overlay);
+  background: var(--barracks-surface-interactive);
 }
 
 .recently-added-search {
@@ -62,7 +62,7 @@
   min-width: 0;
   border: 0;
   outline: 0;
-  color: var(--barracks-text);
+  color: var(--barracks-text-muted-raised);
   background: transparent;
   font-size: 13px;
   font-weight: 760;
@@ -99,7 +99,7 @@
 
 .recently-added-control:focus-within {
   border-color: var(--barracks-action);
-  background: var(--barracks-overlay);
+  background: var(--barracks-surface-interactive);
   box-shadow: 0 0 0 3px var(--barracks-action);
 }
 
@@ -122,14 +122,14 @@
 }
 
 .recently-added-control select option {
-  color: var(--barracks-text);
+  color: var(--barracks-text-muted-raised);
   background-color: var(--barracks-surface-inset);
   font-weight: 760;
 }
 
 .recently-added-clear {
   padding: 0 16px;
-  color: var(--barracks-text);
+  color: var(--barracks-text-muted-raised);
   font-size: 13px;
   font-weight: 850;
   transition:
@@ -230,7 +230,7 @@
   place-items: center;
   border: 1px solid var(--barracks-action);
   border-radius: 12px;
-  color: var(--barracks-text);
+  color: var(--barracks-text-muted-raised);
   background: var(--barracks-surface-interactive);
   transition:
     border-color 160ms ease,
@@ -327,8 +327,8 @@
   min-height: 220px;
   border: 1px solid var(--barracks-action);
   border-radius: 16px;
-  color: var(--barracks-text);
-  background: var(--barracks-overlay);
+  color: var(--barracks-text-muted-raised);
+  background: var(--barracks-surface-raised);
   font-weight: 850;
 }
 
