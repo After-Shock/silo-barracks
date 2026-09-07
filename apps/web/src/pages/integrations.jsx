@@ -60,14 +60,14 @@ function normalizeIntegrationTabSlug(value = "") {
 }
 
 const automationApps = [
-  { name: "Sonarr", slug: "sonarr", purpose: "Series automation", accent: "#35c5f4" },
-  { name: "SickChill", slug: "sickchill", purpose: "Series automation", accent: "#d35b5b" },
-  { name: "Radarr", slug: "radarr", purpose: "Movie automation", accent: "#f4c430" },
-  { name: "Lidarr", slug: "lidarr", purpose: "Music automation", accent: "var(--secondary-color)" },
-  { name: "Prowlarr", slug: "prowlarr", purpose: "Indexer management", accent: "#4aa8f0" },
-  { name: "Bazarr", slug: "bazarr", purpose: "Subtitle automation", accent: "#84d160" },
-  { name: "Jellyseerr", slug: "jellyseerr", purpose: "Request management", accent: "#6366f1" },
-  { name: "Overseerr", slug: "overseerr", purpose: "Request management", accent: "#7dd3fc" },
+  { name: "Sonarr", slug: "sonarr", purpose: "Series automation", accent: "var(--barracks-action)" },
+  { name: "SickChill", slug: "sickchill", purpose: "Series automation", accent: "var(--barracks-state-danger)" },
+  { name: "Radarr", slug: "radarr", purpose: "Movie automation", accent: "var(--barracks-state-danger)" },
+  { name: "Lidarr", slug: "lidarr", purpose: "Music automation", accent: "var(--barracks-accent-secondary)" },
+  { name: "Prowlarr", slug: "prowlarr", purpose: "Indexer management", accent: "var(--barracks-action)" },
+  { name: "Bazarr", slug: "bazarr", purpose: "Subtitle automation", accent: "var(--barracks-state-success)" },
+  { name: "Jellyseerr", slug: "jellyseerr", purpose: "Request management", accent: "var(--barracks-action)" },
+  { name: "Overseerr", slug: "overseerr", purpose: "Request management", accent: "var(--barracks-action)" },
 ];
 
 const downloadClientOptions = [
@@ -81,8 +81,8 @@ const downloadClientOptions = [
 ];
 
 const thirdPartyOptions = [
-  { name: "Tdarr", slug: "tdarr", purpose: "Active transcodes", accent: "var(--primary-light-color)", secretOptional: true },
-  { name: "Wizarr", slug: "wizarr", purpose: "Jellyfin invite links", accent: "#8b5cf6" },
+  { name: "Tdarr", slug: "tdarr", purpose: "Active transcodes", accent: "var(--barracks-action)", secretOptional: true },
+  { name: "Wizarr", slug: "wizarr", purpose: "Jellyfin invite links", accent: "var(--barracks-action)" },
 ];
 
 const initialThirdPartyApps = thirdPartyOptions.map((app, index) => ({
@@ -106,12 +106,12 @@ const defaultAgentOptions = {
 };
 
 const defaultAgentMeta = {
-  Sonarr: { slug: "sonarr", accent: "#35c5f4", role: "Series automation" },
-  SickChill: { slug: "sickchill", accent: "#d35b5b", role: "Series automation" },
-  Radarr: { slug: "radarr", accent: "#f4c430", role: "Movie automation" },
-  Tdarr: { slug: "tdarr", accent: "#38bdf8", role: "Media processing" },
-  Lidarr: { slug: "lidarr", accent: "var(--secondary-color)", role: "Music automation" },
-  Jellyfin: { slug: "jellyfin", accent: "#8b5cf6", role: "Media server" },
+  Sonarr: { slug: "sonarr", accent: "var(--barracks-action)", role: "Series automation" },
+  SickChill: { slug: "sickchill", accent: "var(--barracks-state-danger)", role: "Series automation" },
+  Radarr: { slug: "radarr", accent: "var(--barracks-state-danger)", role: "Movie automation" },
+  Tdarr: { slug: "tdarr", accent: "var(--barracks-action)", role: "Media processing" },
+  Lidarr: { slug: "lidarr", accent: "var(--barracks-accent-secondary)", role: "Music automation" },
+  Jellyfin: { slug: "jellyfin", accent: "var(--barracks-action)", role: "Media server" },
 };
 
 const seerrAppNames = new Set(["seerr", "jellyseerr", "overseerr"]);
@@ -222,7 +222,7 @@ function IntegrationCard({ app, type, onChange, onRemove, onSave, onTest, onCopy
   const [showSecret, setShowSecret] = useState(false);
 
   return (
-    <article className="integration-card" style={{ "--integration-accent": app.accent || "var(--primary-light-color)" }}>
+    <article className="integration-card" style={{ "--integration-accent": app.accent || "var(--barracks-action)" }}>
       <div className="integration-card-header">
         <span className="integration-icon">
           <AppIcon app={app} />
@@ -656,7 +656,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
   }
 
   return (
-    <div className={`integrations-page${embedded ? " is-embedded" : ""}`}>
+    <div className={`integrations-page${embedded ? " is-embedded" : ""}`} data-theme-screen="integrations">
       <section className="integrations-hero">
         <div>
           <p>Media control</p>
@@ -702,7 +702,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
                           type="button"
                           key={option}
                           className={`integration-agent-choice${isSelected ? " is-selected" : ""}`}
-                          style={{ "--agent-accent": meta.accent || "var(--primary-color)" }}
+                          style={{ "--agent-accent": meta.accent || "var(--barracks-action)" }}
                           onClick={() => updateAgentDefault(type, option)}
                           aria-pressed={isSelected}
                         >

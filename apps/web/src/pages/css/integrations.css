@@ -9,11 +9,11 @@
   align-items: start;
   gap: 14px;
   padding: 12px;
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
   background:
-    radial-gradient(circle at 8% 0%, rgba(var(--secondary-rgb), 0.12), transparent 28%),
-    radial-gradient(circle at 74% 0%, rgba(var(--primary-rgb), 0.24), transparent 34%),
-    linear-gradient(180deg, #121524, #07090d 58%);
+    radial-gradient(circle at 8% 0%, rgba(var(--barracks-accent-secondary-rgb), 0.12), transparent 28%),
+    radial-gradient(circle at 74% 0%, rgba(var(--barracks-action-rgb), 0.24), transparent 34%),
+    linear-gradient(180deg, var(--barracks-surface-inset), var(--barracks-surface-inset) 58%);
 }
 
 .integrations-page > *,
@@ -59,10 +59,10 @@
 .calendar-shell,
 .downloads-summary,
 .downloads-board article {
-  border: 1px solid rgba(var(--primary-light-rgb), 0.18);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
   border-radius: 16px;
-  background: rgba(9, 12, 19, 0.82);
-  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
+  box-shadow: 0 22px 60px color-mix(in srgb, var(--barracks-surface-inset) 28%, transparent);
 }
 
 .integrations-hero {
@@ -80,17 +80,17 @@
   align-items: center;
   gap: 16px;
   padding: 16px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.18);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
   border-radius: 16px;
   background:
-    linear-gradient(135deg, rgba(var(--primary-rgb), 0.12), rgba(255, 255, 255, 0.025)),
-    rgba(9, 12, 19, 0.82);
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.24);
+    linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.12), color-mix(in srgb, var(--barracks-text-raised) 3%, transparent)),
+    color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
+  box-shadow: 0 18px 46px color-mix(in srgb, var(--barracks-surface-inset) 24%, transparent);
 }
 
 .integration-page-header p {
   margin: 0;
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.18em;
@@ -99,14 +99,14 @@
 
 .integration-page-header h1 {
   margin: 4px 0 6px !important;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: clamp(28px, 2.6vw, 42px);
   font-weight: 950;
   line-height: 0.95;
 }
 
 .integration-page-header span {
-  color: #aebbd0;
+  color: var(--barracks-action);
   font-size: 14px;
   font-weight: 750;
 }
@@ -115,7 +115,7 @@
 .integration-card p,
 .integration-section-title span {
   margin: 0;
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.18em;
@@ -130,7 +130,7 @@
 }
 
 .integrations-hero span {
-  color: #aebbd0;
+  color: var(--barracks-action);
   font-weight: 750;
 }
 
@@ -140,15 +140,15 @@
   justify-items: center;
   gap: 3px;
   padding: 12px;
-  border: 1px solid rgba(var(--primary-rgb), 0.34);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.34);
   border-radius: 14px;
-  background: rgba(var(--primary-rgb), 0.13);
+  background: rgba(var(--barracks-action-rgb), 0.13);
 }
 
 .integrations-status svg {
   width: 24px;
   height: 24px;
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
 }
 
 .integrations-status strong {
@@ -161,7 +161,7 @@
   flex-wrap: wrap;
   gap: 8px;
   padding: 8px;
-  background: rgba(5, 8, 13, 0.78);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 78%, transparent);
 }
 
 .integration-subtabs button {
@@ -170,15 +170,15 @@
   border: 1px solid transparent;
   border-radius: 12px;
   background: transparent;
-  color: #c8d2e3;
+  color: var(--barracks-action);
   font-weight: 950;
 }
 
 .integration-subtabs button.is-active {
-  border-color: rgba(var(--primary-light-rgb), 0.42);
-  background: linear-gradient(90deg, rgba(var(--primary-rgb), 0.86), rgba(var(--primary-light-rgb), 0.56));
-  color: #fff;
-  box-shadow: 0 14px 28px rgba(var(--primary-rgb), 0.18);
+  border-color: rgba(var(--barracks-action-rgb), 0.42);
+  background: linear-gradient(90deg, rgba(var(--barracks-action-rgb), 0.86), rgba(var(--barracks-action-rgb), 0.56));
+  color: var(--barracks-text-raised);
+  box-shadow: 0 14px 28px rgba(var(--barracks-action-rgb), 0.18);
 }
 
 .integration-section {
@@ -212,13 +212,13 @@
 }
 
 .integration-subsection-title strong {
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
   font-size: 14px;
   font-weight: 900;
 }
 
 .integration-subsection-title span {
-  color: #aebbd0;
+  color: var(--barracks-action);
   font-size: 11px;
 }
 
@@ -231,11 +231,11 @@
   display: grid;
   gap: 12px;
   padding: 14px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.18);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
   border-radius: 14px;
   background:
-    linear-gradient(135deg, rgba(var(--primary-rgb), 0.06), transparent),
-    rgba(8, 11, 17, 0.72);
+    linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.06), transparent),
+    color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
 }
 
 .integration-agent-grid {
@@ -250,7 +250,7 @@
 }
 
 .integration-agent-type-label {
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
   font-size: 10px;
   font-weight: 950;
   letter-spacing: 0.12em;
@@ -269,26 +269,26 @@
   align-items: center;
   gap: 10px;
   padding: 9px 11px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 9%, transparent);
   border-radius: 11px;
-  background: rgba(255, 255, 255, 0.04);
-  color: #d8e1f1;
+  background: color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
+  color: var(--barracks-action);
   cursor: pointer;
   text-align: left;
   transition: all 0.16s ease;
 }
 
 .integration-agent-choice:hover {
-  border-color: rgba(var(--agent-accent, var(--primary-rgb)), 0.4);
-  background: rgba(var(--agent-accent, var(--primary-rgb)), 0.08);
+  border-color: rgba(var(--barracks-action-rgb), 0.4);
+  background: rgba(var(--barracks-action-rgb), 0.08);
 }
 
 .integration-agent-choice.is-selected {
-  border-color: rgba(var(--agent-accent, var(--primary-rgb)), 0.6);
+  border-color: rgba(var(--barracks-action-rgb), 0.6);
   background:
-    linear-gradient(135deg, rgba(var(--agent-accent, var(--primary-rgb)), 0.15), rgba(var(--agent-accent, var(--primary-rgb)), 0.06));
-  box-shadow: 0 0 0 1px rgba(var(--agent-accent, var(--primary-rgb)), 0.18) inset;
-  color: #fff;
+    linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.15), rgba(var(--barracks-action-rgb), 0.06));
+  box-shadow: 0 0 0 1px rgba(var(--barracks-action-rgb), 0.18) inset;
+  color: var(--barracks-text-raised);
 }
 
 .integration-agent-choice-icon {
@@ -297,9 +297,9 @@
   height: 38px;
   place-items: center;
   overflow: hidden;
-  border: 1px solid rgba(var(--agent-accent, var(--primary-rgb)), 0.32);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.32);
   border-radius: 9px;
-  background: rgba(var(--agent-accent, var(--primary-rgb)), 0.14);
+  background: rgba(var(--barracks-action-rgb), 0.14);
 }
 
 .integration-agent-choice-icon img,
@@ -318,7 +318,7 @@
 .integration-agent-choice-copy strong {
   display: block;
   overflow: hidden;
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
   font-size: 13px;
   font-weight: 900;
   text-overflow: ellipsis;
@@ -328,7 +328,7 @@
 .integration-agent-choice-copy small {
   display: block;
   overflow: hidden;
-  color: #7a90a8;
+  color: var(--barracks-action);
   font-size: 10px;
   font-weight: 750;
   text-overflow: ellipsis;
@@ -337,7 +337,7 @@
 
 .integration-agent-check {
   flex-shrink: 0;
-  color: color-mix(in srgb, var(--agent-accent, var(--primary-color)) 90%, #fff);
+  color: color-mix(in srgb, var(--barracks-action) 90%, var(--barracks-text-raised));
   font-size: 14px;
   font-weight: 950;
 }
@@ -345,7 +345,7 @@
 .integration-section-title > svg {
   width: 34px;
   height: 34px;
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
 }
 
 .integration-section-title h2,
@@ -370,9 +370,9 @@
   align-items: center;
   gap: 14px;
   padding: 14px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.18);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
   border-radius: 14px;
-  background: rgba(15, 20, 31, 0.72);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
 }
 
 .integration-link-panel strong,
@@ -381,14 +381,14 @@
 }
 
 .integration-link-panel strong {
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 15px;
   font-weight: 950;
 }
 
 .integration-link-panel span {
   margin-top: 3px;
-  color: #aebbd0;
+  color: var(--barracks-action);
   font-size: 13px;
   font-weight: 750;
 }
@@ -409,10 +409,10 @@
   justify-content: center;
   gap: 8px;
   padding: 0 14px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.36);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.36);
   border-radius: 8px;
-  background: rgba(var(--primary-rgb), 0.34);
-  color: #fff;
+  background: rgba(var(--barracks-action-rgb), 0.34);
+  color: var(--barracks-text-raised);
   font-weight: 950;
   text-decoration: none;
 }
@@ -423,13 +423,13 @@
   gap: 14px;
   align-content: start;
   padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 9%, transparent);
   border-radius: 14px;
   background:
-    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--integration-accent) 24%, transparent), transparent 34%),
-    linear-gradient(135deg, rgba(var(--primary-rgb), 0.1), rgba(var(--secondary-rgb), 0.04)),
-    rgba(8, 11, 17, 0.9);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--barracks-action) 24%, transparent), transparent 34%),
+    linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.1), rgba(var(--barracks-accent-secondary-rgb), 0.04)),
+    color-mix(in srgb, var(--barracks-surface-inset) 90%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
 }
 
 .integrations-page.is-embedded .integration-grid {
@@ -473,10 +473,10 @@
   width: 58px;
   height: 58px;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--integration-accent) 42%, rgba(255, 255, 255, 0.12));
+  border: 1px solid color-mix(in srgb, var(--barracks-action) 42%, color-mix(in srgb, var(--barracks-text-raised) 12%, transparent));
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.26);
+  background: color-mix(in srgb, var(--barracks-text-raised) 6%, transparent);
+  box-shadow: 0 14px 32px color-mix(in srgb, var(--barracks-surface-inset) 26%, transparent);
 }
 
 .integration-icon img {
@@ -486,7 +486,7 @@
 }
 
 .integration-fallback-icon {
-  color: #f8d6ff;
+  color: var(--barracks-action);
   font-size: 16px;
   font-weight: 950;
 }
@@ -501,16 +501,16 @@
   width: 13px;
   height: 13px;
   border-radius: 999px;
-  box-shadow: 0 0 0 5px rgba(248, 113, 113, 0.12), 0 0 22px rgba(248, 113, 113, 0.34);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--barracks-state-danger) 12%, transparent), 0 0 22px color-mix(in srgb, var(--barracks-state-danger) 34%, transparent);
 }
 
 .integration-status-light.is-disconnected {
-  background: #fb7185;
+  background: var(--barracks-state-danger);
 }
 
 .integration-status-light.is-connected {
-  background: #22c55e;
-  box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.12), 0 0 22px rgba(34, 197, 94, 0.38);
+  background: var(--barracks-state-success);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--barracks-state-success) 12%, transparent), 0 0 22px color-mix(in srgb, var(--barracks-state-success) 38%, transparent);
 }
 
 .integration-fields {
@@ -523,7 +523,7 @@
   display: grid;
   min-width: 0;
   gap: 6px;
-  color: #bdc8dc;
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 900;
 }
@@ -533,10 +533,10 @@
   width: 100%;
   min-width: 0;
   min-height: 42px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 12%, transparent);
   border-radius: 10px;
-  background: #070a10;
-  color: #f8fafc;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-raised);
   padding: 0 12px;
 }
 
@@ -560,10 +560,10 @@
   justify-content: center;
   gap: 8px;
   min-height: 38px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.42);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.42);
   border-radius: 10px;
-  background: rgba(var(--primary-rgb), 0.2);
-  color: #f8d6ff;
+  background: rgba(var(--barracks-action-rgb), 0.2);
+  color: var(--barracks-action);
   font-weight: 950;
 }
 
@@ -596,10 +596,10 @@
 
 .integration-notice {
   padding: 10px 12px;
-  border: 1px solid rgba(34, 197, 94, 0.28);
+  border: 1px solid color-mix(in srgb, var(--barracks-state-success) 28%, transparent);
   border-radius: 12px;
-  background: rgba(22, 101, 52, 0.16);
-  color: #bbf7d0;
+  background: color-mix(in srgb, var(--barracks-state-success) 16%, transparent);
+  color: var(--barracks-state-success);
   font-weight: 850;
 }
 
@@ -628,10 +628,10 @@
   gap: 8px;
   min-height: 38px;
   padding: 0 16px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.42);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.42);
   border-radius: 10px;
-  background: rgba(var(--primary-rgb), 0.2);
-  color: #f8d6ff;
+  background: rgba(var(--barracks-action-rgb), 0.2);
+  color: var(--barracks-action);
   font-weight: 950;
 }
 
@@ -641,25 +641,25 @@
 }
 
 .integration-actions button.is-danger {
-  border-color: rgba(248, 113, 113, 0.4);
-  background: rgba(127, 29, 29, 0.18);
-  color: #fecaca;
+  border-color: color-mix(in srgb, var(--barracks-state-danger) 40%, transparent);
+  background: color-mix(in srgb, var(--barracks-state-danger) 18%, transparent);
+  color: var(--barracks-state-danger);
 }
 
 .integration-message {
   min-height: 18px;
   margin: -4px 0 0;
-  color: #86efac;
+  color: var(--barracks-state-success);
   font-size: 12px;
   font-weight: 850;
 }
 
 .integration-message.is-error {
-  color: #fecaca;
+  color: var(--barracks-state-danger);
 }
 
 .integration-health-panel {
-  background: rgba(6, 9, 14, 0.86);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 86%, transparent);
 }
 
 .integration-health-grid {
@@ -671,9 +671,9 @@
 .integration-health-grid .integration-empty-state {
   grid-column: 1 / -1;
   padding: 18px;
-  border: 1px dashed rgba(var(--primary-light-rgb), 0.28);
+  border: 1px dashed rgba(var(--barracks-action-rgb), 0.28);
   border-radius: 12px;
-  color: #aebbd0;
+  color: var(--barracks-action);
   font-weight: 850;
   text-align: center;
 }
@@ -685,17 +685,17 @@
   gap: 10px;
   min-width: 0;
   padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 9%, transparent);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
 }
 
 .integration-health-grid article > svg:first-child {
-  color: #fb7185;
+  color: var(--barracks-state-danger);
 }
 
 .integration-health-grid article.is-ok > svg:first-child {
-  color: #22c55e;
+  color: var(--barracks-state-success);
 }
 
 .integration-health-grid strong,
@@ -707,21 +707,21 @@
 }
 
 .integration-health-grid strong {
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-weight: 950;
 }
 
 .integration-health-grid span,
 .integration-health-grid em,
 .integration-health-grid small {
-  color: #aebbd0;
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 800;
 }
 
 .integration-health-grid em {
   margin-top: 2px;
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
   font-style: normal;
 }
 
@@ -737,15 +737,15 @@
   display: block;
   height: 18px;
   border-radius: 3px;
-  background: rgba(148, 163, 184, 0.24);
+  background: color-mix(in srgb, var(--barracks-action) 24%, transparent);
 }
 
 .integration-uptime-timeline i.is-ok {
-  background: linear-gradient(180deg, #34d399, #059669);
+  background: linear-gradient(180deg, var(--barracks-state-success), var(--barracks-state-success));
 }
 
 .integration-uptime-timeline i.is-error {
-  background: linear-gradient(180deg, #fb7185, #be123c);
+  background: linear-gradient(180deg, var(--barracks-state-danger), var(--barracks-state-danger));
 }
 
 .integration-diagnostic-list {
@@ -756,18 +756,18 @@
 
 .integration-diagnostic-list span {
   padding: 7px 10px;
-  border: 1px solid rgba(34, 197, 94, 0.28);
+  border: 1px solid color-mix(in srgb, var(--barracks-state-success) 28%, transparent);
   border-radius: 999px;
-  background: rgba(22, 101, 52, 0.14);
-  color: #bbf7d0;
+  background: color-mix(in srgb, var(--barracks-state-success) 14%, transparent);
+  color: var(--barracks-state-success);
   font-size: 12px;
   font-weight: 850;
 }
 
 .integration-diagnostic-list span.is-error {
-  border-color: rgba(248, 113, 113, 0.3);
-  background: rgba(127, 29, 29, 0.18);
-  color: #fecaca;
+  border-color: color-mix(in srgb, var(--barracks-state-danger) 30%, transparent);
+  background: color-mix(in srgb, var(--barracks-state-danger) 18%, transparent);
+  color: var(--barracks-state-danger);
 }
 
 .jellyfin-integration-card {
@@ -775,8 +775,8 @@
   gap: 12px;
   padding: 14px;
   background:
-    radial-gradient(circle at 0% 0%, rgba(var(--primary-rgb), 0.16), transparent 34%),
-    rgba(9, 12, 19, 0.82);
+    radial-gradient(circle at 0% 0%, rgba(var(--barracks-action-rgb), 0.16), transparent 34%),
+    color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
 }
 
 .jellyfin-integration-header {
@@ -788,7 +788,7 @@
 
 .jellyfin-integration-header p {
   margin: 0 0 4px;
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.18em;
@@ -797,7 +797,7 @@
 
 .jellyfin-integration-header h2 {
   margin: 0;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 24px;
   font-weight: 950;
 }
@@ -805,7 +805,7 @@
 .jellyfin-integration-header span:not(.integration-icon) {
   display: block;
   margin-top: 4px;
-  color: #aebbd0;
+  color: var(--barracks-action);
   font-weight: 750;
 }
 
@@ -1049,10 +1049,10 @@
 .requests-control-bar,
 .requests-filter-strip,
 .integration-card {
-  border-color: var(--surface-border-color);
+  border-color: var(--barracks-border-subtle);
   border-radius: 8px;
-  background: rgba(17, 22, 30, 0.82);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--barracks-surface-inset) 18%, transparent);
 }
 
 .integration-page-header p,
@@ -1085,9 +1085,9 @@
 .integration-health-grid article,
 .integration-health-grid .integration-empty-state,
 .integration-notice {
-  border-color: var(--surface-border-color);
+  border-color: var(--barracks-border-subtle);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.045);
+  background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
   box-shadow: none;
 }
 
@@ -1110,10 +1110,10 @@
 .integration-events button,
 .calendar-toolbar button,
 .downloads-board button {
-  border-color: var(--surface-border-color);
+  border-color: var(--barracks-border-subtle);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.045);
-  color: #e9dff4;
+  background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
+  color: var(--barracks-action);
   font-weight: 680;
 }
 
@@ -1125,16 +1125,16 @@
 .integration-events button:hover,
 .calendar-toolbar button:hover,
 .downloads-board button:hover {
-  background: var(--primary-color);
-  color: #fff;
+  background: var(--barracks-action);
+  color: var(--barracks-text-raised);
   box-shadow: none;
 }
 
 .integration-fields input,
 .client-adder select {
-  border-color: var(--surface-border-color);
+  border-color: var(--barracks-border-subtle);
   border-radius: 8px;
-  background: rgba(7, 10, 16, 0.88);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
 }
 
 .integration-status-light {
@@ -1142,10 +1142,9 @@
 }
 
 .integration-uptime-timeline i.is-ok {
-  background: #34d399;
+  background: var(--barracks-state-success);
 }
 
 .integration-uptime-timeline i.is-error {
-  background: #fb7185;
+  background: var(--barracks-state-danger);
 }
-

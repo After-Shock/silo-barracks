@@ -5,7 +5,7 @@
   gap: 18px;
   width: 100%;
   padding: 28px clamp(18px, 3vw, 42px) 48px;
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
 }
 
 .automation-health-header {
@@ -13,17 +13,17 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 18px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.18);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
   border-radius: 16px;
   padding: 24px;
   background:
-    radial-gradient(circle at 10% 0%, rgba(var(--primary-rgb), 0.18), transparent 36%),
-    rgba(13, 18, 27, 0.82);
+    radial-gradient(circle at 10% 0%, rgba(var(--barracks-action-rgb), 0.18), transparent 36%),
+    color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
 }
 
 .automation-health-header p {
   margin: 0 0 4px;
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.14em;
@@ -40,7 +40,7 @@
 .automation-health-header span {
   display: block;
   margin-top: 8px;
-  color: #9aa7bb;
+  color: var(--barracks-action);
   font-size: 14px;
   font-weight: 700;
 }
@@ -50,21 +50,21 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.28);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.28);
   border-radius: 10px;
   padding: 10px 13px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
+  color: var(--barracks-text-raised);
   font-weight: 850;
 }
 
 .automation-health-error,
 .automation-empty {
-  border: 1px solid rgba(248, 113, 113, 0.35);
+  border: 1px solid color-mix(in srgb, var(--barracks-state-danger) 35%, transparent);
   border-radius: 14px;
   padding: 16px;
-  background: rgba(127, 29, 29, 0.18);
-  color: #fecaca;
+  background: color-mix(in srgb, var(--barracks-state-danger) 18%, transparent);
+  color: var(--barracks-state-danger);
   font-weight: 800;
 }
 
@@ -76,10 +76,10 @@
 
 .automation-summary-grid article,
 .automation-service-card {
-  border: 1px solid rgba(var(--primary-light-rgb), 0.16);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.16);
   border-radius: 14px;
-  background: rgba(13, 18, 27, 0.76);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 76%, transparent);
+  box-shadow: 0 20px 50px color-mix(in srgb, var(--barracks-surface-inset) 22%, transparent);
 }
 
 .automation-summary-grid article {
@@ -89,7 +89,7 @@
 }
 
 .automation-summary-grid svg {
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
 }
 
 .automation-summary-grid strong {
@@ -98,7 +98,7 @@
 }
 
 .automation-summary-grid span {
-  color: #9aa7bb;
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 800;
 }
@@ -116,7 +116,7 @@
 }
 
 .automation-service-card.is-warning {
-  border-color: rgba(251, 191, 36, 0.3);
+  border-color: color-mix(in srgb, var(--barracks-state-danger) 30%, transparent);
 }
 
 .automation-service-head {
@@ -131,8 +131,8 @@
   height: 42px;
   place-items: center;
   border-radius: 12px;
-  background: rgba(var(--primary-rgb), 0.16);
-  color: var(--primary-light-color);
+  background: rgba(var(--barracks-action-rgb), 0.16);
+  color: var(--barracks-action);
 }
 
 .automation-service-head h2 {
@@ -143,7 +143,7 @@
 
 .automation-service-head p {
   margin: 2px 0 0;
-  color: #9aa7bb;
+  color: var(--barracks-action);
   font-weight: 750;
 }
 
@@ -156,22 +156,22 @@
 .automation-service-metrics span,
 .automation-list p,
 .automation-issues p {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 8%, transparent);
   border-radius: 10px;
-  background: rgba(3, 7, 12, 0.46);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 46%, transparent);
 }
 
 .automation-service-metrics span {
   display: grid;
   gap: 2px;
   padding: 11px;
-  color: #9aa7bb;
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 800;
 }
 
 .automation-service-metrics strong {
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 20px;
   font-weight: 950;
 }
@@ -184,7 +184,7 @@
 
 .automation-list > strong,
 .automation-issues > strong {
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 13px;
   font-weight: 900;
   text-transform: uppercase;
@@ -201,13 +201,13 @@
 
 .automation-list span,
 .automation-issues b {
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
   font-weight: 850;
 }
 
 .automation-list small,
 .automation-issues span {
-  color: #9aa7bb;
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 750;
   text-align: right;
@@ -217,7 +217,7 @@
   grid-column: 1 / -1;
   display: grid;
   gap: 4px;
-  color: #cbd5e1;
+  color: var(--barracks-action);
 }
 
 @media (max-width: 900px) {

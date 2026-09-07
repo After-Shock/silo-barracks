@@ -180,7 +180,7 @@ export default function SettingsAbout() {
   }, [token]);
 
   return (
-    <div className="about-page">
+    <div className="about-page" data-theme-screen="about">
       <header className="about-header">
         <p>About</p>
         <h1>Silo Barracks</h1>

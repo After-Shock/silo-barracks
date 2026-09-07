@@ -148,7 +148,7 @@ export default function Downloads() {
   }
 
   return (
-    <div className="downloads-page">
+    <div className="downloads-page" data-theme-screen="downloads">
       <header className="download-page-header">
         <div>
           <p>Queue monitor</p>

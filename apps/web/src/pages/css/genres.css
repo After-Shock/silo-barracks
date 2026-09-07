@@ -2,17 +2,17 @@
 .genre-container {
   display: flex;
   overflow-x: none;
-  background-color: var(--secondary-background-color);
+  background-color: var(--barracks-surface-raised);
   padding: 20px;
   border-radius: 8px;
-  color: white;
+  color: var(--barracks-text-raised);
   margin-bottom: 20px;
   width: 100%;
   height: 100%;
 }
 
 .radial-tooltip {
-  background-color: black;
+  background-color: var(--barracks-canvas);
   border-radius: 8px;
   padding: 10px;
 }
@@ -23,7 +23,7 @@
 }
 
 .radial-tooltip > .tooltip-header {
-  color: var(--secondary-color);
+  color: var(--barracks-accent-secondary);
 }
 
 .genre-stats {
@@ -40,11 +40,11 @@
 }
 
 .genre-container::-webkit-scrollbar-thumb {
-  background-color: #8888884d; /* set thumb color */
+  background-color: color-mix(in srgb, var(--barracks-text-muted-raised) 30%, transparent); /* set thumb color */
   border-radius: 5px; /* round corners */
   width: 5px;
 }
 
 .genre-container::-webkit-scrollbar-thumb:hover {
-  background-color: #88888883; /* set thumb color */
+  background-color: color-mix(in srgb, var(--barracks-text-muted-raised) 51%, transparent); /* set thumb color */
 }

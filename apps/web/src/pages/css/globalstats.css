@@ -3,14 +3,14 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 400px));
   grid-auto-rows: 120px;
-  background-color: var(--secondary-background-color);
+  background-color: var(--barracks-surface-raised);
   padding: 20px;
   border-radius: 8px;
   font-size: 1.3em;
 }
 
 .global-stats {
-  color: white;
+  color: var(--barracks-text-raised);
   width: fit-content;
   max-width: 400px;
   min-width: 350px;
@@ -27,7 +27,7 @@
 
 .stat-value {
   text-align: right;
-  color: var(--secondary-color);
+  color: var(--barracks-accent-secondary);
   font-weight: 500;
   font-size: 1.1em;
   margin: 0;

@@ -8,10 +8,10 @@
 .wizarr-dashboard article,
 .wizarr-create-card,
 .wizarr-invite-card {
-  border: 1px solid rgba(var(--primary-light-rgb), 0.18);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
   border-radius: 8px;
-  background: rgba(11, 15, 24, 0.84);
-  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.22);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 84%, transparent);
+  box-shadow: 0 16px 38px color-mix(in srgb, var(--barracks-surface-inset) 22%, transparent);
 }
 
 .wizarr-dashboard article {
@@ -23,20 +23,20 @@
   align-items: center;
   padding: 14px;
   background:
-    linear-gradient(135deg, rgba(var(--primary-rgb), 0.18), rgba(255, 255, 255, 0.03)),
-    rgba(11, 15, 24, 0.88);
+    linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.18), color-mix(in srgb, var(--barracks-text-raised) 3%, transparent)),
+    color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
 }
 
 .wizarr-dashboard strong {
   grid-column: 1 / -1;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 30px;
   font-weight: 950;
   line-height: 0.9;
 }
 
 .wizarr-dashboard span {
-  color: #9fb0c7;
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.12em;
@@ -44,7 +44,7 @@
 }
 
 .wizarr-dashboard small {
-  color: #8fa0b8;
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 800;
 }
@@ -64,15 +64,15 @@
   padding: 14px;
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(var(--primary-rgb), 0.12), rgba(255, 255, 255, 0.02)),
-    rgba(11, 15, 24, 0.92);
+    linear-gradient(180deg, rgba(var(--barracks-action-rgb), 0.12), color-mix(in srgb, var(--barracks-text-raised) 2%, transparent)),
+    color-mix(in srgb, var(--barracks-surface-inset) 92%, transparent);
 }
 
 .wizarr-create-card label,
 .wizarr-form-heading {
   display: grid;
   gap: 8px;
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
   font-size: 11px;
   font-weight: 950;
   letter-spacing: 0.14em;
@@ -83,9 +83,9 @@
   display: grid;
   gap: 10px;
   padding: 12px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.13);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.13);
   border-radius: 8px;
-  background: rgba(5, 8, 13, 0.42);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 42%, transparent);
 }
 
 .wizarr-form-heading {
@@ -94,7 +94,7 @@
 }
 
 .wizarr-form-heading small {
-  color: #8796ad;
+  color: var(--barracks-action);
   font-size: 11px;
   font-weight: 750;
   letter-spacing: 0;
@@ -109,10 +109,10 @@
 .wizarr-form-heading button {
   min-height: 28px;
   padding: 0 10px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.26);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.26);
   border-radius: 8px;
-  background: rgba(var(--primary-rgb), 0.22);
-  color: #fff;
+  background: rgba(var(--barracks-action-rgb), 0.22);
+  color: var(--barracks-text-raised);
   font-size: 11px;
   font-weight: 950;
 }
@@ -127,16 +127,16 @@
 .wizarr-create-card input[type="text"],
 .wizarr-create-card input:not([type]) {
   min-height: 42px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.24);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.24);
   border-radius: 8px;
-  background: #0b101a;
-  color: #f8fafc;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-raised);
   padding: 0 12px;
   font-weight: 850;
 }
 
 .wizarr-create-card input::placeholder {
-  color: #8fa0b8;
+  color: var(--barracks-action);
   opacity: 1;
 }
 
@@ -151,8 +151,8 @@
 }
 
 .wizarr-create-card input.is-invalid {
-  border-color: rgba(248, 113, 113, 0.62);
-  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.1);
+  border-color: color-mix(in srgb, var(--barracks-state-danger) 62%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--barracks-state-danger) 10%, transparent);
 }
 
 .wizarr-choice-grid {
@@ -169,10 +169,10 @@
   gap: 4px;
   min-height: 62px;
   padding: 11px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.18);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
   border-radius: 8px;
-  background: rgba(16, 22, 34, 0.88);
-  color: #dfe7f3;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
+  color: var(--barracks-action);
   text-align: left;
   transition:
     border-color 160ms ease,
@@ -182,16 +182,16 @@
 
 .wizarr-choice-grid button:hover {
   transform: translateY(-1px);
-  border-color: rgba(var(--primary-light-rgb), 0.38);
+  border-color: rgba(var(--barracks-action-rgb), 0.38);
 }
 
 .wizarr-choice-grid button.is-selected {
-  border-color: rgba(var(--primary-light-rgb), 0.56);
+  border-color: rgba(var(--barracks-action-rgb), 0.56);
   background:
-    linear-gradient(135deg, rgba(var(--primary-rgb), 0.42), rgba(var(--primary-light-rgb), 0.14)),
-    rgba(16, 22, 34, 0.92);
-  color: #fff;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.42), rgba(var(--barracks-action-rgb), 0.14)),
+    color-mix(in srgb, var(--barracks-surface-inset) 92%, transparent);
+  color: var(--barracks-text-raised);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
 }
 
 .wizarr-choice-grid button strong {
@@ -201,7 +201,7 @@
 
 .wizarr-choice-grid button span,
 .wizarr-empty-inline {
-  color: #97a8bf;
+  color: var(--barracks-action);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0;
@@ -226,10 +226,10 @@
   align-items: center;
   gap: 8px;
   padding: 0 10px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.18);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
   border-radius: 8px;
-  background: rgba(16, 22, 34, 0.88);
-  color: #dbe6f5;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
+  color: var(--barracks-action);
   letter-spacing: 0;
   text-transform: none;
 }
@@ -238,11 +238,11 @@
   display: grid;
   gap: 10px;
   padding: 12px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.14);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.14);
   border-radius: 8px;
   background:
-    linear-gradient(135deg, rgba(var(--secondary-rgb), 0.08), transparent 50%),
-    rgba(5, 8, 13, 0.34);
+    linear-gradient(135deg, rgba(var(--barracks-accent-secondary-rgb), 0.08), transparent 50%),
+    color-mix(in srgb, var(--barracks-surface-inset) 34%, transparent);
 }
 
 .wizarr-email-box label {
@@ -250,14 +250,14 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
-  color: #dfe7f3;
+  color: var(--barracks-action);
   letter-spacing: 0;
   text-transform: none;
 }
 
 .wizarr-email-box label strong {
   display: block;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 13px;
   font-weight: 950;
 }
@@ -265,13 +265,13 @@
 .wizarr-email-box label small {
   display: block;
   margin-top: 2px;
-  color: #93a4bb;
+  color: var(--barracks-action);
   font-size: 11px;
   font-weight: 800;
 }
 
 .wizarr-email-box svg {
-  color: var(--secondary-color);
+  color: var(--barracks-accent-secondary);
 }
 
 .wizarr-email-box input[type="email"]:disabled {
@@ -283,9 +283,9 @@
   display: grid;
   gap: 12px;
   padding: 14px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.18);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
   border-radius: 8px;
-  background: rgba(8, 11, 17, 0.68);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 68%, transparent);
 }
 
 .wizarr-invite-toolbar {
@@ -297,13 +297,13 @@
 
 .wizarr-invite-toolbar h2 {
   margin: 0 !important;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 24px;
   font-weight: 950;
 }
 
 .wizarr-invite-toolbar span {
-  color: #9fb0c7;
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 850;
 }
@@ -314,10 +314,10 @@
   align-items: center;
   gap: 8px;
   padding: 0 12px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.2);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.2);
   border-radius: 8px;
-  background: #080c14;
-  color: #96a8bf;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-action);
 }
 
 .wizarr-search input {
@@ -326,7 +326,7 @@
   border: 0;
   outline: 0;
   background: transparent;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-weight: 850;
 }
 
@@ -339,18 +339,18 @@
 .wizarr-filter-row button {
   min-height: 34px;
   padding: 0 12px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.18);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
   border-radius: 8px;
-  background: rgba(16, 22, 34, 0.72);
-  color: #c7d4e5;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 950;
 }
 
 .wizarr-filter-row button.is-active {
-  border-color: rgba(var(--primary-light-rgb), 0.5);
-  background: rgba(var(--primary-rgb), 0.5);
-  color: #fff;
+  border-color: rgba(var(--barracks-action-rgb), 0.5);
+  background: rgba(var(--barracks-action-rgb), 0.5);
+  color: var(--barracks-text-raised);
 }
 
 .wizarr-invite-list {
@@ -367,8 +367,8 @@
   min-height: 190px;
   padding: 14px;
   background:
-    linear-gradient(145deg, rgba(20, 26, 39, 0.96), rgba(10, 14, 22, 0.86)),
-    rgba(11, 15, 24, 0.9);
+    linear-gradient(145deg, color-mix(in srgb, var(--barracks-surface-inset) 96%, transparent), color-mix(in srgb, var(--barracks-surface-inset) 86%, transparent)),
+    color-mix(in srgb, var(--barracks-surface-inset) 90%, transparent);
 }
 
 .wizarr-invite-card > div:first-child > span {
@@ -377,21 +377,21 @@
   align-items: center;
   padding: 0 8px;
   border-radius: 8px;
-  background: rgba(34, 197, 94, 0.14);
-  color: #86efac;
+  background: color-mix(in srgb, var(--barracks-state-success) 14%, transparent);
+  color: var(--barracks-state-success);
   font-size: 11px;
   font-weight: 950;
 }
 
 .wizarr-invite-card.is-used > div:first-child > span,
 .wizarr-invite-card.is-expired > div:first-child > span {
-  background: rgba(248, 113, 113, 0.14);
-  color: #fca5a5;
+  background: color-mix(in srgb, var(--barracks-state-danger) 14%, transparent);
+  color: var(--barracks-state-danger);
 }
 
 .wizarr-invite-card h2 {
   margin: 8px 0 4px !important;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 24px;
   font-weight: 950;
 }
@@ -399,7 +399,7 @@
 .wizarr-invite-card p,
 .wizarr-invite-meta span {
   margin: 0;
-  color: #9fb0c7;
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 800;
 }
@@ -431,16 +431,16 @@
   height: 38px;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.26);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.26);
   border-radius: 8px;
-  background: rgba(var(--primary-rgb), 0.22);
-  color: #fff;
+  background: rgba(var(--barracks-action-rgb), 0.22);
+  color: var(--barracks-text-raised);
 }
 
 .wizarr-invite-actions .is-danger {
-  border-color: rgba(248, 113, 113, 0.32);
-  background: rgba(248, 113, 113, 0.12);
-  color: #fecaca;
+  border-color: color-mix(in srgb, var(--barracks-state-danger) 32%, transparent);
+  background: color-mix(in srgb, var(--barracks-state-danger) 12%, transparent);
+  color: var(--barracks-state-danger);
 }
 
 .wizarr-invite-actions a[aria-disabled="true"] {

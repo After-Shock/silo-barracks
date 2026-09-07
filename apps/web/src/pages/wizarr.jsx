@@ -206,7 +206,7 @@ export default function WizarrPage() {
   }
 
   return (
-    <div className="integrations-page wizarr-page">
+    <div className="integrations-page wizarr-page" data-theme-screen="wizarr">
       <section className="integration-page-header">
         <div>
           <p>Invite manager</p>

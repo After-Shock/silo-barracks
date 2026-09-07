@@ -133,13 +133,13 @@ function GlobalStats(props) {
           onClose={handleMenuClose}
           sx={{
             "& .MuiPaper-root": {
-              backgroundColor: `var(--background-color)`,
-              color: "#fff",
+              backgroundColor: `var(--barracks-canvas)`,
+              color: "var(--barracks-text-raised)",
               minWidth: "200px",
             },
             "& .MuiMenuItem-root": {
               "&:hover": {
-                backgroundColor: "#555",
+                backgroundColor: "var(--barracks-border-subtle)",
               },
             },
           }}

@@ -730,7 +730,7 @@ export default function Requests() {
   const selectedRequestRoot = selectedRequestServer?.rootFolders?.find((folder) => folder.path === selectedRequestForm.rootFolder);
 
   return (
-    <div className="requests-page">
+    <div className="requests-page" data-theme-screen="requests">
       {actionMessage ? <div className="requests-action-message">{actionMessage}</div> : null}
 
       <section className="requests-discovery">

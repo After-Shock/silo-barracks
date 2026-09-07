@@ -67,7 +67,7 @@ function formatSaved(job) {
 function JobCard({ job, kind }) {
   const bannerStyle = job.bannerUrl
     ? {
-        backgroundImage: `linear-gradient(90deg, rgba(7, 10, 16, 0.96), rgba(7, 10, 16, 0.72), rgba(7, 10, 16, 0.32)), url(${job.bannerUrl})`,
+        backgroundImage: `linear-gradient(90deg, color-mix(in srgb, var(--barracks-surface-inset) 96%, transparent), color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent), color-mix(in srgb, var(--barracks-surface-inset) 32%, transparent)), url(${job.bannerUrl})`,
       }
     : {};
   const progress = Number(job.progress || 0);
@@ -185,7 +185,7 @@ export default function ActiveTranscodes() {
   }, [activeTab, cachedTranscodes, loadTranscodes]);
 
   return (
-    <div className="transcodes-page">
+    <div className="transcodes-page" data-theme-screen="active-transcodes">
       <header className="transcodes-header">
         <div>
           <p>Active Transcodes</p>

@@ -12,24 +12,24 @@
   align-items: center;
   gap: 12px;
   padding: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 8%, transparent);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.035);
+  background: color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
 }
 
 .download-summary-card svg {
   width: 28px;
   height: 28px;
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
 }
 
 .download-summary-card span {
-  color: #aebbd0;
+  color: var(--barracks-action);
   font-weight: 900;
 }
 
 .download-summary-card strong {
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 26px;
   font-weight: 950;
 }
@@ -59,7 +59,7 @@
 }
 
 .downloads-board span {
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.12em;
@@ -68,7 +68,7 @@
 
 .downloads-board p {
   margin: 0;
-  color: #93a0b4;
+  color: var(--barracks-action);
   font-weight: 800;
 }
 
@@ -79,11 +79,11 @@
   align-items: start;
   gap: 16px;
   padding: 14px;
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
   background:
-    radial-gradient(circle at 12% 0%, rgba(var(--secondary-rgb), 0.13), transparent 28%),
-    radial-gradient(circle at 76% 0%, rgba(var(--primary-rgb), 0.18), transparent 30%),
-    linear-gradient(180deg, rgba(12, 15, 22, 0.96), rgba(5, 8, 13, 0.98));
+    radial-gradient(circle at 12% 0%, rgba(var(--barracks-accent-secondary-rgb), 0.13), transparent 28%),
+    radial-gradient(circle at 76% 0%, rgba(var(--barracks-action-rgb), 0.18), transparent 30%),
+    linear-gradient(180deg, color-mix(in srgb, var(--barracks-surface-inset) 96%, transparent), color-mix(in srgb, var(--barracks-surface-inset) 98%, transparent));
 }
 
 .download-page-header {
@@ -92,17 +92,17 @@
   align-items: center;
   gap: 18px;
   padding: 16px 18px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.18);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
   border-radius: 16px;
   background:
-    linear-gradient(135deg, rgba(var(--primary-rgb), 0.14), rgba(var(--secondary-rgb), 0.05)),
-    rgba(8, 11, 17, 0.82);
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.24);
+    linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.14), rgba(var(--barracks-accent-secondary-rgb), 0.05)),
+    color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
+  box-shadow: 0 18px 46px color-mix(in srgb, var(--barracks-surface-inset) 24%, transparent);
 }
 
 .download-page-header p {
   margin: 0 0 4px;
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.18em;
@@ -111,7 +111,7 @@
 
 .download-page-header h1 {
   margin: 0 !important;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: clamp(32px, 3.6vw, 52px);
   font-weight: 950;
   line-height: 0.95;
@@ -120,7 +120,7 @@
 .download-page-header span {
   display: block;
   margin-top: 8px;
-  color: #aebbd0;
+  color: var(--barracks-action);
   font-size: 14px;
   font-weight: 800;
 }
@@ -131,19 +131,19 @@
   justify-items: center;
   gap: 3px;
   padding: 12px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.34);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.34);
   border-radius: 14px;
-  background: rgba(var(--primary-rgb), 0.14);
+  background: rgba(var(--barracks-action-rgb), 0.14);
 }
 
 .download-header-stat svg {
   width: 25px;
   height: 25px;
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
 }
 
 .download-header-stat strong {
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 30px;
   font-weight: 950;
   line-height: 1;
@@ -151,7 +151,7 @@
 
 .download-header-stat span {
   margin: 0;
-  color: #bfd0e8;
+  color: var(--barracks-action);
   font-size: 13px;
   font-weight: 900;
 }
@@ -159,10 +159,10 @@
 .download-add-bar,
 .download-count-grid article,
 .download-panel {
-  border: 1px solid rgba(var(--primary-light-rgb), 0.16);
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.16);
   border-radius: 14px;
-  background: rgba(11, 17, 27, 0.88);
-  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.24);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
+  box-shadow: 0 16px 42px color-mix(in srgb, var(--barracks-surface-inset) 24%, transparent);
 }
 
 .download-add-bar {
@@ -177,7 +177,7 @@
 .download-add-bar::before {
   content: "Add download";
   align-self: center;
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.16em;
@@ -198,7 +198,7 @@
 .download-count-grid span,
 .download-row-meta,
 .download-client-row small {
-  color: #9fb1c9;
+  color: var(--barracks-action);
   font-size: 11px;
   font-weight: 950;
   letter-spacing: 0.12em;
@@ -210,10 +210,10 @@
   width: 100%;
   min-width: 0;
   min-height: 42px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid color-mix(in srgb, var(--barracks-action) 18%, transparent);
   border-radius: 8px;
-  background: #111827;
-  color: #f8fafc;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-raised);
   padding: 0 14px;
   font-weight: 800;
 }
@@ -226,10 +226,10 @@
   justify-content: center;
   gap: 8px !important;
   padding: 0 16px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid color-mix(in srgb, var(--barracks-action) 18%, transparent);
   border-radius: 8px;
-  background: rgba(17, 24, 39, 0.86);
-  color: #f8fafc;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 86%, transparent);
+  color: var(--barracks-text-raised);
   font-weight: 950;
   cursor: pointer;
 }
@@ -241,7 +241,7 @@
 }
 
 .download-file-button svg {
-  color: #00c8ff;
+  color: var(--barracks-action);
 }
 
 .download-file-button input {
@@ -252,9 +252,9 @@
 }
 
 .download-add-button {
-  border-color: rgba(0, 200, 255, 0.28);
-  background: #0b82b2;
-  color: #061019;
+  border-color: color-mix(in srgb, var(--barracks-action) 28%, transparent);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
 .download-add-button:disabled {
@@ -264,7 +264,7 @@
 
 .download-inline-message {
   margin: -6px 2px 0;
-  color: var(--primary-light-color);
+  color: var(--barracks-action);
   font-size: 13px;
   font-weight: 900;
 }
@@ -284,18 +284,18 @@
 }
 
 .download-count-grid article.is-active {
-  border-color: rgba(0, 200, 255, 0.76);
+  border-color: color-mix(in srgb, var(--barracks-action) 76%, transparent);
 }
 
 .download-count-grid strong {
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
   font-size: 26px;
   font-weight: 950;
   line-height: 1;
 }
 
 .download-count-grid article.is-active strong {
-  color: #00c8ff;
+  color: var(--barracks-action);
 }
 
 .download-console-grid {
@@ -315,7 +315,7 @@
 
 .download-panel h2 {
   margin: 0 0 16px !important;
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
   font-size: 20px;
   font-weight: 950;
 }
@@ -332,7 +332,7 @@
   gap: 8px 14px;
   padding: 14px;
   border-radius: 11px;
-  background: rgba(15, 25, 39, 0.78);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 78%, transparent);
 }
 
 .download-row-main,
@@ -381,7 +381,7 @@
 .download-row strong,
 .download-client-row strong {
   display: block;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 15px;
   font-weight: 950;
   overflow: hidden;
@@ -393,7 +393,7 @@
 .download-client-row span:not(.integration-status-light):not(.download-client-icon) {
   display: block;
   margin-top: 3px;
-  color: #9fb1c9;
+  color: var(--barracks-action);
   font-size: 12px;
   font-weight: 750;
 }
@@ -406,7 +406,7 @@
 }
 
 .download-row-actions small {
-  color: #00c8ff;
+  color: var(--barracks-action);
   font-size: 13px;
   font-weight: 950;
 }
@@ -416,16 +416,16 @@
   width: 30px;
   height: 30px;
   place-items: center;
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  border: 1px solid color-mix(in srgb, var(--barracks-action) 22%, transparent);
   border-radius: 8px;
-  background: rgba(17, 24, 39, 0.9);
-  color: #dbeafe;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 90%, transparent);
+  color: var(--barracks-action);
 }
 
 .download-row-actions button.is-danger {
-  border-color: rgba(248, 113, 113, 0.38);
-  background: rgba(127, 29, 29, 0.32);
-  color: #fecaca;
+  border-color: color-mix(in srgb, var(--barracks-state-danger) 38%, transparent);
+  background: color-mix(in srgb, var(--barracks-state-danger) 32%, transparent);
+  color: var(--barracks-state-danger);
 }
 
 .download-progress-track {
@@ -433,14 +433,14 @@
   height: 7px;
   overflow: hidden;
   border-radius: 99px;
-  background: rgba(148, 163, 184, 0.18);
+  background: color-mix(in srgb, var(--barracks-action) 18%, transparent);
 }
 
 .download-progress-track span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: #00c8ff;
+  background: var(--barracks-action);
 }
 
 .download-row-meta {
@@ -460,7 +460,7 @@
   gap: 12px;
   padding: 14px;
   border-radius: 11px;
-  background: rgba(15, 25, 39, 0.78);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 78%, transparent);
 }
 
 .download-client-row > div {
@@ -489,8 +489,7 @@
 .download-client-row small {
   display: block;
   margin-top: 8px;
-  color: #fda4af;
+  color: var(--barracks-state-danger);
   letter-spacing: 0;
   text-transform: none;
 }
-

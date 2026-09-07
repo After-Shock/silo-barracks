@@ -104,7 +104,7 @@ export default function AutomationHealth() {
   }, []);
 
   return (
-    <div className="automation-health-page">
+    <div className="automation-health-page" data-theme-screen="automation-health">
       <header className="automation-health-header">
         <div>
           <p>Automation Health</p>

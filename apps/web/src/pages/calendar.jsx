@@ -178,7 +178,7 @@ export default function Calendar() {
   }, []);
 
   return (
-    <div className="integrations-page is-compact-page calendar-dashboard">
+    <div className="integrations-page is-compact-page calendar-dashboard" data-theme-screen="calendar">
       <section className="integration-page-header">
         <div>
           <p>Release planning</p>
