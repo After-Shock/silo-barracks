@@ -14,7 +14,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--barracks-text);
-  width: 125vw;
+  width: 125%;
   min-height: 125vh;
   zoom: 0.8;
 }

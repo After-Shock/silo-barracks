@@ -9,7 +9,7 @@ import ArrowLeftSLineIcon from "remixicon-react/ArrowLeftSLineIcon";
 import ArrowRightSLineIcon from "remixicon-react/ArrowRightSLineIcon";
 import MagicLineIcon from "remixicon-react/MagicLineIcon";
 import MenuLineIcon from "remixicon-react/MenuLineIcon";
-import logo_dark from "../../../../public/brand/barracks-mark.svg";
+import logo_dark from "../../images/silo-icon.png";
 import "../../css/navbar.css";
 import VersionCard from "./version-card";
 import { OPEN_WHATS_NEW_EVENT } from "../../../lib/events";
