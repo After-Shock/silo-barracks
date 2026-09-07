@@ -55,7 +55,7 @@
 .library-detail-title > span {
   display: block;
   margin-bottom: 4px;
-  color: var(--barracks-focus);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.18em;
@@ -243,7 +243,7 @@
 .library-options-heading span {
   display: block;
   margin-bottom: 5px;
-  color: var(--barracks-focus);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.18em;

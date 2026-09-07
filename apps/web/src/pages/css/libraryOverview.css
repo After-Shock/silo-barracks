@@ -73,7 +73,7 @@
   .library-item-count {
     width: 60%;
     text-align: right;
-    color: var(--barracks-focus);
+    color: var(--barracks-text-raised);
     font-weight: 850;
     font-size: 1.1em;
 

@@ -368,7 +368,7 @@
 
 .library-list-title span {
   margin-top: 3px;
-  color: var(--barracks-focus);
+  color: var(--barracks-text-muted-raised);
   letter-spacing: 0.14em;
 }
 

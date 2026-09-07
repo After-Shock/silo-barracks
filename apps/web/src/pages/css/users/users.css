@@ -134,7 +134,7 @@
 
 .users-stat-card svg {
   grid-row: span 2;
-  color: var(--barracks-focus);
+  color: var(--barracks-text-muted-raised);
 }
 
 .users-stat-card span {
@@ -580,7 +580,7 @@
 .users-track-button:focus-visible,
 .users-page .users-track-button.btn:hover,
 .users-page .users-track-button.btn:focus-visible {
-  color: var(--barracks-focus) !important;
+  color: var(--barracks-text-raised) !important;
   background: transparent !important;
 }
 
@@ -653,7 +653,7 @@
 }
 
 .users-track-button.is-tracked {
-  color: var(--barracks-focus) !important;
+  color: var(--barracks-text-raised) !important;
 }
 
 .users-hidden-toggle {
