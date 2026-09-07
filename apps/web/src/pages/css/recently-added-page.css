@@ -9,7 +9,7 @@
 
 .recently-added-page-header p {
   margin: 0 0 6px;
-  color: var(--primary-light-color);
+  color: var(--barracks-action-foreground);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.18em;
@@ -21,7 +21,7 @@
 }
 
 .recently-added-page-header span {
-  color: #9aa7bb;
+  color: var(--barracks-text-muted-raised);
   font-size: 14px;
   font-weight: 750;
 }
@@ -33,9 +33,9 @@
   gap: 10px;
   margin-bottom: 22px;
   padding: 12px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.16);
+  border: 1px solid var(--barracks-action);
   border-radius: 12px;
-  background: rgba(8, 10, 15, 0.72);
+  background: var(--barracks-overlay);
 }
 
 .recently-added-search,
@@ -43,9 +43,9 @@
 .recently-added-clear,
 .recently-added-count {
   min-height: 42px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 8px;
-  background: rgba(12, 16, 24, 0.94);
+  background: var(--barracks-overlay);
 }
 
 .recently-added-search {
@@ -53,7 +53,7 @@
   align-items: center;
   gap: 9px;
   padding: 0 12px;
-  color: #bda9d8;
+  color: var(--barracks-text-muted-raised);
 }
 
 .recently-added-search input,
@@ -62,14 +62,14 @@
   min-width: 0;
   border: 0;
   outline: 0;
-  color: #eef4ff;
+  color: var(--barracks-text);
   background: transparent;
   font-size: 13px;
   font-weight: 760;
 }
 
 .recently-added-search input::placeholder {
-  color: #8d9ab0;
+  color: var(--barracks-text-muted-raised);
 }
 
 .recently-added-control {
@@ -90,21 +90,21 @@
   bottom: 10px;
   width: 8px;
   height: 8px;
-  border-right: 2px solid #cbb7e7;
-  border-bottom: 2px solid #cbb7e7;
+  border-right: 2px solid var(--barracks-text-muted-raised);
+  border-bottom: 2px solid var(--barracks-text-muted-raised);
   content: "";
   pointer-events: none;
   transform: rotate(45deg);
 }
 
 .recently-added-control:focus-within {
-  border-color: rgba(var(--primary-light-rgb), 0.68);
-  background: rgba(15, 20, 30, 0.98);
-  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.16);
+  border-color: var(--barracks-action);
+  background: var(--barracks-overlay);
+  box-shadow: 0 0 0 3px var(--barracks-action);
 }
 
 .recently-added-control span {
-  color: #c69df0;
+  color: var(--barracks-action-foreground);
   font-size: 9px;
   font-weight: 950;
   letter-spacing: 0.14em;
@@ -122,14 +122,14 @@
 }
 
 .recently-added-control select option {
-  color: #eef4ff;
-  background-color: #111722;
+  color: var(--barracks-text);
+  background-color: var(--barracks-surface-inset);
   font-weight: 760;
 }
 
 .recently-added-clear {
   padding: 0 16px;
-  color: #f2e8ff;
+  color: var(--barracks-text);
   font-size: 13px;
   font-weight: 850;
   transition:
@@ -139,15 +139,16 @@
 
 .recently-added-clear:hover,
 .recently-added-clear:focus-visible {
-  border-color: rgba(var(--primary-light-rgb), 0.62);
-  background: rgba(var(--primary-rgb), 0.2);
+  border-color: var(--barracks-action);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
 .recently-added-count {
   display: grid;
   place-items: center;
   padding: 0 14px;
-  color: #bdd7ff;
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 900;
   white-space: nowrap;
@@ -162,12 +163,10 @@
 .recent-library-shelf {
   --recent-shelf-gap: 14px;
   padding: 18px 20px 20px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.16);
+  border: 1px solid var(--barracks-action);
   border-radius: 16px;
-  background:
-    linear-gradient(135deg, rgba(var(--primary-light-rgb), 0.1), transparent 34%),
-    rgba(8, 10, 15, 0.82);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  background: var(--barracks-surface-raised);
+  box-shadow: 0 18px 40px var(--barracks-scrim);
   content-visibility: auto;
   contain-intrinsic-size: 310px;
 }
@@ -193,16 +192,16 @@
   width: 42px;
   height: 42px;
   place-items: center;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.42);
+  border: 1px solid var(--barracks-action);
   border-radius: 14px;
-  color: #e38df5;
-  background: rgba(var(--primary-light-rgb), 0.13);
+  color: var(--barracks-action-foreground);
+  background: var(--barracks-surface-interactive);
 }
 
 .recent-library-shelf-title h2 {
   margin: 0;
   overflow: hidden;
-  color: #ffffff;
+  color: var(--barracks-text);
   font-size: clamp(18px, 1.4vw, 24px);
   font-weight: 950;
   line-height: 1.05;
@@ -213,7 +212,7 @@
 .recent-library-shelf-title span {
   display: block;
   margin-top: 4px;
-  color: #9fb0c7;
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 850;
 }
@@ -229,10 +228,10 @@
   width: 40px;
   height: 40px;
   place-items: center;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.34);
+  border: 1px solid var(--barracks-action);
   border-radius: 12px;
-  color: #f5d2ff;
-  background: rgba(var(--primary-light-rgb), 0.15);
+  color: var(--barracks-text);
+  background: var(--barracks-surface-interactive);
   transition:
     border-color 160ms ease,
     background 160ms ease,
@@ -241,8 +240,9 @@
 
 .recent-library-shelf-controls button:hover,
 .recent-library-shelf-controls button:focus-visible {
-  border-color: rgba(var(--primary-light-rgb), 0.82);
-  background: rgba(var(--primary-light-rgb), 0.28);
+  border-color: var(--barracks-action);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
   transform: translateY(-1px);
 }
 
@@ -279,7 +279,7 @@
 .recently-added-page .last-card-banner {
   height: auto;
   aspect-ratio: 2 / 3;
-  background: rgba(255, 255, 255, 0.035);
+  background: var(--barracks-surface-interactive);
 }
 
 .recently-added-page .last-card-banner img {
@@ -311,10 +311,10 @@
   width: 100%;
   min-height: 96px;
   padding: 0 18px;
-  border: 1px dashed rgba(var(--primary-light-rgb), 0.24);
+  border: 1px dashed var(--barracks-action);
   border-radius: 14px;
-  color: #9fb0c7;
-  background: rgba(255, 255, 255, 0.025);
+  color: var(--barracks-text-muted-raised);
+  background: var(--barracks-surface-interactive);
   font-size: 13px;
   font-weight: 850;
 }
@@ -325,17 +325,22 @@
   align-items: center;
   justify-content: center;
   min-height: 220px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.18);
+  border: 1px solid var(--barracks-action);
   border-radius: 16px;
-  color: #d4deef;
-  background: rgba(8, 10, 15, 0.72);
+  color: var(--barracks-text);
+  background: var(--barracks-overlay);
   font-weight: 850;
 }
 
 .recently-added-empty {
   flex-direction: column;
   gap: 12px;
-  color: #aebbd0;
+  color: var(--barracks-text-muted-raised);
+}
+
+.recently-added-error {
+  border-color: var(--barracks-state-danger);
+  color: var(--barracks-state-danger);
 }
 
 @media (max-width: 1400px) {

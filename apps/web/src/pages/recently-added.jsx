@@ -223,7 +223,7 @@ export default function RecentlyAddedPage() {
   }
 
   return (
-    <div className="Home recently-added-page">
+    <div className="Home recently-added-page" data-theme-screen="recently-added">
       <div className="recently-added-page-header">
         <p>Media shelf</p>
         <h1>Recently Added</h1>

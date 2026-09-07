@@ -394,7 +394,7 @@ export function QuickConnectUserWrap({ user, rank }) {
         className="user-wrap-hero"
         style={{
           backgroundImage: heroImageId
-            ? `linear-gradient(90deg, rgba(14, 20, 32, 0.98), rgba(14, 20, 32, 0.72)), url(/proxy/Items/Images/Backdrop?id=${heroImageId}&fillWidth=1800&quality=50)`
+            ? `linear-gradient(90deg, var(--barracks-overlay), var(--barracks-overlay)), url(/proxy/Items/Images/Backdrop?id=${heroImageId}&fillWidth=1800&quality=50)`
             : undefined,
         }}
       >

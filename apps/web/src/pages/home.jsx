@@ -760,7 +760,10 @@ export default function Home({ kioskMode = false }) {
   }, [effectiveAutoRotate, orderedSectionIds.length]);
 
   return (
-    <div className={`Home home-dashboard home-density-${homeSettings.density} home-theme-${homeSettings.theme} ${effectiveAutoRotate ? "is-rotating-home" : ""} ${kioskMode ? "is-kiosk-home" : ""}`}>
+    <div
+      className={`Home home-dashboard home-density-${homeSettings.density} home-theme-${homeSettings.theme} ${effectiveAutoRotate ? "is-rotating-home" : ""} ${kioskMode ? "is-kiosk-home" : ""}`}
+      data-theme-screen={kioskMode ? "kiosk" : "home"}
+    >
       <div className="home-dashboard-backdrop" aria-hidden="true" />
 
       <div className="home-order-toolbar">

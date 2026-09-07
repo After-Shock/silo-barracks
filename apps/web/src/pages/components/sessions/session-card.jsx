@@ -16,7 +16,7 @@ import Tooltip from "@mui/material/Tooltip";
 import IpInfoModal from "../ip-info";
 import { Trans } from "react-i18next";
 import baseUrl from "../../../lib/baseurl";
-import siloIcon from "../../images/silo-icon.png";
+import siloIcon from "../../../../public/brand/barracks-mark.svg";
 
 function publicSiloPoster(value) {
   try {
@@ -99,6 +99,10 @@ function SessionCard(props) {
   const [loadBackdrop, setLoadBackdrop] = useState(false);
   const [sessionModalVisible, setSessionModalVisible] = useState(false);
   const isSilo = session.MediaServerProvider === "silo";
+  const clientLabel = `${session.Client || 'Unknown'} ${session.ApplicationVersion || ''}`.trim();
+  // Additional-server IDs must never navigate into primary-server catalog/users.
+  const LocalLink = ({ to, target, ...rest }) => session.FleetServerId && session.FleetServerId !== 'primary'
+    ? <span {...rest} /> : <Link to={to} target={target} {...rest} />;
   const posterUrl = isSilo ? publicSiloPoster(nowPlaying.SiloPosterUrl)
     : `${baseUrl}/proxy/Items/Images/Primary?id=${encodeURIComponent(mediaItemId)}&fillHeight=420&fillWidth=280&quality=68`;
   const backdropUrl = isSilo ? posterUrl
@@ -111,14 +115,15 @@ function SessionCard(props) {
 
   const cardStyle = {
     backgroundImage: loadBackdrop
-      ? `url(${JSON.stringify(backdropUrl)}), linear-gradient(135deg, var(--primary-color), #0b1119)`
-      : "linear-gradient(135deg, rgba(var(--primary-rgb), 0.28), #0b1119)",
+      ? `url(${JSON.stringify(backdropUrl)})`
+      : "none",
+    backgroundColor: "var(--barracks-surface-inset)",
     backgroundSize: "cover",
   };
 
   const cardBgStyle = {
     backdropFilter: "blur(8px)",
-    backgroundColor: "rgb(0, 0, 0, 0.46)",
+    backgroundColor: "var(--barracks-scrim)",
   };
   const progressPercent = nowPlaying.RunTimeTicks
     ? Math.min(
@@ -195,11 +200,11 @@ function SessionCard(props) {
       aria-label={`Open session details for ${title}`}
     >
       <div className="card-device-image-overlay">
-        <PlatformIcon
+        {isSilo ? <img className="card-device-image" src={siloIcon} alt="Silo" /> : <PlatformIcon
           className="card-device-image"
           client={props.data.session.Client}
           deviceName={props.data.session.DeviceName}
-        />
+        />}
       </div>
       <IpInfoModal show={ipModalVisible} onHide={() => setIPModalVisible(false)} ipAddress={ipAddressLookup} />
       <Modal
@@ -221,7 +226,7 @@ function SessionCard(props) {
           <div
             className="session-popout-hero"
             style={{
-              backgroundImage: `linear-gradient(90deg, rgba(7, 9, 13, 0.96), rgba(7, 9, 13, 0.68), rgba(7, 9, 13, 0.3)), url(${JSON.stringify(backdropUrl)})`,
+              backgroundImage: `linear-gradient(90deg, var(--barracks-overlay), var(--barracks-overlay), var(--barracks-overlay)), url(${JSON.stringify(backdropUrl)})`,
             }}
           >
             <img
@@ -302,7 +307,7 @@ function SessionCard(props) {
                         </Tooltip>
                     </SessionCardDetailRow>
                     <SessionCardDetailRow label={<Trans i18nKey="ACTIVITY_TABLE.CLIENT" />} className="session-details-row-short">
-                        <Tooltip title={props.data.session.Client + " " + props.data.session.ApplicationVersion}>
+                        <Tooltip title={clientLabel}>
                           <span
                             style={{
                               display: "-webkit-box",
@@ -310,7 +315,7 @@ function SessionCard(props) {
                               WebkitLineClamp: 1,
                             }}
                           >
-                            {props.data.session.Client + " " + props.data.session.ApplicationVersion}
+                            {clientLabel}
                           </span>
                         </Tooltip>
                     </SessionCardDetailRow>
@@ -477,11 +482,11 @@ function SessionCard(props) {
           <span className="session-play-state">{props.data.session.PlayState.IsPaused ? <PauseFillIcon /> : <PlayFillIcon />}</span>
           <div className="session-title-copy">
             <Card.Text className="session-title">
-              <Link to={`/libraries/item/${props.data.session.NowPlayingItem.Id}`} target="_blank" className="item-name">
+              <LocalLink to={`/libraries/item/${props.data.session.NowPlayingItem.Id}`} target="_blank" className="item-name">
                 {props.data.session.NowPlayingItem.Type === "Episode" && props.data.session.NowPlayingItem.SeriesName
                   ? props.data.session.NowPlayingItem.SeriesName
                   : props.data.session.NowPlayingItem.Name}
-              </Link>
+              </LocalLink>
             </Card.Text>
             <Card.Text className="session-subtitle">
               {props.data.session.NowPlayingItem.Type === "Episode"
@@ -494,12 +499,12 @@ function SessionCard(props) {
         </Col>
         <Col className="session-card-user">
           <Tooltip title={props.data.session.UserName}>
-            <Link to={`/users/${props.data.session.UserId}`} className="item-name session-user-name">
+            <LocalLink to={`/users/${props.data.session.UserId}`} className="item-name session-user-name">
               {props.data.session.UserName}
               {session.ProfileName && <small> · {session.ProfileName}</small>}
-            </Link>
+            </LocalLink>
           </Tooltip>
-          {props.data.session.UserPrimaryImageTag !== undefined ? (
+          {!isSilo && props.data.session.UserPrimaryImageTag !== undefined ? (
             <img
               className="session-card-user-image"
               src={baseUrl + "/proxy/Users/Images/Primary?id=" + props.data.session.UserId + "&fillWidth=72&quality=55"}

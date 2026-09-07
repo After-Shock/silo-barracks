@@ -3,18 +3,16 @@
   display: flex;
   gap: 16px;
   overflow-x: auto;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02)),
-    rgba(12, 16, 23, 0.78);
+  background: var(--barracks-surface-raised);
   padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.075);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 16px;
-  color: white;
+  color: var(--barracks-text);
   margin-bottom: 20px;
   min-height: 326px;
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.26);
+  box-shadow: 0 18px 60px var(--barracks-scrim);
   scroll-snap-type: x proximity;
-  scrollbar-color: rgba(var(--primary-light-rgb), 0.32) transparent;
+  scrollbar-color: var(--barracks-action) transparent;
 }
 
 .last-played-container::-webkit-scrollbar {
@@ -26,13 +24,13 @@
 }
 
 .last-played-container::-webkit-scrollbar-thumb {
-  background-color: rgba(var(--primary-light-rgb), 0.28);
+  background-color: var(--barracks-action);
   border-radius: 5px; /* round corners */
   width: 5px;
 }
 
 .last-played-container::-webkit-scrollbar-thumb:hover {
-  background-color: #88888883; /* set thumb color */
+  background-color: var(--barracks-text-muted-raised); /* set thumb color */
 }
 
 .last-card {
@@ -41,20 +39,18 @@
   flex: 0 0 154px;
   width: 154px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.075);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
-    rgba(6, 8, 12, 0.92);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+  background: var(--barracks-surface-inset);
+  box-shadow: 0 14px 34px var(--barracks-scrim);
   scroll-snap-align: start;
   transition: transform 170ms ease, border-color 170ms ease, box-shadow 170ms ease;
 }
 
 .last-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(var(--primary-rgb), 0.36);
-  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.36);
+  border-color: var(--barracks-action);
+  box-shadow: 0 20px 44px var(--barracks-scrim);
 }
 
 .episode {
@@ -81,7 +77,7 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  background-color: rgba(90, 45, 165, 0.8);
+  background-color: var(--barracks-accent-secondary);
   padding: 2px;
   border-radius: 8px 0px 0px 0px;
   font-size: 0.9rem;
@@ -107,17 +103,17 @@
 
 .last-item-details a {
   text-decoration: none !important;
-  color: white !important;
+  color: var(--barracks-text) !important;
 }
 
 .last-item-details a:hover {
-  color: var(--secondary-color) !important;
+  color: var(--barracks-accent-secondary) !important;
 }
 
 .last-item-name {
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #f8fafc;
+  color: var(--barracks-text);
   font-size: 14px;
   font-weight: 750;
   line-height: 1.35;
@@ -126,7 +122,7 @@
 .last-item-episode {
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #8b98ad;
+  color: var(--barracks-text-muted-raised);
   font-size: 0.8em;
 }
 
@@ -138,6 +134,6 @@
 .last-last-played {
   font-size: 11px;
   margin-bottom: 5px;
-  color: var(--primary-light-color);
+  color: var(--barracks-action-foreground);
   font-weight: 800;
 }
