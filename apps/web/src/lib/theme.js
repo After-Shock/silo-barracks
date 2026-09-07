@@ -220,8 +220,13 @@ export function resolveTheme(theme) {
   const overlay = mixHex(input.surface, canvas, 0.18);
   const borderSubtle = mixHex(input.surface, text, 0.18);
   const borderStrong = ensureContrast(mixHex(surfaceInteractive, text, 0.42), surfaceInteractive, 3);
+  const textRaised = strongestTextEndpoint(surfaceRaised);
+  const textInset = strongestTextEndpoint(surfaceInset);
+  const textInteractive = strongestTextEndpoint(surfaceInteractive);
+  const textNav = strongestTextEndpoint(nav);
+  const textOverlay = strongestTextEndpoint(overlay);
   const textMuted = closestMixToward(text, canvas);
-  const textMutedRaised = closestMixToward(strongestTextEndpoint(surfaceRaised), surfaceRaised);
+  const textMutedRaised = closestMixToward(textRaised, surfaceRaised);
   const focus = ensureContrast(input.primary, surfaceRaised, 3);
   const { action, actionText } = resolveActionPair(input.primary, surfaceInteractive);
   const actionForeground = ensureContrast(input.primary, canvas, 4.5);
@@ -251,6 +256,11 @@ export function resolveTheme(theme) {
     borderSubtle,
     borderStrong,
     text,
+    textRaised,
+    textInset,
+    textInteractive,
+    textNav,
+    textOverlay,
     textMuted,
     textMutedRaised,
     textInverse,
@@ -376,6 +386,11 @@ const semanticPropertyMap = [
   ["--barracks-border-subtle", "borderSubtle"],
   ["--barracks-border-strong", "borderStrong"],
   ["--barracks-text", "text"],
+  ["--barracks-text-raised", "textRaised"],
+  ["--barracks-text-inset", "textInset"],
+  ["--barracks-text-interactive", "textInteractive"],
+  ["--barracks-text-nav", "textNav"],
+  ["--barracks-text-overlay", "textOverlay"],
   ["--barracks-text-muted", "textMuted"],
   ["--barracks-text-muted-raised", "textMutedRaised"],
   ["--barracks-text-inverse", "textInverse"],

@@ -8,6 +8,11 @@
     --barracks-border-subtle: #48423a;
     --barracks-border-strong: #827d74;
     --barracks-text: #f5f0e7;
+    --barracks-text-raised: #f5f0e7;
+    --barracks-text-inset: #f5f0e7;
+    --barracks-text-interactive: #f5f0e7;
+    --barracks-text-nav: #f5f0e7;
+    --barracks-text-overlay: #f5f0e7;
     --barracks-text-muted: #817e77;
     --barracks-text-muted-raised: #89847b;
     --barracks-text-inverse: #10100f;

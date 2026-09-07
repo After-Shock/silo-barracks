@@ -28,6 +28,11 @@ const SEMANTIC_KEYS = [
   "borderSubtle",
   "borderStrong",
   "text",
+  "textRaised",
+  "textInset",
+  "textInteractive",
+  "textNav",
+  "textOverlay",
   "textMuted",
   "textMutedRaised",
   "textInverse",
@@ -116,6 +121,15 @@ function createEventTarget(log = []) {
 
 function assertAccessibleTokens(tokens) {
   assert.ok(contrastRatio(tokens.text, tokens.canvas) >= 4.5);
+  for (const [textKey, surfaceKey] of [
+    ["textRaised", "surfaceRaised"],
+    ["textInset", "surfaceInset"],
+    ["textInteractive", "surfaceInteractive"],
+    ["textNav", "nav"],
+    ["textOverlay", "overlay"],
+  ]) {
+    assert.ok(contrastRatio(tokens[textKey], tokens[surfaceKey]) >= 4.5, `${textKey} is accessible on ${surfaceKey}`);
+  }
   assert.ok(contrastRatio(tokens.textMuted, tokens.canvas) >= 4.5);
   assert.ok(contrastRatio(tokens.textMutedRaised, tokens.surfaceRaised) >= 4.5);
   assert.ok(contrastRatio(tokens.borderStrong, tokens.surfaceInteractive) >= 3);
@@ -204,6 +218,11 @@ test("resolveTheme derives every semantic token for the default palette", () => 
   assert.equal(tokens.overlay, "#201b13");
   assert.equal(tokens.borderSubtle, "#48423a");
   assert.equal(tokens.text, "#f5f0e7");
+  assert.equal(tokens.textRaised, "#f5f0e7");
+  assert.equal(tokens.textInset, "#f5f0e7");
+  assert.equal(tokens.textInteractive, "#f5f0e7");
+  assert.equal(tokens.textNav, "#f5f0e7");
+  assert.equal(tokens.textOverlay, "#f5f0e7");
   assert.equal(tokens.textMuted, "#817e77");
   assert.equal(tokens.textMutedRaised, "#89847b");
   assert.equal(tokens.textInverse, "#10100f");
@@ -239,6 +258,17 @@ test("resolveTheme preserves the four public inputs and all token relationships"
   assert.equal(tokens.surfaceInset, mixHex(normalized.surface, normalized.background, 0.38));
   assert.equal(tokens.surfaceInteractive, mixHex(normalized.surface, tokens.text, 0.06));
   assert.equal(tokens.overlay, mixHex(normalized.surface, normalized.background, 0.18));
+  for (const [textKey, surfaceKey] of [
+    ["textRaised", "surfaceRaised"],
+    ["textInset", "surfaceInset"],
+    ["textInteractive", "surfaceInteractive"],
+    ["textNav", "nav"],
+    ["textOverlay", "overlay"],
+  ]) {
+    const surface = tokens[surfaceKey];
+    const expected = contrastRatio("#f5f0e7", surface) >= contrastRatio("#10100f", surface) ? "#f5f0e7" : "#10100f";
+    assert.equal(tokens[textKey], expected, `${textKey} uses strongest endpoint for ${surfaceKey}`);
+  }
   assert.equal(tokens.borderSubtle, mixHex(normalized.surface, tokens.text, 0.18));
   assert.equal(tokens.borderStrong, ensureContrast(mixHex(tokens.surfaceInteractive, tokens.text, 0.42), tokens.surfaceInteractive, 3));
   assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3);
@@ -348,18 +378,21 @@ test("resolveTheme chooses accessible action pairs for opposing and deterministi
   const channel = (seed) => ((seed * 73 + 41) % 256).toString(16).padStart(2, "0");
   for (let index = 0; index < 24; index += 1) {
     const canvasTone = index % 2 === 0 ? 16 + ((index * 37) % 48) : 192 + ((index * 37) % 48);
+    const surfaceTone = index % 2 === 0 ? 24 + ((index * 29) % 56) : 200 + ((index * 29) % 48);
     const canvas = canvasTone.toString(16).padStart(2, "0");
+    const surface = surfaceTone.toString(16).padStart(2, "0");
     palettes.push({
       name: `seeded palette ${index}`,
       primary: `#${channel(index + 1)}${channel(index + 11)}${channel(index + 23)}`,
       secondary: `#${channel(index + 31)}${channel(index + 43)}${channel(index + 59)}`,
       background: `#${canvas}${canvas}${canvas}`,
-      surface: `#${channel(index + 101)}${channel(index + 127)}${channel(index + 149)}`,
+      surface: `#${surface}${surface}${surface}`,
     });
   }
 
   for (const palette of palettes) {
     const { tokens } = resolveTheme(palette);
+    assertAccessibleTokens(tokens);
     assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3, `${palette.name}: action contrast`);
     assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5, `${palette.name}: action text contrast`);
     assert.ok(contrastRatio(tokens.actionForeground, tokens.canvas) >= 4.5, `${palette.name}: action foreground contrast`);
@@ -377,6 +410,7 @@ test("resolveTheme gives vivid custom palettes separate readable muted text role
   assert.ok(contrastRatio(tokens.textMuted, tokens.canvas) >= 4.5);
   assert.ok(contrastRatio(tokens.textMutedRaised, tokens.surfaceRaised) >= 4.5);
   assert.notEqual(tokens.textMuted, tokens.textMutedRaised);
+  assertAccessibleTokens(tokens);
 });
 
 test("getStoredTheme validates each persisted field, ignores unknown fields, and falls back on read errors", () => {
@@ -479,6 +513,11 @@ test("applyTheme writes semantic tokens, RGB companions, and legacy aliases as o
     "--barracks-border-subtle": tokens.borderSubtle,
     "--barracks-border-strong": tokens.borderStrong,
     "--barracks-text": tokens.text,
+    "--barracks-text-raised": tokens.textRaised,
+    "--barracks-text-inset": tokens.textInset,
+    "--barracks-text-interactive": tokens.textInteractive,
+    "--barracks-text-nav": tokens.textNav,
+    "--barracks-text-overlay": tokens.textOverlay,
     "--barracks-text-muted": tokens.textMuted,
     "--barracks-text-muted-raised": tokens.textMutedRaised,
     "--barracks-text-inverse": tokens.textInverse,
