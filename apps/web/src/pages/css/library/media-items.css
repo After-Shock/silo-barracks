@@ -43,6 +43,6 @@
 
   .library-items > div>div> .form-control::placeholder
   {
-    color: var(--barracks-text-muted-raised) !important;
+    color: var(--barracks-text-interactive) !important;
 
   }

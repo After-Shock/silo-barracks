@@ -12,7 +12,7 @@
 
 .lib-card:hover {
   transform: translateY(-3px);
-  border-color: var(--barracks-action) !important;
+  border-color: var(--barracks-border-strong) !important;
   box-shadow: 0 30px 70px var(--barracks-scrim);
 }
 
@@ -27,6 +27,7 @@
   height: 210px;
   overflow: hidden;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .library-card-banner,
@@ -35,6 +36,7 @@
   height: 210px;
   object-fit: cover;
   background-color: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
   transition: transform 220ms ease, opacity 220ms ease;
 }
 
@@ -70,9 +72,10 @@
   flex: 0 0 46px;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 14px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
   box-shadow: 0 14px 36px var(--barracks-action);
 }
 
@@ -134,6 +137,7 @@
 .library-card-details {
   padding: 16px !important;
   background: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text-raised);
 }
 
 .library-card-actions {
@@ -180,6 +184,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .library-card-stat-grid > div {
@@ -187,7 +192,18 @@
 }
 
 .library-card-stat-grid span,
-.library-card-readout span,
+.library-card-readout span {
+  display: block;
+  overflow: hidden;
+  color: var(--barracks-text-inset);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .library-card-footer span {
   display: block;
   overflow: hidden;
@@ -271,10 +287,11 @@
   align-items: center;
   justify-content: center;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .form-switch .form-check-input {
-  border-color: var(--barracks-action) !important;
+  border-color: var(--barracks-border-strong) !important;
 }
   
 .form-switch .form-check-input:checked {
@@ -283,11 +300,11 @@
 
 .form-switch .form-check-input:hover {
   box-shadow: none;
-  border-color: var(--barracks-action) !important;
+  border-color: var(--barracks-border-strong) !important;
 }
 
 .form-switch .form-check-input:focus-visible {
-  border-color: var(--barracks-action) !important;
+  border-color: var(--barracks-border-strong) !important;
 }
 
 .library-list-row {
@@ -320,6 +337,7 @@
   overflow: hidden;
   border-radius: 10px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .library-list-image,
@@ -335,9 +353,10 @@
   height: 42px;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 12px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .library-list-title {
@@ -388,6 +407,11 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 10px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
+}
+
+.library-list-stats span {
+  color: var(--barracks-text-inset);
 }
 
 .library-list-stats strong,
@@ -459,8 +483,9 @@
 
 .selector-library-card {
   min-height: 0;
-  border-color: var(--barracks-action) !important;
+  border-color: var(--barracks-border-strong) !important;
   background: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset);
   box-shadow: none;
 }
 
@@ -484,6 +509,7 @@
 
 .selector-library-image .default_library_image-inv {
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .selector-library-overlay {
@@ -516,6 +542,7 @@
   gap: 8px;
   padding: 13px 14px 14px !important;
   background: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text-raised);
 }
 
 .selector-library-card .card-row {

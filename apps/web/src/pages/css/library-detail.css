@@ -28,7 +28,7 @@
   gap: 22px;
   min-height: 138px;
   padding: 26px;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 20px;
   background: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
@@ -82,9 +82,9 @@
   align-items: center;
   gap: 8px;
   margin: 0 !important;
-  border: 1px solid var(--barracks-action) !important;
+  border: 1px solid var(--barracks-border-strong) !important;
   border-radius: 12px !important;
-  color: var(--barracks-text-muted-raised) !important;
+  color: var(--barracks-text-inset) !important;
   background: var(--barracks-surface-inset) !important;
   box-shadow: none;
   font-size: 13px;
@@ -134,9 +134,10 @@
   grid-auto-rows: auto;
   gap: 14px;
   padding: 16px;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 16px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
 }
 
 .library-detail-overview .global-stats {
@@ -153,7 +154,7 @@
 }
 
 .library-detail-overview .stats-header {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 13px;
   font-weight: 900;
 }
@@ -171,7 +172,7 @@
 
 .library-detail-overview .stat-unit {
   align-self: center;
-  color: var(--barracks-text-raised);
+  color: var(--barracks-text-inset);
   font-size: 15px;
   font-weight: 850;
 }
@@ -180,9 +181,10 @@
   height: auto;
   min-height: 440px;
   padding: 20px;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 18px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
 }
 
 .library-detail-overview .genre-container .row {
@@ -226,9 +228,10 @@
 .library-options-panel {
   margin-top: 26px;
   padding: 22px;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 18px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   box-shadow: 0 18px 46px var(--barracks-scrim);
 }
 
@@ -273,11 +276,12 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 14px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .library-option-row strong {
   display: block;
-  color: var(--barracks-text-raised);
+  color: var(--barracks-text-inset);
   font-size: 15px;
   font-weight: 900;
 }
@@ -285,7 +289,7 @@
 .library-option-row span {
   display: block;
   margin-top: 4px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 13px;
   font-weight: 750;
   line-height: 1.35;
@@ -295,7 +299,7 @@
   min-width: 132px;
   border: 0;
   border-radius: 12px;
-  border: 1px solid var(--barracks-state-danger);
+  border: 1px solid var(--barracks-border-strong);
   background: var(--barracks-surface-interactive);
   color: var(--barracks-text-interactive);
   box-shadow: var(--barracks-shadow);
@@ -304,7 +308,7 @@
 
 .library-option-row .btn-danger:hover,
 .library-option-row .btn-danger:focus-visible {
-  border-color: var(--barracks-state-danger);
+  border-color: var(--barracks-border-strong);
   background: var(--barracks-surface-interactive);
   color: var(--barracks-text-interactive);
 }

@@ -87,6 +87,7 @@
     min-height: 184px;
     width: 132px;
     background-color: var(--barracks-surface-inset);
+    color: var(--barracks-text-inset);
   }
 
   .library-banner-image

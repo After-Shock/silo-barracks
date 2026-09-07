@@ -26,6 +26,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 14px;
   background: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .users-title-block {
@@ -67,7 +68,7 @@
 
 .users-eyebrow {
   margin: 0 0 2px;
-  color: var(--barracks-action-foreground);
+  color: var(--barracks-text-inset);
   font-size: 10px;
   font-weight: 950;
   letter-spacing: 0.16em;
@@ -87,6 +88,10 @@
   color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 750;
+}
+
+.users-hero p {
+  color: var(--barracks-text-inset);
 }
 
 .users-primary-action,
@@ -119,6 +124,7 @@
 .users-modal {
   border: 1px solid var(--barracks-border-subtle);
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   box-shadow: 0 22px 58px var(--barracks-scrim);
 }
 
@@ -202,13 +208,14 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .users-view-toggle button {
   border: 0;
   border-right: 1px solid var(--barracks-border-subtle);
   background: transparent;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 13px;
   font-weight: 900;
 }
@@ -231,6 +238,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .users-search svg {
@@ -252,7 +260,7 @@
 .users-page .form-select:focus-visible,
 .users-modal .form-control:focus-visible,
 .users-modal .form-select:focus-visible {
-  border-color: var(--barracks-action) !important;
+  border-color: var(--barracks-border-strong) !important;
 }
 
 .users-search .form-control {
@@ -282,12 +290,14 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 16px;
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   box-shadow: 0 22px 58px var(--barracks-scrim);
 }
 
 .users-profile-card.is-account-card {
-  border-color: var(--barracks-action);
+  border-color: var(--barracks-border-strong);
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
 }
 
 .users-profile-card.is-hidden-user,
@@ -344,6 +354,7 @@
 
 .source-hidden {
   background: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .users-profile-metrics {
@@ -358,6 +369,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .users-profile-metrics small,
@@ -367,7 +379,7 @@
 }
 
 .users-profile-metrics small {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -378,7 +390,7 @@
 
 .users-profile-metrics strong {
   margin-top: 6px;
-  color: var(--barracks-text-raised);
+  color: var(--barracks-text-inset);
   font-size: 14px;
   font-weight: 850;
   line-height: 1.25;
@@ -400,8 +412,9 @@
 }
 
 .users-row-card.is-account-row {
-  border-color: var(--barracks-action);
+  border-color: var(--barracks-border-strong);
   background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
 }
 
 .users-row-person {
@@ -415,7 +428,7 @@
 
 .users-avatar {
   flex: 0 0 auto;
-  border: 2px solid var(--barracks-action);
+  border: 2px solid var(--barracks-border-strong);
   border-radius: 50%;
   object-fit: cover;
   overflow: hidden;
@@ -472,46 +485,59 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .users-row-meta strong {
   display: block;
   overflow: hidden;
-  color: var(--barracks-text-raised);
+  color: var(--barracks-text-inset);
   font-size: 13px;
   font-weight: 850;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.users-row-meta span {
+  color: var(--barracks-text-inset);
+}
+
 .users-role-badge {
   flex: 0 0 auto;
   border-radius: 999px !important;
   padding: 7px 9px !important;
-  color: var(--barracks-text-interactive) !important;
+  color: var(--barracks-text-raised) !important;
   font-size: 11px !important;
   font-weight: 950 !important;
 }
 
 .role-owner,
+.role-admin,
+.role-manager,
+.role-viewer,
+.role-disabled {
+  background: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text-raised) !important;
+}
+
+.role-owner {
+  border: 1px solid var(--barracks-state-live) !important;
+}
+
 .role-admin {
-  border: 1px solid var(--barracks-action) !important;
-  background: var(--barracks-surface-interactive) !important;
+  border: 1px solid var(--barracks-state-warning) !important;
 }
 
 .role-manager {
-  border: 1px solid var(--barracks-chart-1) !important;
-  background: var(--barracks-surface-interactive) !important;
+  border: 1px solid var(--barracks-state-unavailable) !important;
 }
 
 .role-viewer {
   border: 1px solid var(--barracks-state-success) !important;
-  background: var(--barracks-surface-interactive) !important;
 }
 
 .role-disabled {
   border: 1px solid var(--barracks-state-unavailable) !important;
-  background: var(--barracks-surface-inset) !important;
 }
 
 .users-source-badge {
@@ -522,6 +548,12 @@
   font-weight: 950 !important;
 }
 
+.users-source-badge.source-hidden {
+  border-color: var(--barracks-border-strong) !important;
+  background: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset) !important;
+}
+
 .users-row-badges {
   display: flex;
   flex-wrap: wrap;
@@ -530,23 +562,16 @@
   min-width: 0;
 }
 
-.source-jellyfin {
-  border: 1px solid var(--barracks-action) !important;
-  background: var(--barracks-surface-interactive) !important;
-}
-
-.source-local {
-  border: 1px solid var(--barracks-accent-secondary) !important;
-  background: var(--barracks-surface-interactive) !important;
-}
-
+.source-jellyfin,
+.source-local,
 .source-oidc {
-  border: 1px solid var(--barracks-state-success) !important;
+  border: 1px solid var(--barracks-border-strong) !important;
   background: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
 }
 
 .role-chip[class*="role-"] {
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   background: var(--barracks-surface-interactive);
   color: var(--barracks-text-interactive);
 }
@@ -611,15 +636,16 @@
 }
 
 .users-row-action-button.is-danger {
-  border-color: var(--barracks-state-danger) !important;
+  border-color: var(--barracks-border-strong) !important;
   background: var(--barracks-surface-interactive) !important;
   color: var(--barracks-text-interactive) !important;
 }
 
 .users-row-action-button.is-danger:hover,
 .users-row-action-button.is-danger:focus-visible {
-  border-color: var(--barracks-state-danger) !important;
+  border-color: var(--barracks-border-strong) !important;
   background: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
 }
 
 .users-row-card > .form-select,
@@ -642,7 +668,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 11px;
   background: var(--barracks-surface-inset);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-weight: 900;
 }
 
@@ -666,7 +692,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
   background: var(--barracks-surface-inset);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 13px;
   font-weight: 900;
   white-space: nowrap;
@@ -717,7 +743,7 @@
 .local-user-card .btn,
 .users-panel-header .btn,
 .users-modal .btn {
-  border-color: var(--barracks-action) !important;
+  border-color: var(--barracks-border-strong) !important;
   color: var(--barracks-text-raised) !important;
 }
 
@@ -726,13 +752,14 @@
   gap: 7px;
   margin: 10px 0;
   padding: 10px;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 14px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .users-role-selector span {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -754,11 +781,13 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 13px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .users-permission-row.is-enabled {
-  border-color: var(--barracks-state-success);
+  border-color: var(--barracks-border-strong);
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .users-permission-row strong,
@@ -767,14 +796,14 @@
 }
 
 .users-permission-row strong {
-  color: var(--barracks-text-raised);
+  color: var(--barracks-text-inset);
   font-size: 13px;
   font-weight: 950;
 }
 
 .users-permission-row small {
   margin-top: 3px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 11px;
   font-weight: 720;
   line-height: 1.35;
@@ -788,8 +817,9 @@
 .users-permission-row .form-check-input,
 .users-page .form-check-input,
 .users-modal .form-check-input {
-  border-color: var(--barracks-action);
+  border-color: var(--barracks-border-strong);
   background-color: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .users-permission-row .form-check-input:checked,
@@ -806,7 +836,7 @@
 .users-permission-note {
   margin: 10px 0 0;
   padding: 10px;
-  border: 1px dashed var(--barracks-action);
+  border: 1px dashed var(--barracks-border-subtle);
   border-radius: 12px;
   color: var(--barracks-text-muted-raised);
   font-size: 11px;
@@ -842,9 +872,10 @@
 .roles-manager {
   margin-bottom: 10px;
   padding: 10px 14px 10px 10px;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 15px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .users-manager-modal {
@@ -870,11 +901,12 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 14px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .users-modal-topline strong {
   display: block;
-  color: var(--barracks-text-raised);
+  color: var(--barracks-text-inset);
   font-size: 17px;
   font-weight: 950;
 }
@@ -882,7 +914,7 @@
 .users-modal-topline span {
   display: block;
   margin-top: 2px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -896,15 +928,16 @@
   align-items: center;
   margin-bottom: 12px;
   padding: 12px;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 14px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .role-preview-panel strong {
   display: block;
   margin-bottom: 6px;
-  color: var(--barracks-text-raised);
+  color: var(--barracks-text-inset);
   font-size: 13px;
   font-weight: 950;
 }
@@ -925,16 +958,16 @@
   padding: 0 8px;
   border: 1px solid var(--barracks-state-danger);
   border-radius: 10px;
-  background: var(--barracks-surface-interactive);
-  color: var(--barracks-text-interactive);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   font-size: 12px;
   font-weight: 900;
 }
 
 .role-preview-grid span.is-allowed {
   border-color: var(--barracks-state-success);
-  background: var(--barracks-surface-interactive);
-  color: var(--barracks-text-interactive);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
 }
 
 .local-users-modal-list {
@@ -951,14 +984,26 @@
   margin-bottom: 10px;
 }
 
-.roles-manager-header strong,
+.roles-manager-header strong {
+  color: var(--barracks-text-inset);
+  font-size: 15px;
+  font-weight: 950;
+}
+
 .local-section-title strong {
   color: var(--barracks-text-raised);
   font-size: 15px;
   font-weight: 950;
 }
 
-.roles-manager-header span,
+.roles-manager-header span {
+  color: var(--barracks-text-inset);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .local-section-title span {
   color: var(--barracks-text-muted-raised);
   font-size: 11px;
@@ -979,6 +1024,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 13px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .role-permission-title {
@@ -997,7 +1043,7 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  border: 1px solid var(--barracks-state-danger);
+  border: 1px solid var(--barracks-border-strong);
   background: var(--barracks-surface-interactive);
   color: var(--barracks-text-interactive);
 }
@@ -1014,7 +1060,7 @@
   align-items: center;
   min-height: 28px;
   margin: 0;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 11px;
   font-weight: 850;
 }
@@ -1022,8 +1068,9 @@
 .permission-toggle-grid .form-check-input {
   flex: 0 0 auto;
   margin: 0;
-  border-color: var(--barracks-action);
+  border-color: var(--barracks-border-strong);
   background-color: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .permission-toggle-grid .form-check-input:checked {
@@ -1069,7 +1116,7 @@
 .users-empty-state {
   margin-top: 12px;
   padding: 28px;
-  border: 1px dashed var(--barracks-action);
+  border: 1px dashed var(--barracks-border-subtle);
   border-radius: 15px;
   color: var(--barracks-text-muted-raised);
   text-align: center;

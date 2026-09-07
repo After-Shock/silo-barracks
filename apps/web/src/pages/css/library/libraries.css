@@ -62,10 +62,10 @@
 
 .libraries-summary span,
 .libraries-archive-button {
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 999px;
   background: var(--barracks-surface-inset);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 13px;
   font-weight: 800;
 }
@@ -83,7 +83,7 @@
 }
 
 .libraries-archive-button:hover {
-  border-color: var(--barracks-action);
+  border-color: var(--barracks-border-strong);
   background: var(--barracks-surface-interactive);
   color: var(--barracks-text-interactive);
   transform: translateY(-1px);
@@ -111,17 +111,17 @@
 .libraries-scan-message {
   margin: -8px 0 18px;
   padding: 11px 14px;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 13px;
-  background: var(--barracks-surface-inset);
-  color: var(--barracks-text-inset);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   font-size: 13px;
   font-weight: 850;
 }
 
 .libraries-scan-message.is-success {
   border-color: var(--barracks-state-success);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-raised);
 }
 
 .libraries-scan-message.is-error {
@@ -144,15 +144,15 @@
   gap: 10px;
   min-height: 44px;
   padding: 0 13px;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 13px;
   background: var(--barracks-surface-inset);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
 }
 
 .libraries-search svg {
   flex: 0 0 auto;
-  color: var(--barracks-action-foreground);
+  color: var(--barracks-text-inset);
 }
 
 .libraries-search input {
@@ -167,16 +167,17 @@
 }
 
 .libraries-search input::placeholder {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
 }
 
 .libraries-view-toggle {
   display: inline-flex;
   gap: 4px;
   padding: 4px;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 14px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .libraries-view-toggle button {
@@ -188,7 +189,7 @@
   border: 0;
   border-radius: 10px;
   background: transparent;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 13px;
   font-weight: 900;
 }
@@ -201,10 +202,10 @@
 .libraries-empty {
   margin-bottom: 18px;
   padding: 18px;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 14px;
   background: var(--barracks-surface-inset);
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 14px;
   font-weight: 850;
 }
@@ -216,15 +217,16 @@
   gap: 16px;
   margin-bottom: 18px;
   padding: 16px;
-  border: 1px solid var(--barracks-action);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 14px;
   background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .library-display-settings span,
 .library-display-settings small {
   display: block;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 12px;
   font-weight: 800;
 }
