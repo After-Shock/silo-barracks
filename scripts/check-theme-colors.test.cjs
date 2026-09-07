@@ -122,10 +122,45 @@ test("masks comments according to source language without breaking URLs or regex
 const pattern = /https?:\\/\\/cdn\\/red/;
 const colorPattern = /color: #abc/;
 const svgPattern = /fill="#def"/;
+if (ready) /fill="#fed"/.test(value);
 const style = "color: #def";
 `);
     const result = fixture.audit([css, js]);
     assert.deepEqual(values(result), ["#abc", "#def"]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("detects colors in named palette arrays and palette objects without scanning arbitrary data", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/palette.jsx", `
+const colors = ["#abc", "rgb(1, 2, 3)", "ReD"];
+const chartColors = ["#fed"];
+const palette = { primary: "#def", "secondary-color": "hsl(20 30% 40%)", label: "blue" };
+const metadata = { label: "#123", description: "red" };
+const arbitrary = ["#456", "green"];
+`);
+    const result = fixture.audit([source]);
+    assert.deepEqual(values(result), ["#abc", "rgb(1, 2, 3)", "ReD", "#fed", "#def", "hsl(20 30% 40%)"]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("detects quoted and hyphenated CSS-in-JS color keys", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/inline-style.jsx", `
+const style = {
+  "background-color": "#abc",
+  'border-top-color': "rgb(1, 2, 3)",
+  "data-value": "red",
+};
+`);
+    const result = fixture.audit([source]);
+    assert.deepEqual(values(result), ["#abc", "rgb(1, 2, 3)"]);
   } finally {
     fixture.cleanup();
   }
@@ -169,7 +204,11 @@ test("detects literal gradient stops alongside semantic tokens", () => {
   try {
     const source = fixture.write("apps/web/src/gradient.css", ".hero { background: linear-gradient(var(--barracks-action), #fff 20%, rgba(0, 0, 0, .4)); }");
     const result = fixture.audit([source]);
-    assert.deepEqual(values(result), ["#fff", "rgba(0, 0, 0, .4)"]);
+    assert.deepEqual(values(result), [
+      "linear-gradient(var(--barracks-action), #fff 20%, rgba(0, 0, 0, .4))",
+      "#fff",
+      "rgba(0, 0, 0, .4)",
+    ]);
   } finally {
     fixture.cleanup();
   }
@@ -204,6 +243,37 @@ test("enforces gradient token rules independently from literal exceptions and va
       "linear-gradient(var(--brand-start), #fff)",
       "linear-gradient(var(--brand-start), var(--barracks-action))",
     ]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("reports literal-only gradients independently from literal exceptions and approved variables", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/literal-gradient.css", `
+.card { background: linear-gradient(#abc, #def); }
+`);
+    const variables = fixture.write("apps/web/src/pages/css/variables.css", `
+:root { --barracks-shadow: linear-gradient(#123, #456); }
+`);
+    const result = fixture.audit([source, variables], [
+      {
+        path: "apps/web/src/literal-gradient.css",
+        values: ["#abc", "#def"],
+        reason: "Official provider artwork.",
+      },
+      {
+        path: "apps/web/src/pages/css/variables.css",
+        values: ["#123", "#456"],
+        reason: "Official provider artwork.",
+      },
+    ]);
+    assert.deepEqual(values(result), [
+      "linear-gradient(#abc, #def)",
+      "linear-gradient(#123, #456)",
+    ]);
+    assert.ok(colorViolations(result).every((violation) => /gradient.*literal|literal.*gradient/i.test(violation.message)));
   } finally {
     fixture.cleanup();
   }
@@ -469,6 +539,21 @@ test("rejects invalid files entries without falling back to the default scan", (
       assert.deepEqual(result.scannedFiles, []);
       assert.ok(result.violations.some((violation) => violation.kind === "input" && /files entry/i.test(violation.message)));
     }
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("rejects exception paths that do not resolve to scanned in-scope files", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/app.css", ".app { color: #abc; }");
+    const result = fixture.audit([source], [{
+      path: "apps/web/src/missing-provider.css",
+      values: ["#def"],
+      reason: "Official provider artwork.",
+    }]);
+    assert.ok(result.violations.some((violation) => violation.kind === "exception" && /does not resolve|scanned/i.test(violation.message)));
   } finally {
     fixture.cleanup();
   }

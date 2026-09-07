@@ -210,6 +210,23 @@ function looksLikeRegexStart(source, index) {
   let previous = index - 1;
   while (previous >= 0 && /\s/.test(source[previous])) previous -= 1;
   if (previous < 0 || /[=([{!?,:;]/.test(source[previous])) return true;
+  if (source[previous] === ")") {
+    let depth = 0;
+    for (let cursor = previous; cursor >= 0; cursor -= 1) {
+      if (source[cursor] === ")") depth += 1;
+      else if (source[cursor] === "(") {
+        depth -= 1;
+        if (depth === 0) {
+          let end = cursor - 1;
+          while (end >= 0 && /\s/.test(source[end])) end -= 1;
+          let start = end;
+          while (start >= 0 && /[A-Za-z]/.test(source[start])) start -= 1;
+          if (["if", "while", "for", "switch", "catch", "with"].includes(source.slice(start + 1, end + 1))) return true;
+          break;
+        }
+      }
+    }
+  }
   const wordEnd = previous + 1;
   while (previous >= 0 && /[A-Za-z]/.test(source[previous])) previous -= 1;
   const word = source.slice(previous + 1, wordEnd);
@@ -372,7 +389,7 @@ function findDeclarationProperty(source, offset, { lineDelimited = false } = {})
   const segment = source.slice(start + 1, offset);
   const colon = segment.lastIndexOf(":");
   if (colon < 0) return null;
-  const property = segment.slice(0, colon).trim().match(/(?:^|[;,{])\s*([A-Za-z_-][A-Za-z0-9_-]*)\s*$/);
+  const property = segment.slice(0, colon).trim().match(/(?:^|[;,{])\s*["']?([A-Za-z_-][A-Za-z0-9_-]*)["']?\s*$/);
   return property ? property[1] : null;
 }
 
@@ -434,6 +451,51 @@ function isColorProperty(property) {
   return /(?:color|background|border|outline|shadow|fill|stroke|filter|caret|accent|decoration|column-rule|stop-color|flood-color|lighting-color)/i.test(property);
 }
 
+function isPaletteName(name) {
+  return /(?:^|[-_])(color|colors|colour|colours|palette|palettes|swatch|swatches)(?:$|[-_])/.test(name.toLowerCase())
+    || /[a-z](?:Color|Colors|Colour|Colours|Palette|Palettes|Swatch|Swatches)(?:$|[-_]|[A-Z])/.test(name);
+}
+
+function isPaletteKey(name) {
+  return isColorProperty(name)
+    || /^(?:primary|secondary|accent|action|surface|canvas|border|text|status|success|warning|danger|error|muted|focus|shadow|grid|tooltip|chart)(?:$|[-_])/i.test(name || "");
+}
+
+function isPaletteContext(source, offset) {
+  const stack = [];
+  let quote = "";
+  let escaped = false;
+  for (let index = 0; index < offset; index += 1) {
+    const current = source[index];
+    if (quote) {
+      if (escaped) escaped = false;
+      else if (current === "\\") escaped = true;
+      else if (current === quote) quote = "";
+      continue;
+    }
+    if (current === "'" || current === '"' || current === "`") {
+      quote = current;
+    } else if (current === "[" || current === "{" || current === "(") {
+      stack.push({ current, index });
+    } else if ((current === "]" && stack.at(-1)?.current === "[")
+      || (current === "}" && stack.at(-1)?.current === "{")
+      || (current === ")" && stack.at(-1)?.current === "(")) {
+      stack.pop();
+    }
+  }
+  for (let stackIndex = stack.length - 1; stackIndex >= 0; stackIndex -= 1) {
+    const context = stack[stackIndex];
+    if (context.current !== "[" && context.current !== "{") continue;
+    const before = source.slice(Math.max(0, context.index - 160), context.index);
+    const declaration = before.match(/(?:const|let|var)\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*=\s*$/)
+      || before.match(/(?:^|[,;{])\s*["']?([A-Za-z_$][A-Za-z0-9_$-]*)["']?\s*:\s*$/);
+    if (declaration && isPaletteName(declaration[1])) {
+      if (context.current === "[" || isPaletteKey(findDeclarationProperty(source, offset, { lineDelimited: true }))) return true;
+    }
+  }
+  return false;
+}
+
 function isColorContext(source, original, start, extension, contextRequired = true) {
   if (!contextRequired) return true;
   if (isInsideFunction(source, start, "url")) {
@@ -444,6 +506,7 @@ function isColorContext(source, original, start, extension, contextRequired = tr
     if (isInsideQuotedString(source, start) && !isColorProperty(declaration) && !declaration?.startsWith("--")) return false;
     return Boolean(declaration);
   }
+  if (isPaletteContext(source, start)) return true;
   if (declaration && isColorProperty(declaration)) return true;
   const before = source.slice(Math.max(0, start - 120), start);
   const embeddedProperty = before.match(/([A-Za-z_-][A-Za-z0-9_-]*)\s*:\s*$/);
@@ -505,6 +568,7 @@ function normalizeExceptions(input) {
     };
   }
   const allowed = new Set();
+  const references = [];
   entries.forEach((entry, index) => {
     const file = normalizeExceptionPath(entry && (entry.file ?? entry.path));
     const rawValues = entry && (entry.values ?? entry.value ?? entry.literal);
@@ -536,9 +600,10 @@ function normalizeExceptions(input) {
       violations.push({ kind: "exception", file: "<exceptions>", line: index + 1, column: 1, value: "", message: `Exception ${index + 1} must include a nonempty reason or purpose.` });
       return;
     }
+    references.push({ file, index });
     for (const value of values) allowed.add(`${file}\u0000${value.toLowerCase()}`);
   });
-  return { allowed, violations };
+  return { allowed, violations, references };
 }
 
 function addColorOccurrence(occurrences, source, start, end) {
@@ -659,9 +724,11 @@ function scanGradientViolations(source, extension) {
     const end = findBalancedFunctionEnd(masked, next);
     const body = masked.slice(next + 1, end);
     const variables = [...body.matchAll(/var\s*\(\s*(--[A-Za-z0-9_-]+)/gi)].map((match) => match[1]);
-    if (variables.length
-      && variables.some((variable) => !variable.toLowerCase().startsWith("--barracks-"))
-      && isColorContext(masked, source, index, extension)) {
+    const bodySource = source.slice(next + 1, end);
+    const literalStops = scanColors(bodySource, extension, { contextRequired: false }).length > 0
+      || variableFallbackOccurrences(bodySource, body, extension, next + 1).length > 0;
+    const nonBarracksVariable = variables.some((variable) => !variable.toLowerCase().startsWith("--barracks-"));
+    if ((literalStops || nonBarracksVariable) && isColorContext(masked, source, index, extension)) {
       occurrences.push({ start: index, end, value: source.slice(index, end + 1), isGradient: true });
     }
     index = end;
@@ -708,6 +775,19 @@ function auditSources({ root = process.cwd(), files, exceptions } = {}) {
   const normalizedExceptions = normalizeExceptions(exceptionInput);
   const violations = [...collected.errors, ...normalizedExceptions.violations];
   const scannedFiles = sourceEntries.map(([relative]) => relative);
+  const scannedFileSet = new Set(scannedFiles);
+  for (const reference of normalizedExceptions.references || []) {
+    if (!scannedFileSet.has(reference.file)) {
+      violations.push({
+        kind: "exception",
+        file: "<exceptions>",
+        line: reference.index + 1,
+        column: 1,
+        value: reference.file,
+        message: `Exception ${reference.index + 1} references ${reference.file}, which does not resolve to an in-scope scanned source file.`,
+      });
+    }
+  }
   for (const [relative, file] of sourceEntries) {
     const source = fs.readFileSync(file, "utf8");
     const extension = path.extname(file).toLowerCase();
@@ -727,7 +807,9 @@ function auditSources({ root = process.cwd(), files, exceptions } = {}) {
         column: position.column,
         value: occurrence.value,
         property,
-        message: variablesFile
+        message: occurrence.isGradient
+          ? `Gradient ${occurrence.value} contains literal color stops or non-Barracks variables; use only --barracks-* semantic tokens.`
+          : variablesFile
           ? `Color literal ${occurrence.value} is not allowed in variables.css declaration ${property || "<unknown>"}; use an approved semantic token declaration.`
           : `Color literal ${occurrence.value} is not allowed; use a --barracks-* semantic token or an approved exact exception.`,
       });
