@@ -69,7 +69,7 @@ a plain object of CSS color strings keyed by the following stable contract, then
 | `surfaceInteractive` | `--barracks-surface-interactive` | Inputs/menus/hover targets |
 | `overlay` | `--barracks-overlay` | Popovers/tooltips |
 | `borderSubtle`, `borderStrong` | `--barracks-border-subtle`, `--barracks-border-strong` | Boundaries |
-| `text`, `textMuted`, `textInverse` | `--barracks-text`, `--barracks-text-muted`, `--barracks-text-inverse` | Typography |
+| `text`, `textMuted`, `textMutedRaised`, `textInverse` | `--barracks-text`, `--barracks-text-muted`, `--barracks-text-muted-raised`, `--barracks-text-inverse` | Canvas, muted-canvas, muted-raised, and inverse typography |
 | `focus`, `focusLight`, `focusDark`, `action`, `accentSecondary` | `--barracks-focus`, `--barracks-focus-light`, `--barracks-focus-dark`, `--barracks-action`, `--barracks-accent-secondary` | Keyboard focus/actions/theme personality |
 | `live`, `success`, `warning`, `danger`, `unavailable` | matching `--barracks-state-*` properties | Status semantics |
 | `chartGrid`, `chartTooltip` | matching `--barracks-chart-*` properties | Chart structure |
@@ -109,13 +109,20 @@ visible 3:1 boundary even for degenerate custom palettes with opposing canvas
 and surface colors.
 
 For each background/surface, the resolver chooses the higher-contrast of warm
-light `#f5f0e7` and near-black `#10100f` for normal text. Muted text is mixed
-toward the background only until it still meets 4.5:1. Action/state text chooses
-black or white based on the same WCAG relative-luminance calculation. If a custom
-foreground role cannot meet 4.5:1, the resolver substitutes the higher-contrast
-choice. Thus arbitrary valid custom inputs remain accepted without making normal
-text unreadable. Missing or malformed fields fall back individually to the
-corresponding default input. Theme application is atomic from the UI's
+light `#f5f0e7` and near-black `#10100f` for normal text. Because arbitrary
+canvas and raised-surface inputs can make one shared muted color mathematically
+incapable of reaching 4.5:1 on both, muted typography has two roles:
+`textMuted` is mixed toward `canvas` only until it still meets 4.5:1 there, and
+`textMutedRaised` is independently chosen and mixed toward `surfaceRaised` only
+until it still meets 4.5:1 there. Canvas/nav contexts use the former; cards,
+dialogs, menus, and other raised surfaces use the latter. The legacy
+`--muted-text-color` alias remains mapped to `textMuted` during migration.
+Action/state text chooses black or white based on the same WCAG
+relative-luminance calculation. If a custom foreground role cannot meet 4.5:1,
+the resolver substitutes the higher-contrast choice for that role's associated
+surface. Thus arbitrary valid custom inputs remain accepted without making
+normal text unreadable. Missing or malformed fields fall back individually to
+the corresponding default input. Theme application is atomic from the UI's
 perspective: all properties are calculated before any are written to the root.
 
 ### 2. Framework compatibility layer

@@ -55,7 +55,7 @@ All RGB mixing uses `round(a * (1 - weight) + b * weight)` per channel.
 - `overlay = mix(surface, background, 0.18)`.
 - `borderSubtle = mix(surface, text, 0.18)` and is decorative only.
 - `borderStrong` begins at `mix(surfaceInteractive, text, 0.42)` and is adjusted toward warm light or near-black until it reaches 3:1 against `surfaceInteractive`.
-- `text` is whichever of `#f5f0e7` or `#10100f` has greater contrast against `canvas`; `textMuted` is the closest mix toward `canvas` that still reaches 4.5:1 on both `canvas` and `surfaceRaised`; `textInverse` is the opposite text endpoint.
+- `text` is whichever of `#f5f0e7` or `#10100f` has greater contrast against `canvas`; `textMuted` is the closest mix toward `canvas` that still reaches 4.5:1 there. `textMutedRaised` independently starts from the higher-contrast text endpoint for `surfaceRaised` and is the closest mix toward `surfaceRaised` that still reaches 4.5:1 there. `textInverse` is the opposite canvas text endpoint. Canvas/nav contexts use `textMuted`; cards/dialogs/menus and other raised surfaces use `textMutedRaised`.
 - `accentSecondary = secondary`; expose comma-separated RGB companions for `action`, `accentSecondary`, and `surfaceRaised`.
 - `focus = ensureContrast(primary, surfaceRaised, 3)`, with `focusLight = #f5f0e7` and `focusDark = #10100f`; focus CSS always renders all three rings.
 - `action = ensureContrast(primary, surfaceInteractive, 3)`.
@@ -74,7 +74,7 @@ All RGB mixing uses `round(a * (1 - weight) + b * weight)` per channel.
 
 - [ ] **Step 1: Write failing resolver tests**
 
-Add table-driven Node tests for default values, per-field malformed fallback, all semantic keys, RGB mixing coefficients, and `contrastRatio()` results. Include separate degenerate palettes where primary equals background while the other inputs differ, all inputs match, and background/surface are `#000000`/`#ffffff` opposites. Assert muted text against both canvas and raised surface, all six chart series against inset, strong border against interactive, all state colors against raised, and that the three focus-ring tokens remain the primary/accessible light/dark combination.
+Add table-driven Node tests for default values, per-field malformed fallback, all semantic keys, RGB mixing coefficients, and `contrastRatio()` results. Include separate degenerate palettes where primary equals background while the other inputs differ, all inputs match, and background/surface are `#000000`/`#ffffff` opposites. Assert `textMuted` against canvas and `textMutedRaised` against raised surface, including a vivid palette where no single color can meet 4.5:1 on both; assert all six chart series against inset, strong border against interactive, all state colors against raised, and that the three focus-ring tokens remain the primary/accessible light/dark combination.
 
 ```js
 test('resolveTheme keeps meaningful UI contrast for degenerate custom colors', () => {
@@ -165,7 +165,7 @@ Update `variables.css` with every `--barracks-*` property and map old properties
 }
 ```
 
-Declare every semantic property in the spec table plus all three RGB companions before aliases. The required alias map is: primary color/RGB → action; primary light color/RGB → `mix(action, focusLight, 0.42)`; primary dark → `mix(action, focusDark, 0.28)`; secondary color/RGB → accentSecondary; background → canvas; secondary background → raised; tertiary background → interactive; surface color → raised RGB at 86% alpha; surface border → borderSubtle; text → text; muted text → textMuted; subtle text → unavailable. Tests assert every semantic property, RGB companion, and alias, including comma-separated RGB formats.
+Declare every semantic property in the spec table, including `--barracks-text-muted-raised`, plus all three RGB companions before aliases. The required alias map is: primary color/RGB → action; primary light color/RGB → `mix(action, focusLight, 0.42)`; primary dark → `mix(action, focusDark, 0.28)`; secondary color/RGB → accentSecondary; background → canvas; secondary background → raised; tertiary background → interactive; surface color → raised RGB at 86% alpha; surface border → borderSubtle; text → text; muted text → textMuted; subtle text → unavailable. Tests assert every semantic property, RGB companion, and alias, including comma-separated RGB formats.
 
 - [ ] **Step 5: Run focused tests and build**
 
