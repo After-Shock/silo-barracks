@@ -49,11 +49,11 @@ function formatTotalWatchTime(seconds) {
 }
 
 const colors = {
-  primary: "#d78df0",
-  secondary: "#00c8ff",
-  backgroundColor: "#070a10",
-  secondaryBackgroundColor: "#0b1018",
-  tertiaryBackgroundColor: "#101620",
+  primary: "var(--barracks-action)",
+  secondary: "var(--barracks-accent-secondary)",
+  backgroundColor: "var(--barracks-canvas)",
+  secondaryBackgroundColor: "var(--barracks-surface-raised)",
+  tertiaryBackgroundColor: "var(--barracks-surface-interactive)",
 };
 const token = localStorage.getItem("token");
 const activityColumnVisibilityKey = "PREF_ACTIVITY_ColumnVisibility";
@@ -147,8 +147,8 @@ export default function ActivityTable(props) {
   const [themeTick, setThemeTick] = React.useState(0);
   const muiColors = useMemo(
     () => ({
-      primary: getCssVariableColor("--primary-light-color", colors.primary),
-      secondary: getCssVariableColor("--secondary-color", colors.secondary),
+      primary: getCssVariableColor("--barracks-action", colors.primary),
+      secondary: getCssVariableColor("--barracks-accent-secondary", colors.secondary),
       tertiaryBackgroundColor: colors.tertiaryBackgroundColor,
     }),
     [themeTick]
@@ -541,7 +541,7 @@ export default function ActivityTable(props) {
       return <span className="activity-table-toolbar-title">Activity view</span>;
     },
     renderEmptyRowsFallback: () => (
-      <span style={{ textAlign: "center", fontStyle: "italic", color: "grey" }} className="py-5">
+      <span style={{ textAlign: "center", fontStyle: "italic", color: "var(--barracks-text-muted-raised)" }} className="py-5">
         <Trans i18nKey="ERROR_MESSAGES.NO_ACTIVITY" />
       </span>
     ),
@@ -549,10 +549,10 @@ export default function ActivityTable(props) {
       sx: {
         backgroundColor: "transparent",
         "&:nth-of-type(odd) .MuiTableCell-body": {
-          backgroundColor: "rgba(10, 13, 18, 0.92)",
+          backgroundColor: "var(--barracks-surface-raised)",
         },
         "&:nth-of-type(even) .MuiTableCell-body": {
-          backgroundColor: "rgba(13, 17, 23, 0.92)",
+          backgroundColor: "var(--barracks-surface-inset)",
         },
         "& .MuiTableCell-body:first-of-type": {
           borderTopLeftRadius: "0",
@@ -563,7 +563,7 @@ export default function ActivityTable(props) {
           borderBottomRightRadius: "0",
         },
         "&:hover .MuiTableCell-body": {
-          backgroundColor: "rgba(24, 30, 39, 0.96)",
+          backgroundColor: "var(--barracks-surface-interactive)",
         },
         "&:hover .MuiCheckbox-root": {
           opacity: 1,
@@ -611,8 +611,8 @@ export default function ActivityTable(props) {
     paginationDisplayMode: "pages",
     muiTableBodyCellProps: {
       sx: {
-        borderBottom: "1px solid rgba(255, 255, 255, 0.045)",
-        color: "#d9e2ee",
+        borderBottom: "1px solid var(--barracks-border-raised)",
+        color: "var(--barracks-text-raised)",
         fontSize: "13px",
         fontWeight: 560,
         lineHeight: 1.35,
@@ -621,9 +621,9 @@ export default function ActivityTable(props) {
     },
     muiTableHeadCellProps: {
       sx: {
-        backgroundColor: "rgba(8, 11, 16, 0.98)",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-        color: "#9ca8b8",
+        backgroundColor: "var(--barracks-surface-inset)",
+        borderBottom: "1px solid var(--barracks-border-inset)",
+        color: "var(--barracks-text-inset)",
         fontSize: "11px",
         fontWeight: 680,
         letterSpacing: "0.04em",
@@ -636,17 +636,17 @@ export default function ActivityTable(props) {
       elevation: 0,
       sx: {
         overflow: "hidden",
-        border: "1px solid rgba(255, 255, 255, 0.1)",
+        border: "1px solid var(--barracks-border-raised)",
         borderRadius: "8px",
-        background: "rgba(9, 12, 17, 0.96)",
-        boxShadow: "0 12px 30px rgba(0, 0, 0, 0.18)",
+        background: "var(--barracks-surface-raised)",
+        boxShadow: "var(--barracks-shadow)",
       },
     },
     muiTopToolbarProps: {
       sx: {
         minHeight: "48px",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-        background: "rgba(8, 11, 16, 0.98)",
+        borderBottom: "1px solid var(--barracks-border-inset)",
+        background: "var(--barracks-surface-inset)",
       },
     },
     muiTableContainerProps: {
@@ -668,7 +668,7 @@ export default function ActivityTable(props) {
     },
 
     mrtTheme: () => ({
-      baseBackgroundColor: "#070a10",
+      baseBackgroundColor: colors.secondaryBackgroundColor,
     }),
   });
   const theme = useMemo(

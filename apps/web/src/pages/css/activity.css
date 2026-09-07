@@ -1,19 +1,23 @@
 .Activity {
   position: relative;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  max-width: 100%;
   gap: 14px;
   min-width: 0;
   padding: 18px clamp(14px, 1.6vw, 24px) 32px;
-  color: #f8fafc;
+  color: var(--barracks-text);
 }
 
 .activity-sessions-panel {
   margin-bottom: 26px;
   padding: 24px;
-  border: 1px solid var(--surface-border-color);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 8px;
-  background: rgba(17, 22, 30, 0.82);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+  box-shadow: var(--barracks-shadow);
 }
 
 .activity-sessions-panel > div > h1,
@@ -31,7 +35,7 @@
 
 .activity-page-header p {
   margin: 0 0 6px;
-  color: #9da8b8;
+  color: var(--barracks-text-muted);
   font-size: 12px;
   font-weight: 680;
   letter-spacing: 0.08em;
@@ -40,7 +44,7 @@
 
 .activity-page-header h1 {
   margin: 0 !important;
-  color: #fff;
+  color: var(--barracks-text);
   font-size: clamp(32px, 3.2vw, 46px);
   font-weight: 760;
   line-height: 1.05;
@@ -49,7 +53,7 @@
 .activity-page-header > div:first-child > span {
   display: block;
   margin-top: 10px;
-  color: #aab8cc;
+  color: var(--barracks-text-muted);
   font-size: 14px;
   font-weight: 560;
 }
@@ -70,19 +74,20 @@
 }
 
 .activity-control-button {
-  border: 1px solid var(--surface-border-color) !important;
+  border: 1px solid var(--barracks-border-strong) !important;
   border-radius: 8px !important;
   padding: 0 16px !important;
-  color: #fff !important;
-  background: rgba(255, 255, 255, 0.045) !important;
+  color: var(--barracks-text-interactive) !important;
+  background: var(--barracks-surface-interactive) !important;
   font-weight: 680 !important;
   box-shadow: none;
 }
 
 .activity-control-button:hover,
 .activity-control-button:focus {
-  border-color: rgba(var(--primary-light-rgb), 0.38) !important;
-  background: rgba(var(--primary-rgb), 0.18) !important;
+  border-color: var(--barracks-action) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .activity-control-field {
@@ -90,9 +95,10 @@
   grid-template-columns: auto minmax(110px, 1fr);
   overflow: hidden;
   align-items: stretch;
-  border: 1px solid var(--surface-border-color);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 8px;
-  background: rgba(10, 14, 20, 0.88);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .activity-control-field.is-compact {
@@ -103,8 +109,8 @@
   display: inline-flex;
   align-items: center;
   padding: 0 12px;
-  color: #c9d2df;
-  background: rgba(255, 255, 255, 0.045);
+  color: var(--barracks-text-raised);
+  background: var(--barracks-surface-raised);
   font-size: 12px;
   font-weight: 680;
   letter-spacing: 0.04em;
@@ -113,8 +119,8 @@
 .activity-control-field select,
 .activity-search-input {
   border: 0 !important;
-  color: #f8fafc !important;
-  background-color: rgba(6, 9, 14, 0.92) !important;
+  color: var(--barracks-text-interactive) !important;
+  background-color: var(--barracks-surface-interactive) !important;
   box-shadow: none !important;
 }
 
@@ -126,21 +132,23 @@
 
 .activity-search-input {
   width: min(220px, 100%) !important;
-  border: 1px solid var(--surface-border-color) !important;
+  border: 1px solid var(--barracks-border-strong) !important;
   border-radius: 8px !important;
   padding: 0 14px !important;
 }
 
 .activity-search-input::placeholder {
-  color: rgba(222, 232, 246, 0.68) !important;
+  color: var(--barracks-text-interactive) !important;
 }
 
 .activity-table-shell {
+  padding: 0;
+  overflow: hidden;
   border-radius: 8px;
 }
 
 .library-filter-modal {
-  color: #eef4ff;
+  color: var(--barracks-text-overlay);
 }
 
 .library-filter-modal .form-check {
@@ -157,14 +165,14 @@
 }
 
 .library-filter-modal .form-check-label {
-  color: #dbe6f7 !important;
+  color: var(--barracks-text-interactive) !important;
   font-size: 14px;
   font-weight: 650;
   line-height: 1.35;
 }
 
 .library-filter-modal .form-check-input:not(:checked) + .form-check-label {
-  color: #aebbd0 !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 @media (max-width: 1100px) {

@@ -1,56 +1,185 @@
 @import "../variables.css";
 
-.Heading {
+.watch-stats {
+  display: grid;
+  min-width: 0;
+  gap: 24px;
+  padding: 18px clamp(14px, 1.6vw, 24px) 32px;
+  color: var(--barracks-text);
+}
+
+.watch-stats > .Heading {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  @media (max-width: 576px) {
-    h1 {
-      width: 100%;
-      padding-bottom: 1rem;
-    }
-    * {
-      flex-grow: 1;
-    }
-  }
+  gap: 16px;
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: 12px;
+  padding: 18px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+  box-shadow: var(--barracks-shadow);
 }
-.activity-card {
+
+.watch-stats > .Heading h1 {
+  margin: 0;
+  color: var(--barracks-text-raised);
+}
+
+.watch-stats .user-selection,
+.watch-stats .library-selection {
+  min-width: 0;
+}
+
+.watch-stats .bg-primary-1 {
+  border: 1px solid var(--barracks-border-inset);
+  background: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset);
+}
+
+.watch-stats :is(.form-select, .btn) {
+  min-height: 42px;
+}
+
+.watch-stats .MuiTimeline-root {
+  min-width: 0;
+  margin: 0;
+  padding: 12px 0;
+}
+
+.watch-stats .MuiTimelineItem-root {
+  min-height: 20rem;
+  color: var(--barracks-text);
+}
+
+.watch-stats .MuiTimelineConnector-root {
+  width: 3px;
+  background: var(--barracks-border-canvas);
+}
+
+.watch-stats .MuiTimelineDot-root {
+  border-color: var(--barracks-action);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+}
+
+.watch-stats .MuiTimelineContent-root {
+  align-self: center;
+  min-width: 0;
+}
+
+.watch-stats .activity-card {
   display: flex;
   width: 10rem;
-  * {
-    flex-grow: 1;
-    border-radius: var(--bs-border-radius-lg) !important;
-  }
-  .activity-card-img {
-    object-fit: cover;
-    background-color: black;
-    background-repeat: no-repeat;
-    background-size: cover;
-    transition: all 0.2s ease-in-out;
-  }
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: var(--bs-border-radius-lg);
+  background: var(--barracks-surface-raised);
+  box-shadow: var(--barracks-shadow);
 }
 
-.MuiTimelineItem-root {
-  height: 20rem;
-  @media (max-width: 576px) {
-    height: 25rem;
-    ::before {
-      padding: 0;
-      flex: 0;
-    }
-    .MuiTimelineSeparator-root {
-      flex: 1;
-    }
-    .MuiTimelineOppositeContent-root {
-      display: none;
-    }
-    .activity-description {
-      max-width: 50%;
-      padding: 0.5rem 0;
-      text-align: center;
-    }
-  }
+.watch-stats .activity-card > * {
+  flex-grow: 1;
+  min-width: 0;
+  border-radius: inherit !important;
 }
 
-.MuiTimelineContent-root {
-  align-self: center;
+.watch-stats .activity-card a {
+  display: block;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
+}
+
+.watch-stats .activity-card-img,
+.watch-stats .default_library_image {
+  display: block;
+  width: 100%;
+  height: 15rem;
+  object-fit: cover;
+  background-color: var(--barracks-surface-inset);
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: var(--barracks-text-inset);
+  transition: transform 0.2s ease-in-out;
+}
+
+.watch-stats .activity-card a:hover .activity-card-img {
+  transform: scale(1.025);
+}
+
+.watch-stats .activity-description {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: 10px;
+  padding: 14px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+  box-shadow: var(--barracks-shadow);
+}
+
+.watch-stats .activity-description .MuiTypography-root {
+  color: var(--barracks-text-muted-raised);
+  overflow-wrap: anywhere;
+}
+
+.watch-stats .activity-description .MuiTypography-h6 {
+  color: var(--barracks-text-raised);
+  font-weight: 760;
+}
+
+@media (max-width: 576px) {
+  .watch-stats {
+    gap: 16px;
+  }
+
+  .watch-stats > .Heading {
+    align-items: stretch;
+    padding: 14px;
+  }
+
+  .watch-stats > .Heading h1 {
+    width: 100%;
+  }
+
+  .watch-stats > .Heading > *,
+  .watch-stats .user-selection,
+  .watch-stats .library-selection,
+  .watch-stats .user-selection > div,
+  .watch-stats .library-selection .btn {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+
+  .watch-stats .MuiTimelineItem-root {
+    min-height: 25rem;
+  }
+
+  .watch-stats .MuiTimelineItem-root::before {
+    flex: 0;
+    padding: 0;
+  }
+
+  .watch-stats .MuiTimelineSeparator-root {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .watch-stats .MuiTimelineOppositeContent-root {
+    display: none;
+  }
+
+  .watch-stats .activity-card {
+    width: min(10rem, 100%);
+  }
+
+  .watch-stats .activity-description {
+    width: min(16rem, 100%);
+    max-width: 100%;
+    padding: 10px;
+    text-align: center;
+  }
 }

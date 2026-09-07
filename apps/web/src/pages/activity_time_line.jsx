@@ -126,7 +126,7 @@ function ActivityTimeline(props) {
   }, [config]);
 
   return timelineReady ? (
-    <div className="watch-stats">
+    <div className="watch-stats" data-theme-screen={preselectedUser ? undefined : "timeline"}>
       <div className="Heading">
         <h1>
           <Trans i18nKey={"TIMELINE_PAGE.TIMELINE"} />
@@ -204,7 +204,7 @@ function ActivityTimeline(props) {
       </div>
     </div>
   ) : (
-    <Loading />
+    <div data-theme-screen={preselectedUser ? undefined : "timeline"} aria-busy="true"><Loading /></div>
   );
 }
 

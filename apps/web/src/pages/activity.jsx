@@ -279,12 +279,12 @@ function Activity() {
   }, [config, itemCount, currentPage, debouncedSearchQuery, sorting, filterParams, libraries.length, libraryFilters, allLibrariesSelected, streamTypeFilter]);
 
   if (!data) {
-    return <Loading />;
+    return <div data-theme-screen="activity" aria-busy="true"><Loading /></div>;
   }
 
   if (data.length === 0) {
     return (
-      <div className="Activity">
+      <div className="Activity" data-theme-screen="activity">
         <div className="Heading">
           <h1>
             <Trans i18nKey="MENU_TABS.ACTIVITY" />
@@ -300,7 +300,7 @@ function Activity() {
   }
 
   return (
-    <div className="Activity">
+    <div className="Activity" data-theme-screen="activity">
       <Modal show={showLibraryFilters} onHide={() => setShowLibraryFilters(false)}>
         <Modal.Header>
           <Modal.Title>

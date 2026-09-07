@@ -46,8 +46,8 @@ function formatEntryDates(FirstActivityDate, LastActivityDate, MediaType) {
 }
 const DefaultImage = (props) => {
   const { MediaType } = props;
-  const SeriesIcon = <TvLineIcon size={"50%"} color="white" />;
-  const MovieIcon = <FilmLineIcon size={"50%"} color="white" />;
+  const SeriesIcon = <TvLineIcon size={"50%"} color="var(--barracks-text-inset)" />;
+  const MovieIcon = <FilmLineIcon size={"50%"} color="var(--barracks-text-inset)" />;
   return (
     <div className="default_library_image default_library_image_hover d-flex justify-content-center align-items-center">
       {MediaType === MEDIA_TYPES.Shows ? SeriesIcon : MovieIcon}
