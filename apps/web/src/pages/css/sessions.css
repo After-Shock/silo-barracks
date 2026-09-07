@@ -505,10 +505,14 @@
 
 .session-popout-status .is-playing {
   border-color: var(--barracks-state-live);
-  color: var(--barracks-text);
+  color: var(--barracks-state-live);
 }
 
-.session-popout-status .is-paused,
+.session-popout-status .is-paused {
+  border-color: var(--barracks-state-warning);
+  color: var(--barracks-state-warning);
+}
+
 .session-popout-status .is-transcoding {
   border-color: var(--barracks-action);
   color: var(--barracks-action-foreground);
@@ -541,7 +545,7 @@
   height: 100%;
   min-width: 4px;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--barracks-action), var(--barracks-action-foreground));
+  background: var(--barracks-action);
   box-shadow: 0 0 20px var(--barracks-action);
 }
 

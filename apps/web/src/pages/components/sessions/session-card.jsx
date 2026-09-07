@@ -16,7 +16,7 @@ import Tooltip from "@mui/material/Tooltip";
 import IpInfoModal from "../ip-info";
 import { Trans } from "react-i18next";
 import baseUrl from "../../../lib/baseurl";
-import siloIcon from "../../../../public/brand/barracks-mark.svg";
+import siloIcon from "../../images/silo-icon.png";
 
 function publicSiloPoster(value) {
   try {
