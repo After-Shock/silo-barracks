@@ -70,7 +70,7 @@ a plain object of CSS color strings keyed by the following stable contract, then
 | `overlay` | `--barracks-overlay` | Popovers/tooltips |
 | `borderSubtle`, `borderStrong` | `--barracks-border-subtle`, `--barracks-border-strong` | Boundaries |
 | `text`, `textMuted`, `textMutedRaised`, `textInverse` | `--barracks-text`, `--barracks-text-muted`, `--barracks-text-muted-raised`, `--barracks-text-inverse` | Canvas, muted-canvas, muted-raised, and inverse typography |
-| `focus`, `focusLight`, `focusDark`, `action`, `accentSecondary` | `--barracks-focus`, `--barracks-focus-light`, `--barracks-focus-dark`, `--barracks-action`, `--barracks-accent-secondary` | Keyboard focus/actions/theme personality |
+| `focus`, `focusLight`, `focusDark`, `action`, `actionText`, `accentSecondary` | `--barracks-focus`, `--barracks-focus-light`, `--barracks-focus-dark`, `--barracks-action`, `--barracks-action-text`, `--barracks-accent-secondary` | Keyboard focus/actions/action labels/theme personality |
 | `live`, `success`, `warning`, `danger`, `unavailable` | matching `--barracks-state-*` properties | Status semantics |
 | `chartGrid`, `chartTooltip` | matching `--barracks-chart-*` properties | Chart structure |
 | `chart1` through `chart6` | `--barracks-chart-1` through `--barracks-chart-6` | Ordered series palette |
@@ -101,10 +101,13 @@ accessible fixed status values above; chart series are `[primary, live, warning,
 secondary, success, danger]`. The resolver and storage adapter are exported pure
 units and can be tested without rendering React.
 
-Non-text contrast uses WCAG's 3:1 threshold. Primary/action and each state/chart
-candidate are mixed toward whichever of warm light or near-black reaches 3:1
-against its specified surface with the smallest change; action text is then
-chosen at 4.5:1. `borderStrong` reaches 3:1 against its associated interactive
+Non-text contrast uses WCAG's 3:1 threshold. Each state/chart candidate is mixed
+toward whichever of warm light or near-black reaches 3:1 against its specified
+surface with the smallest change. Action resolution additionally requires that
+one of warm light or near-black can serve as `actionText` at 4.5:1 against the
+resolved action fill; the resolver chooses the valid fill/text pair with the
+smallest change from `primary`. Focus is a ring color only and is never used as
+an action fill. `borderStrong` reaches 3:1 against its associated interactive
 surface and is used for controls and meaningful boundaries; `borderSubtle` is
 decorative only. Charts resolve series against `surfaceInset`, and retain labels,
 legends, markers, or existing patterns so color is not their sole distinction.
@@ -123,7 +126,7 @@ incapable of reaching 4.5:1 on both, muted typography has two roles:
 until it still meets 4.5:1 there. Canvas/nav contexts use the former; cards,
 dialogs, menus, and other raised surfaces use the latter. The legacy
 `--muted-text-color` alias remains mapped to `textMuted` during migration.
-Action/state text chooses black or white based on the same WCAG
+Action/state text chooses warm light or near-black based on the same WCAG
 relative-luminance calculation. If a custom foreground role cannot meet 4.5:1,
 the resolver substitutes the higher-contrast choice for that role's associated
 surface. Thus arbitrary valid custom inputs remain accepted without making
