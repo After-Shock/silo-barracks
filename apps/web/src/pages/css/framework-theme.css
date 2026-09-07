@@ -120,6 +120,31 @@ html body :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   --bs-btn-active-border-color: var(--barracks-action);
 }
 
+.btn-danger,
+.btn-outline-danger {
+  --bs-btn-color: var(--barracks-text-interactive);
+  --bs-btn-bg: var(--barracks-surface-interactive);
+  --bs-btn-border-color: var(--barracks-state-danger-interactive);
+  --bs-btn-hover-color: var(--barracks-text-interactive);
+  --bs-btn-hover-bg: var(--barracks-surface-interactive);
+  --bs-btn-hover-border-color: var(--barracks-state-danger-interactive);
+  --bs-btn-active-color: var(--barracks-text-interactive);
+  --bs-btn-active-bg: var(--barracks-surface-interactive);
+  --bs-btn-active-border-color: var(--barracks-state-danger-interactive);
+  --bs-btn-disabled-color: var(--barracks-text-inset);
+  --bs-btn-disabled-bg: var(--barracks-surface-inset);
+  --bs-btn-disabled-border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-state-danger-interactive);
+  background-color: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+  text-decoration: underline 2px var(--barracks-state-danger-interactive);
+  text-underline-offset: 0.18em;
+}
+
+:is(.btn-danger, .btn-outline-danger) :is(svg, .btn-icon) {
+  color: var(--barracks-state-danger-interactive) !important;
+}
+
 .btn:disabled,
 .btn.disabled,
 fieldset:disabled .btn {
@@ -131,12 +156,63 @@ fieldset:disabled .btn {
   color: var(--barracks-text-inset) !important;
 }
 
+:is(.btn-danger, .btn-outline-danger):is(:disabled, .disabled),
+fieldset:disabled :is(.btn-danger, .btn-outline-danger) {
+  --bs-btn-disabled-color: var(--barracks-text-inset);
+  --bs-btn-disabled-bg: var(--barracks-surface-inset);
+  --bs-btn-disabled-border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-subtle) !important;
+  background-color: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset) !important;
+  text-decoration: none;
+}
+
+:is(.btn-danger, .btn-outline-danger):is(:disabled, .disabled) :is(svg, .btn-icon),
+fieldset:disabled :is(.btn-danger, .btn-outline-danger) :is(svg, .btn-icon) {
+  color: var(--barracks-text-inset) !important;
+}
+
 .card,
 .modal-content,
 .dropdown-menu {
   border-color: var(--barracks-border-raised);
   background-color: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
+}
+
+.alert-success,
+.alert-danger {
+  --bs-alert-color: var(--barracks-text-raised);
+  --bs-alert-bg: var(--barracks-surface-raised);
+  background-color: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+}
+
+.alert-success {
+  --bs-alert-border-color: var(--barracks-state-success);
+  border-color: var(--barracks-state-success);
+}
+
+.alert-danger {
+  --bs-alert-border-color: var(--barracks-state-danger);
+  border-color: var(--barracks-state-danger);
+}
+
+.alert-success :is(svg, .alert-icon) {
+  color: var(--barracks-state-success) !important;
+}
+
+.alert-danger :is(svg, .alert-icon) {
+  color: var(--barracks-state-danger) !important;
+}
+
+:is(.alert-success, .alert-danger) :is(a, .alert-link),
+:is(.alert-success, .alert-danger) :is(a, .alert-link):hover {
+  color: var(--barracks-text-raised) !important;
+}
+
+:is(.alert-success, .alert-danger) :is(.text-muted, small) {
+  color: var(--barracks-text-muted-raised) !important;
 }
 
 .card :is(.text-muted, small),
