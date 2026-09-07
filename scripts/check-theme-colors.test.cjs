@@ -354,6 +354,11 @@ test("allows literals only on approved variables.css declarations", () => {
   --barracks-canvas: #161410;
   --barracks-action-text: #fff;
   --barracks-action-foreground: #161410;
+  --barracks-text-raised: #fff;
+  --barracks-text-inset: #fff;
+  --barracks-text-interactive: #fff;
+  --barracks-text-nav: #fff;
+  --barracks-text-overlay: #fff;
   --barracks-shadow: 0 12px 32px rgba(22, 20, 16, .28);
   --barracks-action-rgb: 111, 155, 207;
   --primary-light-color: hsl(210 40% 75%);
