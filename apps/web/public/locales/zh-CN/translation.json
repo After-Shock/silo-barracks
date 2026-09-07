@@ -352,5 +352,6 @@
   "X_ROWS_SELECTED": "已选中 {ROWS} 行",
   "TRANSCODE_REASONS": "转码原因",
   "SUBTITLES": "字幕",
+  "UNAVAILABLE": "不可用",
   "GENRES": "类型"
 }

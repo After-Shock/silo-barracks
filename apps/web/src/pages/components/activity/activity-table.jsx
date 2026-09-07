@@ -304,7 +304,7 @@ export default function ActivityTable(props) {
       size: 160,
       Cell: ({ row }) => {
         row = row.original;
-        const unavailableLabel = i18next.t("UNAVAILABLE", { defaultValue: "Unavailable" });
+        const unavailableLabel = i18next.t("UNAVAILABLE");
         if (row.PlayMethod === "Transcode") {
           return (
             <Link onClick={() => openModal(row)} className="activity-method-pill is-transcode">

@@ -96,7 +96,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 0 12px;
-  border-bottom: 1px solid var(--barracks-border-raised);
+  border-bottom: 1px solid var(--barracks-border-inset);
   background: var(--barracks-surface-inset);
 }
 

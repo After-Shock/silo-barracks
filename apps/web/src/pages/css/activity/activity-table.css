@@ -107,7 +107,7 @@
 .activity-user-avatar-fallback {
   width: 34px;
   height: 34px;
-  border: 1px solid var(--barracks-border-raised);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 50%;
   background: var(--barracks-surface-inset);
   box-shadow: var(--barracks-shadow);
@@ -147,7 +147,7 @@
 .activity-poster-fallback {
   width: 42px;
   height: 62px;
-  border: 1px solid var(--barracks-border-raised);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 5px;
   background: var(--barracks-surface-inset);
   box-shadow: var(--barracks-shadow);
