@@ -22,6 +22,7 @@ const SEMANTIC_KEYS = [
   "borderStrong",
   "text",
   "textMuted",
+  "textMutedRaised",
   "textInverse",
   "focus",
   "focusLight",
@@ -54,7 +55,7 @@ const CHART_KEYS = ["chart1", "chart2", "chart3", "chart4", "chart5", "chart6"];
 function assertAccessibleTokens(tokens) {
   assert.ok(contrastRatio(tokens.text, tokens.canvas) >= 4.5);
   assert.ok(contrastRatio(tokens.textMuted, tokens.canvas) >= 4.5);
-  assert.ok(contrastRatio(tokens.textMuted, tokens.surfaceRaised) >= 4.5);
+  assert.ok(contrastRatio(tokens.textMutedRaised, tokens.surfaceRaised) >= 4.5);
   assert.ok(contrastRatio(tokens.borderStrong, tokens.surfaceInteractive) >= 3);
   for (const key of STATE_KEYS) {
     assert.ok(contrastRatio(tokens[key], tokens.surfaceRaised) >= 3, `${key} is accessible on raised surface`);
@@ -138,6 +139,8 @@ test("resolveTheme derives every semantic token for the default palette", () => 
   assert.equal(tokens.overlay, "#201b13");
   assert.equal(tokens.borderSubtle, "#48423a");
   assert.equal(tokens.text, "#f5f0e7");
+  assert.equal(tokens.textMuted, "#817e77");
+  assert.equal(tokens.textMutedRaised, "#89847b");
   assert.equal(tokens.textInverse, "#10100f");
   assert.equal(tokens.focusLight, "#f5f0e7");
   assert.equal(tokens.focusDark, "#10100f");
@@ -242,4 +245,17 @@ test("resolveTheme keeps contrast guarantees for degenerate custom palettes", ()
     assert.equal(tokens.focusDark, "#10100f", `${palette.name}: focus dark`);
     assert.equal(tokens.action, ensureContrast(palette.primary, tokens.surfaceInteractive, 3), `${palette.name}: action`);
   }
+});
+
+test("resolveTheme gives vivid custom palettes separate readable muted text roles", () => {
+  const { tokens } = resolveTheme({
+    primary: "#8caaac",
+    secondary: "#9d1c7b",
+    background: "#347008",
+    surface: "#6ec621",
+  });
+
+  assert.ok(contrastRatio(tokens.textMuted, tokens.canvas) >= 4.5);
+  assert.ok(contrastRatio(tokens.textMutedRaised, tokens.surfaceRaised) >= 4.5);
+  assert.notEqual(tokens.textMuted, tokens.textMutedRaised);
 });

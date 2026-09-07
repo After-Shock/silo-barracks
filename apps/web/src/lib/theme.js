@@ -153,24 +153,28 @@ export function ensureContrast(foreground, background, minimum = 3) {
   return lightContrast >= darkContrast ? TEXT_LIGHT : TEXT_DARK;
 }
 
-function mutedTextColor(text, canvas, surfaceRaised) {
-  let closestColor = text;
+function closestMixToward(color, background, minimum = 4.5) {
+  let closestColor = color;
   let closestWeight = 0;
   const steps = 4096;
   for (let index = 0; index <= steps; index += 1) {
     const weight = index / steps;
-    const color = mixHex(text, canvas, weight);
-    if (contrastRatio(color, canvas) >= 4.5 && contrastRatio(color, surfaceRaised) >= 4.5) {
-      closestColor = color;
+    const mixedColor = mixHex(color, background, weight);
+    if (contrastRatio(mixedColor, background) >= minimum) {
+      closestColor = mixedColor;
       closestWeight = weight;
     }
   }
 
-  if (closestWeight > 0 || (contrastRatio(closestColor, canvas) >= 4.5 && contrastRatio(closestColor, surfaceRaised) >= 4.5)) {
+  if (closestWeight > 0 || contrastRatio(closestColor, background) >= minimum) {
     return closestColor;
   }
 
-  return ensureContrast(text, surfaceRaised, 4.5);
+  return ensureContrast(color, background, minimum);
+}
+
+function strongestTextEndpoint(background) {
+  return contrastRatio(TEXT_LIGHT, background) >= contrastRatio(TEXT_DARK, background) ? TEXT_LIGHT : TEXT_DARK;
 }
 
 function isDefaultThemeInput(input) {
@@ -182,16 +186,15 @@ export function resolveTheme(theme) {
   const canvas = input.background;
   const nav = mixHex(input.surface, canvas, 0.35);
   const surfaceRaised = input.surface;
-  const lightContrast = contrastRatio(TEXT_LIGHT, canvas);
-  const darkContrast = contrastRatio(TEXT_DARK, canvas);
-  const text = lightContrast >= darkContrast ? TEXT_LIGHT : TEXT_DARK;
+  const text = strongestTextEndpoint(canvas);
   const textInverse = text === TEXT_LIGHT ? TEXT_DARK : TEXT_LIGHT;
   const surfaceInset = mixHex(input.surface, canvas, 0.38);
   const surfaceInteractive = mixHex(input.surface, text, 0.06);
   const overlay = mixHex(input.surface, canvas, 0.18);
   const borderSubtle = mixHex(input.surface, text, 0.18);
   const borderStrong = ensureContrast(mixHex(surfaceInteractive, text, 0.42), surfaceInteractive, 3);
-  const textMuted = mutedTextColor(text, canvas, surfaceRaised);
+  const textMuted = closestMixToward(text, canvas);
+  const textMutedRaised = closestMixToward(strongestTextEndpoint(surfaceRaised), surfaceRaised);
   const focus = ensureContrast(input.primary, surfaceRaised, 3);
   const action = ensureContrast(input.primary, surfaceInteractive, 3);
   const statusCandidates = {
@@ -221,6 +224,7 @@ export function resolveTheme(theme) {
     borderStrong,
     text,
     textMuted,
+    textMutedRaised,
     textInverse,
     focus,
     focusLight: TEXT_LIGHT,
