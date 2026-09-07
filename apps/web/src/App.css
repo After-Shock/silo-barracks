@@ -204,7 +204,7 @@ h2 {
 }
 
 ::placeholder {
-  color: var(--barracks-text-muted-raised) !important;
+  color: var(--barracks-text) !important;
 }
 
 .text-primary-custom {
@@ -268,7 +268,7 @@ h2 {
 .jellyglance-toast .Toastify__close-button {
   align-self: flex-start;
   margin-top: 7px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   opacity: 0.72;
 }
 
@@ -400,7 +400,7 @@ h2 {
 
 .whats-new-list span {
   margin-top: 3px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   font-size: 12px;
   font-weight: 600;
   line-height: 1.4;

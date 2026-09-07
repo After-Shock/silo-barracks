@@ -192,7 +192,7 @@
     border: 1px solid var(--barracks-border-subtle);
     border-radius: 16px;
     background: var(--barracks-surface-interactive);
-    color: var(--barracks-text-muted);
+    color: var(--barracks-text);
     box-shadow: var(--barracks-shadow);
   }
 
@@ -441,7 +441,7 @@
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px !important;
   background: var(--barracks-surface-interactive);
-  color: var(--barracks-text-muted);
+  color: var(--barracks-text);
   font: inherit;
   transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
   transform: translateY(-50%);
@@ -512,7 +512,7 @@
   margin: 0;
   padding: 7px 12px !important;
   border-radius: 999px !important;
-  color: var(--barracks-text-muted) !important;
+  color: var(--barracks-text) !important;
   cursor: pointer;
   gap: 13px;
   background: transparent;
@@ -578,7 +578,7 @@
   max-width: 132px;
   overflow: hidden;
   margin-top: 4px;
-  color: var(--barracks-text-muted);
+  color: var(--barracks-text);
   font-size: 13px;
   font-weight: 800;
   text-overflow: ellipsis;
@@ -605,7 +605,7 @@
 
 .navbar-version-row .version .card-body {
   padding: 7px 10px 8px;
-  color: var(--barracks-text-muted);
+  color: var(--barracks-text);
   font-size: 12px;
   text-align: center;
 }
@@ -629,7 +629,7 @@
 
 .navitem {
   position: relative;
-  color: var(--barracks-text-muted) !important;
+  color: var(--barracks-text) !important;
   font-size: 15px !important;
   font-weight: 750;
   text-decoration: none;
@@ -851,7 +851,7 @@
     border-radius: 999px !important;
     border-color: var(--barracks-border-subtle);
     background: var(--barracks-surface-interactive);
-    color: var(--barracks-text-muted);
+    color: var(--barracks-text);
     transform: none;
   }
 }
@@ -945,8 +945,8 @@
 }
 
 .profile-modal .btn-close {
-  filter: invert(1) grayscale(1);
-  opacity: 0.75;
+  color: var(--barracks-text);
+  opacity: 1;
 }
 
 .profile-modal-identity {
@@ -1005,7 +1005,7 @@
   display: block;
   overflow: hidden;
   margin-top: 3px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   font-size: 15px;
   font-weight: 750;
   text-overflow: ellipsis;
@@ -1023,13 +1023,13 @@
 }
 
 .profile-avatar-upload span {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   font-size: 13px;
 }
 
 .profile-avatar-upload input {
   width: 100%;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   font-size: 13px;
 }
 
@@ -1067,7 +1067,7 @@
 
 .profile-whats-new-button small {
   margin-top: 2px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   font-size: 13px;
   font-weight: 750;
 }
@@ -1097,7 +1097,7 @@
 .profile-font-header span {
   display: block;
   margin-top: 3px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   font-size: 13px;
   font-weight: 700;
 }
@@ -1133,7 +1133,7 @@
 }
 
 .profile-font-options span {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   font-size: 12px;
   font-weight: 650;
   line-height: 1.25;
@@ -1166,7 +1166,7 @@
 .profile-theme-header span {
   display: block;
   margin-top: 3px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   font-size: 13px;
   font-weight: 700;
 }
@@ -1194,7 +1194,7 @@
 }
 
 .profile-theme-select > span {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   font-size: 12px;
   font-weight: 800;
 }
@@ -1231,7 +1231,7 @@
 }
 
 .profile-theme-select-arrow {
-  color: var(--barracks-text-muted-raised) !important;
+  color: var(--barracks-text) !important;
   font-size: 11px !important;
 }
 
@@ -1285,7 +1285,7 @@
 }
 
 .profile-theme-field > span {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text);
   font-size: 12px;
   font-weight: 800;
 }

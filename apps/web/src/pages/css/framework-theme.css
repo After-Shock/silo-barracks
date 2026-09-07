@@ -5,10 +5,6 @@ body {
   color: var(--barracks-text);
 }
 
-body {
-  color-scheme: dark;
-}
-
 a {
   color: var(--barracks-action);
 }
@@ -27,13 +23,79 @@ textarea {
 }
 
 ::placeholder {
-  color: var(--barracks-text-muted-raised) !important;
+  color: var(--barracks-text) !important;
   opacity: 1;
 }
 
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--barracks-focus);
-  box-shadow: 0 0 0 3px var(--barracks-focus-light), 0 0 0 4px var(--barracks-focus-dark);
+html body :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--barracks-focus) !important;
+  box-shadow: 0 0 0 3px var(--barracks-focus-light), 0 0 0 4px var(--barracks-focus-dark) !important;
+}
+
+.form-control,
+.form-select {
+  --bs-body-color: var(--barracks-text);
+  --bs-body-bg: var(--barracks-surface-interactive);
+  --bs-border-color: var(--barracks-border-subtle);
+  --bs-secondary-color: var(--barracks-text);
+  --bs-secondary-bg: var(--barracks-surface-inset);
+  border-color: var(--barracks-border-subtle) !important;
+  background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text) !important;
+}
+
+.form-control::placeholder,
+.form-select::placeholder {
+  color: var(--barracks-text) !important;
+  opacity: 1;
+}
+
+.form-control:hover:not(:disabled),
+.form-select:hover:not(:disabled),
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--barracks-border-strong) !important;
+  background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text) !important;
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  border-color: var(--barracks-border-subtle) !important;
+  background-color: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text) !important;
+}
+
+.btn {
+  --bs-btn-color: var(--barracks-text);
+  --bs-btn-bg: var(--barracks-surface-interactive);
+  --bs-btn-border-color: var(--barracks-border-subtle);
+  --bs-btn-hover-color: var(--barracks-text);
+  --bs-btn-hover-bg: var(--barracks-surface-inset);
+  --bs-btn-hover-border-color: var(--barracks-border-strong);
+  --bs-btn-active-color: var(--barracks-text);
+  --bs-btn-active-bg: var(--barracks-surface-inset);
+  --bs-btn-active-border-color: var(--barracks-border-strong);
+  --bs-btn-disabled-color: var(--barracks-text);
+  --bs-btn-disabled-bg: var(--barracks-surface-inset);
+  --bs-btn-disabled-border-color: var(--barracks-border-subtle);
+  border-color: var(--bs-btn-border-color);
+  background-color: var(--bs-btn-bg);
+  color: var(--bs-btn-color);
+}
+
+.btn:hover {
+  border-color: var(--bs-btn-hover-border-color);
+  background-color: var(--bs-btn-hover-bg);
+  color: var(--bs-btn-hover-color);
+}
+
+.btn:disabled,
+.btn.disabled,
+fieldset:disabled .btn {
+  border-color: var(--bs-btn-disabled-border-color);
+  background-color: var(--bs-btn-disabled-bg);
+  color: var(--bs-btn-disabled-color);
 }
 
 .card,
@@ -55,6 +117,33 @@ textarea {
 .modal-footer,
 .dropdown-divider {
   border-color: var(--barracks-border-subtle);
+}
+
+.btn-close {
+  position: relative;
+  background-image: none;
+  color: var(--barracks-text);
+  opacity: 1;
+}
+
+.btn-close::before,
+.btn-close::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1rem;
+  height: 2px;
+  border-radius: 999px;
+  background-color: currentColor;
+  content: "";
+}
+
+.btn-close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.btn-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
 }
 
 .dropdown-item {
@@ -87,7 +176,7 @@ textarea {
 
 .nav-tabs .nav-link {
   border-color: transparent;
-  color: var(--barracks-text-muted);
+  color: var(--barracks-text);
 }
 
 .nav-tabs .nav-link:hover,
@@ -117,7 +206,7 @@ textarea {
   --bs-pagination-active-color: var(--barracks-text-inverse);
   --bs-pagination-disabled-bg: var(--barracks-surface-inset);
   --bs-pagination-disabled-border-color: var(--barracks-border-subtle);
-  --bs-pagination-disabled-color: var(--barracks-state-unavailable);
+  --bs-pagination-disabled-color: var(--barracks-text);
 }
 
 .tooltip {
@@ -164,7 +253,7 @@ textarea {
 .MuiInputBase-input::placeholder,
 .MuiInputLabel-root,
 .MuiFormLabel-root {
-  color: var(--barracks-text-muted-raised) !important;
+  color: var(--barracks-text) !important;
 }
 
 .MuiOutlinedInput-notchedOutline,
