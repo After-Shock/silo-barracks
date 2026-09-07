@@ -428,6 +428,11 @@
   white-space: nowrap;
 }
 
+.session-card .session-card-meta :is(a, .session-user-name, small),
+.session-card .session-card-meta :is(a, .session-user-name):is(:hover, :focus-visible) {
+  color: var(--barracks-text-overlay) !important;
+}
+
 .session-popout-modal {
   --bs-modal-width: min(940px, calc(100vw - 28px));
 }
