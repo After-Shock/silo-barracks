@@ -35,7 +35,8 @@
     "docs"
   ],
   "scripts": {
-    "test": "node --test apps/api/tests/*.test.js",
+    "test": "node --test apps/api/tests/*.test.js apps/web/src/lib/*.test.js scripts/*.test.cjs",
+    "theme:check": "node scripts/check-theme-colors.cjs",
     "dev": "concurrently \"npm run dev -w @jellyglance/api\" \"npm run dev -w @jellyglance/web\"",
     "dev:web": "npm run dev -w @jellyglance/web",
     "dev:api": "npm run dev -w @jellyglance/api",
