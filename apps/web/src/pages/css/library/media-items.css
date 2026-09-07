@@ -46,11 +46,3 @@
     color: var(--barracks-text-muted-raised) !important;
 
   }
-
-
-
-  .library-items > div> div>.form-control:focus-visible
-  {
-    box-shadow: 0 0 0 3px var(--barracks-focus) !important;
-    border-color: var(--barracks-border-strong) !important;
-  }

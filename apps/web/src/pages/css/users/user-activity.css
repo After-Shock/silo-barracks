@@ -7,8 +7,3 @@
 .Activity > div > div > .form-control::placeholder {
   color: var(--barracks-text-muted-raised) !important;
 }
-
-.Activity > div > div > .form-control:focus-visible {
-  box-shadow: 0 0 0 3px var(--barracks-focus) !important;
-  border-color: var(--barracks-border-strong) !important;
-}

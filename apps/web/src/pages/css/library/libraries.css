@@ -278,11 +278,6 @@
   border-style: none !important;
 }
 
-.libraries :is(button, input, a):focus-visible {
-  outline: 3px solid var(--barracks-focus);
-  outline-offset: 2px;
-}
-
 @media (max-width: 720px) {
   .libraries {
     padding: 22px 14px 36px;

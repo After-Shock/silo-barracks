@@ -248,12 +248,11 @@
   min-height: 36px;
 }
 
-.users-page .form-control:focus,
-.users-page .form-select:focus,
-.users-modal .form-control:focus,
-.users-modal .form-select:focus {
+.users-page .form-control:focus-visible,
+.users-page .form-select:focus-visible,
+.users-modal .form-control:focus-visible,
+.users-modal .form-select:focus-visible {
   border-color: var(--barracks-action) !important;
-  box-shadow: 0 0 0 3px var(--barracks-action) !important;
 }
 
 .users-search .form-control {
@@ -261,7 +260,7 @@
   padding: 0;
   border: 0 !important;
   background: transparent !important;
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 .users-list {
@@ -564,7 +563,7 @@
   border-radius: 0 !important;
   background: transparent !important;
   color: var(--barracks-text-muted-raised) !important;
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 .users-page .users-track-button.btn,
@@ -573,7 +572,7 @@
   border: 0 !important;
   background: transparent !important;
   color: var(--barracks-text-muted-raised) !important;
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 .users-track-button:hover,
@@ -602,7 +601,7 @@
   border-radius: 12px !important;
   background: var(--barracks-action) !important;
   color: var(--barracks-action-text) !important;
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 .users-row-action-button:hover,
@@ -1091,12 +1090,6 @@
 .users-modal-copy {
   color: var(--barracks-text-muted-raised);
   font-weight: 750;
-}
-
-.Users.users-page :is(button, input, select, textarea, a):focus-visible,
-.users-modal :is(button, input, select, textarea, a):focus-visible {
-  outline: 3px solid var(--barracks-focus);
-  outline-offset: 2px;
 }
 
 @media (max-width: 1280px) {

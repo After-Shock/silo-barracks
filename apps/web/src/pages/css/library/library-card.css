@@ -281,9 +281,12 @@
   background-color: var(--barracks-action);
 }
 
-.form-switch .form-check-input:focus,
 .form-switch .form-check-input:hover {
-  box-shadow: none !important;
+  box-shadow: none;
+  border-color: var(--barracks-action) !important;
+}
+
+.form-switch .form-check-input:focus-visible {
   border-color: var(--barracks-action) !important;
 }
 
@@ -572,14 +575,6 @@
 
 .selector-library-card.is-untracked .selector-library-image .library-card-banner {
   filter: saturate(0.94) brightness(0.92) contrast(1.02);
-}
-
-.library-card-link:focus-visible,
-.library-list-main:focus-visible,
-.library-scan-button:focus-visible,
-.selector-library-card .form-check-input:focus-visible {
-  outline: 3px solid var(--barracks-focus);
-  outline-offset: 2px;
 }
 
 @media (max-width: 520px) {

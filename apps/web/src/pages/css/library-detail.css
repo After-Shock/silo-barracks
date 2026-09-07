@@ -86,7 +86,7 @@
   border-radius: 12px !important;
   color: var(--barracks-text-muted-raised) !important;
   background: var(--barracks-surface-inset) !important;
-  box-shadow: none !important;
+  box-shadow: none;
   font-size: 13px;
   font-weight: 850;
 }
@@ -307,11 +307,6 @@
   border-color: var(--barracks-state-danger);
   background: var(--barracks-surface-interactive);
   color: var(--barracks-text-interactive);
-}
-
-.library-detail-page :is(button, input, select, textarea, a):focus-visible {
-  outline: 3px solid var(--barracks-focus);
-  outline-offset: 2px;
 }
 
 @media (max-width: 900px) {

@@ -353,11 +353,6 @@
   color: var(--barracks-text-interactive);
 }
 
-.item-detail-page :is(button, input, select, textarea, a):focus-visible {
-  outline: 3px solid var(--barracks-focus);
-  outline-offset: 2px;
-}
-
 .hide-tab-titles {
   display: none !important;
 }
