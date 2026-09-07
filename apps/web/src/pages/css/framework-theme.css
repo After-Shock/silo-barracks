@@ -268,8 +268,36 @@ fieldset:disabled .btn {
   color: var(--barracks-text-muted-raised) !important;
 }
 
-:is(.MuiPaper-root, .MuiDialog-paper, .MuiMenu-paper, .MuiPopover-paper) a,
-:is(.MuiPaper-root, .MuiDialog-paper, .MuiMenu-paper, .MuiPopover-paper) :is(.MuiButton-root:not(.MuiButton-contained), .MuiIconButton-root) {
+:is(
+  .MuiPaper-root,
+  .MuiDialog-paper,
+  .MuiMenu-paper,
+  .MuiPopover-paper,
+  .MuiTableContainer-root,
+  .MuiTable-root,
+  .MuiTableCell-root,
+  .MuiDataGrid-root,
+  .MuiPickersLayout-root,
+  .MuiDateCalendar-root,
+  .MuiTimeClock-root,
+  .MuiDayCalendar-header,
+  .MuiPickersCalendarHeader-root
+) a,
+:is(
+  .MuiPaper-root,
+  .MuiDialog-paper,
+  .MuiMenu-paper,
+  .MuiPopover-paper,
+  .MuiTableContainer-root,
+  .MuiTable-root,
+  .MuiTableCell-root,
+  .MuiDataGrid-root,
+  .MuiPickersLayout-root,
+  .MuiDateCalendar-root,
+  .MuiTimeClock-root,
+  .MuiDayCalendar-header,
+  .MuiPickersCalendarHeader-root
+) :is(.MuiButton-root:not(.MuiButton-contained), .MuiIconButton-root) {
   color: var(--barracks-text-muted-raised) !important;
 }
 
