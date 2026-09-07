@@ -1,6 +1,6 @@
 .console-container {
   background-color: var(--barracks-surface-inset);
-  color: var(--barracks-text);
+  color: var(--barracks-text-inset);
   height: 500px;
   overflow-y: auto;
   margin-top: 20px;

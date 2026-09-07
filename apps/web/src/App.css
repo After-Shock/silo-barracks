@@ -132,13 +132,13 @@ h2 {
 .form-select {
   background-color: var(--barracks-surface-interactive) !important;
   border-color: var(--barracks-border-subtle) !important ;
-  color: var(--barracks-text) !important;
+  color: var(--barracks-text-interactive) !important;
   border-radius: 8px !important;
 }
 
 .form-select:focus {
   border-color: var(--barracks-border-strong) !important;
-  color: var(--barracks-text) !important;
+  color: var(--barracks-text-interactive) !important;
 }
 
 .form-select option {
@@ -162,7 +162,7 @@ h2 {
 }
 
 ::placeholder {
-  color: var(--barracks-text) !important;
+  color: var(--barracks-text-interactive) !important;
 }
 
 .text-primary-custom {
@@ -183,7 +183,7 @@ h2 {
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 10px !important;
   background: var(--barracks-overlay) !important;
-  color: var(--barracks-text) !important;
+  color: var(--barracks-text-overlay) !important;
   box-shadow: var(--barracks-shadow);
   backdrop-filter: blur(14px);
 }
@@ -199,11 +199,11 @@ h2 {
   width: 38px;
   min-width: 38px;
   margin-inline-end: 14px;
-  color: var(--barracks-text);
+  color: var(--barracks-text-overlay);
 }
 
 .jellyglance-toast.Toastify__toast--info .Toastify__toast-icon {
-  color: var(--barracks-text);
+  color: var(--barracks-text-overlay);
 }
 
 .jellyglance-toast.Toastify__toast--success .Toastify__toast-icon {
@@ -217,7 +217,7 @@ h2 {
 .jellyglance-toast-body {
   align-items: center;
   padding: 8px 8px 8px 2px;
-  color: var(--barracks-text);
+  color: var(--barracks-text-overlay);
   font-size: 14px;
   font-weight: 700;
   line-height: 1.35;
@@ -226,12 +226,12 @@ h2 {
 .jellyglance-toast .Toastify__close-button {
   align-self: flex-start;
   margin-top: 7px;
-  color: var(--barracks-text);
+  color: var(--barracks-text-overlay);
   opacity: 0.72;
 }
 
 .jellyglance-toast .Toastify__close-button:hover {
-  color: var(--barracks-text);
+  color: var(--barracks-text-overlay);
   opacity: 1;
 }
 
@@ -261,7 +261,7 @@ h2 {
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 12px;
   background: var(--barracks-surface-raised);
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   box-shadow: var(--barracks-shadow);
 }
 
@@ -284,7 +284,7 @@ h2 {
   border: 1px solid var(--barracks-border-subtle);
   border-radius: 999px;
   background: var(--barracks-overlay);
-  color: var(--barracks-text);
+  color: var(--barracks-text-overlay);
   font-size: 24px;
   line-height: 1;
 }
@@ -306,7 +306,7 @@ h2 {
 
 .whats-new-hero h2 {
   margin: 6px 0 6px !important;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: 30px;
   font-weight: 780 !important;
   line-height: 1.05;
@@ -342,7 +342,7 @@ h2 {
 }
 
 .whats-new-list svg {
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-interactive);
 }
 
 .whats-new-list strong,
@@ -351,14 +351,14 @@ h2 {
 }
 
 .whats-new-list strong {
-  color: var(--barracks-text);
+  color: var(--barracks-text-interactive);
   font-size: 14px;
   font-weight: 760;
 }
 
 .whats-new-list span {
   margin-top: 3px;
-  color: var(--barracks-text);
+  color: var(--barracks-text-interactive);
   font-size: 12px;
   font-weight: 600;
   line-height: 1.4;
