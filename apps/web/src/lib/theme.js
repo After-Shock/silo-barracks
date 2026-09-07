@@ -98,6 +98,9 @@ export function contrastRatio(foreground, background) {
 
 const TEXT_LIGHT = "#f5f0e7";
 const TEXT_DARK = "#10100f";
+const PURE_TEXT_LIGHT = "#ffffff";
+const PURE_TEXT_DARK = "#000000";
+const TEXT_CONTRAST_MINIMUM = 4.5;
 
 function contrastAdjustment(candidate, endpoint, background, minimum) {
   if (contrastRatio(endpoint, background) < minimum) {
@@ -197,11 +200,22 @@ function resolveActionPair(candidate, background) {
   }
 
   const action = ensureContrast(candidate, background, 3);
-  return { action, actionText: strongestTextEndpoint(action), weight: 1 };
+  return { action, actionText: strongestWarmTextEndpoint(action), weight: 1 };
+}
+
+function strongestWarmTextEndpoint(background) {
+  return contrastRatio(TEXT_LIGHT, background) >= contrastRatio(TEXT_DARK, background) ? TEXT_LIGHT : TEXT_DARK;
 }
 
 function strongestTextEndpoint(background) {
-  return contrastRatio(TEXT_LIGHT, background) >= contrastRatio(TEXT_DARK, background) ? TEXT_LIGHT : TEXT_DARK;
+  const warmEndpoint = strongestWarmTextEndpoint(background);
+  if (contrastRatio(warmEndpoint, background) >= TEXT_CONTRAST_MINIMUM) {
+    return warmEndpoint;
+  }
+
+  return contrastRatio(PURE_TEXT_LIGHT, background) >= contrastRatio(PURE_TEXT_DARK, background)
+    ? PURE_TEXT_LIGHT
+    : PURE_TEXT_DARK;
 }
 
 function isDefaultThemeInput(input) {
@@ -214,7 +228,8 @@ export function resolveTheme(theme) {
   const nav = mixHex(input.surface, canvas, 0.35);
   const surfaceRaised = input.surface;
   const text = strongestTextEndpoint(canvas);
-  const textInverse = text === TEXT_LIGHT ? TEXT_DARK : TEXT_LIGHT;
+  const warmCanvasText = strongestWarmTextEndpoint(canvas);
+  const textInverse = warmCanvasText === TEXT_LIGHT ? TEXT_DARK : TEXT_LIGHT;
   const surfaceInset = mixHex(input.surface, canvas, 0.38);
   const surfaceInteractive = mixHex(input.surface, text, 0.06);
   const overlay = mixHex(input.surface, canvas, 0.18);

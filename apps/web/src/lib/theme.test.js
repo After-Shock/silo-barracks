@@ -65,6 +65,22 @@ const SEMANTIC_KEYS = [
 
 const STATE_KEYS = ["live", "success", "warning", "danger", "unavailable"];
 const CHART_KEYS = ["chart1", "chart2", "chart3", "chart4", "chart5", "chart6"];
+const WARM_TEXT_LIGHT = "#f5f0e7";
+const WARM_TEXT_DARK = "#10100f";
+const PURE_TEXT_LIGHT = "#ffffff";
+const PURE_TEXT_DARK = "#000000";
+
+function expectedNormalText(background) {
+  const warmLightContrast = contrastRatio(WARM_TEXT_LIGHT, background);
+  const warmDarkContrast = contrastRatio(WARM_TEXT_DARK, background);
+  if (Math.max(warmLightContrast, warmDarkContrast) >= 4.5) {
+    return warmLightContrast >= warmDarkContrast ? WARM_TEXT_LIGHT : WARM_TEXT_DARK;
+  }
+
+  return contrastRatio(PURE_TEXT_LIGHT, background) >= contrastRatio(PURE_TEXT_DARK, background)
+    ? PURE_TEXT_LIGHT
+    : PURE_TEXT_DARK;
+}
 
 function createStorage(initial = {}, { getItem, setItem, removeItem } = {}) {
   const values = new Map(Object.entries(initial));
@@ -266,8 +282,7 @@ test("resolveTheme preserves the four public inputs and all token relationships"
     ["textOverlay", "overlay"],
   ]) {
     const surface = tokens[surfaceKey];
-    const expected = contrastRatio("#f5f0e7", surface) >= contrastRatio("#10100f", surface) ? "#f5f0e7" : "#10100f";
-    assert.equal(tokens[textKey], expected, `${textKey} uses strongest endpoint for ${surfaceKey}`);
+    assert.equal(tokens[textKey], expectedNormalText(surface), `${textKey} uses strongest endpoint for ${surfaceKey}`);
   }
   assert.equal(tokens.borderSubtle, mixHex(normalized.surface, tokens.text, 0.18));
   assert.equal(tokens.borderStrong, ensureContrast(mixHex(tokens.surfaceInteractive, tokens.text, 0.42), tokens.surfaceInteractive, 3));
@@ -282,6 +297,31 @@ test("resolveTheme preserves the four public inputs and all token relationships"
   assert.equal(tokens.accentSecondaryRgb, "254, 220, 186");
   assert.equal(tokens.surfaceRaisedRgb, "64, 64, 64");
   assertAccessibleTokens(tokens);
+});
+
+test("resolveTheme falls back to pure endpoints for saturated midtone surfaces", () => {
+  const { tokens } = resolveTheme({
+    primary: "#224466",
+    secondary: "#cc8844",
+    background: "#7c0e19",
+    surface: "#825ec1",
+  });
+
+  for (const [textKey, surfaceKey] of [
+    ["text", "canvas"],
+    ["textRaised", "surfaceRaised"],
+    ["textInset", "surfaceInset"],
+    ["textInteractive", "surfaceInteractive"],
+    ["textNav", "nav"],
+    ["textOverlay", "overlay"],
+  ]) {
+    assert.equal(tokens[textKey], expectedNormalText(tokens[surfaceKey]), `${textKey} selects the strongest accessible endpoint`);
+  }
+
+  const warmCanvas = contrastRatio(WARM_TEXT_LIGHT, tokens.canvas) >= contrastRatio(WARM_TEXT_DARK, tokens.canvas)
+    ? WARM_TEXT_LIGHT
+    : WARM_TEXT_DARK;
+  assert.equal(tokens.textInverse, warmCanvas === WARM_TEXT_LIGHT ? WARM_TEXT_DARK : WARM_TEXT_LIGHT);
 });
 
 test("resolveTheme adjusts only inaccessible fixed status and chart candidates", () => {
@@ -396,6 +436,48 @@ test("resolveTheme chooses accessible action pairs for opposing and deterministi
     assert.ok(contrastRatio(tokens.action, tokens.surfaceInteractive) >= 3, `${palette.name}: action contrast`);
     assert.ok(contrastRatio(tokens.actionText, tokens.action) >= 4.5, `${palette.name}: action text contrast`);
     assert.ok(contrastRatio(tokens.actionForeground, tokens.canvas) >= 4.5, `${palette.name}: action foreground contrast`);
+  }
+});
+
+test("resolveTheme keeps normal and muted text readable for seeded saturated palettes", () => {
+  const palettes = [
+    {
+      name: "seeded saturated blue",
+      primary: "#bf3c79",
+      secondary: "#20cf87",
+      background: "#2078c9",
+      surface: "#2083af",
+    },
+    {
+      name: "seeded saturated violet",
+      primary: "#e08a2e",
+      secondary: "#2ac6d8",
+      background: "#2e78d6",
+      surface: "#2083af",
+    },
+    {
+      name: "seeded saturated teal",
+      primary: "#d650a0",
+      secondary: "#f3c243",
+      background: "#2078c9",
+      surface: "#2783af",
+    },
+  ];
+
+  for (const palette of palettes) {
+    const { tokens } = resolveTheme(palette);
+    for (const [textKey, surfaceKey] of [
+      ["text", "canvas"],
+      ["textRaised", "surfaceRaised"],
+      ["textInset", "surfaceInset"],
+      ["textInteractive", "surfaceInteractive"],
+      ["textNav", "nav"],
+      ["textOverlay", "overlay"],
+    ]) {
+      assert.ok(contrastRatio(tokens[textKey], tokens[surfaceKey]) >= 4.5, `${palette.name}: ${textKey}`);
+    }
+    assert.ok(contrastRatio(tokens.textMuted, tokens.canvas) >= 4.5, `${palette.name}: textMuted`);
+    assert.ok(contrastRatio(tokens.textMutedRaised, tokens.surfaceRaised) >= 4.5, `${palette.name}: textMutedRaised`);
   }
 });
 
