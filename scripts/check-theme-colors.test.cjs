@@ -123,6 +123,9 @@ const pattern = /https?:\\/\\/cdn\\/red/;
 const colorPattern = /color: #abc/;
 const svgPattern = /fill="#def"/;
 if (ready) /fill="#fed"/.test(value);
+const factory = () => /color: #bed/;
+do /fill="#ace"/;
+await /stroke="#f0f"/;
 const style = "color: #def";
 `);
     const result = fixture.audit([css, js]);
@@ -554,6 +557,24 @@ test("rejects exception paths that do not resolve to scanned in-scope files", ()
       reason: "Official provider artwork.",
     }]);
     assert.ok(result.violations.some((violation) => violation.kind === "exception" && /does not resolve|scanned/i.test(violation.message)));
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("valid exceptions outside a selected batch remain globally valid and do not expand diagnostics", () => {
+  const fixture = createFixture();
+  try {
+    const selected = fixture.write("apps/web/src/a.css", ".a { color: #abc; }");
+    fixture.write("apps/web/src/b.css", ".b { color: #def; }");
+    const result = fixture.audit([selected], [{
+      path: "apps/web/src/b.css",
+      values: ["#def"],
+      reason: "Official provider artwork.",
+    }]);
+    assert.deepEqual(result.scannedFiles, ["apps/web/src/a.css"]);
+    assert.deepEqual(values(result), ["#abc"]);
+    assert.deepEqual(result.violations.filter((violation) => violation.kind === "exception"), []);
   } finally {
     fixture.cleanup();
   }

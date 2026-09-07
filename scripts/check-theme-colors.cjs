@@ -210,6 +210,7 @@ function looksLikeRegexStart(source, index) {
   let previous = index - 1;
   while (previous >= 0 && /\s/.test(source[previous])) previous -= 1;
   if (previous < 0 || /[=([{!?,:;]/.test(source[previous])) return true;
+  if (source[previous] === ">" && source[previous - 1] === "=") return true;
   if (source[previous] === ")") {
     let depth = 0;
     for (let cursor = previous; cursor >= 0; cursor -= 1) {
@@ -230,7 +231,7 @@ function looksLikeRegexStart(source, index) {
   const wordEnd = previous + 1;
   while (previous >= 0 && /[A-Za-z]/.test(source[previous])) previous -= 1;
   const word = source.slice(previous + 1, wordEnd);
-  return ["case", "else", "return", "throw", "typeof", "void", "yield"].includes(word);
+  return ["await", "case", "do", "else", "return", "throw", "typeof", "void", "yield"].includes(word);
 }
 
 function maskComments(source, extension = ".css") {
@@ -771,13 +772,14 @@ function auditSources({ root = process.cwd(), files, exceptions } = {}) {
   }
   const collected = collectFiles(absoluteRoot, realRoot, files);
   const sourceEntries = collected.entries;
+  const eligibleEntries = collectFiles(absoluteRoot, realRoot).entries;
   const exceptionInput = exceptions === undefined ? loadExceptions(absoluteRoot) : exceptions;
   const normalizedExceptions = normalizeExceptions(exceptionInput);
   const violations = [...collected.errors, ...normalizedExceptions.violations];
   const scannedFiles = sourceEntries.map(([relative]) => relative);
-  const scannedFileSet = new Set(scannedFiles);
+  const eligibleFileSet = new Set(eligibleEntries.map(([relative]) => relative));
   for (const reference of normalizedExceptions.references || []) {
-    if (!scannedFileSet.has(reference.file)) {
+    if (!eligibleFileSet.has(reference.file)) {
       violations.push({
         kind: "exception",
         file: "<exceptions>",
