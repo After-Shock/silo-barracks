@@ -12,9 +12,16 @@ UI.
 
 ## Scope
 
-The audit covers Home, Recently Added, Libraries and nested item views, Users and
-profiles, Activity, Calendar, Statistics, every Settings subsection, About, and
-their responsive/mobile presentations. It also covers components reached from
+The audit covers every unconditional and conditional main-navigation destination:
+Home and Kiosk, Recently Added, Libraries and nested item views, Users and
+profiles, Activity and Timeline, Calendar, Requests, Downloads, Active
+Transcodes, Invites/Wizarr, Automation Health, Statistics, Server Management,
+Settings, Integrations, and About. It includes every Settings subsection:
+General, Security, Kiosk, Libraries, Activity Monitor, Authorised Devices,
+Plugins, Integrations, Silo Servers, API Keys, Webhooks, Notifications,
+Newsletter, Tasks, Backup, Imports, Health, Repair, and Logs. Provider- or
+integration-dependent screens are tested with fixture availability enabled.
+All routes include their responsive/mobile presentations and components reached from
 those screens: dialogs, menus, tooltips, forms, tables, pagination, charts,
 loading states, empty states, warnings, and errors.
 
@@ -28,8 +35,10 @@ contracts, navigation, permissions, or backend behavior.
 All themes share the Barracks visual grammar:
 
 - Dark, warm foundations with clearly separated surface levels.
-- Restrained blue for focus and primary action, coral for live/active emphasis,
-  and orange for warnings or paused states in the default theme.
+- Default semantic accents are steel blue `#6f9bcf` for focus and primary action,
+  coral `#ff6f63` for live/active emphasis, and orange `#ffa64f` for warnings or
+  paused states. Success is `#70b981`; danger/error is `#e45f55`. All are paired
+  with text or icons rather than used as the only state indicator.
 - Section accents may use coordinated theme colors, but broad decorative
   purple/teal gradients are prohibited.
 - Compact operational typography, readable contrast, deliberate borders, and
@@ -45,29 +54,61 @@ updates the complete visible interface immediately, and persists across reloads.
 
 ### 1. Semantic theme contract
 
-`apps/web/src/lib/theme.js` owns the theme definition and application logic. Each
-theme supplies core palette inputs and resolves them into a complete semantic
-contract exposed as CSS custom properties:
+`apps/web/src/lib/theme.js` owns theme validation, derivation, persistence, and
+application. Presets and custom themes retain the four public six-digit hex
+inputs `primary`, `secondary`, `background`, and `surface`. The resolver returns
+a plain object of CSS color strings keyed by the following stable contract, then
+`applyTheme` writes the equivalent CSS properties:
 
-- canvas and navigation backgrounds;
-- raised, inset, interactive, and overlay surfaces;
-- subtle and strong borders;
-- primary, secondary, muted, and inverse text;
-- focus and primary action;
-- active/live, success, warning/paused, danger/error, and unavailable states;
-- chart/grid/tooltip colors and a bounded chart series palette;
-- shadows and scrims.
+| Resolver key | CSS property | Role |
+| --- | --- | --- |
+| `canvas` | `--barracks-canvas` | Page background |
+| `nav` | `--barracks-nav` | Desktop/mobile navigation |
+| `surfaceRaised` | `--barracks-surface-raised` | Cards/dialogs |
+| `surfaceInset` | `--barracks-surface-inset` | Tables/code/inset regions |
+| `surfaceInteractive` | `--barracks-surface-interactive` | Inputs/menus/hover targets |
+| `overlay` | `--barracks-overlay` | Popovers/tooltips |
+| `borderSubtle`, `borderStrong` | `--barracks-border-subtle`, `--barracks-border-strong` | Boundaries |
+| `text`, `textMuted`, `textInverse` | `--barracks-text`, `--barracks-text-muted`, `--barracks-text-inverse` | Typography |
+| `focus`, `action` | `--barracks-focus`, `--barracks-action` | Keyboard focus/primary actions |
+| `live`, `success`, `warning`, `danger`, `unavailable` | matching `--barracks-state-*` properties | Status semantics |
+| `chartGrid`, `chartTooltip` | matching `--barracks-chart-*` properties | Chart structure |
+| `chart1` through `chart6` | `--barracks-chart-1` through `--barracks-chart-6` | Ordered series palette |
+| `scrim`, `shadow` | `--barracks-scrim`, `--barracks-shadow` | Layer depth |
 
-Missing or malformed stored theme data resolves to the default Barracks theme.
-Theme application is atomic from the UI's perspective: all properties are set on
-the root before consumers render the new state.
+Legacy aliases such as `--primary-color`, `--background-color`, and
+`--secondary-background-color` remain mapped to the semantic values during this
+migration so unchanged third-party/library rules do not break. New or migrated
+application styles use only `--barracks-*` names.
+
+Derivation is deterministic: `canvas` uses `background`; `nav` and
+`surfaceRaised` use `surface`; inset/interactive/overlay and borders are fixed
+linear RGB mixes of `surface`, `background`, and the chosen text color; focus and
+action use `primary`; theme personality uses `secondary`; state colors use the
+accessible fixed status values above; chart series are `[primary, live, warning,
+secondary, success, danger]`. The resolver and storage adapter are exported pure
+units and can be tested without rendering React.
+
+For each background/surface, the resolver chooses the higher-contrast of warm
+light `#f5f0e7` and near-black `#10100f` for normal text. Muted text is mixed
+toward the background only until it still meets 4.5:1. Action/state text chooses
+black or white based on the same WCAG relative-luminance calculation. If a custom
+foreground role cannot meet 4.5:1, the resolver substitutes the higher-contrast
+choice. Thus arbitrary valid custom inputs remain accepted without making normal
+text unreadable. Missing or malformed fields fall back individually to the
+corresponding default input. Theme application is atomic from the UI's
+perspective: all properties are calculated before any are written to the root.
 
 ### 2. Framework compatibility layer
 
-A single application-owned stylesheet maps the semantic contract onto shared
+A new `apps/web/src/pages/css/framework-theme.css` stylesheet maps the semantic contract onto shared
 HTML controls and third-party component surfaces used by the product, including
 Bootstrap and MUI cards, modals, menus, inputs, buttons, tables, tooltips,
-pagination, tabs, chips, and popovers. This layer establishes safe defaults; it
+pagination, tabs, chips, and popovers. It may target documented Bootstrap/MUI
+public classes and CSS variables but may not depend on generated class names.
+Charts do not depend on this stylesheet: `getThemeTokens()` from `theme.js`
+supplies SVG/canvas props and the theme-change event triggers their rerender.
+This layer establishes safe defaults; it
 does not use sweeping selectors that erase intentional component states or
 provider branding.
 
@@ -90,27 +131,50 @@ Literal colors remain permissible only in a documented allowlist for:
 - accessibility-critical browser or library behavior that cannot consume CSS
   custom properties.
 
-Exceptions must be narrow to a file and purpose. They must not provide page
+Exceptions live in `apps/web/theme-color-exceptions.json` as
+`{"exceptions":[{"path":"relative/file","values":["#rrggbb"],"reason":"..."}]}`.
+Paths are exact repository-relative paths, values are case-insensitive exact
+color literals (no regular expressions or directory wildcards), and every entry
+requires a nonempty reason. The audit permits only the listed value in the listed
+file. The web UI maintainers own this file. Exceptions must be narrow to a file and purpose. They must not provide page
 backgrounds, general surfaces, generic controls, or decorative gradients.
 
 ## State and Data Flow
 
 At startup, saved theme input is validated and resolved against the default.
+The existing `silo_barracks_theme` storage value remains a JSON object with the
+four public palette fields; no destructive migration is required. Unknown fields
+are ignored. Existing per-field fallback behavior is retained and made explicit:
+one invalid field does not discard valid siblings. Storage reads, writes, and
+removals are wrapped independently. A read failure uses defaults; a write/remove
+failure still applies the requested theme for the current page lifetime and does
+not throw into React.
 The theme module calculates derived colors and writes the semantic property set
 to the document root. Application styles and compatibility rules consume only
 those properties. Selecting another theme repeats this resolution, persists the
 selection through the existing storage mechanism, and updates the open page,
-portals, and overlays without reload.
+portals, and overlays without reload. The existing
+`jellyglance-theme-updated` event remains emitted for compatibility and a new
+`silo-barracks-theme-updated` event with the resolved token object is emitted for
+migrated consumers. Both fire after root properties are updated.
 
 Charts read the semantic chart palette at render time or receive resolved values
 from the same theme module. They must refresh when the theme-change event fires.
 Portalled MUI/Bootstrap overlays inherit root variables and therefore update with
 the rest of the interface.
 
+Home/Kiosk display modes remain layout/density choices, not independent color
+systems. `default`, `darker`, `highContrast`, and `wall` remain supported and use
+semantic tokens. The stored `neon` identifier remains accepted for backward
+compatibility but is relabeled “Signal” and recolored with low-opacity semantic
+blue/coral/orange accents. It contains no purple/teal literals. Existing saved
+Kiosk settings therefore continue to load without preserving JellyGlance styling.
+
 ## Error Handling and Accessibility
 
 - Invalid saved theme names, malformed colors, or incomplete custom values fall
-  back to Barracks defaults without producing invalid CSS.
+  back per field to Barracks defaults without producing invalid CSS. Storage API
+  failures use the in-memory/default behavior described above.
 - Focus indicators remain visible on every interactive surface.
 - Text and meaningful UI boundaries target WCAG AA contrast for their rendered
   size; disabled state may be lower contrast but remains legible.
@@ -125,9 +189,12 @@ the rest of the interface.
 
 - Unit tests cover theme resolution, selection/persistence, derived semantic
   values, theme-change behavior, and malformed-input fallback.
-- A repository style audit flags prohibited legacy literal purple/teal values,
-  unauthorized application gradients, and newly introduced presentation color
-  literals outside the explicit exceptions file.
+- `scripts/check-theme-colors.cjs` scans application-owned `.css`, `.js`, and
+  `.jsx` under `apps/web/src`. It flags every hex/rgb/hsl color literal outside
+  `theme.js` unless the exact file/value pair is allowlisted. It also flags every
+  `linear-gradient`, `radial-gradient`, or `conic-gradient` whose color stops
+  contain literals or do not exclusively reference `--barracks-*` tokens.
+  Generated assets, `apps/web/public`, and dependencies are outside its scan.
 - The production frontend build and full existing project test suite pass.
 
 The style audit scans application-owned JSX/JS/CSS while ignoring generated
@@ -136,13 +203,19 @@ reports the file, line, and offending value so migration gaps are actionable.
 
 ### Browser coverage
 
-An authenticated browser sweep visits every main sidebar route and representative
-nested views/settings subsections. It verifies desktop and mobile navigation,
+An authenticated browser route matrix visits every route named in Scope, both
+nested Library routes, a User profile, Activity Timeline, Integrations, Kiosk,
+and every named Settings subsection. Conditional destinations use controlled
+fixtures so the sidebar links and principal states render. For each route it verifies desktop navigation,
+and a 390px mobile pass verifies navigation,
 forms, tables, charts, dialogs, menus, loading/empty/error states, and absence of
 horizontal overflow or runtime errors. Screenshots are captured for the default
 Barracks theme and at least two visually distinct alternate themes. Switching a
 theme while a dialog/chart is visible verifies that portalled and canvas/SVG
-content updates immediately.
+content updates immediately. The screenshot matrix captures all routes in the
+default Barracks preset. Ocean and Mono exercise all top-level routes plus open
+dialog, chart, table, and Settings samples. One valid custom palette and malformed
+stored input exercise Home, Activity, Settings, an open dialog, and a chart.
 
 ## Acceptance Criteria
 
