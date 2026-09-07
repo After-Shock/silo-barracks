@@ -209,8 +209,7 @@ function collectFiles(root, realRoot, requestedFiles) {
 function looksLikeRegexStart(source, index) {
   let previous = index - 1;
   while (previous >= 0 && /\s/.test(source[previous])) previous -= 1;
-  if (previous < 0 || /[=([{!?,:;]/.test(source[previous])) return true;
-  if (source[previous] === ">" && source[previous - 1] === "=") return true;
+  if (previous < 0 || /[=([{!?,:;\/~%^&|*+\-<>]/.test(source[previous])) return true;
   if (source[previous] === ")") {
     let depth = 0;
     for (let cursor = previous; cursor >= 0; cursor -= 1) {
@@ -231,7 +230,7 @@ function looksLikeRegexStart(source, index) {
   const wordEnd = previous + 1;
   while (previous >= 0 && /[A-Za-z]/.test(source[previous])) previous -= 1;
   const word = source.slice(previous + 1, wordEnd);
-  return ["await", "case", "do", "else", "return", "throw", "typeof", "void", "yield"].includes(word);
+  return ["await", "case", "delete", "do", "else", "extends", "in", "instanceof", "new", "of", "return", "throw", "typeof", "void", "yield"].includes(word);
 }
 
 function maskComments(source, extension = ".css") {

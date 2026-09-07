@@ -135,6 +135,36 @@ const style = "color: #def";
   }
 });
 
+test("masks regex literals after expression operators without swallowing division", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/operator-regex.js", `
+const andValue = ready && /color: #abc/;
+const orValue = ready || /fill="#def"/;
+const nullishValue = ready ?? /stroke="#fed"/;
+const multiplyValue = ready * /color: #bed/;
+const remainderValue = ready % /fill="#ace"/;
+const plusValue = ready + /stroke="#f0f"/;
+const lessValue = ready < /color: #123/;
+const equalValue = ready === /fill="#456"/;
+const bitValue = ready & /stroke="#789"/;
+const notValue = !/color: #987/;
+const invertValue = ~ /fill="#654"/;
+const ternaryValue = ready ? /stroke="#321"/ : null;
+const commaValue = (ready, /color: #fed/);
+const assignmentValue = result = /fill="#cba"/;
+const ratio = total / 2;
+const style = { color: "#abc" };
+const later = /stroke="#def"/;
+const finalStyle = { color: "#fed" };
+`);
+    const result = fixture.audit([source]);
+    assert.deepEqual(values(result), ["#abc", "#fed"]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
 test("detects colors in named palette arrays and palette objects without scanning arbitrary data", () => {
   const fixture = createFixture();
   try {
