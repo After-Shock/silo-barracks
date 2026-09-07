@@ -123,7 +123,10 @@ visible 3:1 boundary even for degenerate custom palettes with opposing canvas
 and surface colors.
 
 For each semantic surface, the resolver chooses the higher-contrast of warm
-light `#f5f0e7` and near-black `#10100f` for its normal text role:
+light `#f5f0e7` and near-black `#10100f` for its normal text role when that
+choice reaches 4.5:1. If both warm endpoints fall short on a saturated
+midtone, it falls back to whichever of pure white `#ffffff` or black `#000000`
+has higher contrast so the threshold remains guaranteed:
 `text`/canvas, `textRaised`/raised, `textInset`/inset,
 `textInteractive`/interactive, `textNav`/navigation, and
 `textOverlay`/overlay. Each pair must reach 4.5:1. Because arbitrary
