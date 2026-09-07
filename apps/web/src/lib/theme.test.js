@@ -519,6 +519,21 @@ test("resetTheme returns defaults and emits each exact event once after applicat
   assert.equal(log.filter(([type, name]) => type === "event" && name === "silo-barracks-theme-updated").length, 1);
 });
 
+test("resetTheme persists defaults so a legacy theme cannot re-migrate after reload", () => {
+  const legacyTheme = { primary: "#123456", secondary: "#654321", background: "#202020", surface: "#303030" };
+  const storage = createStorage({ [LEGACY_THEME_STORAGE_KEY]: JSON.stringify(legacyTheme) });
+  const root = createRoot();
+  const eventTarget = createEventTarget();
+
+  resetTheme({ storage, root, eventTarget });
+
+  assert.deepEqual(storage.calls.filter(([operation, key]) => operation === "setItem" && key === THEME_STORAGE_KEY), [
+    ["setItem", THEME_STORAGE_KEY, JSON.stringify(DEFAULT_THEME)],
+  ]);
+  assert.deepEqual(getStoredTheme({ storage }), DEFAULT_THEME);
+  assert.equal(root.style.values.get("--barracks-canvas"), DEFAULT_THEME.background);
+});
+
 test("failed storage writes and removals do not prevent applying themes in memory", () => {
   const saveRoot = createRoot();
   const saveEvents = createEventTarget();
@@ -534,6 +549,12 @@ test("failed storage writes and removals do not prevent applying themes in memor
   assert.equal(saveRoot.style.values.get("--barracks-canvas"), DEFAULT_THEME.background);
   assert.doesNotThrow(() => resetTheme({ storage: failingStorage, root: saveRoot, eventTarget: saveEvents }));
   assert.equal(saveRoot.style.values.get("--barracks-canvas"), DEFAULT_THEME.background);
+  assert.deepEqual(saveEvents.log.map(([, type]) => type), [
+    "jellyglance-theme-updated",
+    "silo-barracks-theme-updated",
+    "jellyglance-theme-updated",
+    "silo-barracks-theme-updated",
+  ]);
 });
 
 test("legacy theme migrates once when the Barracks key is absent and remains best effort", () => {

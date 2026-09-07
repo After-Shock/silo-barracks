@@ -440,6 +440,7 @@ export function saveTheme(theme, { storage = getGlobalStorage(), root = getDocum
 export function resetTheme({ storage = getGlobalStorage(), root = getDocumentRoot(), eventTarget = getGlobalEventTarget() } = {}) {
   const nextTheme = normalizeThemeInput(DEFAULT_THEME);
   removeStoredValue(storage, THEME_STORAGE_KEY);
+  writeStoredValue(storage, THEME_STORAGE_KEY, JSON.stringify(nextTheme));
   applyTheme(nextTheme, { root, storage });
   dispatchThemeEvent(eventTarget, "jellyglance-theme-updated", nextTheme);
   dispatchThemeEvent(eventTarget, "silo-barracks-theme-updated", getThemeTokens());
