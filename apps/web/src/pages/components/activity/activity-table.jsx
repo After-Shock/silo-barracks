@@ -304,6 +304,7 @@ export default function ActivityTable(props) {
       size: 160,
       Cell: ({ row }) => {
         row = row.original;
+        const unavailableLabel = i18next.t("UNAVAILABLE", { defaultValue: "Unavailable" });
         if (row.PlayMethod === "Transcode") {
           return (
             <Link onClick={() => openModal(row)} className="activity-method-pill is-transcode">
@@ -334,8 +335,13 @@ export default function ActivityTable(props) {
           );
         } else {
           return (
-            <Link onClick={() => openModal(row)} className="activity-method-pill is-empty">
-              -
+            <Link
+              onClick={() => openModal(row)}
+              className="activity-method-pill is-empty"
+              aria-label={unavailableLabel}
+              title={unavailableLabel}
+            >
+              {unavailableLabel}
             </Link>
           );
         }
@@ -550,9 +556,16 @@ export default function ActivityTable(props) {
         backgroundColor: "transparent",
         "&:nth-of-type(odd) .MuiTableCell-body": {
           backgroundColor: "var(--barracks-surface-raised)",
+          borderBottom: "1px solid var(--barracks-border-raised)",
+          color: "var(--barracks-text-raised)",
         },
         "&:nth-of-type(even) .MuiTableCell-body": {
           backgroundColor: "var(--barracks-surface-inset)",
+          borderBottom: "1px solid var(--barracks-border-inset)",
+          color: "var(--barracks-text-inset)",
+        },
+        "& .MuiTableCell-body :is(a:not(.activity-method-pill):not(.activity-client-link), .activity-title-copy strong, .activity-title-copy small, .activity-device-cell, .activity-ip-cell, .activity-ip-link, .activity-date-cell, .activity-duration-cell, .activity-user-link, .MuiIconButton-root, .MuiCheckbox-root, .MuiSvgIcon-root)": {
+          color: "inherit !important",
         },
         "& .MuiTableCell-body:first-of-type": {
           borderTopLeftRadius: "0",
@@ -564,10 +577,12 @@ export default function ActivityTable(props) {
         },
         "&:hover .MuiTableCell-body": {
           backgroundColor: "var(--barracks-surface-interactive)",
+          borderBottomColor: "var(--barracks-border-strong)",
+          color: "var(--barracks-text-interactive)",
         },
         "&:hover .MuiCheckbox-root": {
           opacity: 1,
-          color: muiColors.secondary,
+          color: "var(--barracks-text-interactive)",
         },
       },
     },
@@ -611,8 +626,6 @@ export default function ActivityTable(props) {
     paginationDisplayMode: "pages",
     muiTableBodyCellProps: {
       sx: {
-        borderBottom: "1px solid var(--barracks-border-raised)",
-        color: "var(--barracks-text-raised)",
         fontSize: "13px",
         fontWeight: 560,
         lineHeight: 1.35,

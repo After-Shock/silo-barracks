@@ -14,12 +14,12 @@
 
 .activity-mrt-paper .MuiTableHead-root .MuiButtonBase-root,
 .activity-mrt-paper .MuiTableHead-root .MuiSvgIcon-root {
-  color: var(--barracks-text-muted-raised) !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .activity-mrt-paper .MuiTableHead-root .Mui-active,
 .activity-mrt-paper .MuiTableSortLabel-icon {
-  color: var(--barracks-action-foreground) !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .activity-mrt-paper .MuiTableBody-root .MuiTableRow-root {
@@ -27,7 +27,8 @@
 }
 
 .activity-mrt-paper .MuiToolbar-root {
-  color: var(--barracks-text-raised);
+  border-color: var(--barracks-border-inset);
+  color: var(--barracks-text-inset);
 }
 
 .activity-table-toolbar-title {
@@ -35,7 +36,7 @@
   align-items: center;
   min-height: 28px;
   padding-left: 4px;
-  color: var(--barracks-text-muted-raised);
+  color: var(--barracks-text-inset);
   font-size: 12px;
   font-weight: 720;
   letter-spacing: 0.04em;
@@ -46,20 +47,20 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  border: 1px solid var(--barracks-border-strong);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 7px;
   padding: 2px 5px 2px 10px;
-  background: var(--barracks-surface-interactive);
+  background: var(--barracks-surface-inset);
 }
 
 .activity-table-actions-label {
-  color: var(--barracks-text-interactive);
+  color: var(--barracks-text-inset);
   font-size: 12px;
   font-weight: 700;
 }
 
 .activity-table-actions .MuiIconButton-root {
-  color: var(--barracks-text-interactive) !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .activity-table-actions .MuiIconButton-root:hover {
@@ -70,15 +71,20 @@
   color: var(--barracks-action) !important;
 }
 
+.activity-mrt-paper .MuiTableHead-root .MuiCheckbox-root {
+  color: var(--barracks-text-inset) !important;
+}
+
 .activity-mrt-paper a,
 .activity-table-link {
-  color: var(--barracks-text-raised) !important;
+  color: inherit !important;
   text-decoration: none !important;
 }
 
 .activity-table-link:hover,
 .activity-title-link:hover {
-  color: var(--barracks-action-foreground) !important;
+  color: inherit !important;
+  text-decoration: underline !important;
 }
 
 .activity-user-link {
@@ -221,8 +227,8 @@
 }
 
 .activity-method-pill.is-transcode {
-  border-color: var(--barracks-action);
-  color: var(--barracks-text-raised) !important;
+  border-color: var(--barracks-state-warning);
+  color: var(--barracks-state-warning) !important;
 }
 
 .activity-method-pill.is-stream {
@@ -255,7 +261,8 @@
 }
 
 .activity-ip-link {
-  color: var(--barracks-action-foreground) !important;
+  color: inherit !important;
+  text-decoration: underline !important;
 }
 
 .activity-duration-cell {
@@ -310,11 +317,11 @@
 }
 
 .activity-client:hover {
-  color: var(--barracks-action-foreground) !important;
+  color: var(--barracks-text-interactive) !important;
 }
 .activity-client:hover > span {
   cursor: pointer;
-  color: var(--barracks-action-foreground) !important;
+  color: var(--barracks-text-interactive) !important;
 }
 
 .activity-table td > a {
@@ -322,7 +329,7 @@
 }
 
 .activity-table td:hover > a {
-  color: var(--barracks-action-foreground);
+  color: inherit;
 }
 
 .page-number {
@@ -378,11 +385,11 @@
 
 .MuiTableCell-head > .Mui-active,
 .MuiTableSortLabel-icon {
-  color: var(--barracks-action-foreground) !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .MuiTableCell-head :hover {
-  color: var(--barracks-action-foreground) !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .activity-table-shell ~ .modal .modal-header {
