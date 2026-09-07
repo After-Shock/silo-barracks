@@ -3,12 +3,19 @@ import test from "node:test";
 
 import {
   DEFAULT_THEME,
+  LEGACY_THEME_STORAGE_KEY,
+  THEME_STORAGE_KEY,
+  applyTheme,
   contrastRatio,
   ensureContrast,
+  getStoredTheme,
+  getThemeTokens,
   mixHex,
   normalizeThemeInput,
   relativeLuminance,
+  resetTheme,
   resolveTheme,
+  saveTheme,
 } from "./theme.js";
 
 const SEMANTIC_KEYS = [
@@ -51,6 +58,59 @@ const SEMANTIC_KEYS = [
 
 const STATE_KEYS = ["live", "success", "warning", "danger", "unavailable"];
 const CHART_KEYS = ["chart1", "chart2", "chart3", "chart4", "chart5", "chart6"];
+
+function createStorage(initial = {}, { getItem, setItem, removeItem } = {}) {
+  const values = new Map(Object.entries(initial));
+  const calls = [];
+  return {
+    calls,
+    getItem(key) {
+      calls.push(["getItem", key]);
+      return getItem ? getItem(key, values) : (values.has(key) ? values.get(key) : null);
+    },
+    setItem(key, value) {
+      calls.push(["setItem", key, value]);
+      if (setItem) {
+        return setItem(key, value, values);
+      }
+      values.set(key, value);
+      return undefined;
+    },
+    removeItem(key) {
+      calls.push(["removeItem", key]);
+      if (removeItem) {
+        return removeItem(key, values);
+      }
+      values.delete(key);
+      return undefined;
+    },
+  };
+}
+
+function createRoot(log = []) {
+  const values = new Map();
+  return {
+    log,
+    style: {
+      colorScheme: "",
+      values,
+      setProperty(name, value) {
+        log.push(["set", name, value]);
+        values.set(name, value);
+      },
+    },
+  };
+}
+
+function createEventTarget(log = []) {
+  return {
+    log,
+    dispatchEvent(event) {
+      log.push(["event", event.type, event.detail]);
+      return true;
+    },
+  };
+}
 
 function assertAccessibleTokens(tokens) {
   assert.ok(contrastRatio(tokens.text, tokens.canvas) >= 4.5);
@@ -258,4 +318,234 @@ test("resolveTheme gives vivid custom palettes separate readable muted text role
   assert.ok(contrastRatio(tokens.textMuted, tokens.canvas) >= 4.5);
   assert.ok(contrastRatio(tokens.textMutedRaised, tokens.surfaceRaised) >= 4.5);
   assert.notEqual(tokens.textMuted, tokens.textMutedRaised);
+});
+
+test("getStoredTheme validates each persisted field, ignores unknown fields, and falls back on read errors", () => {
+  const storage = createStorage({
+    [THEME_STORAGE_KEY]: JSON.stringify({
+      primary: "invalid",
+      secondary: " #010203 ",
+      background: 42,
+      surface: "#040506",
+      ignored: "#abcdef",
+    }),
+  });
+  assert.deepEqual(getStoredTheme({ storage }), {
+    primary: DEFAULT_THEME.primary,
+    secondary: "#010203",
+    background: DEFAULT_THEME.background,
+    surface: "#040506",
+  });
+
+  const failedStorage = createStorage({}, {
+    getItem() {
+      throw new Error("storage unavailable");
+    },
+  });
+  assert.deepEqual(getStoredTheme({ storage: failedStorage }), DEFAULT_THEME);
+});
+
+test("applyTheme(undefined) loads the injected stored theme and emits no event", () => {
+  const theme = { primary: "#123456", secondary: "#654321", background: "#202020", surface: "#303030" };
+  const storage = createStorage({ [THEME_STORAGE_KEY]: JSON.stringify(theme) });
+  const root = createRoot();
+  const eventLog = [];
+  const eventTarget = createEventTarget(eventLog);
+
+  applyTheme(undefined, { storage, root });
+
+  assert.deepEqual(getThemeTokens(), resolveTheme(theme).tokens);
+  assert.equal(eventLog.length, 0);
+  assert.ok(root.style.values.has("--barracks-canvas"));
+});
+
+test("applyTheme calculates the complete palette before the first style write", () => {
+  const reads = new Set();
+  const theme = {};
+  for (const [key, value] of Object.entries({
+    primary: "#123456",
+    secondary: "#654321",
+    background: "#202020",
+    surface: "#303030",
+  })) {
+    Object.defineProperty(theme, key, {
+      get() {
+        reads.add(key);
+        return value;
+      },
+    });
+  }
+  const root = createRoot();
+  const expectedReads = ["primary", "secondary", "background", "surface"];
+  let firstWriteReads;
+  const originalSetProperty = root.style.setProperty;
+  root.style.setProperty = (...args) => {
+    firstWriteReads = [...reads];
+    originalSetProperty.apply(root.style, args);
+  };
+
+  applyTheme(theme, { root, storage: createStorage() });
+
+  assert.deepEqual(firstWriteReads.sort(), expectedReads.sort());
+});
+
+test("applyTheme writes semantic tokens, RGB companions, and legacy aliases as one complete map", () => {
+  const root = createRoot();
+  const theme = { primary: "#123456", secondary: "#fedcba", background: "#202020", surface: "#404040" };
+  const { tokens } = resolveTheme(theme);
+  applyTheme(theme, { root, storage: createStorage() });
+  const values = root.style.values;
+  const expected = {
+    "--barracks-canvas": tokens.canvas,
+    "--barracks-nav": tokens.nav,
+    "--barracks-surface-raised": tokens.surfaceRaised,
+    "--barracks-surface-inset": tokens.surfaceInset,
+    "--barracks-surface-interactive": tokens.surfaceInteractive,
+    "--barracks-overlay": tokens.overlay,
+    "--barracks-border-subtle": tokens.borderSubtle,
+    "--barracks-border-strong": tokens.borderStrong,
+    "--barracks-text": tokens.text,
+    "--barracks-text-muted": tokens.textMuted,
+    "--barracks-text-muted-raised": tokens.textMutedRaised,
+    "--barracks-text-inverse": tokens.textInverse,
+    "--barracks-focus": tokens.focus,
+    "--barracks-focus-light": tokens.focusLight,
+    "--barracks-focus-dark": tokens.focusDark,
+    "--barracks-action": tokens.action,
+    "--barracks-accent-secondary": tokens.accentSecondary,
+    "--barracks-state-live": tokens.live,
+    "--barracks-state-success": tokens.success,
+    "--barracks-state-warning": tokens.warning,
+    "--barracks-state-danger": tokens.danger,
+    "--barracks-state-unavailable": tokens.unavailable,
+    "--barracks-chart-grid": tokens.chartGrid,
+    "--barracks-chart-tooltip": tokens.chartTooltip,
+    "--barracks-chart-1": tokens.chart1,
+    "--barracks-chart-2": tokens.chart2,
+    "--barracks-chart-3": tokens.chart3,
+    "--barracks-chart-4": tokens.chart4,
+    "--barracks-chart-5": tokens.chart5,
+    "--barracks-chart-6": tokens.chart6,
+    "--barracks-scrim": tokens.scrim,
+    "--barracks-shadow": tokens.shadow,
+    "--barracks-action-rgb": tokens.actionRgb,
+    "--barracks-accent-secondary-rgb": tokens.accentSecondaryRgb,
+    "--barracks-surface-raised-rgb": tokens.surfaceRaisedRgb,
+    "--primary-color": tokens.action,
+    "--primary-rgb": tokens.actionRgb,
+    "--primary-light-color": mixHex(tokens.action, tokens.focusLight, 0.42),
+    "--primary-light-rgb": "185, 190, 192",
+    "--primary-dark-color": mixHex(tokens.action, tokens.focusDark, 0.28),
+    "--secondary-color": tokens.accentSecondary,
+    "--secondary-rgb": tokens.accentSecondaryRgb,
+    "--background-color": tokens.canvas,
+    "--secondary-background-color": tokens.surfaceRaised,
+    "--tertiary-background-color": tokens.surfaceInteractive,
+    "--surface-color": `rgba(${tokens.surfaceRaisedRgb}, 0.86)`,
+    "--surface-border-color": tokens.borderSubtle,
+    "--text-color": tokens.text,
+    "--muted-text-color": tokens.textMuted,
+    "--subtle-text-color": tokens.unavailable,
+  };
+  assert.deepEqual(Object.fromEntries(values), expected);
+});
+
+test("getThemeTokens returns a defensive copy of the last applied tokens", () => {
+  const root = createRoot();
+  applyTheme(DEFAULT_THEME, { root, storage: createStorage() });
+  const first = getThemeTokens();
+  first.canvas = "#000000";
+  const second = getThemeTokens();
+  assert.notEqual(first, second);
+  assert.equal(second.canvas, resolveTheme(DEFAULT_THEME).tokens.canvas);
+});
+
+test("applyTheme chooses a matching color scheme for dark and light canvases", () => {
+  const darkRoot = createRoot();
+  applyTheme(DEFAULT_THEME, { root: darkRoot, storage: createStorage() });
+  assert.equal(darkRoot.style.colorScheme, "dark");
+
+  const lightRoot = createRoot();
+  applyTheme({ primary: "#123456", secondary: "#654321", background: "#ffffff", surface: "#f0f0f0" }, {
+    root: lightRoot,
+    storage: createStorage(),
+  });
+  assert.equal(lightRoot.style.colorScheme, "light");
+});
+
+test("saveTheme applies before emitting normalized and resolved theme events", () => {
+  const log = [];
+  const root = createRoot(log);
+  const eventTarget = createEventTarget(log);
+  const storage = createStorage();
+  const theme = { primary: "invalid", secondary: " #010203 ", background: 42, surface: "#040506", ignored: true };
+  const normalized = { primary: DEFAULT_THEME.primary, secondary: "#010203", background: DEFAULT_THEME.background, surface: "#040506" };
+
+  assert.deepEqual(saveTheme(theme, { storage, root, eventTarget }), normalized);
+  assert.deepEqual(log.filter(([type]) => type === "event"), [
+    ["event", "jellyglance-theme-updated", normalized],
+    ["event", "silo-barracks-theme-updated", resolveTheme(normalized).tokens],
+  ]);
+  assert.ok(log.findIndex(([type, name]) => type === "set" && name === "--barracks-canvas") < log.findIndex(([type, name]) => type === "event" && name === "silo-barracks-theme-updated"));
+});
+
+test("resetTheme returns defaults and emits each exact event once after application", () => {
+  const log = [];
+  const root = createRoot(log);
+  const eventTarget = createEventTarget(log);
+  const storage = createStorage({ [THEME_STORAGE_KEY]: JSON.stringify({ primary: "#123456" }) });
+
+  assert.deepEqual(resetTheme({ storage, root, eventTarget }), DEFAULT_THEME);
+  assert.deepEqual(log.filter(([type]) => type === "event"), [
+    ["event", "jellyglance-theme-updated", DEFAULT_THEME],
+    ["event", "silo-barracks-theme-updated", resolveTheme(DEFAULT_THEME).tokens],
+  ]);
+  assert.equal(log.filter(([type, name]) => type === "event" && name === "jellyglance-theme-updated").length, 1);
+  assert.equal(log.filter(([type, name]) => type === "event" && name === "silo-barracks-theme-updated").length, 1);
+});
+
+test("failed storage writes and removals do not prevent applying themes in memory", () => {
+  const saveRoot = createRoot();
+  const saveEvents = createEventTarget();
+  const failingStorage = createStorage({}, {
+    setItem() {
+      throw new Error("quota exceeded");
+    },
+    removeItem() {
+      throw new Error("storage unavailable");
+    },
+  });
+  assert.doesNotThrow(() => saveTheme(DEFAULT_THEME, { storage: failingStorage, root: saveRoot, eventTarget: saveEvents }));
+  assert.equal(saveRoot.style.values.get("--barracks-canvas"), DEFAULT_THEME.background);
+  assert.doesNotThrow(() => resetTheme({ storage: failingStorage, root: saveRoot, eventTarget: saveEvents }));
+  assert.equal(saveRoot.style.values.get("--barracks-canvas"), DEFAULT_THEME.background);
+});
+
+test("legacy theme migrates once when the Barracks key is absent and remains best effort", () => {
+  const legacyTheme = { primary: "#123456", secondary: "invalid", background: "#202020", surface: "#303030", ignored: true };
+  const normalized = { primary: "#123456", secondary: DEFAULT_THEME.secondary, background: "#202020", surface: "#303030" };
+  const storage = createStorage({ [LEGACY_THEME_STORAGE_KEY]: JSON.stringify(legacyTheme) });
+  const root = createRoot();
+  assert.deepEqual(getStoredTheme({ storage }), normalized);
+  assert.deepEqual(storage.calls.filter(([operation, key]) => operation === "setItem" && key === THEME_STORAGE_KEY), [
+    ["setItem", THEME_STORAGE_KEY, JSON.stringify(normalized)],
+  ]);
+  applyTheme(undefined, { storage, root });
+  assert.equal(root.style.values.get("--barracks-canvas"), normalized.background);
+
+  const barracksWins = createStorage({
+    [THEME_STORAGE_KEY]: JSON.stringify({ primary: "#abcdef" }),
+    [LEGACY_THEME_STORAGE_KEY]: JSON.stringify(legacyTheme),
+  });
+  assert.deepEqual(getStoredTheme({ storage: barracksWins }), { ...DEFAULT_THEME, primary: "#abcdef" });
+  assert.equal(barracksWins.calls.some(([operation, key]) => operation === "setItem" && key === THEME_STORAGE_KEY), false);
+
+  const failedMigration = createStorage({ [LEGACY_THEME_STORAGE_KEY]: JSON.stringify(legacyTheme) }, {
+    setItem() {
+      throw new Error("quota exceeded");
+    },
+  });
+  const failedRoot = createRoot();
+  assert.doesNotThrow(() => applyTheme(undefined, { storage: failedMigration, root: failedRoot }));
+  assert.equal(failedRoot.style.values.get("--barracks-canvas"), normalized.background);
 });

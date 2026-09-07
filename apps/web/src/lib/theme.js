@@ -1,4 +1,5 @@
 export const THEME_STORAGE_KEY = "silo_barracks_theme";
+export const LEGACY_THEME_STORAGE_KEY = "jellyglance_custom_theme";
 
 export const DEFAULT_THEME = {
   primary: "#6f9bcf",
@@ -65,12 +66,6 @@ function hexToRgb(hexColor) {
     g: parseInt(normalized.slice(2, 4), 16),
     b: parseInt(normalized.slice(4, 6), 16),
   };
-}
-
-function darkenHex(hexColor, amount = 0.28) {
-  const { r, g, b } = hexToRgb(hexColor);
-  const channel = (value) => Math.max(0, Math.min(255, Math.round(value * (1 - amount))));
-  return `#${[channel(r), channel(g), channel(b)].map((value) => value.toString(16).padStart(2, "0")).join("")}`;
 }
 
 export function mixHex(firstHexColor, secondHexColor, weight = 0.42) {
@@ -259,62 +254,194 @@ function rgbString(hexColor) {
   return `${r}, ${g}, ${b}`;
 }
 
-export function getStoredTheme() {
+let lastAppliedTokens = null;
+
+function getGlobalStorage() {
   try {
-    const storedTheme = JSON.parse(localStorage.getItem(THEME_STORAGE_KEY) || "{}");
-    return {
-      primary: normalizeHexColor(storedTheme.primary, DEFAULT_THEME.primary),
-      secondary: normalizeHexColor(storedTheme.secondary, DEFAULT_THEME.secondary),
-      background: normalizeHexColor(storedTheme.background, DEFAULT_THEME.background),
-      surface: normalizeHexColor(storedTheme.surface, DEFAULT_THEME.surface),
-    };
+    return typeof localStorage === "undefined" ? undefined : localStorage;
   } catch {
-    return DEFAULT_THEME;
+    return undefined;
   }
 }
 
-export function saveTheme(theme) {
-  const nextTheme = {
-    primary: normalizeHexColor(theme.primary, DEFAULT_THEME.primary),
-    secondary: normalizeHexColor(theme.secondary, DEFAULT_THEME.secondary),
-    background: normalizeHexColor(theme.background, DEFAULT_THEME.background),
-    surface: normalizeHexColor(theme.surface, DEFAULT_THEME.surface),
-  };
+function getDocumentRoot() {
+  try {
+    return typeof document === "undefined" ? undefined : document.documentElement;
+  } catch {
+    return undefined;
+  }
+}
 
-  localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(nextTheme));
-  applyTheme(nextTheme);
-  window.dispatchEvent(new CustomEvent("jellyglance-theme-updated", { detail: nextTheme }));
+function getGlobalEventTarget() {
+  try {
+    return typeof window === "undefined" ? undefined : window;
+  } catch {
+    return undefined;
+  }
+}
+
+function readStoredValue(storage, key) {
+  try {
+    const value = storage?.getItem(key);
+    if (value === null || typeof value === "undefined") {
+      return { status: "absent" };
+    }
+    return { status: "present", value: JSON.parse(value) };
+  } catch {
+    return { status: "failed" };
+  }
+}
+
+function isThemeRecord(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function writeStoredValue(storage, key, value) {
+  try {
+    storage?.setItem(key, value);
+  } catch {
+    // Storage is optional and may be unavailable or full; the in-memory theme still applies.
+  }
+}
+
+function removeStoredValue(storage, key) {
+  try {
+    storage?.removeItem(key);
+  } catch {
+    // Storage removal is best effort; reset still applies in memory.
+  }
+}
+
+export function getStoredTheme({ storage = getGlobalStorage() } = {}) {
+  const stored = readStoredValue(storage, THEME_STORAGE_KEY);
+  if (stored.status === "present") {
+    return normalizeThemeInput(stored.value);
+  }
+  if (stored.status === "failed") {
+    return normalizeThemeInput();
+  }
+
+  const legacy = readStoredValue(storage, LEGACY_THEME_STORAGE_KEY);
+  if (legacy.status !== "present" || !isThemeRecord(legacy.value)) {
+    return normalizeThemeInput();
+  }
+
+  const normalizedLegacy = normalizeThemeInput(legacy.value);
+  writeStoredValue(storage, THEME_STORAGE_KEY, JSON.stringify(normalizedLegacy));
+  return normalizedLegacy;
+}
+
+const semanticPropertyMap = [
+  ["--barracks-canvas", "canvas"],
+  ["--barracks-nav", "nav"],
+  ["--barracks-surface-raised", "surfaceRaised"],
+  ["--barracks-surface-inset", "surfaceInset"],
+  ["--barracks-surface-interactive", "surfaceInteractive"],
+  ["--barracks-overlay", "overlay"],
+  ["--barracks-border-subtle", "borderSubtle"],
+  ["--barracks-border-strong", "borderStrong"],
+  ["--barracks-text", "text"],
+  ["--barracks-text-muted", "textMuted"],
+  ["--barracks-text-muted-raised", "textMutedRaised"],
+  ["--barracks-text-inverse", "textInverse"],
+  ["--barracks-focus", "focus"],
+  ["--barracks-focus-light", "focusLight"],
+  ["--barracks-focus-dark", "focusDark"],
+  ["--barracks-action", "action"],
+  ["--barracks-accent-secondary", "accentSecondary"],
+  ["--barracks-state-live", "live"],
+  ["--barracks-state-success", "success"],
+  ["--barracks-state-warning", "warning"],
+  ["--barracks-state-danger", "danger"],
+  ["--barracks-state-unavailable", "unavailable"],
+  ["--barracks-chart-grid", "chartGrid"],
+  ["--barracks-chart-tooltip", "chartTooltip"],
+  ["--barracks-chart-1", "chart1"],
+  ["--barracks-chart-2", "chart2"],
+  ["--barracks-chart-3", "chart3"],
+  ["--barracks-chart-4", "chart4"],
+  ["--barracks-chart-5", "chart5"],
+  ["--barracks-chart-6", "chart6"],
+  ["--barracks-scrim", "scrim"],
+  ["--barracks-shadow", "shadow"],
+  ["--barracks-action-rgb", "actionRgb"],
+  ["--barracks-accent-secondary-rgb", "accentSecondaryRgb"],
+  ["--barracks-surface-raised-rgb", "surfaceRaisedRgb"],
+];
+
+function getCssPropertyValues(tokens) {
+  const primaryLightColor = mixHex(tokens.action, tokens.focusLight, 0.42);
+  const primaryDarkColor = mixHex(tokens.action, tokens.focusDark, 0.28);
+  return {
+    ...Object.fromEntries(semanticPropertyMap.map(([property, key]) => [property, tokens[key]])),
+    "--primary-color": tokens.action,
+    "--primary-rgb": tokens.actionRgb,
+    "--primary-light-color": primaryLightColor,
+    "--primary-light-rgb": rgbString(primaryLightColor),
+    "--primary-dark-color": primaryDarkColor,
+    "--secondary-color": tokens.accentSecondary,
+    "--secondary-rgb": tokens.accentSecondaryRgb,
+    "--background-color": tokens.canvas,
+    "--secondary-background-color": tokens.surfaceRaised,
+    "--tertiary-background-color": tokens.surfaceInteractive,
+    "--surface-color": `rgba(${tokens.surfaceRaisedRgb}, 0.86)`,
+    "--surface-border-color": tokens.borderSubtle,
+    "--text-color": tokens.text,
+    "--muted-text-color": tokens.textMuted,
+    "--subtle-text-color": tokens.unavailable,
+  };
+}
+
+function writeThemeToRoot(root, tokens) {
+  if (!root?.style?.setProperty) {
+    return;
+  }
+  const values = getCssPropertyValues(tokens);
+  root.style.colorScheme = tokens.text === TEXT_DARK ? "light" : "dark";
+  for (const [property, value] of Object.entries(values)) {
+    root.style.setProperty(property, value);
+  }
+}
+
+export function applyTheme(theme, { root = getDocumentRoot(), storage = getGlobalStorage() } = {}) {
+  const sourceTheme = theme === undefined ? getStoredTheme({ storage }) : theme;
+  const { tokens } = resolveTheme(sourceTheme);
+  lastAppliedTokens = { ...tokens };
+  writeThemeToRoot(root, tokens);
+}
+
+export function getThemeTokens() {
+  return lastAppliedTokens ? { ...lastAppliedTokens } : null;
+}
+
+function dispatchThemeEvent(eventTarget, type, detail) {
+  if (!eventTarget?.dispatchEvent) {
+    return;
+  }
+  try {
+    const event = typeof CustomEvent === "function"
+      ? new CustomEvent(type, { detail })
+      : { type, detail };
+    eventTarget.dispatchEvent(event);
+  } catch {
+    // Consumers must not prevent a theme from being applied.
+  }
+}
+
+export function saveTheme(theme, { storage = getGlobalStorage(), root = getDocumentRoot(), eventTarget = getGlobalEventTarget() } = {}) {
+  const nextTheme = normalizeThemeInput(theme);
+  writeStoredValue(storage, THEME_STORAGE_KEY, JSON.stringify(nextTheme));
+  applyTheme(nextTheme, { root, storage });
+  dispatchThemeEvent(eventTarget, "jellyglance-theme-updated", nextTheme);
+  dispatchThemeEvent(eventTarget, "silo-barracks-theme-updated", getThemeTokens());
   return nextTheme;
 }
 
-export function resetTheme() {
-  localStorage.removeItem(THEME_STORAGE_KEY);
-  applyTheme(DEFAULT_THEME);
-  window.dispatchEvent(new CustomEvent("jellyglance-theme-updated", { detail: DEFAULT_THEME }));
-  return DEFAULT_THEME;
-}
-
-export function applyTheme(theme = getStoredTheme()) {
-  const root = document.documentElement;
-  const nextTheme = {
-    primary: normalizeHexColor(theme.primary, DEFAULT_THEME.primary),
-    secondary: normalizeHexColor(theme.secondary, DEFAULT_THEME.secondary),
-    background: normalizeHexColor(theme.background, DEFAULT_THEME.background),
-    surface: normalizeHexColor(theme.surface, DEFAULT_THEME.surface),
-  };
-  const { r, g, b } = hexToRgb(nextTheme.surface);
-  const primaryLightColor = mixHex(nextTheme.primary, "#ffffff");
-
-  root.style.colorScheme = "dark";
-  root.style.setProperty("--primary-color", nextTheme.primary);
-  root.style.setProperty("--primary-rgb", rgbString(nextTheme.primary));
-  root.style.setProperty("--primary-light-color", primaryLightColor);
-  root.style.setProperty("--primary-light-rgb", rgbString(primaryLightColor));
-  root.style.setProperty("--primary-dark-color", darkenHex(nextTheme.primary));
-  root.style.setProperty("--secondary-color", nextTheme.secondary);
-  root.style.setProperty("--secondary-rgb", rgbString(nextTheme.secondary));
-  root.style.setProperty("--background-color", nextTheme.background);
-  root.style.setProperty("--secondary-background-color", nextTheme.surface);
-  root.style.setProperty("--tertiary-background-color", darkenHex(nextTheme.surface, -0.18));
-  root.style.setProperty("--surface-color", `rgba(${r}, ${g}, ${b}, 0.86)`);
+export function resetTheme({ storage = getGlobalStorage(), root = getDocumentRoot(), eventTarget = getGlobalEventTarget() } = {}) {
+  const nextTheme = normalizeThemeInput(DEFAULT_THEME);
+  removeStoredValue(storage, THEME_STORAGE_KEY);
+  applyTheme(nextTheme, { root, storage });
+  dispatchThemeEvent(eventTarget, "jellyglance-theme-updated", nextTheme);
+  dispatchThemeEvent(eventTarget, "silo-barracks-theme-updated", getThemeTokens());
+  return nextTheme;
 }
