@@ -237,7 +237,9 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: var(--metric-art);
+  background-image:
+    linear-gradient(180deg, var(--barracks-scrim), var(--barracks-scrim)),
+    var(--metric-art);
   background-position: center;
   background-size: cover;
   content: "";
@@ -247,9 +249,12 @@
 
 .wrap-metric-card::after {
   position: absolute;
-  inset: 0;
+  inset: 7px;
   z-index: 1;
-  background: linear-gradient(180deg, var(--barracks-scrim), var(--barracks-scrim));
+  border: 1px solid var(--barracks-border-subtle);
+  border-radius: 8px;
+  background: var(--barracks-surface-raised);
+  box-shadow: 0 8px 24px var(--barracks-scrim);
   content: "";
 }
 
@@ -259,7 +264,7 @@
 }
 
 .wrap-metric-card.has-artwork::before {
-  opacity: 0.34;
+  opacity: 1;
 }
 
 .wrap-metric-card svg {

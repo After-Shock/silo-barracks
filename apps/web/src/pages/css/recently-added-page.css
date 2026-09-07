@@ -203,7 +203,7 @@
 .recent-library-shelf-title h2 {
   margin: 0;
   overflow: hidden;
-  color: var(--barracks-text);
+  color: var(--barracks-text-raised);
   font-size: clamp(18px, 1.4vw, 24px);
   font-weight: 950;
   line-height: 1.05;
@@ -214,7 +214,7 @@
 .recent-library-shelf-title span {
   display: block;
   margin-top: 4px;
-  color: var(--barracks-text);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 850;
 }
