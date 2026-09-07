@@ -69,7 +69,8 @@ a plain object of CSS color strings keyed by the following stable contract, then
 | `surfaceInteractive` | `--barracks-surface-interactive` | Inputs/menus/hover targets |
 | `overlay` | `--barracks-overlay` | Popovers/tooltips |
 | `borderSubtle`, `borderStrong` | `--barracks-border-subtle`, `--barracks-border-strong` | Boundaries |
-| `text`, `textMuted`, `textMutedRaised`, `textInverse` | `--barracks-text`, `--barracks-text-muted`, `--barracks-text-muted-raised`, `--barracks-text-inverse` | Canvas, muted-canvas, muted-raised, and inverse typography |
+| `text`, `textRaised`, `textInset`, `textInteractive`, `textNav`, `textOverlay` | `--barracks-text`, `--barracks-text-raised`, `--barracks-text-inset`, `--barracks-text-interactive`, `--barracks-text-nav`, `--barracks-text-overlay` | Surface-specific normal text |
+| `textMuted`, `textMutedRaised`, `textInverse` | `--barracks-text-muted`, `--barracks-text-muted-raised`, `--barracks-text-inverse` | Muted canvas/raised text and inverse typography |
 | `focus`, `focusLight`, `focusDark`, `action`, `actionText`, `actionForeground`, `accentSecondary` | `--barracks-focus`, `--barracks-focus-light`, `--barracks-focus-dark`, `--barracks-action`, `--barracks-action-text`, `--barracks-action-foreground`, `--barracks-accent-secondary` | Keyboard focus/action fills/action labels/canvas action links/theme personality |
 | `live`, `success`, `warning`, `danger`, `unavailable` | matching `--barracks-state-*` properties | Status semantics |
 | `chartGrid`, `chartTooltip` | matching `--barracks-chart-*` properties | Chart structure |
@@ -121,8 +122,11 @@ the adjusted `focus` ring together with one-pixel `focusLight` (`#f5f0e7`) and
 visible 3:1 boundary even for degenerate custom palettes with opposing canvas
 and surface colors.
 
-For each background/surface, the resolver chooses the higher-contrast of warm
-light `#f5f0e7` and near-black `#10100f` for normal text. Because arbitrary
+For each semantic surface, the resolver chooses the higher-contrast of warm
+light `#f5f0e7` and near-black `#10100f` for its normal text role:
+`text`/canvas, `textRaised`/raised, `textInset`/inset,
+`textInteractive`/interactive, `textNav`/navigation, and
+`textOverlay`/overlay. Each pair must reach 4.5:1. Because arbitrary
 canvas and raised-surface inputs can make one shared muted color mathematically
 incapable of reaching 4.5:1 on both, muted typography has two roles:
 `textMuted` is mixed toward `canvas` only until it still meets 4.5:1 there, and
@@ -130,6 +134,8 @@ incapable of reaching 4.5:1 on both, muted typography has two roles:
 until it still meets 4.5:1 there. Canvas/nav contexts use the former; cards,
 dialogs, menus, and other raised surfaces use the latter. The legacy
 `--muted-text-color` alias remains mapped to `textMuted` during migration.
+Normal text must always use the token associated with the element's actual
+semantic background; canvas text is not a fallback for surface-derived panels.
 Action/state text chooses warm light or near-black based on the same WCAG
 relative-luminance calculation. If a custom foreground role cannot meet 4.5:1,
 the resolver substitutes the higher-contrast choice for that role's associated
