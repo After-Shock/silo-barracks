@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/public/full-logo-transparent.png">
-    <img src="docs/public/full-logo-transparent.png" alt="JellyGlance" width="280">
+    <source media="(prefers-color-scheme: dark)" srcset="/full-logo-transparent.png">
+    <img src="/full-logo-transparent.png" alt="JellyGlance" width="280">
   </picture>
 </p>
 
@@ -71,7 +71,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/public/screenshots/Home.png" alt="JellyGlance home dashboard" width="920">
+  <img src="/screenshots/Home.png" alt="JellyGlance home dashboard" width="920">
 </p>
 
 <p align="center">
@@ -131,11 +131,11 @@ JellyGlance gives your Jellyfin server a proper dashboard: live sessions, reques
 
 | Dashboard | Activity |
 | --- | --- |
-| <img src="docs/public/screenshots/Home.png" alt="Home dashboard" width="440"> | <img src="docs/public/screenshots/Activity.png" alt="Activity table" width="440"> |
+| <img src="/screenshots/Home.png" alt="Home dashboard" width="440"> | <img src="/screenshots/Activity.png" alt="Activity table" width="440"> |
 
 | Libraries | Recently Added |
 | --- | --- |
-| <img src="docs/public/screenshots/Libraries.png" alt="Libraries overview" width="440"> | <img src="docs/public/screenshots/recently-added.png" alt="Recently added shelves" width="440"> |
+| <img src="/screenshots/Libraries.png" alt="Libraries overview" width="440"> | <img src="/screenshots/recently-added.png" alt="Recently added shelves" width="440"> |
 
 </details>
 
@@ -144,11 +144,11 @@ JellyGlance gives your Jellyfin server a proper dashboard: live sessions, reques
 
 | Statistics | Users |
 | --- | --- |
-| <img src="docs/public/screenshots/Stats.png" alt="Statistics dashboard" width="440"> | <img src="docs/public/screenshots/Users.png" alt="Users and roles" width="440"> |
+| <img src="/screenshots/Stats.png" alt="Statistics dashboard" width="440"> | <img src="/screenshots/Users.png" alt="Users and roles" width="440"> |
 
 | Calendar | Downloads |
 | --- | --- |
-| <img src="docs/public/screenshots/Calendar.png" alt="Release calendar" width="440"> | <img src="docs/public/screenshots/Downloads.png" alt="Download queue" width="440"> |
+| <img src="/screenshots/Calendar.png" alt="Release calendar" width="440"> | <img src="/screenshots/Downloads.png" alt="Download queue" width="440"> |
 
 </details>
 
@@ -157,17 +157,17 @@ JellyGlance gives your Jellyfin server a proper dashboard: live sessions, reques
 
 | Settings | Activity Settings |
 | --- | --- |
-| <img src="docs/public/screenshots/Settings.png" alt="Settings overview" width="440"> | <img src="docs/public/screenshots/Settings-Activity.png" alt="Activity settings" width="440"> |
+| <img src="/screenshots/Settings.png" alt="Settings overview" width="440"> | <img src="/screenshots/Settings-Activity.png" alt="Activity settings" width="440"> |
 
 The refreshed Settings center uses a persistent sidebar for general settings, security, authorised Jellyfin devices, plugins, tasks, integrations, webhooks, notifications, backups, imports, health, repair, and logs.
 
 | Security | Tasks |
 | --- | --- |
-| <img src="docs/public/screenshots/Settings-Security.png" alt="Security settings" width="440"> | <img src="docs/public/screenshots/Settings-Tasks.png" alt="Task settings" width="440"> |
+| <img src="/screenshots/Settings-Security.png" alt="Security settings" width="440"> | <img src="/screenshots/Settings-Tasks.png" alt="Task settings" width="440"> |
 
 | Webhooks | Profile |
 | --- | --- |
-| <img src="docs/public/screenshots/Settings-Webhooks.png" alt="Webhook settings" width="440"> | <img src="docs/public/screenshots/Profile-Page.png" alt="Profile page" width="440"> |
+| <img src="/screenshots/Settings-Webhooks.png" alt="Webhook settings" width="440"> | <img src="/screenshots/Profile-Page.png" alt="Profile page" width="440"> |
 
 </details>
 
