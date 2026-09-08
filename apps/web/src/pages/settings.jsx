@@ -49,6 +49,7 @@ const JellyfinAdminSettings = lazy(() => import("./components/settings/JellyfinA
 const BackupPage = lazy(() => import("./components/settings/backup_page"));
 const Logs = lazy(() => import("./components/settings/logs"));
 const KioskSettings = lazy(() => import("./components/settings/KioskSettings"));
+const SiloServers = lazy(() => import('./components/settings/SiloServers'));
 
 function tabTitle(Icon, label) {
   return (
@@ -76,6 +77,7 @@ const settingsTabItems = [
   { key: "tabJellyfinDevices", Icon: DeviceLineIcon, label: "Authorised Devices", group: "Media" },
   { key: "tabJellyfinPlugins", Icon: AppsLineIcon, label: "Plugins", group: "Media" },
   { key: "tabIntegrations", Icon: Plug2LineIcon, label: "Integrations", group: "Connections" },
+  { key: "tabServers", Icon: DeviceLineIcon, label: "Silo Servers", group: "Connections" },
   { key: "tabKeys", Icon: Key2LineIcon, label: <Trans i18nKey={"SETTINGS_PAGE.API_KEY"} />, group: "Connections" },
   { key: "tabWebhooks", Icon: Notification3LineIcon, label: <Trans i18nKey={"SETTINGS_PAGE.WEBHOOKS"} />, group: "Connections" },
   { key: "tabNotifications", Icon: Notification3LineIcon, label: "Notifications", group: "Connections" },
@@ -125,6 +127,7 @@ const settingsTabHashes = {
   tabLogs: "logs",
 };
 const settingsTabPaths = {
+  tabServers: 'servers',
   tabGeneral: "general",
   tabSecurity: "security",
   tabActivityMonitor: "activity-monitor",
@@ -301,6 +304,8 @@ export default function Settings() {
 
   function renderActiveSettingsPane() {
     switch (activeTab) {
+      case 'tabServers':
+        return <SettingsPane><SiloServers /></SettingsPane>;
       case "tabSecurity":
         return (
           <SettingsPane>
@@ -433,7 +438,7 @@ export default function Settings() {
     >
       <div className="settings-mobile-menu">
         <div className="settings-mobile-menu-list" role="tablist" aria-label="Settings sections">
-          {settingsTabItems.filter(({ key }) => !isSilo || !['tabJellyfinDevices', 'tabJellyfinPlugins'].includes(key)).map(({ key, Icon, label }) => (
+          {settingsTabItems.filter(({ key }) => isSilo ? !['tabJellyfinDevices', 'tabJellyfinPlugins'].includes(key) : key !== 'tabServers').map(({ key, Icon, label }) => (
             <button
               key={key}
               type="button"
@@ -452,7 +457,7 @@ export default function Settings() {
         {settingsTabGroups.map((group) => (
           <div className="settings-sidebar-group" key={group.label}>
             <span className="settings-sidebar-category">{group.label}</span>
-            {group.items.filter(({ key }) => !isSilo || !['tabJellyfinDevices', 'tabJellyfinPlugins'].includes(key)).map(({ key }) => (
+            {group.items.filter(({ key }) => isSilo ? !['tabJellyfinDevices', 'tabJellyfinPlugins'].includes(key) : key !== 'tabServers').map(({ key }) => (
               <button
                 key={key}
                 type="button"

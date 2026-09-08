@@ -19,6 +19,7 @@ class SiloAPI {
     this.version = 'Silo';
     this.userAgent = `Silo-Barracks/${require('../package.json').version}`;
     this.timeoutMs = Number.isFinite(options.timeoutMs) && options.timeoutMs > 0 ? options.timeoutMs : DEFAULT_TIMEOUT_MS;
+    this.enrichmentTimeoutMs = Math.min(this.timeoutMs, options.enrichmentTimeoutMs || 1500);
     this.fetch = options.fetch || globalThis.fetch;
     this.httpClient = options.httpClient;
     this.getConfig = options.getConfig || (async () => {
@@ -53,9 +54,9 @@ class SiloAPI {
     return this.config;
   }
 
-  async _rawRequest(path, { base, key } = {}) {
+  async _rawRequest(path, { base, key, timeoutMs = this.timeoutMs } = {}) {
     const settings = base ? { base: normalizeBase(base), key: String(key || '') } : await this._configured();
-    return requestJSON({ path, base: settings.base, key: settings.key, timeoutMs: this.timeoutMs,
+    return requestJSON({ path, base: settings.base, key: settings.key, timeoutMs,
       fetchImpl: this.fetch, httpClient: this.httpClient, userAgent: this.userAgent });
   }
 
@@ -77,11 +78,11 @@ class SiloAPI {
     return detail;
   }
 
-  async _detail(id) {
+  async _detail(id, options) {
     if (!id || /^https?:\/\//i.test(String(id))) throw new SiloRequestError('Invalid Silo item ID', 400);
     const cached = this._cachedDetail(id);
     if (cached) return cached;
-    const detail = await this._request(`catalog/items/${encodeURIComponent(String(id))}`);
+    const detail = await this._request(`catalog/items/${encodeURIComponent(String(id))}`, options);
     if (!detail || typeof detail !== 'object' || String(detail.content_id) !== String(id)) throw new SiloRequestError('Invalid Silo item response');
     return this._storeDetail(id, detail);
   }
@@ -101,7 +102,7 @@ class SiloAPI {
     if (this.serverInfoCache) return this.serverInfoCache.id;
     const fallback = `silo-${createHash('sha256').update(this.config.base).digest('hex').slice(0, 24)}`;
     try {
-      const health = await this._request('health');
+      const health = await this._request('health', { timeoutMs: this.enrichmentTimeoutMs });
       const id = health?.server_id ? String(health.server_id) : fallback;
       this.serverInfoCache = { id };
       return id;
@@ -111,11 +112,30 @@ class SiloAPI {
     }
   }
 
-  async getSessions() {
+  getSessions() {
+    if (!this.sessionsInFlight) {
+      this.sessionsInFlight = this._getSessions().finally(() => { this.sessionsInFlight = null; });
+    }
+    return this.sessionsInFlight;
+  }
+
+  async _getSessions() {
     await this._configured(true);
-    const rows = await this._request('admin/sessions');
+    // Two bounded attempts plus parallel optional metadata stay below the UI's
+    // 15-second deadline. Never retry authentication, redirects, or bad payloads.
+    const options = { timeoutMs: Math.min(this.timeoutMs, 5000) };
+    let rows;
+    try {
+      rows = await this._request('admin/sessions', options);
+    } catch (error) {
+      const transient = [502, 503, 504].includes(error.status)
+        || ['Silo request timed out', 'Unable to connect to Silo'].includes(error.message);
+      if (!transient) throw error;
+      await new Promise(resolve => setTimeout(resolve, 150));
+      rows = await this._request('admin/sessions', options);
+    }
     if (!Array.isArray(rows)) throw new SiloRequestError('Invalid Silo session response');
-    const serverId = await this._serverId();
+    const serverIdPromise = this._serverId();
     const details = new Map();
     const ids = [...new Set(rows.filter(isEpisodeSession).map(row => String(row.content_id || '')).filter(Boolean))];
     const uncached = [];
@@ -126,12 +146,13 @@ class SiloAPI {
       else if (failedUntil <= Date.now() && uncached.length < SESSION_ENRICH_LIMIT) uncached.push(id);
     }
     await Promise.all(uncached.map(async id => {
-      try { details.set(id, await this._detail(id)); }
+      try { details.set(id, await this._detail(id, { timeoutMs: this.enrichmentTimeoutMs })); }
       catch {
         this.detailFailureCache.set(id, Date.now() + DETAIL_CACHE_TTL_MS);
         while (this.detailFailureCache.size > DETAIL_CACHE_MAX) this.detailFailureCache.delete(this.detailFailureCache.keys().next().value);
       }
     }));
+    const serverId = await serverIdPromise;
     return rows.map(row => sessionToJellyfin(row, details.get(String(row.content_id)), serverId));
   }
 

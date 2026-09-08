@@ -356,6 +356,14 @@ app.use(`/auth`, authRateLimitUnlessPublicStatus, authRouter, () => {
 app.use("/proxy", authenticate, authorizeApiRoute, proxyRouter, () => {
   /*  #swagger.tags = ['Proxy']*/
 }); // mount the API router at /proxy
+let fleetRouter;
+app.use('/fleet', authenticate, (req, res, next) => {
+  if (require('./classes/provider').getProvider() !== 'silo') {
+    return res.status(404).json({ error: 'Multiple-server monitoring requires Silo.' });
+  }
+  if (!fleetRouter) fleetRouter = require('./routes/fleet').createFleetRouter(require('./classes/fleet-service').getFleetService());
+  return fleetRouter(req, res, next);
+});
 app.use("/api/startTask", taskRateLimit);
 app.use("/api/server-management/action", taskRateLimit);
 app.use("/sync", taskRateLimit);
@@ -676,6 +684,7 @@ try {
         console.log(`[JellyGlance] Server listening on http://${LISTEN_IP}:${PORT}`);
         if (require('./classes/provider').getProvider() === 'silo') {
           require('./tasks/SiloActivityMonitor').startSiloActivityMonitor();
+          require('./classes/fleet-service').startFleet();
         } else {
           ActivityMonitor.ActivityMonitor(1000);
         }

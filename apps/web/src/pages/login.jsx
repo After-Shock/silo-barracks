@@ -10,7 +10,7 @@ import { InputGroup } from "react-bootstrap";
 
 import EyeFillIcon from "remixicon-react/EyeFillIcon";
 import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
-import logo_dark from "./images/silo-icon.png";
+import logo_dark from "../../public/brand/barracks-mark.svg";
 import AuthArtworkBackground from "./components/AuthArtworkBackground";
 
 // import LibrarySync from "./components/settings/librarySync";

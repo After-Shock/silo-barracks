@@ -2,6 +2,8 @@ import axios from "./axios_instance";
 import baseUrl from "./baseurl";
 
 let cachedSessions = null;
+let sessionsInFlight = null;
+let sessionsInFlightToken = null;
 const listeners = new Set();
 const preloadedImages = new Set();
 let sessionStatus = { state: 'connecting', lastSuccessAt: null };
@@ -45,7 +47,7 @@ function handleLiveTV(row) {
 }
 
 function getContainerStream(row) {
-  const transcodeContainer = row.TranscodingInfo ? ` -> ${row.TranscodingInfo.Container.toUpperCase()}` : "";
+  const transcodeContainer = row.TranscodingInfo?.Container ? ` -> ${row.TranscodingInfo.Container.toUpperCase()}` : "";
   let nowPlayingItemContainer = "";
 
   if (row.NowPlayingItem.Container === undefined) {
@@ -56,7 +58,7 @@ function getContainerStream(row) {
     nowPlayingItemContainer = row.NowPlayingItem.Container;
   }
 
-  return `${nowPlayingItemContainer.toUpperCase()}${transcodeContainer}`;
+  return `${String(nowPlayingItemContainer || '').toUpperCase()}${transcodeContainer}`;
 }
 
 function getVideoStream(row) {
@@ -69,10 +71,10 @@ function getVideoStream(row) {
   if (row.TranscodingInfo && !row.TranscodingInfo.IsVideoDirect) {
     transcodeType = "Transcode";
     transcodeVideoResolution = getVideoResolution(row.TranscodingInfo.Height);
-    transcodeVideoCodec = ` -> ${row.TranscodingInfo.VideoCodec.toUpperCase()}-${transcodeVideoResolution}`;
+    transcodeVideoCodec = row.TranscodingInfo.VideoCodec ? ` -> ${row.TranscodingInfo.VideoCodec.toUpperCase()}-${transcodeVideoResolution}` : '';
   }
 
-  const originalVideoCodec = videoStream.Codec.toUpperCase();
+  const originalVideoCodec = String(videoStream.Codec || 'Unknown').toUpperCase();
   const videoResolution = getVideoResolution(videoStream.Height);
 
   return `${transcodeType} (${originalVideoCodec}-${videoResolution}${transcodeVideoCodec})`;
@@ -104,14 +106,14 @@ function getAudioStream(row) {
   let transcodeCodec = "";
   if (row.TranscodingInfo && !row.TranscodingInfo.IsAudioDirect) {
     transcodeType = "Transcode";
-    transcodeCodec = ` -> ${row.TranscodingInfo.AudioCodec.toUpperCase()}-${row.TranscodingInfo.AudioChannels}Ch`;
+    transcodeCodec = row.TranscodingInfo.AudioCodec ? ` -> ${row.TranscodingInfo.AudioCodec.toUpperCase()}-${row.TranscodingInfo.AudioChannels ?? '?'}Ch` : '';
   }
 
   let originalCodec = "";
   if (mediaTypeAudio) {
-    originalCodec = `${row.NowPlayingItem.Container.toUpperCase()}`;
+    originalCodec = String(row.NowPlayingItem.Container || '').toUpperCase();
   } else if (row.NowPlayingItem.MediaStreams?.length && streamIndex < row.NowPlayingItem.MediaStreams.length) {
-    originalCodec = `${row.NowPlayingItem.MediaStreams[streamIndex].Codec.toUpperCase()}-${
+    originalCodec = `${String(row.NowPlayingItem.MediaStreams[streamIndex]?.Codec || 'Unknown').toUpperCase()}-${
       row.NowPlayingItem.MediaStreams[streamIndex].Channels
     }Ch`;
   }
@@ -146,7 +148,7 @@ function getAudioBitrateStream(row) {
 function getSubtitleStream(row) {
   const subStreamIndex = row.PlayState?.SubtitleStreamIndex;
   if (subStreamIndex === undefined || subStreamIndex === -1) return "";
-  return row.NowPlayingItem.MediaStreams?.length ? `${row.NowPlayingItem.MediaStreams[subStreamIndex].DisplayTitle}` : "";
+  return row.NowPlayingItem.MediaStreams?.[subStreamIndex]?.DisplayTitle || "";
 }
 
 function preloadImage(src) {
@@ -161,9 +163,9 @@ export function normalizeSessions(sessionData) {
   if (!Array.isArray(sessionData)) return [];
 
   return sessionData
-    .filter((row) => row.NowPlayingItem !== undefined)
+    .filter((row) => row?.NowPlayingItem)
     .map((session) => {
-      const nextSession = { ...session, NowPlayingItem: { ...session.NowPlayingItem } };
+      const nextSession = { ...session, PlayState: session.PlayState || {}, NowPlayingItem: { ...session.NowPlayingItem } };
       handleLiveTV(nextSession);
       nextSession.NowPlayingItem.ContainerStream = getContainerStream(nextSession);
       nextSession.NowPlayingItem.VideoStream = getVideoStream(nextSession);
@@ -201,24 +203,39 @@ export function subscribeActiveSessions(listener) {
   return () => listeners.delete(listener);
 }
 
-export async function fetchActiveSessions(token = localStorage.getItem("token")) {
+export function fetchActiveSessions(token = localStorage.getItem("token")) {
+  if (sessionsInFlight && sessionsInFlightToken === token) return sessionsInFlight;
+  sessionsInFlightToken = token;
+  const request = refreshActiveSessions(token).finally(() => {
+    if (sessionsInFlight === request) sessionsInFlight = null;
+  });
+  sessionsInFlight = request;
+  return request;
+}
+
+async function refreshActiveSessions(token) {
+  const previousSuccessAt = sessionStatus.lastSuccessAt;
   try {
     const response = await axios.get("/proxy/getSessions", {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       timeout: 15000,
     });
     if (!Array.isArray(response.data)) throw new Error('Invalid activity response');
-    cacheSessionStatus({ state: 'connected', lastSuccessAt: new Date().toISOString(), message: '' });
+    const sessions = cacheActiveSessions(response.data);
+    const lastSuccessAt = new Date().toISOString();
+    cacheSessionStatus({ state: 'connected', lastSuccessAt, message: '' });
     // The independent history recorder can be unavailable while live REST works.
-    try {
-      const status = await axios.get('/proxy/sessionStatus', {
+    void axios.get('/proxy/sessionStatus', {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined, timeout: 5000,
-      });
-      if (status.data?.state === 'storage-unavailable') cacheSessionStatus(status.data);
-    } catch { /* Live data remains usable if the optional status request fails. */ }
-    return cacheActiveSessions(response.data);
+      }).then(status => {
+      if (sessionStatus.lastSuccessAt === lastSuccessAt && sessionStatus.state === 'connected'
+        && status.data?.state === 'storage-unavailable') cacheSessionStatus(status.data);
+      }).catch(() => { /* Optional history status must not block live data. */ });
+    return sessions;
   } catch (error) {
-    cacheSessionStatus({ state: 'unavailable', message: 'Activity is unavailable. Showing the last successful update.' });
+    if (sessionStatus.lastSuccessAt === previousSuccessAt) {
+      cacheSessionStatus({ state: 'unavailable', message: 'Activity is unavailable. Showing the last successful update.' });
+    }
     throw error;
   }
 }

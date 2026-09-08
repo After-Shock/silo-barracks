@@ -5,6 +5,7 @@ import Config from "../../../lib/config";
 import "../../css/sessions.css";
 import ErrorBoundary from "../general/ErrorBoundary";
 import SessionCard from "./session-card";
+import FleetOverview from './FleetOverview';
 
 import socket from "../../../socket";
 import {
@@ -23,7 +24,7 @@ import {
   shouldHideActiveSessionIp,
 } from "../../../lib/privacy-settings";
 
-function Sessions({ surface = "home" }) {
+function LegacySessions({ surface = "home" }) {
   const [data, setData] = useState(() => getCachedActiveSessions());
   const [status, setStatus] = useState(getSessionStatus);
   const [ipPrivacy, setIpPrivacy] = useState(() => getActiveSessionIpPrivacy());
@@ -156,4 +157,14 @@ function Sessions({ surface = "home" }) {
   );
 }
 
-export default Sessions;
+export default function Sessions(props) {
+  const [isSilo, setIsSilo] = useState(null);
+  const [configError, setConfigError] = useState(false);
+  useEffect(() => { Config.getConfig().then(config => {
+    if (typeof config?.IS_SILO !== 'boolean') throw new Error('Configuration unavailable');
+    setIsSilo(config.IS_SILO);
+  }).catch(() => setConfigError(true)); }, []);
+  if (configError) return <p role="status">Activity configuration unavailable. Please reload to retry.</p>;
+  if (isSilo === null) return <p role="status">Loading activity…</p>;
+  return isSilo ? <FleetOverview {...props} /> : <LegacySessions {...props} />;
+}

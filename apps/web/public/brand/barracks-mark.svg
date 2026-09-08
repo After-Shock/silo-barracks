@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <title>Silo Barracks</title>
+  <path fill="#6f9bcf" d="M5 22 19 10v44H5z"/>
+  <path fill="#ff6f63" d="m25 16 14-12v50H25z"/>
+  <path fill="#ffa64f" d="m45 22 14-12v44H45z"/>
+  <path stroke="#e8e0d0" stroke-width="3" d="M5 60h54"/>
+</svg>

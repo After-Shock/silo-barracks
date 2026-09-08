@@ -6,7 +6,7 @@ import { InputGroup } from "react-bootstrap";
 
 import EyeFillIcon from "remixicon-react/EyeFillIcon";
 import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
-import jellyfinLogo from "./images/silo-icon.png";
+import jellyfinLogo from "../../public/brand/barracks-mark.svg";
 
 import "./css/setup.css";
 import i18next from "i18next";

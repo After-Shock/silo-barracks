@@ -6,7 +6,7 @@ import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
 import DashboardLineIcon from "remixicon-react/DashboardLineIcon";
 import Database2LineIcon from "remixicon-react/Database2LineIcon";
 import Key2LineIcon from "remixicon-react/Key2LineIcon";
-import logo from "../../images/silo-icon.png";
+import logo from "../../../../public/brand/barracks-mark.svg";
 import AuthArtworkBackground from "../AuthArtworkBackground";
 
 const steps = [

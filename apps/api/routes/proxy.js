@@ -298,10 +298,17 @@ router.get("/Plugins/Images/", async (req, res) => {
 });
 
 router.get("/getSessions", async (req, res) => {
+  const startedAt = Date.now();
   try {
     const sessions = await API.getSessions();
     res.send(sessions);
   } catch (error) {
+    console.warn('[ACTIVITY] Session refresh failed', {
+      elapsedMs: Date.now() - startedAt,
+      status: Number(error?.status) || null,
+      // Do not log upstream messages, URLs, request headers, or credentials.
+      timeout: error?.message === 'Silo request timed out',
+    });
     res.status(503);
     res.json({ error: 'Activity is unavailable. Check the server connection and administrator API key.' });
   }

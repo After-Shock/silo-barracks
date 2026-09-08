@@ -46,6 +46,50 @@ function apiFor(url, key = 'sa_test_secret', extra = {}) {
   });
 }
 
+test('simultaneous activity consumers share the same upstream poll', async t => {
+  let polls = 0;
+  const fixture = await fixtureServer((req, res) => {
+    if (req.url.endsWith('/health')) return json(res, 200, { status: 'ok', server_id: 's' });
+    polls++;
+    setTimeout(() => json(res, 200, []), 30);
+  });
+  t.after(fixture.close);
+  const api = apiFor(fixture.url);
+  await Promise.all([api.getSessions(), api.getSessions(), api.getSessions()]);
+  assert.equal(polls, 1);
+});
+
+test('activity retries a transient upstream failure once but never retries denied credentials', async t => {
+  let polls = 0;
+  let denied = false;
+  const fixture = await fixtureServer((req, res) => {
+    if (req.url.endsWith('/health')) return json(res, 200, { status: 'ok', server_id: 's' });
+    polls++;
+    if (denied) return json(res, 401, {});
+    return json(res, polls === 1 ? 503 : 200, []);
+  });
+  t.after(fixture.close);
+  const api = apiFor(fixture.url);
+  assert.deepEqual(await api.getSessions(), []);
+  assert.equal(polls, 2);
+  denied = true;
+  await assert.rejects(api.getSessions());
+  assert.equal(polls, 3);
+});
+
+test('optional health and episode lookups do not stack full request timeouts', async t => {
+  const fixture = await fixtureServer((req, res) => {
+    if (req.url.endsWith('/admin/sessions')) return json(res, 200, [sessionWire]);
+    // Both optional endpoints hang until their request is aborted.
+  });
+  t.after(fixture.close);
+  const api = apiFor(fixture.url, 'test', { timeoutMs: 300, enrichmentTimeoutMs: 40 });
+  const start = Date.now();
+  const rows = await api.getSessions();
+  assert.equal(rows.length, 1);
+  assert.ok(Date.now() - start < 200, 'optional enrichment must have a short, parallel budget');
+});
+
 test('minimal direct sessions keep frontend-accessed string fields safe', () => {
   const session = sessionToJellyfin({ session_id: 'minimal', user_id: 1, content_id: 'movie',
     media_type: 'movie', media_title: 'Movie', effective_play_method: 'direct' }, null, 'server');
