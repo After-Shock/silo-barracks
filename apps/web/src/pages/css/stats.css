@@ -40,7 +40,7 @@
   border: 1px solid rgba(var(--barracks-action-rgb), 0.42);
   border-radius: 16px;
   background: linear-gradient(145deg, rgba(var(--barracks-action-rgb), 0.24), rgba(var(--barracks-action-rgb), 0.12));
-  color: var(--barracks-action);
+  color: var(--barracks-text-raised);
   box-shadow: 0 16px 42px rgba(var(--barracks-action-rgb), 0.16);
 }
 
@@ -51,7 +51,7 @@
 
 .stats-eyebrow {
   margin: 0 0 4px;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.16em;
@@ -103,7 +103,7 @@
 
 .stats-tab-nav .nav-link.active {
   background: linear-gradient(90deg, rgba(var(--barracks-action-rgb), 0.9), rgba(var(--barracks-action-rgb), 0.62)) !important;
-  color: var(--barracks-text-raised) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .stats-range-panel {
@@ -129,7 +129,7 @@
 }
 
 .stats-range-label {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   text-transform: uppercase;
 }
 
@@ -156,7 +156,7 @@
 .stats-presets button.active {
   border-color: rgba(var(--barracks-action-rgb), 0.58);
   background: linear-gradient(90deg, rgba(var(--barracks-action-rgb), 0.82), rgba(var(--barracks-action-rgb), 0.66));
-  color: var(--barracks-text-raised);
+  color: var(--barracks-action-text);
 }
 
 .stats-days-input {
@@ -182,7 +182,7 @@
   padding: 0 16px;
   border-color: rgba(var(--barracks-action-rgb), 0.42);
   background: rgba(var(--barracks-action-rgb), 0.16);
-  color: var(--barracks-action);
+  color: var(--barracks-text-interactive);
 }
 
 .stats-summary-strip {
@@ -208,7 +208,7 @@
   grid-row: span 2;
   width: 22px;
   height: 22px;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
 }
 
 .stats-summary-strip span {
@@ -266,7 +266,7 @@
   grid-row: span 2;
   width: 25px;
   height: 25px;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
 }
 
 .stats-overview-kpis span,
@@ -330,7 +330,7 @@
   border: 1px solid rgba(var(--barracks-action-rgb), 0.24);
   border-radius: 8px;
   background: rgba(var(--barracks-action-rgb), 0.13);
-  color: var(--barracks-action);
+  color: var(--barracks-text-raised);
 }
 
 .stats-leader-card svg {
@@ -417,7 +417,7 @@
 
 .stats-section-heading p {
   margin: 0 0 4px;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 950;
   letter-spacing: 0.18em;
@@ -515,7 +515,7 @@
 
 .stats-tooltip-title {
   margin: 0 0 8px;
-  color: var(--barracks-action);
+  color: var(--barracks-text-raised);
   font-size: 13px;
   font-weight: 950;
   text-align: center;
@@ -627,7 +627,7 @@
   border-color: var(--barracks-border-subtle);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
-  color: var(--barracks-action);
+  color: var(--barracks-text-raised);
   box-shadow: none;
 }
 
@@ -661,6 +661,7 @@
 .stats-tab-nav .nav-link.active,
 .stats-presets button.active {
   background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .stats-apply-button {
@@ -789,7 +790,7 @@
   border: 1px solid rgba(var(--barracks-action-rgb), 0.2);
   border-radius: 8px;
   background: rgba(var(--barracks-action-rgb), 0.12);
-  color: var(--barracks-action);
+  color: var(--barracks-text-raised);
 }
 
 .stats-rank-panel header svg {
@@ -833,7 +834,7 @@ a.stats-rank-row:hover {
   place-items: center;
   border-radius: 999px;
   background: rgba(var(--barracks-action-rgb), 0.16);
-  color: var(--barracks-action);
+  color: var(--barracks-text-raised);
   font-size: 11px;
   font-weight: 780;
 }
@@ -877,7 +878,7 @@ a.stats-rank-row:hover {
 
 .stats-chart-intro p {
   margin: 0 0 4px;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 740;
   letter-spacing: 0.08em;
