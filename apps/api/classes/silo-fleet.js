@@ -212,6 +212,7 @@ function createFleet({
       playingStreams,
       pausedStreams,
       sessions,
+      connection: record.client?.getConnectionInfo?.() || null,
     };
   }
 

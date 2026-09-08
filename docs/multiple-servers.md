@@ -8,4 +8,14 @@ Connections can be renamed, disabled, enabled, or removed. Leaving the key blank
 
 This version aggregates **live activity only**. Saved playback history, library statistics, user pages, and catalog pages still belong to the primary server. Additional-server session cards do not link into primary-server users or catalog items.
 
+Connections negotiate v1 or v2 independently, so mixed fleets are supported. Server
+settings display the detected API major and optional session-diagnostics availability.
+V2 session/user collections are fully paged with per-server ID deduplication. A failed
+later page or page-limit breach makes that server unavailable/partial rather than
+publishing a smaller confirmed total. Sessions without catalog attribution still
+count, but have no catalog link. Supported diagnostics include hardware acceleration,
+tone mapping, client build/channel, source/target audio and execution/egress nodes;
+denied diagnostics do not disable ordinary activity. Restart Barracks after an
+upstream API-version upgrade to renegotiate cached connections.
+
 Additional API keys are encrypted in PostgreSQL using the installation's `JWT_SECRET`. Keep that secret securely with full PostgreSQL backups: restoring the database with a different secret requires re-entering the additional-server keys. The existing in-app activity/catalog backup does not include server connections. Keys are never returned by management or activity endpoints. Management requires Settings permission; viewing activity requires Dashboard permission. Fleet updates use authenticated REST polling every five seconds.

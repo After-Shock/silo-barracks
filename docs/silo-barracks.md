@@ -3,7 +3,7 @@
 ## Connection
 
 Use the Silo native HTTP listener, not its Jellyfin compatibility listener.
-Both `https://silo.example.com` and `https://silo.example.com/api/v1` are accepted;
+Root URLs and URLs ending in `/api/v1` or `/api/v2` are accepted;
 reverse-proxy prefixes are preserved. An administrator-owned `sa_` API key is
 sent as a bearer credential by the backend. Setup checks health and the protected
 native session list. Barracks login is separate: choose local login or OIDC.
@@ -24,11 +24,23 @@ configure its database/volume; do not assume the new Compose file discovers it.
 
 ## Live activity and history
 
-The adapter consumes `GET /api/v1/admin/sessions`. The inspected Silo compatibility
+The adapter discovers `/api/v2/system/info` per connection and consumes the negotiated
+native `admin/sessions` endpoint. Only an explicit discovery 404 followed by valid
+legacy health and session responses selects v1; permission errors and malformed v2
+responses never silently downgrade. `/api/v1/health` remains the physical-identity
+probe for both versions. Restart Barracks after upgrading a connected server from
+v1 to v2: negotiated versions are cached until connection settings change or restart.
+The inspected Silo compatibility
 `/Sessions` returns an empty array and is intentionally not used. Native account ID,
 profile ID/name, session ID, content ID, pause state, progress and stream details
 are translated for the existing dashboard. Silo does not supply a stable physical
 device ID in this response, so the adapter labels its fallback as session-derived.
+
+V2 catalog/details/season/episode reads use the API-key owner's primary household
+profile, discovered through read-only `/api/v2/profiles`. A unique primary profile
+and upstream policy access are required; Barracks never selects a child/viewer's
+profile as a fallback or bypasses a PIN requirement. Activity remains available
+when optional catalog enrichment cannot resolve a usable profile.
 
 Five-second polling is the default. `SILO_POLL_INTERVAL_MS` is bounded from 1,000 to
 60,000 ms. A slow poll cannot overlap the next one. The browser receives sessions
@@ -64,7 +76,11 @@ upstream documentation describe JellyGlance, not a Silo feature guarantee.
 
 ## Verification
 
-The API reference is Silo source commit `2dedf3ff26e488dce37d5ef81d7cdce2d9ec80e5`.
+The original v1 reference is Silo commit `2dedf3ff26e488dce37d5ef81d7cdce2d9ec80e5`.
+The v2 contract fixtures are pinned to `26661d76f451ed790cf74221538b1048a8d193d6`.
+V2 verification currently covers synthetic native HTTP servers, strict draft-2020-12
+contract validation, and browser fixtures—not a deployed v2 Silo canary. See
+[v2 implementation status](silo-v2-status.md) for release gates.
 `npm test` runs transport, contract, provider and lifecycle tests. To include real
 PostgreSQL persistence/rollback checks, set `SILO_TEST_DATABASE_URL` to an isolated
 test database. Tests create and delete only their own temporary schema.

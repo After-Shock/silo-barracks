@@ -19,7 +19,10 @@ function createFleetRouter({ registry, fleet }) {
     fleet.invalidate(id);
     void fleet.refresh().catch(() => {});
   };
-  router.get('/servers', handle(async (_req, res) => res.json(await registry.listPublic())));
+  router.get('/servers', handle(async (_req, res) => {
+    const connections = new Map(fleet.snapshot().servers?.map(server => [server.id, server.connection]) || []);
+    res.json((await registry.listPublic()).map(server => ({ ...server, connection: connections.get(server.id) || null })));
+  }));
   router.post('/servers', handle(async (req, res) => {
     const server = await registry.add(req.body || {});
     refresh(server.id);

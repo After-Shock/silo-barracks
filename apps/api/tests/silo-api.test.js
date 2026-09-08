@@ -40,6 +40,7 @@ async function fixtureServer(handler) {
 
 function apiFor(url, key = 'sa_test_secret', extra = {}) {
   return new SiloAPI({
+    apiMajor: 1, // Legacy adapter contract; automatic negotiation is covered separately.
     getConfig: async () => ({ state: 2, JF_HOST: url, JF_API_KEY: key }),
     timeoutMs: 1000,
     ...extra,
@@ -237,7 +238,7 @@ test('systemInfo can probe health while setup config is at state one', async t =
     json(res, 200, { status: 'ok', server_name: 'Setup Silo', server_id: 'setup-id' });
   });
   t.after(fixture.close);
-  const api = new SiloAPI({ getConfig: async () => ({ state: 1, JF_HOST: fixture.url, JF_API_KEY: 'sa_setup' }) });
+  const api = new SiloAPI({ apiMajor: 1, getConfig: async () => ({ state: 1, JF_HOST: fixture.url, JF_API_KEY: 'sa_setup' }) });
   assert.equal((await api.systemInfo()).Id, 'setup-id');
 });
 
@@ -250,7 +251,7 @@ test('state-one setup can load native admins after the server key is saved', asy
     json(res, 404, {});
   });
   t.after(fixture.close);
-  const api = new SiloAPI({ getConfig: async () => ({ state: 1, JF_HOST: fixture.url, JF_API_KEY: 'sa_setup' }) });
+  const api = new SiloAPI({ apiMajor: 1, getConfig: async () => ({ state: 1, JF_HOST: fixture.url, JF_API_KEY: 'sa_setup' }) });
   assert.deepEqual((await api.getAdmins(true)).map(row => row.Id), ['9']);
 });
 
@@ -269,7 +270,7 @@ test('refreshes connection settings between top-level operations and resets serv
   });
   t.after(first.close); t.after(second.close);
   let config = { state: 2, JF_HOST: first.url, JF_API_KEY: 'sa_first' };
-  const api = new SiloAPI({ getConfig: async () => config });
+  const api = new SiloAPI({ apiMajor: 1, getConfig: async () => config });
   assert.equal((await api.getSessions())[0].ServerId, 'first-server');
   config = { state: 2, JF_HOST: second.url, JF_API_KEY: 'sa_second' };
   const changed = await api.getSessions();

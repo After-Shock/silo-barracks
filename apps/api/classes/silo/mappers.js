@@ -11,6 +11,7 @@ function ticks(seconds) {
 }
 
 function bps(kbps) {
+  if (kbps === null || kbps === undefined || kbps === '') return undefined;
   const value = Number(kbps);
   return Number.isFinite(value) && value >= 0 ? Math.round(value * 1000) : undefined;
 }
@@ -48,7 +49,7 @@ function mediaStreams(row) {
   }
   if (row.source_audio_codec || row.source_audio_channels || row.source_audio_language || row.source_audio_title) {
     streams.push({
-      Type: 'Audio', Codec: row.source_audio_codec || 'unknown', Channels: row.source_audio_channels ?? 0,
+      Type: 'Audio', Codec: row.source_audio_codec || 'unknown', Channels: row.source_audio_channels ?? undefined,
       Language: row.source_audio_language || undefined,
       DisplayTitle: row.source_audio_title || row.source_audio_layout || row.source_audio_codec || 'Unknown audio',
       IsExternal: false,
@@ -58,7 +59,7 @@ function mediaStreams(row) {
 }
 
 function sessionToJellyfin(row, detail, serverId) {
-  if (!row || typeof row !== 'object' || !row.session_id || row.user_id === undefined || !row.content_id) {
+  if (!row || typeof row !== 'object' || !row.session_id || row.user_id === undefined || row.user_id === null) {
     throw new TypeError('Invalid Silo session response');
   }
   const streams = mediaStreams(row);
@@ -73,7 +74,7 @@ function sessionToJellyfin(row, detail, serverId) {
     Container: String(row.target_container || row.source_container || ''),
     VideoCodec: String(row.target_video_codec || row.source_video_codec || 'unknown'),
     AudioCodec: String(row.target_audio_codec || row.source_audio_codec || 'unknown'),
-    AudioChannels: Number(row.target_audio_channels || row.source_audio_channels || 0),
+    AudioChannels: row.target_audio_channels ?? row.source_audio_channels ?? undefined,
     Height: resolutionHeight(row.target_resolution || row.source_video_resolution),
     VideoBitrate: bps(row.target_bitrate_kbps),
     IsVideoDirect: ['direct', 'remux'].includes(String(row.video_decision || '').toLowerCase()),
@@ -81,9 +82,10 @@ function sessionToJellyfin(row, detail, serverId) {
     TranscodeReasons: [],
   } : null;
   const item = {
-    Id: String(row.content_id), Name: isEpisode ? (row.episode_name || row.media_title || '') : (row.media_title || detail?.title || ''),
+    Id: row.content_id ? String(row.content_id) : '', SiloUnattributed: !row.content_id,
+    Name: isEpisode ? (row.episode_name || row.media_title || '') : (row.media_title || detail?.title || ''),
     Type: isEpisode ? 'Episode' : itemType(row.media_type),
-    RunTimeTicks: ticks(row.file_duration ?? (detail?.runtime === undefined ? undefined : detail.runtime * 60)),
+    RunTimeTicks: row.file_duration == null && detail?.runtime == null ? undefined : ticks(row.file_duration ?? detail.runtime * 60),
     SeriesName: row.series_name || detail?.series_title || undefined,
     SeriesId: detail?.series_id ? String(detail.series_id) : undefined,
     IndexNumber: row.episode_number ?? detail?.episode_number ?? undefined,
@@ -103,6 +105,14 @@ function sessionToJellyfin(row, detail, serverId) {
     PlayState: { IsPaused: Boolean(row.is_paused), PositionTicks: ticks(row.position_seconds), PlayMethod: method,
       AudioStreamIndex: streams.findIndex(stream => stream.Type === 'Audio'), SubtitleStreamIndex: -1 },
     TranscodingInfo: transcoding,
+    SiloDiagnostics: {
+      clientBuild: row.client_build || undefined, clientChannel: row.client_channel || undefined,
+      hardwareAcceleration: row.transcode_hw_accel || undefined, toneMapMode: row.tone_map_mode || undefined,
+      executionNode: row.routing_execution_node_name || undefined, egressNode: row.routing_egress_node_name || undefined,
+      sourceAudioCodec: row.source_audio_codec || undefined, sourceAudioChannels: row.source_audio_channels ?? undefined,
+      targetAudioCodec: row.target_audio_codec || undefined, targetAudioChannels: row.target_audio_channels ?? undefined,
+      reportedBitrate: bps(row.stream_bitrate_kbps),
+    },
   };
 }
 

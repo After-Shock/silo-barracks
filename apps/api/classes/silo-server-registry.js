@@ -1,5 +1,5 @@
 const { createHash, randomBytes, randomUUID, createCipheriv, createDecipheriv } = require('node:crypto');
-const { normalizeBase, requestJSON } = require('./silo/http');
+const { normalizeBase } = require('./silo/http');
 
 class RegistryError extends Error {
   constructor(message, status = 400) { super(message); this.status = status; }
@@ -25,13 +25,13 @@ function decryptKey(value, secret) {
 
 async function validateConnection(url, key) {
   try {
-    const request = path => requestJSON({ path, base: url, key, timeoutMs: 5000,
-      fetchImpl: globalThis.fetch, userAgent: 'Silo-Barracks' }).then(result => result.data);
-    const [health, sessions] = await Promise.all([request('health'), request('admin/sessions')]);
-    if (health?.status !== 'ok' || !health.server_id || !Array.isArray(sessions)) {
+    const SiloAPI = require('./silo-api');
+    const api = new SiloAPI({ getConfig: async () => ({ state: 2, SILO_URL: url, SILO_API_KEY: key }), timeoutMs: 5000 });
+    const { identity, sessions } = await api.probeConnection();
+    if (!identity?.Id || !Array.isArray(sessions)) {
       throw new RegistryError('The server did not return valid Silo health and activity data.');
     }
-    return { id: String(health.server_id), name: health.server_name || 'Silo' };
+    return { id: identity.Id, name: identity.ServerName };
   } catch (error) {
     if (error instanceof RegistryError) throw error;
     throw new RegistryError([401, 403].includes(error.status)

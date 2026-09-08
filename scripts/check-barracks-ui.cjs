@@ -13,7 +13,7 @@ async function main() {
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', error => { errors.push(error.message); console.log('Browser error:', error.stack); });
-    await page.goto('http://127.0.0.1:3000');
+    await page.goto(process.env.BARRACKS_BASE_URL || 'http://127.0.0.1:3000');
     await page.getByRole('button', { name: 'Login', exact: true }).waitFor();
     await page.screenshot({ path: `${process.env.BARRACKS_QA_DIR}/login.png` });
     await page.evaluate(token => localStorage.setItem('token', token), token);
@@ -30,7 +30,7 @@ async function main() {
     const polls = Number(process.env.BARRACKS_SMOKE_POLLS) || 16;
     for (let i = 0; i < polls; i++) {
       const started = Date.now();
-      const response = await context.request.get('http://127.0.0.1:3000/proxy/getSessions', {
+      const response = await context.request.get(`${process.env.BARRACKS_BASE_URL || 'http://127.0.0.1:3000'}/proxy/getSessions`, {
         headers: { Authorization: `Bearer ${token}` }, timeout: 15000,
       });
       timings.push(Date.now() - started);
@@ -42,7 +42,7 @@ async function main() {
     console.log(JSON.stringify({ polls: timings.length, failures, maxMs: Math.max(...timings),
       pageErrors: errors, activityNotice: await page.locator('.session-connection-status').allTextContents() }));
     await page.screenshot({ path: `${process.env.BARRACKS_QA_DIR}/dashboard.png` });
-    await page.goto('http://127.0.0.1:3000/activity');
+    await page.goto(`${process.env.BARRACKS_BASE_URL || 'http://127.0.0.1:3000'}/activity`);
     await page.getByRole('heading', { name: 'Activity', exact: true }).waitFor();
     await page.screenshot({ path: `${process.env.BARRACKS_QA_DIR}/activity.png` });
     await page.setViewportSize({ width: 390, height: 844 });

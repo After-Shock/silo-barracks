@@ -53,8 +53,11 @@ export default function SiloServers() {
     <div className="server-settings-list">
       {servers.map(server => {
         const status = snapshot?.servers.find(item => item.id === server.id);
+        const connection = server.connection || status?.connection;
         return <article className="server-settings-row" key={server.id}>
-          <div><strong>{server.name}</strong><small>{server.url}</small><small>{server.isPrimary ? 'Primary server · ' : ''}{!server.enabled ? 'Monitoring disabled' : status?.state === 'connected' ? `${status.activeStreams} active streams` : status?.state || 'Connecting…'}</small></div>
+          <div><strong>{server.name}</strong><small>{server.url}</small><small>{server.isPrimary ? 'Primary server · ' : ''}{!server.enabled ? 'Monitoring disabled' : status?.state === 'connected' ? `${status.activeStreams} active streams` : status?.state || 'Connecting…'}</small>
+            {connection?.apiMajor && <small>API v{connection.apiMajor}{connection.apiMajor === 2 ? ` · ${connection.diagnosticsAvailable ? 'Extended diagnostics available' : 'Extended diagnostics unavailable'}` : ' · Legacy API'}</small>}
+          </div>
           {server.isPrimary ? <Link to="/settings/integrations/media-server">Primary connection settings</Link> : <div className="server-settings-actions">
             <button disabled={busy} onClick={() => { setEditing(server.id); setForm({ name: server.name, url: server.url, apiKey: '' }); setError(''); }}>Edit</button>
             <button disabled={busy} onClick={() => run(() => axios.put(`/fleet/servers/${server.id}`, { enabled: !server.enabled }))}>{server.enabled ? 'Disable' : 'Enable'}</button>

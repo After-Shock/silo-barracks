@@ -5,18 +5,25 @@ const SiloAPI = require('../classes/silo-api');
 const { createFleet } = require('../classes/silo-fleet');
 const { validateConnection } = require('../classes/silo-server-registry');
 
-test('two native HTTP servers retain separate credentials, count paused streams, fail independently and recover', async t => {
+test('mixed v1/v2 native servers retain credentials, count paused streams, fail independently and recover', async t => {
   let failed = false;
   const rows = [];
   for (const id of ['alpha', 'beta']) {
     const server = http.createServer((req, res) => {
       res.setHeader('content-type', 'application/json');
       if (req.headers.authorization !== `Bearer fixture-${id}`) { res.statusCode = 403; return res.end('{}'); }
+      if (req.url.endsWith('/api/v2/system/info')) {
+        if (id === 'alpha') { res.statusCode = 404; return res.end('{}'); }
+        return res.end(JSON.stringify({ api_major: 2, server_version: 'fixture-v2', contract_digest: 'a'.repeat(64),
+          links: { openapi: '/api/v2/openapi.json', capabilities: '/api/v2/capabilities' } }));
+      }
       if (req.url.endsWith('/health')) return res.end(JSON.stringify({ status: 'ok', server_id: id }));
+      if (req.url.endsWith('/capabilities')) return res.end('{"available":false}');
       if (id === 'beta' && failed) { res.statusCode = 503; return res.end('{}'); }
-      res.end(JSON.stringify([{ session_id: 'same-session', user_id: 1, username: id,
+      const sessions = [{ session_id: 'same-session', user_id: '1', username: id,
         content_id: 'same-item', media_title: 'Fixture', media_type: 'movie', file_duration: 100,
-        position_seconds: 5, is_paused: id === 'beta', play_method: 'direct', client_name: 'Silo Web' }]));
+        position_seconds: 5, is_paused: id === 'beta', play_method: 'direct', client_name: 'Silo Web' }];
+      res.end(JSON.stringify(id === 'beta' ? { items: sessions } : sessions));
     });
     await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
     t.after(() => new Promise(resolve => server.close(resolve)));
@@ -29,6 +36,7 @@ test('two native HTTP servers retain separate credentials, count paused streams,
   let snapshot = await fleet.refresh();
   assert.equal(snapshot.totalActiveStreams, 2);
   assert.equal(snapshot.pausedStreams, 1);
+  assert.deepEqual(snapshot.servers.map(server => server.connection.apiMajor), [1, 2]);
   assert.notEqual(snapshot.servers[0].sessions[0].FleetSessionId, snapshot.servers[1].sessions[0].FleetSessionId);
   failed = true;
   snapshot = await fleet.refresh();

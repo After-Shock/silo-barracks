@@ -99,9 +99,11 @@ function SessionCard(props) {
   const [loadBackdrop, setLoadBackdrop] = useState(false);
   const [sessionModalVisible, setSessionModalVisible] = useState(false);
   const isSilo = session.MediaServerProvider === "silo";
+  const diagnostics = session.SiloDiagnostics || {};
   const clientLabel = `${session.Client || 'Unknown'} ${session.ApplicationVersion || ''}`.trim();
   // Additional-server IDs must never navigate into primary-server catalog/users.
-  const LocalLink = ({ to, target, ...rest }) => session.FleetServerId && session.FleetServerId !== 'primary'
+  const LocalLink = ({ to, target, ...rest }) => (session.FleetServerId && session.FleetServerId !== 'primary')
+    || (to.startsWith('/libraries/') && nowPlaying.SiloUnattributed)
     ? <span {...rest} /> : <Link to={to} target={target} {...rest} />;
   const posterUrl = isSilo ? publicSiloPoster(nowPlaying.SiloPosterUrl)
     : `${baseUrl}/proxy/Items/Images/Primary?id=${encodeURIComponent(mediaItemId)}&fillHeight=420&fillWidth=280&quality=68`;
@@ -256,6 +258,7 @@ function SessionCard(props) {
             </div>
           </div>
           <div className="session-popout-grid">
+            <SessionDetailItem label="Server" value={session.FleetServerName || session.ServerId} />
             <SessionDetailItem label="Viewer" value={session.UserName} />
             {session.ProfileName && <SessionDetailItem label="Profile" value={session.ProfileName} />}
             <SessionDetailItem label="Device" value={session.DeviceName} />
@@ -267,6 +270,15 @@ function SessionCard(props) {
             <SessionDetailItem label="Audio" value={nowPlaying.AudioStream} wide />
             <SessionDetailItem label="Audio bitrate" value={nowPlaying.AudioBitrateStream} />
             <SessionDetailItem label="Subtitles" value={nowPlaying.SubtitleStream} />
+            <SessionDetailItem label="Client build" value={diagnostics.clientBuild} />
+            <SessionDetailItem label="Client channel" value={diagnostics.clientChannel} />
+            <SessionDetailItem label="Hardware acceleration" value={diagnostics.hardwareAcceleration} />
+            <SessionDetailItem label="Tone mapping" value={diagnostics.toneMapMode} />
+            <SessionDetailItem label="Execution node" value={diagnostics.executionNode} />
+            <SessionDetailItem label="Egress node" value={diagnostics.egressNode} />
+            <SessionDetailItem label="Source audio" value={[diagnostics.sourceAudioCodec, diagnostics.sourceAudioChannels != null ? `${diagnostics.sourceAudioChannels} channels` : ''].filter(Boolean).join(' · ')} />
+            <SessionDetailItem label="Target audio" value={[diagnostics.targetAudioCodec, diagnostics.targetAudioChannels != null ? `${diagnostics.targetAudioChannels} channels` : ''].filter(Boolean).join(' · ')} />
+            <SessionDetailItem label="Reported stream bitrate" value={diagnostics.reportedBitrate != null ? `${(diagnostics.reportedBitrate / 1000000).toFixed(2)} Mbps` : ''} />
           </div>
         </Modal.Body>
       </Modal>
@@ -319,6 +331,8 @@ function SessionCard(props) {
                           </span>
                         </Tooltip>
                     </SessionCardDetailRow>
+                    {diagnostics.hardwareAcceleration && <SessionCardDetailRow label="Hardware"><span>{diagnostics.hardwareAcceleration}</span></SessionCardDetailRow>}
+                    {diagnostics.executionNode && <SessionCardDetailRow label="Worker"><span>{diagnostics.executionNode}</span></SessionCardDetailRow>}
                     {props.data.session.NowPlayingItem.ContainerStream !== "" && (
                       <SessionCardDetailRow label={<Trans i18nKey="CONTAINER" />} className="mt-2">
                           <Tooltip title={props.data.session.NowPlayingItem.ContainerStream}>

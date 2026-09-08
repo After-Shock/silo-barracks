@@ -1,12 +1,14 @@
 'use strict';
 
-const { createHash } = require('node:crypto');
-
 const {
   isEpisodeSession, sessionToJellyfin, userToJellyfin, libraryToJellyfin, itemToJellyfin,
   seasonToJellyfin, episodeToJellyfin, versionToMediaSource, forEachLimited,
 } = require('./silo/mappers');
 const { SiloRequestError, normalizeBase, requestJSON } = require('./silo/http');
+const { discoverSilo } = require('./silo/discovery');
+const createV1 = require('./silo/v1');
+const createV2 = require('./silo/v2');
+const { sessionCapabilities, supportedSession } = require('./silo/capabilities');
 
 const DEFAULT_TIMEOUT_MS = 8000;
 const DETAIL_CACHE_TTL_MS = 60 * 1000;
@@ -19,9 +21,13 @@ class SiloAPI {
     this.version = 'Silo';
     this.userAgent = `Silo-Barracks/${require('../package.json').version}`;
     this.timeoutMs = Number.isFinite(options.timeoutMs) && options.timeoutMs > 0 ? options.timeoutMs : DEFAULT_TIMEOUT_MS;
+    this.sessionBudgetMs = Number.isFinite(options.sessionBudgetMs) && options.sessionBudgetMs > 0
+      ? Math.min(options.sessionBudgetMs, 11500) : 11500;
     this.enrichmentTimeoutMs = Math.min(this.timeoutMs, options.enrichmentTimeoutMs || 1500);
     this.fetch = options.fetch || globalThis.fetch;
     this.httpClient = options.httpClient;
+    this.apiMajor = options.apiMajor;
+    this.maxPages = options.maxPages || 100;
     this.getConfig = options.getConfig || (async () => {
       const Config = require('./config');
       return new Config().getConfig();
@@ -30,6 +36,10 @@ class SiloAPI {
     this.detailFailureCache = new Map();
     this.seasonCache = new Map();
     this.serverInfoCache = null;
+    this.wirePromise = null;
+    this.connectionInfo = null;
+    this.backoffUntil = 0;
+    this.capabilityCache = null;
   }
 
   _clearUpstreamCaches() {
@@ -37,6 +47,10 @@ class SiloAPI {
     this.detailFailureCache.clear();
     this.seasonCache.clear();
     this.serverInfoCache = null;
+    this.wirePromise = null;
+    this.connectionInfo = null;
+    this.backoffUntil = 0;
+    this.capabilityCache = null;
   }
 
   async _configured(refresh = false) {
@@ -49,18 +63,97 @@ class SiloAPI {
     const key = config.SILO_API_KEY || config.JF_API_KEY;
     if (!host || !key) throw new SiloRequestError('Silo is not configured');
     const next = { base: normalizeBase(host), key: String(key), state: config.state };
-    if (this.config && (this.config.base !== next.base || this.config.key !== next.key)) this._clearUpstreamCaches();
-    this.config = next;
+    if (!this.config || this.config.base !== next.base || this.config.key !== next.key) {
+      this._clearUpstreamCaches();
+      this.config = next;
+    }
     return this.config;
   }
 
-  async _rawRequest(path, { base, key, timeoutMs = this.timeoutMs } = {}) {
+  async _rawRequest(path, { base, key, timeoutMs = this.timeoutMs, apiMajor = 1, profileId } = {}) {
     const settings = base ? { base: normalizeBase(base), key: String(key || '') } : await this._configured();
-    return requestJSON({ path, base: settings.base, key: settings.key, timeoutMs,
+    return requestJSON({ path, base: settings.base, key: settings.key, timeoutMs, apiMajor, profileId,
       fetchImpl: this.fetch, httpClient: this.httpClient, userAgent: this.userAgent });
   }
 
-  async _request(path, options) { return (await this._rawRequest(path, options)).data; }
+  async _wire(deadlineAt = Date.now() + this.timeoutMs) {
+    if (this.wirePromise) return this.wirePromise;
+    const settings = await this._configured();
+    if (this.wirePromise) return this.wirePromise;
+    const assertCurrent = () => { if (this.config !== settings) throw new SiloRequestError('Silo connection changed; retry the request'); };
+    const request = async (path, options = {}) => {
+      assertCurrent();
+      if (this.backoffUntil > Date.now()) {
+        const error = new SiloRequestError('Silo request failed (429)', 429);
+        error.retryAfterMs = this.backoffUntil - Date.now(); throw error;
+      }
+      try {
+        const result = await this._rawRequest(path, { ...settings, ...options });
+        assertCurrent();
+        return result.data;
+      } catch (error) {
+        assertCurrent();
+        if (error.retryAfterMs) this.backoffUntil = Date.now() + error.retryAfterMs;
+        throw error;
+      }
+    };
+    const promise = (async () => {
+      const discovered = this.apiMajor === 1 ? { apiMajor: 1, serverVersion: 'Silo', capabilities: {} }
+        : await discoverSilo({ request: (path, options) => {
+          const remaining = deadlineAt - Date.now();
+          if (remaining <= 0) throw new SiloRequestError('Silo request timed out');
+          return request(path, { ...options, timeoutMs: Math.min(this.timeoutMs, remaining) });
+        } });
+      assertCurrent();
+      if (this.apiMajor === 2 && discovered.apiMajor !== 2) throw new SiloRequestError('Silo API v2 is unavailable');
+      this.connectionInfo = discovered;
+      if (discovered.serverId) this.serverInfoCache = { id: discovered.serverId };
+      const read = (path, options) => request(path, { apiMajor: discovered.apiMajor, ...options });
+      return discovered.apiMajor === 2 ? createV2(read, { maxPages: this.maxPages }) : createV1(read);
+    })();
+    this.wirePromise = promise;
+    try { return await promise; }
+    catch (error) { if (this.wirePromise === promise) this.wirePromise = null; throw error; }
+  }
+
+  async _request(path, options) {
+    if (path === 'health' || options?.base) return (await this._rawRequest(path, options)).data;
+    const wire = await this._wire(options?.deadlineAt);
+    if (options?.deadlineAt) {
+      const remaining = options.deadlineAt - Date.now();
+      if (remaining <= 0) throw new SiloRequestError('Silo request timed out');
+      options = { ...options, timeoutMs: Math.min(options.timeoutMs || this.timeoutMs, remaining) };
+    }
+    return wire.read(path, options);
+  }
+
+  getConnectionInfo() {
+    if (!this.connectionInfo) return null;
+    const { apiMajor, serverVersion, contractDigest, checkedAt } = this.connectionInfo;
+    return { apiMajor, serverVersion, contractDigest, checkedAt,
+      diagnosticsAvailable: this.capabilityCache?.value?.available ?? null };
+  }
+
+  async _sessionCapabilities(settings) {
+    if (this.connectionInfo?.apiMajor !== 2) return undefined;
+    if (this.capabilityCache?.expiresAt > Date.now()) return this.capabilityCache.value;
+    let value;
+    try {
+      const response = await this._rawRequest('admin/sessions/capabilities', { ...settings, apiMajor: 2,
+        timeoutMs: Math.min(this.enrichmentTimeoutMs, 750) });
+      value = sessionCapabilities(response.data);
+    } catch { value = { available: false }; }
+    if (this.config === settings) this.capabilityCache = { value, expiresAt: Date.now() + 60000 };
+    return value;
+  }
+
+  async probeConnection() {
+    await this._configured(true);
+    await this._wire();
+    const sessions = await this._request('admin/sessions', { timeoutMs: Math.min(this.timeoutMs, 5000) });
+    if (!Array.isArray(sessions)) throw new SiloRequestError('Invalid Silo session response');
+    return { identity: await this.systemInfo(), sessions };
+  }
 
   _cachedDetail(id) {
     const entry = this.detailCache.get(String(id));
@@ -82,7 +175,9 @@ class SiloAPI {
     if (!id || /^https?:\/\//i.test(String(id))) throw new SiloRequestError('Invalid Silo item ID', 400);
     const cached = this._cachedDetail(id);
     if (cached) return cached;
+    const settings = await this._configured();
     const detail = await this._request(`catalog/items/${encodeURIComponent(String(id))}`, options);
+    if (this.config !== settings) throw new SiloRequestError('Silo connection changed; retry the request');
     if (!detail || typeof detail !== 'object' || String(detail.content_id) !== String(id)) throw new SiloRequestError('Invalid Silo item response');
     return this._storeDetail(id, detail);
   }
@@ -100,42 +195,47 @@ class SiloAPI {
 
   async _serverId() {
     if (this.serverInfoCache) return this.serverInfoCache.id;
-    const fallback = `silo-${createHash('sha256').update(this.config.base).digest('hex').slice(0, 24)}`;
+    const settings = this.config;
     try {
       const health = await this._request('health', { timeoutMs: this.enrichmentTimeoutMs });
-      const id = health?.server_id ? String(health.server_id) : fallback;
-      this.serverInfoCache = { id };
+      const id = health?.status === 'ok' && typeof health.server_id === 'string' ? health.server_id : '';
+      if (id && this.config === settings) this.serverInfoCache = { id };
       return id;
     } catch {
-      this.serverInfoCache = { id: fallback };
-      return fallback;
+      return '';
     }
   }
 
-  getSessions() {
-    if (!this.sessionsInFlight) {
-      this.sessionsInFlight = this._getSessions().finally(() => { this.sessionsInFlight = null; });
+  async getSessions() {
+    const settings = await this._configured(true);
+    if (!this.sessionsInFlight || this.sessionsSettings !== settings) {
+      const promise = this._getSessions(settings).finally(() => {
+        if (this.sessionsInFlight === promise) this.sessionsInFlight = null;
+      });
+      this.sessionsSettings = settings;
+      this.sessionsInFlight = promise;
     }
     return this.sessionsInFlight;
   }
 
-  async _getSessions() {
-    await this._configured(true);
+  async _getSessions(settings) {
     // Two bounded attempts plus parallel optional metadata stay below the UI's
     // 15-second deadline. Never retry authentication, redirects, or bad payloads.
-    const options = { timeoutMs: Math.min(this.timeoutMs, 5000) };
+    const options = { timeoutMs: Math.min(this.timeoutMs, 5000), deadlineAt: Date.now() + this.sessionBudgetMs };
     let rows;
     try {
       rows = await this._request('admin/sessions', options);
     } catch (error) {
       const transient = [502, 503, 504].includes(error.status)
         || ['Silo request timed out', 'Unable to connect to Silo'].includes(error.message);
-      if (!transient) throw error;
+      if (!transient || error.retryAfterMs || Date.now() + 150 >= options.deadlineAt) throw error;
       await new Promise(resolve => setTimeout(resolve, 150));
       rows = await this._request('admin/sessions', options);
     }
     if (!Array.isArray(rows)) throw new SiloRequestError('Invalid Silo session response');
+    if (this.config !== settings) throw new SiloRequestError('Silo connection changed; retry the request');
     const serverIdPromise = this._serverId();
+    const capabilitiesPromise = this._sessionCapabilities(settings);
     const details = new Map();
     const ids = [...new Set(rows.filter(isEpisodeSession).map(row => String(row.content_id || '')).filter(Boolean))];
     const uncached = [];
@@ -148,12 +248,15 @@ class SiloAPI {
     await Promise.all(uncached.map(async id => {
       try { details.set(id, await this._detail(id, { timeoutMs: this.enrichmentTimeoutMs })); }
       catch {
+        if (this.config !== settings) return;
         this.detailFailureCache.set(id, Date.now() + DETAIL_CACHE_TTL_MS);
         while (this.detailFailureCache.size > DETAIL_CACHE_MAX) this.detailFailureCache.delete(this.detailFailureCache.keys().next().value);
       }
     }));
     const serverId = await serverIdPromise;
-    return rows.map(row => sessionToJellyfin(row, details.get(String(row.content_id)), serverId));
+    const capabilities = await capabilitiesPromise;
+    if (this.config !== settings) throw new SiloRequestError('Silo connection changed; retry the request');
+    return rows.map(row => sessionToJellyfin(supportedSession(row, capabilities), details.get(String(row.content_id)), serverId));
   }
 
   async validateSettings(url, apikey) {
@@ -162,7 +265,9 @@ class SiloAPI {
       cleanedUrl = normalizeBase(url);
       const health = await this._request('health', { base: cleanedUrl, key: apikey });
       if (!health || health.status !== 'ok') throw new SiloRequestError('Invalid Silo health response');
-      const sessions = await this._request('admin/sessions', { base: cleanedUrl, key: apikey });
+      const candidate = new SiloAPI({ getConfig: async () => ({ state: 2, SILO_URL: cleanedUrl, SILO_API_KEY: apikey }),
+        fetch: this.fetch, httpClient: this.httpClient, timeoutMs: this.timeoutMs, apiMajor: this.apiMajor, maxPages: this.maxPages });
+      const sessions = await candidate._request('admin/sessions');
       if (!Array.isArray(sessions)) throw new SiloRequestError('Invalid Silo session response');
       return { isValid: true, status: 200, errorMessage: '', url, cleanedUrl };
     } catch (error) {
@@ -174,8 +279,10 @@ class SiloAPI {
     try {
       const settings = await this._configured(true);
       const health = await this._request('health', settings);
-      if (!health || health.status !== 'ok') return {};
-      return { Id: health.server_id || '', ServerName: health.server_name || 'Silo', Version: 'Silo' };
+      if (this.config !== settings || !health || health.status !== 'ok') return {};
+      await this._wire();
+      if (this.config !== settings) return {};
+      return { Id: health.server_id || '', ServerName: health.server_name || 'Silo', Version: this.connectionInfo?.serverVersion || 'Silo' };
     } catch { return {}; }
   }
 
@@ -198,11 +305,11 @@ class SiloAPI {
     return rows.map(row => libraryToJellyfin(row, serverId));
   }
 
-  async _catalogPage({ libraryId, startIndex = 0, limit = 100, recent = false }) {
+  async _catalogPage({ libraryId, startIndex = 0, limit = 100, recent = false, deadlineAt }) {
     const query = new URLSearchParams({ offset: String(Math.max(0, startIndex)), limit: String(Math.min(100, Math.max(1, limit))) });
     if (libraryId !== undefined && libraryId !== null) query.set('library_id', String(libraryId));
     if (recent) { query.set('sort', 'added_at'); query.set('order', 'desc'); }
-    const body = await this._request(`catalog?${query}`);
+    const body = await this._request(`catalog?${query}`, { deadlineAt });
     if (!body || !Array.isArray(body.items)) throw new SiloRequestError('Invalid Silo catalog response');
     return body;
   }
@@ -210,9 +317,12 @@ class SiloAPI {
   async _catalogSlice({ libraryId, startIndex, limit, recent = false }) {
     const result = [];
     let offset = Math.max(0, startIndex);
+    const deadlineAt = Date.now() + this.timeoutMs;
+    let pages = 0;
     while (result.length < limit) {
+      if (++pages > this.maxPages) throw new SiloRequestError('Silo catalog page limit exceeded');
       const pageLimit = Math.min(100, limit - result.length);
-      const page = await this._catalogPage({ libraryId, startIndex: offset, limit: pageLimit, recent });
+      const page = await this._catalogPage({ libraryId, startIndex: offset, limit: pageLimit, recent, deadlineAt });
       result.push(...page.items);
       if (!page.has_more || page.items.length === 0) break;
       offset += page.items.length;
