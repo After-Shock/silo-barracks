@@ -19,6 +19,18 @@
   display: none;
 }
 
+.barracks-nav-tooltip .tooltip-inner {
+  border: 1px solid var(--barracks-border-inset);
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
+  box-shadow: var(--barracks-shadow);
+  font-weight: 800;
+}
+
+.barracks-nav-tooltip.bs-tooltip-end .tooltip-arrow::before {
+  border-right-color: var(--barracks-surface-inset);
+}
+
 @media (min-width: 901px) and (hover: hover) {
   .navbar {
     position: fixed !important;

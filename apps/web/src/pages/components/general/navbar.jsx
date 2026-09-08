@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Button, Modal, Nav, Navbar as BootstrapNavbar } from "react-bootstrap";
+import { Button, Modal, Nav, Navbar as BootstrapNavbar, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
 import axios from "../../../lib/axios_instance";
 import { navData } from "../../../lib/navdata";
@@ -811,41 +811,49 @@ export default function Navbar() {
                 : 0;
             const navLabel = item.label || (typeof item.text === "string" ? item.text : "");
             return (
-              <Nav.Link
-                as={Link}
+              <OverlayTrigger
                 key={item.id}
-                className={`navitem${isActive ? " active" : ""} p-2`} // add the "active" class if the link is active
-                to={item.link}
-                onClick={() => setIsMobileNavOpen(false)}
-                title={navLabel}
-                aria-label={navLabel}
+                placement="right"
+                overlay={
+                  <Tooltip id={`nav-tooltip-${item.id}`} className="barracks-nav-tooltip">
+                    {navLabel}
+                  </Tooltip>
+                }
               >
-                {item.icon}
-                {badgeCount > 0 ? <span className="nav-icon-badge">{badgeCount}</span> : null}
-                <span className="nav-text">
-                  <span>{item.text}</span>
-                  {item.link === "" && activeStreamCount > 0 ? (
-                    <span className="nav-live-count" aria-label={`${activeStreamCount} active streams`}>
-                      {activeStreamCount}
-                    </span>
-                  ) : null}
-                  {item.link === "downloads" && activeDownloadCount > 0 ? (
-                    <span className="nav-live-count" aria-label={`${activeDownloadCount} active downloads`}>
-                      {activeDownloadCount}
-                    </span>
-                  ) : null}
-                  {item.link === "active-transcodes" && activeTranscodeCount > 0 ? (
-                    <span className="nav-live-count" aria-label={`${activeTranscodeCount} active transcodes`}>
-                      {activeTranscodeCount}
-                    </span>
-                  ) : null}
-                  {item.link === "requests" && requestBadgeCount > 0 ? (
-                    <span className="nav-live-count" aria-label={`${requestBadgeCount} pending or failed requests`}>
-                      {requestBadgeCount}
-                    </span>
-                  ) : null}
-                </span>
-              </Nav.Link>
+                <Nav.Link
+                  as={Link}
+                  className={`navitem${isActive ? " active" : ""} p-2`} // add the "active" class if the link is active
+                  to={item.link}
+                  onClick={() => setIsMobileNavOpen(false)}
+                  aria-label={navLabel}
+                >
+                  {item.icon}
+                  {badgeCount > 0 ? <span className="nav-icon-badge">{badgeCount}</span> : null}
+                  <span className="nav-text">
+                    <span>{item.text}</span>
+                    {item.link === "" && activeStreamCount > 0 ? (
+                      <span className="nav-live-count" aria-label={`${activeStreamCount} active streams`}>
+                        {activeStreamCount}
+                      </span>
+                    ) : null}
+                    {item.link === "downloads" && activeDownloadCount > 0 ? (
+                      <span className="nav-live-count" aria-label={`${activeDownloadCount} active downloads`}>
+                        {activeDownloadCount}
+                      </span>
+                    ) : null}
+                    {item.link === "active-transcodes" && activeTranscodeCount > 0 ? (
+                      <span className="nav-live-count" aria-label={`${activeTranscodeCount} active transcodes`}>
+                        {activeTranscodeCount}
+                      </span>
+                    ) : null}
+                    {item.link === "requests" && requestBadgeCount > 0 ? (
+                      <span className="nav-live-count" aria-label={`${requestBadgeCount} pending or failed requests`}>
+                        {requestBadgeCount}
+                      </span>
+                    ) : null}
+                  </span>
+                </Nav.Link>
+              </OverlayTrigger>
             );
           })}
           <div className="navbar-inline-footer">
