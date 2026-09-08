@@ -204,7 +204,7 @@ function collectFiles(root, realRoot, requestedFiles) {
     }
     if (stat.isDirectory()) {
       for (const entry of fs.readdirSync(target, { withFileTypes: true }).sort((a, b) => compareStrings(a.name, b.name))) {
-        visit(path.join(target, entry.name));
+        visit(path.join(target, entry.name), explicit);
       }
       return;
     }

@@ -72,7 +72,7 @@ All RGB mixing uses `round(a * (1 - weight) + b * weight)` per channel.
 - Modify: `apps/web/src/lib/theme.js`
 - Create: `apps/web/src/lib/theme.test.js`
 
-- [ ] **Step 1: Write failing resolver tests**
+- [x] **Step 1: Write failing resolver tests**
 
 Add table-driven Node tests for default values, per-field malformed fallback, all semantic keys, RGB mixing coefficients, and `contrastRatio()` results. Include separate degenerate palettes where primary equals background while the other inputs differ, all inputs match, background/surface are `#000000`/`#ffffff` opposites, and saturated midtones make both warm text endpoints fall short. Assert each normal text token reaches 4.5:1 and each meaningful boundary token reaches 3:1 against its named surface across those and deterministic seeded palettes; assert `textMuted` against canvas and `textMutedRaised` against raised surface, including a vivid palette where no single color can meet 4.5:1 on both; assert `action` is 3:1 against interactive, `actionText` is 4.5:1 against action, and `actionForeground` is 4.5:1 against canvas for opposing light/dark and random valid palettes; assert all six chart series against inset, all raised state colors against raised, `dangerInteractive` against interactive, and that the three focus-ring tokens remain the primary/accessible light/dark combination.
 
@@ -89,23 +89,23 @@ test('resolveTheme keeps meaningful UI contrast for degenerate custom colors', (
 });
 ```
 
-- [ ] **Step 2: Run the focused test and confirm RED**
+- [x] **Step 2: Run the focused test and confirm RED**
 
 Run: `node --test apps/web/src/lib/theme.test.js`
 
 Expected: FAIL because `resolveTheme` and `contrastRatio` are not exported.
 
-- [ ] **Step 3: Implement pure color and resolver functions**
+- [x] **Step 3: Implement pure color and resolver functions**
 
 Export `normalizeThemeInput`, `relativeLuminance`, `contrastRatio`, `mixHex`, `ensureContrast`, and `resolveTheme`. `resolveTheme(input)` must return `{ input, tokens }`, calculate every value before returning, and follow the numeric token rules above. Do not touch DOM or storage in these functions.
 
-- [ ] **Step 4: Run the focused tests and confirm GREEN**
+- [x] **Step 4: Run the focused tests and confirm GREEN**
 
 Run: `node --test apps/web/src/lib/theme.test.js`
 
 Expected: all resolver and contrast tests PASS.
 
-- [ ] **Step 5: Commit the resolver**
+- [x] **Step 5: Commit the resolver**
 
 ```bash
 git add apps/web/src/lib/theme.js apps/web/src/lib/theme.test.js
@@ -119,7 +119,7 @@ git commit -m "feat(theme): add accessible semantic resolver"
 - Modify: `apps/web/src/lib/theme.test.js`
 - Modify: `apps/web/src/pages/css/variables.css`
 
-- [ ] **Step 1: Write failing adapter tests**
+- [x] **Step 1: Write failing adapter tests**
 
 Use small in-memory `storage`, `root.style`, and `eventTarget` fakes. Assert existing four-field JSON loads per field, `applyTheme(undefined)` loads that stored value, unknown fields are ignored, failed reads use defaults, failed writes/removals still apply in memory, all properties are calculated before the first `setProperty`, the complete legacy alias/RGB map below is set, `getThemeTokens()` returns a defensive copy of the last applied tokens, event payloads are exact, save/reset preserve their existing normalized-input return values, and save/reset each emit each event exactly once after application. Direct `applyTheme` must emit no event. Add a regression proving that when `silo_barracks_theme` is absent, a valid `jellyglance_custom_theme` value is loaded, normalized, written once to the Barracks key, and returned; the Barracks key always takes precedence when both exist.
 
@@ -134,17 +134,17 @@ test('saveTheme applies and emits even when storage rejects writes', () => {
 });
 ```
 
-- [ ] **Step 2: Run and confirm RED**
+- [x] **Step 2: Run and confirm RED**
 
 Run: `node --test apps/web/src/lib/theme.test.js`
 
 Expected: FAIL because adapters cannot be injected and Barracks events/tokens are absent.
 
-- [ ] **Step 3: Implement the adapters**
+- [x] **Step 3: Implement the adapters**
 
 Use exact signatures `getStoredTheme({ storage = localStorage } = {})`, `applyTheme(theme, { root = document.documentElement, storage = localStorage } = {})`, `getThemeTokens()`, `saveTheme(theme, { storage = localStorage, root = document.documentElement, eventTarget = window } = {})`, and the same dependency object for `resetTheme`. When `theme` is `undefined`, `applyTheme` calls `getStoredTheme({ storage })`, preserving current `index.jsx` startup behavior. `applyTheme` stores the resolved token object in module state and `getThemeTokens()` returns a defensive copy. Preserve `THEME_STORAGE_KEY = 'silo_barracks_theme'` and add `LEGACY_THEME_STORAGE_KEY = 'jellyglance_custom_theme'`; `getStoredTheme` reads the legacy key only when the Barracks key is absent and best-effort migrates the normalized value to the Barracks key without failing theme load if that write throws. `applyTheme` calculates and writes only; it never dispatches. `saveTheme`/`resetTheme` each call it once, return the normalized four-field input as today, then dispatch `jellyglance-theme-updated` with normalized public inputs and `silo-barracks-theme-updated` with resolved tokens exactly once. Catch storage operations independently.
 
-- [ ] **Step 4: Declare default variables and aliases**
+- [x] **Step 4: Declare default variables and aliases**
 
 Update `variables.css` with every `--barracks-*` property and map old properties, for example:
 
@@ -167,13 +167,13 @@ Update `variables.css` with every `--barracks-*` property and map old properties
 
 Declare every semantic property in the spec table, including surface-specific normal text and meaningful-boundary properties, `--barracks-text-muted-raised`, `--barracks-action-text`, `--barracks-action-foreground`, and `--barracks-state-danger-interactive`, plus all three RGB companions before aliases. The required alias map is: primary color/RGB → action; primary light color/RGB → `mix(action, focusLight, 0.42)`; primary dark → `mix(action, focusDark, 0.28)`; secondary color/RGB → accentSecondary; background → canvas; secondary background → raised; tertiary background → interactive; surface color → raised RGB at 86% alpha; surface border → borderSubtle; text → text; muted text → textMuted; subtle text → unavailable. Tests assert every semantic property, RGB companion, and alias, including comma-separated RGB formats.
 
-- [ ] **Step 5: Run focused tests and build**
+- [x] **Step 5: Run focused tests and build**
 
 Run: `node --test apps/web/src/lib/theme.test.js && npm run build --workspace apps/web`
 
 Expected: tests PASS and Vite exits 0.
 
-- [ ] **Step 6: Commit the adapter contract**
+- [x] **Step 6: Commit the adapter contract**
 
 ```bash
 git add apps/web/src/lib/theme.js apps/web/src/lib/theme.test.js apps/web/src/pages/css/variables.css
@@ -188,25 +188,25 @@ git commit -m "feat(theme): apply semantic themes safely"
 - Create: `apps/web/theme-color-exceptions.json`
 - Modify: `package.json`
 
-- [ ] **Step 1: Write scanner tests against temporary fixtures**
+- [x] **Step 1: Write scanner tests against temporary fixtures**
 
 Test hex, rgb/rgba, hsl/hsla, hwb, lab/lch, oklab/oklch, `color()`, and case-insensitive named colors. Test that `transparent`, `currentColor`, `inherit`, `initial`, `unset`, CSS variables, central `variables.css` fallback declarations, approved exact file/value pairs, and gradients using only `--barracks-*` tokens pass. A `variables.css` fixture containing a literal under an unknown property must fail. Add fixtures proving comments are ignored without shifting diagnostic line numbers and quoted embedded CSS/SVG literals are detected. Test literal gradient stops, wildcard-like exception paths, missing reasons, and mismatched paths fail with file/line/value output.
 
-- [ ] **Step 2: Run and confirm RED**
+- [x] **Step 2: Run and confirm RED**
 
 Run: `node --test scripts/check-theme-colors.test.cjs`
 
 Expected: FAIL because the scanner module is missing.
 
-- [ ] **Step 3: Implement scanner module and CLI**
+- [x] **Step 3: Implement scanner module and CLI**
 
 Export `auditSources({ root, files, exceptions })`. Replace comment characters with spaces/newlines to preserve offsets, parse quoted embedded CSS/SVG as source, and recognize the complete color grammar from the spec. CLI defaults to application `.css/.js/.jsx`; exact file or directory arguments recursively constrain a migration batch. Exclude `apps/web/public`, generated `dist`, dependencies, and `theme.js`. In `variables.css`, permit literals only when the declaration name is one of the complete semantic properties/RGB companions/legacy aliases enumerated in the spec and Task 2; reject literals under any other declaration. Exit 1 with stable diagnostics for violations.
 
-- [ ] **Step 4: Populate narrow initial exceptions**
+- [x] **Step 4: Populate narrow initial exceptions**
 
 Add only official third-party/provider logo or embedded image literals discovered by the first scan. Each object has exact repository path, exact literal values, and a nonempty purpose. Do not except generic page or control colors.
 
-- [ ] **Step 5: Wire scripts and verify scanner behavior**
+- [x] **Step 5: Wire scripts and verify scanner behavior**
 
 Add:
 
@@ -227,7 +227,7 @@ Run: `npm run theme:check`
 
 Expected: FAIL with actionable existing page violations; this is the migration baseline, not a completion failure.
 
-- [ ] **Step 6: Commit audit tooling**
+- [x] **Step 6: Commit audit tooling**
 
 ```bash
 git add scripts/check-theme-colors.cjs scripts/check-theme-colors.test.cjs apps/web/theme-color-exceptions.json package.json
@@ -250,13 +250,13 @@ git commit -m "test(theme): enforce semantic application colors"
 - Modify: `apps/web/src/pages/css/websocket/websocket.css`
 - Modify: `apps/web/src/pages/components/general/navbar.jsx` (stable theme-control test IDs only)
 
-- [ ] **Step 1: Run the audit on shared files and record RED**
+- [x] **Step 1: Run the audit on shared files and record RED**
 
 Run: `node scripts/check-theme-colors.cjs apps/web/src/index.css apps/web/src/App.css apps/web/src/pages/css/barracks.css apps/web/src/pages/css/navbar.css apps/web/src/pages/css/loading.css apps/web/src/pages/css/error.css apps/web/src/pages/css/websocket/websocket.css`
 
 Expected: FAIL listing current literals/legacy gradients.
 
-- [ ] **Step 2: Add framework mappings**
+- [x] **Step 2: Add framework mappings**
 
 Map `body`, links, controls, Bootstrap `.card/.modal-content/.dropdown-menu/.table/.nav-tabs/.pagination/.tooltip`, and MUI paper/dialog/menu/input/button/table/data-grid/picker selectors to semantic properties. Charts remain outside this layer and receive `getThemeTokens()` values in Task 9. Use only stable public selectors. Focus-visible uses three rings:
 
@@ -267,15 +267,15 @@ Map `body`, links, controls, Bootstrap `.card/.modal-content/.dropdown-menu/.tab
 }
 ```
 
-- [ ] **Step 3: Import compatibility CSS after Bootstrap**
+- [x] **Step 3: Import compatibility CSS after Bootstrap**
 
 In `index.jsx`, import `framework-theme.css` after vendor Bootstrap and before the narrow brand stylesheet. Add exact stable IDs `theme-account-desktop`, `theme-account-mobile`, `theme-menu`, `theme-preset-ocean`, `theme-preset-mono`, and `theme-color-primary` to the corresponding account/theme controls in `navbar.jsx`; these do not change behavior. The desktop and mobile account controls have distinct IDs so every rendered test ID is unique; the browser script selects the visible control for its viewport.
 
-- [ ] **Step 4: Migrate shared shell styles**
+- [x] **Step 4: Migrate shared shell styles**
 
 Replace shared hard-coded backgrounds/text/borders in `index.css`, `App.css`, and shared state files with semantic tokens. Keep `barracks.css` for type/shape/brand accents, remove broad corrective selectors now owned by `framework-theme.css`, and preserve responsive dimensions.
 
-- [ ] **Step 5: Run shared audit, lint, and build**
+- [x] **Step 5: Run shared audit, lint, and build**
 
 Run the Step 1 audit command again with `apps/web/src/pages/css/framework-theme.css` appended.
 
@@ -285,7 +285,7 @@ Run: `npm run lint --workspace apps/web && npm run build --workspace apps/web`
 
 Expected: both exit 0.
 
-- [ ] **Step 6: Commit shared compatibility**
+- [x] **Step 6: Commit shared compatibility**
 
 ```bash
 git add apps/web/src/index.jsx apps/web/src/index.css apps/web/src/App.css apps/web/src/pages/components/general/navbar.jsx apps/web/src/pages/css/{framework-theme,barracks,navbar,loading,error}.css apps/web/src/pages/css/websocket/websocket.css
@@ -302,21 +302,21 @@ git commit -m "feat(theme): unify shared application surfaces"
 - Modify: `apps/web/src/pages/debugTools/sessionCard.css`
 - Modify: `apps/web/src/pages/home.jsx`, `apps/web/src/pages/recently-added.jsx` (stable screen IDs)
 
-- [ ] **Step 1: Run the exact batch audit and confirm RED**
+- [x] **Step 1: Run the exact batch audit and confirm RED**
 
 Run: `node scripts/check-theme-colors.cjs apps/web/src/pages/css/home.css apps/web/src/pages/css/home-user-wrap.css apps/web/src/pages/css/sessions.css apps/web/src/pages/css/fleet.css apps/web/src/pages/css/recent.css apps/web/src/pages/css/recently-added-page.css apps/web/src/pages/css/lastplayed.css apps/web/src/pages/components/home/UserWrapUpDashboard.jsx apps/web/src/pages/components/sessions/session-card.jsx apps/web/src/pages/debugTools`
 
 Expected: FAIL with legacy literals/gradients.
 
-- [ ] **Step 2: Migrate Home and session surfaces**
+- [x] **Step 2: Migrate Home and session surfaces**
 
 Use raised/inset panels, semantic metric/status colors, and token-only section accents. Preserve artwork overlays. Replace inline card gradients and debug equivalents with token expressions. Add stable `data-theme-screen` values `home`, `kiosk`, and `recently-added` to page roots.
 
-- [ ] **Step 3: Re-run the exact batch audit**
+- [x] **Step 3: Re-run the exact batch audit**
 
 Expected: PASS. Then run `npm run build --workspace apps/web`; expected exit 0.
 
-- [ ] **Step 4: Commit this route family**
+- [x] **Step 4: Commit this route family**
 
 ```bash
 git add apps/web/src/pages/css/{home,home-user-wrap,sessions,fleet,recent,recently-added-page,lastplayed}.css apps/web/src/pages/components/home/UserWrapUpDashboard.jsx apps/web/src/pages/components/sessions/session-card.jsx apps/web/src/pages/debugTools apps/web/src/pages/{home,recently-added}.jsx
@@ -333,27 +333,27 @@ git commit -m "feat(theme): migrate home and session surfaces"
 - Modify: `apps/web/src/pages/components/LibrarySelector/SelectionCard.jsx`, `components/library/library-card.jsx`, `components/libraryStatCard/library-stat-component.jsx`
 - Modify: `apps/web/src/pages/libraries.jsx`, `pages/components/library-info.jsx`, `pages/components/item-info.jsx`, `pages/users.jsx`, `pages/user-profile.jsx` (stable screen IDs)
 
-- [ ] **Step 1: Run the exact library batch audit and confirm RED**
+- [x] **Step 1: Run the exact library batch audit and confirm RED**
 
 Run: `node scripts/check-theme-colors.cjs apps/web/src/pages/css/libraryOverview.css apps/web/src/pages/css/library-detail.css apps/web/src/pages/css/library apps/web/src/pages/css/items apps/web/src/pages/components/LibrarySelector/SelectionCard.jsx apps/web/src/pages/components/library/library-card.jsx apps/web/src/pages/components/libraryStatCard/library-stat-component.jsx`
 
 Expected: FAIL.
 
-- [ ] **Step 2: Migrate libraries/items, then re-run Step 1**
+- [x] **Step 2: Migrate libraries/items, then re-run Step 1**
 
 Normalize cards, filters, pagination, nested item surfaces, skeleton/empty/error states, and semantic focus. Preserve media artwork. Add `libraries`, `library-detail`, and `item-detail` screen IDs. Expected audit: PASS.
 
-- [ ] **Step 3: Run the exact user batch audit and confirm RED**
+- [x] **Step 3: Run the exact user batch audit and confirm RED**
 
 Run: `node scripts/check-theme-colors.cjs apps/web/src/pages/css/users apps/web/src/pages/css/home-user-wrap.css apps/web/src/pages/users.jsx apps/web/src/pages/user-profile.jsx`
 
 Expected: FAIL before migration.
 
-- [ ] **Step 4: Migrate Users/profile and re-run Step 3**
+- [x] **Step 4: Migrate Users/profile and re-run Step 3**
 
 Normalize cards, tables, user-image frames, charts, empty/error states, and focus. Add `users` and `user-profile` screen IDs. Expected audit: PASS.
 
-- [ ] **Step 5: Build and commit**
+- [x] **Step 5: Build and commit**
 
 Run: `npm run build --workspace apps/web`; expected exit 0.
 
@@ -370,21 +370,21 @@ git commit -m "feat(theme): migrate library and user routes"
 - Modify: `apps/web/src/pages/components/activity-timeline/activity-timeline-item.jsx`
 - Modify: `apps/web/src/pages/activity.jsx`, `apps/web/src/pages/activity_time_line.jsx` (stable screen IDs)
 
-- [ ] **Step 1: Run exact audit and confirm RED**
+- [x] **Step 1: Run exact audit and confirm RED**
 
 Run: `node scripts/check-theme-colors.cjs apps/web/src/pages/css/activity.css apps/web/src/pages/css/activity apps/web/src/pages/css/timeline apps/web/src/pages/components/activity/activity-table.jsx apps/web/src/pages/components/activity-timeline/activity-timeline-item.jsx`
 
 Expected: FAIL.
 
-- [ ] **Step 2: Migrate activity/table/timeline states**
+- [x] **Step 2: Migrate activity/table/timeline states**
 
 Normalize table, cards, session status, progress, timeline rails, chips, loading/empty/error/partial states. Use text/icons with live/warning/unavailable. Add `activity` and `timeline` screen IDs.
 
-- [ ] **Step 3: Re-run audit and live smoke**
+- [x] **Step 3: Re-run audit and live smoke**
 
 Expected audit: PASS. Run: `BARRACKS_SMOKE_POLLS=1 BARRACKS_CHROMIUM=/opt/google/chrome/chrome BARRACKS_PLAYWRIGHT=/tmp/silo-barracks-ui.e9CWfq/node_modules/playwright BARRACKS_QA_DIR=$(mktemp -d /tmp/barracks-activity-theme.XXXXXX) node scripts/check-barracks-ui.cjs`; expected no browser errors or overflow.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add apps/web/src/pages/css/activity.css apps/web/src/pages/css/activity apps/web/src/pages/css/timeline apps/web/src/pages/components/activity apps/web/src/pages/components/activity-timeline apps/web/src/pages/{activity,activity_time_line}.jsx
@@ -401,13 +401,13 @@ git commit -m "feat(theme): migrate activity and timeline"
 - Modify: `apps/web/src/pages/components/general/globalStats.jsx`
 - Modify: `apps/web/theme-color-exceptions.json`
 
-- [ ] **Step 1: Audit `integrations.css`, inline JSX, and operational CSS; confirm RED**
+- [x] **Step 1: Audit `integrations.css`, inline JSX, and operational CSS; confirm RED**
 
 Run: `node scripts/check-theme-colors.cjs apps/web/src/pages/css/integrations.css apps/web/src/pages/css/active-transcodes.css apps/web/src/pages/css/automation-health.css apps/web/src/pages/css/repair-hub.css apps/web/src/pages/css/about.css apps/web/src/pages/css/globalstats.css apps/web/src/pages/css/genres.css apps/web/src/pages/css/statCard.css apps/web/src/pages/{integrations,active-transcodes}.jsx apps/web/src/pages/components/general/globalStats.jsx`
 
 Expected: FAIL.
 
-- [ ] **Step 2: Extract route-owned CSS without changing selectors**
+- [x] **Step 2: Extract route-owned CSS without changing selectors**
 
 Move Calendar, Requests, Downloads, and Wizarr rule blocks into their named stylesheets and update each page import. Leave only integration-hub/shared primitives in `integrations.css`. Run `npm run build --workspace apps/web`; expected exit 0. Commit the mechanical split separately.
 
@@ -416,19 +416,19 @@ git add apps/web/src/pages/css/{integrations,calendar,requests,downloads,wizarr}
 git commit -m "refactor(theme): split operational route styles"
 ```
 
-- [ ] **Step 3: Migrate integration, Calendar, and Requests styles and checkpoint**
+- [x] **Step 3: Migrate integration, Calendar, and Requests styles and checkpoint**
 
 Run: `node scripts/check-theme-colors.cjs apps/web/src/pages/css/integrations.css apps/web/src/pages/css/calendar.css apps/web/src/pages/css/requests.css apps/web/src/pages/integrations.jsx apps/web/src/pages/calendar.jsx apps/web/src/pages/requests.jsx`. Migrate until it exits 0. Add screen IDs `integrations`, `calendar`, `requests`.
 
-- [ ] **Step 4: Migrate Downloads, Wizarr, Active Transcodes, and Automation Health and checkpoint**
+- [x] **Step 4: Migrate Downloads, Wizarr, Active Transcodes, and Automation Health and checkpoint**
 
 Run: `node scripts/check-theme-colors.cjs apps/web/src/pages/css/downloads.css apps/web/src/pages/css/wizarr.css apps/web/src/pages/css/active-transcodes.css apps/web/src/pages/css/automation-health.css apps/web/src/pages/downloads.jsx apps/web/src/pages/wizarr.jsx apps/web/src/pages/active-transcodes.jsx apps/web/src/pages/automation-health.jsx`. Migrate until it exits 0. Add matching screen IDs.
 
-- [ ] **Step 5: Migrate Server Management, Repair, About, and stat primitives and checkpoint**
+- [x] **Step 5: Migrate Server Management, Repair, About, and stat primitives and checkpoint**
 
 Run: `node scripts/check-theme-colors.cjs apps/web/src/pages/css/repair-hub.css apps/web/src/pages/css/about.css apps/web/src/pages/css/globalstats.css apps/web/src/pages/css/genres.css apps/web/src/pages/css/statCard.css apps/web/src/pages/server-management.jsx apps/web/src/pages/repair-hub.jsx apps/web/src/pages/about.jsx apps/web/src/pages/components/general/globalStats.jsx`. Migrate until it exits 0. Server Management styling remains owned by Task 10's Settings styles; here add only its `server-management` screen ID.
 
-- [ ] **Step 6: Build and commit presentation migration**
+- [x] **Step 6: Build and commit presentation migration**
 
 Run: `npm run build --workspace apps/web`; expected exit 0.
 
@@ -447,31 +447,31 @@ git commit -m "feat(theme): migrate operational routes"
 - Modify: `apps/web/src/pages/components/statCards/ItemStatComponent.jsx`, `most_used_client.jsx`, and all JSX in that directory using chart colors
 - Modify: `apps/web/src/pages/statistics.jsx` (stable `statistics` screen ID)
 
-- [ ] **Step 1: Write failing pure contracts**
+- [x] **Step 1: Write failing pure contracts**
 
 In `theme-chart.test.js`, define `getChartTheme(tokens)` returning Recharts/MUI-ready `grid`, `tooltip`, and six `series` values, and `subscribeThemeTokens(eventTarget, callback)` listening only to `silo-barracks-theme-updated` and returning unsubscribe. In `home-settings.test.js`, assert normalization keeps stored `neon` and `HOME_THEME_OPTIONS` maps it to display label `Signal`.
 
-- [ ] **Step 2: Run and confirm RED**
+- [x] **Step 2: Run and confirm RED**
 
 Run: `node --test apps/web/src/lib/theme-chart.test.js apps/web/src/lib/home-settings.test.js apps/web/src/lib/theme.test.js`
 
 Expected: FAIL because the contracts/Signal label do not exist.
 
-- [ ] **Step 3: Implement pure chart adapter and Signal compatibility**
+- [x] **Step 3: Implement pure chart adapter and Signal compatibility**
 
 Implement the exact Task 9 Step 1 exports and use the tested `getThemeTokens()` export from Task 2 as their source. Keep stored `neon`, relabel option “Signal,” and make all Kiosk modes semantic opacity/layout variants. Signal gradients reference only Barracks tokens.
 
-- [ ] **Step 4: Migrate every chart consumer**
+- [x] **Step 4: Migrate every chart consumer**
 
 Read tokens from `getThemeTokens()` and subscribe through the tested adapter; remove inline legacy literals and aliases. Retain legends, labels, and markers.
 
-- [ ] **Step 5: Run focused tests and the complete Task 9 audit**
+- [x] **Step 5: Run focused tests and the complete Task 9 audit**
 
 Run: `node --test apps/web/src/lib/theme-chart.test.js apps/web/src/lib/home-settings.test.js apps/web/src/lib/theme.test.js && node scripts/check-theme-colors.cjs apps/web/src/lib/theme-chart.js apps/web/src/lib/home-settings.js apps/web/src/pages/home.jsx apps/web/src/pages/statistics.jsx apps/web/src/pages/components/settings/KioskSettings.jsx apps/web/src/pages/css/home.css apps/web/src/pages/css/stats.css apps/web/src/pages/components/statistics apps/web/src/pages/components/statCards && npm run lint --workspace apps/web && npm run build --workspace apps/web`
 
 Expected: all commands exit 0.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/web/src/lib/{theme-chart.js,theme-chart.test.js,theme.js,theme.test.js,home-settings.js,home-settings.test.js} apps/web/src/pages/{home,statistics}.jsx apps/web/src/pages/components/settings/KioskSettings.jsx apps/web/src/pages/components/statistics apps/web/src/pages/components/statCards apps/web/src/pages/css/{home,stats}.css
@@ -487,7 +487,7 @@ git commit -m "feat(theme): unify charts and kiosk modes"
 - Modify: `apps/web/src/pages/settings.jsx`, `apps/web/src/pages/components/settings/ServerManagement.jsx`, `TerminalComponent.jsx`, `backupfiles.jsx`, and other Settings JSX only when the audit reports inline colors
 - Create: `scripts/check-universal-theme-ui.cjs` (initial Settings-only matrix, expanded in Task 11)
 
-- [ ] **Step 1: Write the Settings browser matrix, run static/browser baselines, and confirm RED**
+- [x] **Step 1: Write the Settings browser matrix, run static/browser baselines, and confirm RED**
 
 Create the browser script with base `/settings` plus the 19 exact Settings subsection routes from the spec, `data-theme-screen="settings"` readiness plus active-tab assertion, desktop/mobile overflow checks, pageerror capture, and computed surface/control legacy-color rejection.
 
@@ -499,7 +499,7 @@ Run: `node scripts/check-theme-colors.cjs apps/web/src/pages/css/settings apps/w
 
 Expected: FAIL; directory recursion is part of Task 3's tested CLI contract.
 
-- [ ] **Step 2: Extract subsection CSS and build**
+- [x] **Step 2: Extract subsection CSS and build**
 
 Move Security rules to `security.css`, task/backup/import/health/repair/log rules to `operations.css`, and integrations/server/API-key/webhook/notification/newsletter rules to `connections.css`. Import them once from `settings.jsx`; keep general/Kiosk/library/activity/device/plugin navigation and shared controls in `settings.css`.
 
@@ -507,19 +507,19 @@ Run: `npm run build --workspace apps/web`
 
 Expected: exit 0. Commit this mechanical split separately.
 
-- [ ] **Step 3: Migrate Core/Media Settings and checkpoint**
+- [x] **Step 3: Migrate Core/Media Settings and checkpoint**
 
 Run: `node scripts/check-theme-colors.cjs apps/web/src/pages/css/settings/settings.css apps/web/src/pages/css/settings/security.css apps/web/src/pages/settings.jsx apps/web/src/pages/components/settings/settingsConfig.jsx apps/web/src/pages/components/settings/security.jsx apps/web/src/pages/components/settings/KioskSettings.jsx apps/web/src/pages/library_selector.jsx apps/web/src/pages/components/settings/ActivityMonitorSettings.jsx apps/web/src/pages/components/settings/JellyfinAdminSettings.jsx`. Migrate General/Security/Kiosk/Libraries/Activity Monitor/Devices/Plugins until it exits 0.
 
-- [ ] **Step 4: Migrate Connections and checkpoint**
+- [x] **Step 4: Migrate Connections and checkpoint**
 
 Run: `node scripts/check-theme-colors.cjs apps/web/src/pages/css/settings/connections.css apps/web/src/pages/css/settings/apiKeys.css apps/web/src/pages/integrations.jsx apps/web/src/pages/components/settings/SiloServers.jsx apps/web/src/pages/components/settings/apiKeys.jsx apps/web/src/pages/components/settings/webhooks.jsx apps/web/src/pages/components/settings/NotificationSettings.jsx apps/web/src/pages/components/settings/NewsletterSettings.jsx`. Migrate Integrations/Silo Servers/API Keys/Webhooks/Notifications/Newsletter until it exits 0.
 
-- [ ] **Step 5: Migrate Operations and setup checkpoint**
+- [x] **Step 5: Migrate Operations and setup checkpoint**
 
 Run: `node scripts/check-theme-colors.cjs apps/web/src/pages/css/settings/operations.css apps/web/src/pages/css/settings/backups.css apps/web/src/pages/css/settings/version.css apps/web/src/pages/css/setup.css apps/web/src/pages/components/settings/Tasks.jsx apps/web/src/pages/components/settings/Task.jsx apps/web/src/pages/components/settings/backup_page.jsx apps/web/src/pages/components/settings/backupfiles.jsx apps/web/src/pages/components/settings/JellystatImport.jsx apps/web/src/pages/components/settings/TautulliImport.jsx apps/web/src/pages/components/settings/health.jsx apps/web/src/pages/components/settings/logs.jsx apps/web/src/pages/components/settings/ServerManagement.jsx apps/web/src/pages/components/settings/TerminalComponent.jsx apps/web/src/pages/repair-hub.jsx`. Migrate Tasks/Backup/Imports/Health/Repair/Logs/Server Management/auth setup until it exits 0. Add `settings` screen ID with active-tab value.
 
-- [ ] **Step 6: Run Settings browser checkpoint, lint, build, and commit**
+- [x] **Step 6: Run Settings browser checkpoint, lint, build, and commit**
 
 Run: `BARRACKS_THEME_ROUTES=settings BARRACKS_CHROMIUM=/opt/google/chrome/chrome BARRACKS_PLAYWRIGHT=/tmp/silo-barracks-ui.e9CWfq/node_modules/playwright BARRACKS_QA_DIR=$(mktemp -d /tmp/barracks-settings-theme.XXXXXX) node scripts/check-universal-theme-ui.cjs`; expected base Settings plus all 19 subsection entries PASS. Run: `npm run lint --workspace apps/web && npm run build --workspace apps/web`; expected both exit 0.
 
@@ -536,7 +536,7 @@ git commit -m "feat(theme): unify settings and form surfaces"
 - Modify: `scripts/check-universal-theme-ui.cjs`
 - Modify: `scripts/check-barracks-ui.cjs` only if reusable login helpers are extracted without weakening existing assertions
 
-- [ ] **Step 1: Write the route matrix and failing baseline assertions**
+- [x] **Step 1: Write the route matrix and failing baseline assertions**
 
 Expand the existing Settings matrix into this exact route/readiness matrix:
 
@@ -564,13 +564,13 @@ const integrationSettings = [
 
 Iterate `routes`, `/settings/${settingsSlug}` for every settings entry, and every explicit `integrationSettings` tuple. Each waits for `[data-theme-screen="<id>"]`; Settings additionally asserts its visible active-tab or integration-tab label and exact path. Fixtures use IDs exactly as shown. `/api/getLibrary` returns `{Name:'Fixture Library',CollectionType:'movies',archived:false}`; `/api/getItemDetails` returns one minimal Movie named `Fixture Item`; `/stats/getUserProfileWrapUp` and `/api/getUserDetails` return user `{UserId:'fixture-user',UserName:'Fixture User'}` plus rank/details; relevant access/media-list calls return empty authorized structures. For each route require the readiness marker, no browser errors, no computed legacy purple/teal canvas/surface/control color, and no horizontal overflow at 1440px and 390px.
 
-- [ ] **Step 2: Run against the current deployed bundle and confirm RED**
+- [x] **Step 2: Run against the current deployed bundle and confirm RED**
 
 Run: `mkdir -p /tmp/silo-barracks-theme-qa && BARRACKS_CHROMIUM=/opt/google/chrome/chrome BARRACKS_PLAYWRIGHT=/tmp/silo-barracks-ui.e9CWfq/node_modules/playwright BARRACKS_QA_DIR=/tmp/silo-barracks-theme-qa node scripts/check-universal-theme-ui.cjs`
 
 Expected: FAIL until the new bundle is deployed and all route fixtures/assertions are supported.
 
-- [ ] **Step 3: Complete route fixtures and screenshot matrix**
+- [x] **Step 3: Complete route fixtures and screenshot matrix**
 
 Use the existing short-lived local test-token method; never print/store tokens. Install a context-wide route before navigation. Every same-origin `POST`, `PUT`, `PATCH`, and `DELETE` is fulfilled by the fixture dispatcher or rejected with status 418, recorded in `blockedMutations`, and never continued to the live origin. Side-effect GET paths `/api/startTask`, `/api/stopTask`, `/api/restartTask`, `/backup/beginBackup`, `/sync/beginSync`, and any path containing `/delete`, `/remove`, or `/restore` are always rejected and recorded in `forbiddenActions`. Any unmatched same-origin data GET under `/api`, `/stats`, `/proxy`, `/fleet`, `/backup`, `/sync`, `/webhooks`, `/newsletter`, `/jellystat`, `/tautulli`, or `/logs` is rejected and recorded in `unhandledReads`; static assets and document navigation may continue.
 
@@ -596,11 +596,11 @@ The required state matrix is explicit:
 - dialog: click `[aria-label^="Open session details"]` and require `.modal-content`;
 - chart: return the two Statistics series above, click the `Count` tab from the default Overview view, then require `.recharts-wrapper`, legend/labels, and `.recharts-area-curve` series nodes.
 
-- [ ] **Step 4: Test live switching and persistence**
+- [x] **Step 4: Test live switching and persistence**
 
 On Home, use the visible viewport-specific control (`theme-account-desktop` at 1440px or `theme-account-mobile` at 390px), followed by `theme-menu` and `theme-preset-ocean`, to prove the normal actionable UI path and assert `--barracks-action` changes from `#6f9bcf` to Ocean primary. Then open the session dialog. While that portalled dialog remains open, invoke `.click()` through `locator.evaluate(node => node.click())` on the existing account control, wait for `theme-menu`, invoke it the same way, wait for `theme-preset-mono`, and invoke that control; programmatic DOM clicks deliberately bypass the modal backdrop while still exercising the production navbar handlers, `saveTheme`, and theme event. Assert the still-open `.modal-content` computed background changes to the new `--barracks-surface-raised`, then close the dialog. On Statistics, click the `Count` tab and record the first `.recharts-area-curve` stroke/fill, then reopen the visible viewport-specific account control and `theme-menu` before selecting `theme-preset-ocean`; assert the chart color equals the new `--barracks-chart-1` and differs from the prior value. Reload, reopen the visible viewport-specific account control and `theme-menu`, then assert `theme-color-primary` has the persisted value. Inject `{primary:'bad',secondary:'#112233',background:null,surface:'#223344'}` under `silo_barracks_theme`; assert primary/background default per field, valid siblings remain, and no page error.
 
-- [ ] **Step 5: Deploy locally and run the matrix**
+- [x] **Step 5: Deploy locally and run the matrix**
 
 Run: `docker compose up --build -d --wait`
 
@@ -610,7 +610,7 @@ Run the Step 2 browser command again.
 
 Expected: PASS with screenshots and zero browser errors/overflow/color violations.
 
-- [ ] **Step 6: Commit browser verification**
+- [x] **Step 6: Commit browser verification**
 
 ```bash
 git add scripts/check-universal-theme-ui.cjs scripts/check-barracks-ui.cjs
@@ -632,22 +632,28 @@ Create `scripts/run-universal-theme-verification.sh` so the database lifecycle a
 set -euo pipefail
 
 theme_db_name="silo-barracks-theme-test-db-$$"
+theme_db_id=""
 cleanup() {
-  if docker inspect "$theme_db_name" >/dev/null 2>&1; then
-    docker stop "$theme_db_name" >/dev/null
+  if [[ -n "$theme_db_id" ]] && docker inspect "$theme_db_id" >/dev/null 2>&1; then
+    docker stop "$theme_db_id" >/dev/null
   fi
 }
 trap cleanup EXIT
 
-docker run --rm -d --name "$theme_db_name" --tmpfs /var/lib/postgresql/data -e POSTGRES_USER=barracks_test -e POSTGRES_PASSWORD=barracks_test_only -e POSTGRES_DB=barracks_test -p 127.0.0.1::5432 postgres:16-alpine
+theme_db_id=$(docker run --rm -d --name "$theme_db_name" --tmpfs /var/lib/postgresql/data -e POSTGRES_USER=barracks_test -e POSTGRES_PASSWORD=barracks_test_only -e POSTGRES_DB=barracks_test -p 127.0.0.1::5432 postgres:16-alpine)
 for attempt in $(seq 1 30); do
-  if docker exec "$theme_db_name" pg_isready -U barracks_test -d barracks_test; then break; fi
+  if docker exec "$theme_db_id" pg_isready -U barracks_test -d barracks_test; then break; fi
   test "$attempt" -lt 30
   sleep 1
 done
-theme_db_port=$(docker port "$theme_db_name" 5432/tcp | sed -E 's/.*:([0-9]+)$/\1/')
+theme_db_port=$(docker port "$theme_db_id" 5432/tcp | sed -E 's/.*:([0-9]+)$/\1/')
 test -n "$theme_db_port"
-test "$(docker inspect -f '{{.Config.Image}} {{range .Mounts}}{{.Name}}{{end}}' "$theme_db_name")" = 'postgres:16-alpine '
+test "$(docker inspect -f '{{.Config.Image}} {{range .Mounts}}{{.Name}}{{end}}' "$theme_db_id")" = 'postgres:16-alpine '
+
+barracks_chromium="${BARRACKS_CHROMIUM:-/opt/google/chrome/chrome}"
+barracks_playwright="${BARRACKS_PLAYWRIGHT:-/tmp/silo-barracks-ui.e9CWfq/node_modules/playwright}"
+barracks_qa_dir="${BARRACKS_QA_DIR:-/tmp/silo-barracks-theme-qa}"
+barracks_smoke_polls="${BARRACKS_SMOKE_POLLS:-4}"
 
 SILO_TEST_DATABASE_URL="postgres://barracks_test:barracks_test_only@127.0.0.1:${theme_db_port}/barracks_test" npm test
 npm run theme:check
@@ -655,15 +661,21 @@ npm run lint --workspace apps/web
 npm run build --workspace apps/web
 git diff --check
 
-mkdir -p /tmp/silo-barracks-theme-qa
-BARRACKS_SMOKE_POLLS=4 BARRACKS_CHROMIUM=/opt/google/chrome/chrome BARRACKS_PLAYWRIGHT=/tmp/silo-barracks-ui.e9CWfq/node_modules/playwright BARRACKS_QA_DIR=/tmp/silo-barracks-theme-qa node scripts/check-barracks-ui.cjs
-BARRACKS_CHROMIUM=/opt/google/chrome/chrome BARRACKS_PLAYWRIGHT=/tmp/silo-barracks-ui.e9CWfq/node_modules/playwright BARRACKS_QA_DIR=/tmp/silo-barracks-theme-qa node scripts/check-fleet-ui.cjs
-BARRACKS_CHROMIUM=/opt/google/chrome/chrome BARRACKS_PLAYWRIGHT=/tmp/silo-barracks-ui.e9CWfq/node_modules/playwright BARRACKS_QA_DIR=/tmp/silo-barracks-theme-qa node scripts/check-universal-theme-ui.cjs
+mkdir -p "$barracks_qa_dir"
+BARRACKS_SMOKE_POLLS="$barracks_smoke_polls" BARRACKS_CHROMIUM="$barracks_chromium" BARRACKS_PLAYWRIGHT="$barracks_playwright" BARRACKS_QA_DIR="$barracks_qa_dir" node scripts/check-barracks-ui.cjs
+BARRACKS_CHROMIUM="$barracks_chromium" BARRACKS_PLAYWRIGHT="$barracks_playwright" BARRACKS_QA_DIR="$barracks_qa_dir" node scripts/check-fleet-ui.cjs
+BARRACKS_CHROMIUM="$barracks_chromium" BARRACKS_PLAYWRIGHT="$barracks_playwright" BARRACKS_QA_DIR="$barracks_qa_dir" node scripts/check-universal-theme-ui.cjs
+
+for service in silo-barracks-db silo-barracks; do
+  service_id=$(docker compose ps -q "$service")
+  test -n "$service_id"
+  test "$(docker inspect -f '{{.State.Health.Status}}' "$service_id")" = healthy
+done
 
 docker compose ps
 ```
 
-The exact image/no-mount assertion runs before any tests. The EXIT trap owns only the unique PID-suffixed disposable container, fires on success or any earlier failure, and keeps the database alive for the entire verification sequence. Make the script executable.
+The exact image/no-mount assertion runs before any tests. The EXIT trap owns only the successful container ID for the unique PID-suffixed disposable container, fires on success or any earlier failure, and keeps the database alive for the entire verification sequence. Make the script executable.
 
 - [x] **Step 2: Run the complete automated gate**
 
@@ -699,7 +711,7 @@ git commit -m "docs: record universal theme verification"
 - `bash scripts/run-universal-theme-verification.sh` passed: `npm test` reported 127 passing, 0 failing, 0 skipped; `npm run theme:check`, web lint, Vite build, and `git diff --check` all exited 0.
 - Browser suites passed: live activity smoke completed 4/4 polls with no failures or page errors; fleet checks passed; universal matrix reported `routeStateChecks=92`, `themedTopLevelChecks=44`, `stateTests=10`, with `continuedMutations=[]`, `blockedMutations=[]`, `forbiddenActions=[]`, and `unhandledReads=[]`.
 - Screenshots were captured for every default route at desktop/mobile, all Ocean and Mono top-level routes, and default/custom/malformed home, dialog, activity/table, settings, and chart samples. Representative files manually inspected included `default-home-desktop.png`, `default-home-mobile.png`, `default-settings-general-desktop.png`, `ocean-home-desktop.png`, `ocean-statistics-desktop.png`, `mono-statistics-desktop.png`, `custom-sample-dialog.png`, and `custom-sample-chart.png`; hierarchy, warm Barracks surfaces, readable controls/charts, mobile stacking, and absence of JellyGlance purple/teal presentation were confirmed.
-- `docker compose ps` showed `silo-barracks` and `silo-barracks-db` healthy. `test -z "$(docker ps -aq --filter 'name=^silo-barracks-theme-test-db-')"` passed after the EXIT cleanup trap. The disposable database uses tmpfs so the Postgres image's declared anonymous volume cannot violate the no-named-mount assertion.
+- `docker compose ps` showed `silo-barracks` and `silo-barracks-db` healthy, with explicit `docker compose ps -q` plus `State.Health.Status=healthy` assertions for both services. `test -z "$(docker ps -aq --filter 'name=^silo-barracks-theme-test-db-')"` passed after the ID-scoped EXIT cleanup trap. The disposable database uses tmpfs so the Postgres image's declared anonymous volume cannot violate the no-named-mount assertion; browser executable, Playwright module, QA directory, and smoke-poll overrides remain caller-configurable with defaults.
 
 ---
 

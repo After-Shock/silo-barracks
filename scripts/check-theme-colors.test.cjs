@@ -558,14 +558,16 @@ test("directory and exact-file arguments constrain recursive scans", () => {
   const fixture = createFixture();
   try {
     const directory = fixture.write("apps/web/src/nested/one.css", ".one { color: #abc; }");
+    fixture.write("apps/web/src/nested/theme.test.js", "const fixtureStyle = { color: \"#fed\" };\n");
     const exactFile = fixture.write("apps/web/src/nested/two.jsx", "export const two = '#def';");
     const outside = fixture.write("apps/web/src/outside.css", ".outside { color: #ghi; }");
     const result = fixture.audit([path.dirname(directory)]);
     assert.deepEqual(result.scannedFiles, [
       "apps/web/src/nested/one.css",
+      "apps/web/src/nested/theme.test.js",
       "apps/web/src/nested/two.jsx",
     ]);
-    assert.deepEqual(values(result), ["#abc"]);
+    assert.deepEqual(values(result), ["#abc", "#fed"]);
     assert.ok(!result.scannedFiles.includes(path.relative(fixture.root, outside).replaceAll(path.sep, "/")));
     const exactResult = fixture.audit([exactFile]);
     assert.deepEqual(exactResult.scannedFiles, ["apps/web/src/nested/two.jsx"]);
