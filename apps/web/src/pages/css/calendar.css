@@ -46,8 +46,7 @@
   padding: 10px;
 }
 
-.calendar-toolbar a,
-.downloads-board a {
+.calendar-toolbar a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -379,8 +378,8 @@
 
 .calendar-event-pill.is-radarr-movie:hover,
 .calendar-event-pill.is-radarr-movie:focus {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 58%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-danger) 13%, transparent);
+  border-color: var(--barracks-state-danger);
+  background: var(--barracks-surface-raised);
 }
 
 .calendar-event-pill.is-sonarr-tv {
@@ -389,8 +388,8 @@
 
 .calendar-event-pill.is-sonarr-tv:hover,
 .calendar-event-pill.is-sonarr-tv:focus {
-  border-color: color-mix(in srgb, var(--barracks-action) 58%, transparent);
-  background: color-mix(in srgb, var(--barracks-action) 13%, transparent);
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
 }
 
 .calendar-event-pill.has-file {
@@ -465,6 +464,36 @@
   background: color-mix(in srgb, var(--barracks-surface-inset) 48%, transparent);
   color: var(--barracks-action);
   text-align: center;
+}
+
+.calendar-state {
+  display: grid;
+  gap: 6px;
+  min-height: 96px;
+  place-items: center;
+  padding: 18px;
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 12px;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-muted-raised);
+  font-weight: 750;
+  text-align: center;
+}
+
+.calendar-state.is-error {
+  border-color: var(--barracks-state-danger);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-state-danger);
+}
+
+.calendar-state button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--barracks-border-strong);
+  border-radius: 8px;
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+  font-weight: 800;
 }
 
 .calendar-empty-state svg {
@@ -878,17 +907,17 @@
 
 .calendar-toolbar,
 .calendar-shell {
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
   box-shadow: 0 12px 30px color-mix(in srgb, var(--barracks-surface-inset) 18%, transparent);
 }
 
 .calendar-toolbar button {
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-strong);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-weight: 680;
 }
 

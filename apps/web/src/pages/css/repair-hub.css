@@ -83,7 +83,7 @@
 
 .repair-metric.is-warning > svg,
 .repair-queue-card.is-warning > svg {
-  color: var(--barracks-state-danger);
+  color: var(--barracks-state-warning);
 }
 
 .repair-metric.is-ok > svg {

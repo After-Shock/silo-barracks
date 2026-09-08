@@ -8,6 +8,7 @@ import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
 import Settings3LineIcon from "remixicon-react/Settings3LineIcon";
 import TvLineIcon from "remixicon-react/TvLineIcon";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import axios from "../lib/axios_instance";
 import { loadSavedIntegrations } from "../lib/integrations-storage";
 import "./css/integrations.css";
@@ -112,7 +113,10 @@ function CalendarReleaseButton({ item, onClick }) {
 }
 
 export default function Calendar() {
+  const { t } = useTranslation();
   const [calendarData, setCalendarData] = useState({ releases: [], sources: [], syncedAt: null });
+  const [calendarLoading, setCalendarLoading] = useState(true);
+  const [calendarError, setCalendarError] = useState("");
   const [syncing, setSyncing] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState(new Date());
   const [selectedRelease, setSelectedRelease] = useState(null);
@@ -149,6 +153,8 @@ export default function Calendar() {
   const selectedDayReleases = selectedDay ? releasesForDay(selectedDay) : [];
 
   async function loadCalendarData() {
+    setCalendarLoading(true);
+    setCalendarError("");
     try {
       const response = await axios.get("/api/integrations/calendar", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -156,6 +162,9 @@ export default function Calendar() {
       setCalendarData(response.data || { releases: [], sources: [], syncedAt: null });
     } catch (error) {
       console.log("Unable to load calendar sync data", error);
+      setCalendarError(t("OPERATIONAL_STATES.CALENDAR_ERROR"));
+    } finally {
+      setCalendarLoading(false);
     }
   }
 
@@ -244,7 +253,14 @@ export default function Calendar() {
             <span>{filteredReleases.length} planned</span>
           </div>
 
-          {filteredReleases.length ? (
+          {calendarLoading ? (
+            <div className="calendar-state" role="status">{t("OPERATIONAL_STATES.CALENDAR_LOADING")}</div>
+          ) : calendarError ? (
+            <div className="calendar-state is-error" role="alert">
+              <strong>{calendarError}</strong>
+              <button type="button" onClick={loadCalendarData}>{t("OPERATIONAL_STATES.RETRY")}</button>
+            </div>
+          ) : filteredReleases.length ? (
             <div className="calendar-month-grid">
               {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
                 <div className="calendar-weekday" key={day}>{day}</div>
@@ -277,11 +293,11 @@ export default function Calendar() {
           ) : (
             <div className="calendar-empty-state">
               <CalendarEventFillIcon />
-              <strong>No release data yet</strong>
+              <strong>{t("OPERATIONAL_STATES.CALENDAR_EMPTY")}</strong>
               <span>
                 {activeSourceFilter === "all"
-                  ? "Add and test Sonarr, Radarr, or Lidarr in Settings → Integrations, then run Sync Now."
-                  : `No ${activeSourceFilter} releases found for this calendar window.`}
+                  ? t("OPERATIONAL_STATES.CALENDAR_EMPTY_HINT")
+                  : t("OPERATIONAL_STATES.CALENDAR_FILTER_EMPTY", { source: activeSourceFilter })}
               </span>
             </div>
           )}

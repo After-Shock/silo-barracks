@@ -15,7 +15,7 @@
   justify-content: space-between;
   gap: 16px;
   min-width: 0;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   padding: 18px;
   background:
@@ -56,10 +56,10 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-size: 12px;
   font-weight: 760;
 }
@@ -71,13 +71,22 @@
 
 .transcodes-error,
 .transcode-empty {
-  border: 1px solid color-mix(in srgb, var(--barracks-state-danger) 30%, transparent);
   border-radius: 8px;
   padding: 14px;
-  background: color-mix(in srgb, var(--barracks-state-danger) 12%, transparent);
-  color: var(--barracks-state-danger);
   font-size: 13px;
   font-weight: 700;
+}
+
+.transcodes-error {
+  border: 1px solid var(--barracks-state-danger);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-state-danger);
+}
+
+.transcode-empty {
+  border: 1px solid var(--barracks-border-inset);
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-state-unavailable);
 }
 
 .transcode-summary-grid {
@@ -92,7 +101,7 @@
   align-items: center;
   gap: 4px 12px;
   min-width: 0;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   padding: 14px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
@@ -115,7 +124,7 @@
   width: fit-content;
   max-width: 100%;
   gap: 6px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   padding: 6px;
   overflow-x: auto;
@@ -148,7 +157,7 @@
   gap: 12px 18px;
   min-height: 168px;
   overflow: hidden;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   padding: 18px;
   background:
@@ -355,9 +364,9 @@
 .transcode-empty {
   display: grid;
   gap: 4px;
-  border-color: var(--barracks-border-subtle);
-  background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
-  color: var(--barracks-action);
+  border-color: var(--barracks-border-inset);
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-muted-raised);
 }
 
 .transcode-empty strong {
@@ -366,7 +375,7 @@
 }
 
 .transcode-empty span {
-  color: var(--barracks-action);
+  color: var(--barracks-state-unavailable);
   font-size: 12px;
 }
 

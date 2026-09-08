@@ -365,5 +365,22 @@
     "TIMELINE_FILTERS_EMPTY": "No hi ha usuaris o biblioteques disponibles per a la cronologia.",
     "TIMELINE_SELECTION_EMPTY": "Seleccioneu un usuari i almenys una biblioteca per veure la cronologia."
   },
+  "OPERATIONAL_STATES": {
+    "CALENDAR_LOADING": "S'està carregant el calendari…",
+    "CALENDAR_ERROR": "No s'ha pogut carregar la informació del calendari.",
+    "CALENDAR_EMPTY": "Encara no hi ha dades d'estrenes.",
+    "CALENDAR_EMPTY_HINT": "Afegiu i proveu Sonarr, Radarr o Lidarr a Configuració → Integracions i executeu Sincronitza ara.",
+    "CALENDAR_FILTER_EMPTY": "No s'han trobat estrenes de {{source}} per a aquest període del calendari.",
+    "DOWNLOADS_LOADING": "S'està carregant l'activitat de baixades…",
+    "DOWNLOADS_ERROR": "No s'ha pogut carregar l'activitat de baixades.",
+    "DOWNLOADS_EMPTY": "No hi ha baixades actives. Afegiu un client a Configuració → Integracions i sincronitzeu la cua.",
+    "DOWNLOADS_CLIENTS_EMPTY": "Encara no s'han afegit clients de baixada.",
+    "REQUESTS_LOADING": "S'estan carregant les sol·licituds…",
+    "REQUESTS_ERROR": "No s'han pogut carregar les sol·licituds.",
+    "REQUESTS_EMPTY": "No s'han trobat sol·licituds.",
+    "REQUESTS_EMPTY_FILTER_HINT": "Proveu una altra cerca, ordre o filtre d'estat.",
+    "REQUESTS_EMPTY_SETUP_HINT": "Activeu i proveu Jellyseerr o Overseerr a Configuració → Integracions → Aplicacions Seerr.",
+    "RETRY": "Torna-ho a provar"
+  },
   "GENRES": "Gèneres"
 }

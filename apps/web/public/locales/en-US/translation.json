@@ -365,5 +365,22 @@
     "TIMELINE_FILTERS_EMPTY": "No timeline users or libraries are available.",
     "TIMELINE_SELECTION_EMPTY": "Select a user and at least one library to view the timeline."
   },
+  "OPERATIONAL_STATES": {
+    "CALENDAR_LOADING": "Loading calendar…",
+    "CALENDAR_ERROR": "Unable to load calendar data.",
+    "CALENDAR_EMPTY": "No release data yet.",
+    "CALENDAR_EMPTY_HINT": "Add and test Sonarr, Radarr, or Lidarr in Settings → Integrations, then run Sync Now.",
+    "CALENDAR_FILTER_EMPTY": "No {{source}} releases found for this calendar window.",
+    "DOWNLOADS_LOADING": "Loading download activity…",
+    "DOWNLOADS_ERROR": "Unable to load download activity.",
+    "DOWNLOADS_EMPTY": "No active downloads. Add a client in Settings → Integrations, then sync the queue.",
+    "DOWNLOADS_CLIENTS_EMPTY": "No download clients added yet.",
+    "REQUESTS_LOADING": "Loading requests…",
+    "REQUESTS_ERROR": "Unable to load requests.",
+    "REQUESTS_EMPTY": "No requests found.",
+    "REQUESTS_EMPTY_FILTER_HINT": "Try a different search, sort, or status filter.",
+    "REQUESTS_EMPTY_SETUP_HINT": "Enable and test Jellyseerr or Overseerr in Settings → Integrations → Seerr Apps.",
+    "RETRY": "Retry"
+  },
   "GENRES": "Genres"
 }

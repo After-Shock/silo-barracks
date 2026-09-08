@@ -365,5 +365,22 @@
     "TIMELINE_FILTERS_EMPTY": "Aucun utilisateur ni aucune bibliothèque n'est disponible pour la chronologie.",
     "TIMELINE_SELECTION_EMPTY": "Sélectionnez un utilisateur et au moins une bibliothèque pour afficher la chronologie."
   },
+  "OPERATIONAL_STATES": {
+    "CALENDAR_LOADING": "Chargement du calendrier…",
+    "CALENDAR_ERROR": "Impossible de charger les données du calendrier.",
+    "CALENDAR_EMPTY": "Aucune donnée de sortie pour le moment.",
+    "CALENDAR_EMPTY_HINT": "Ajoutez et testez Sonarr, Radarr ou Lidarr dans Paramètres → Intégrations, puis lancez Synchroniser maintenant.",
+    "CALENDAR_FILTER_EMPTY": "Aucune sortie de {{source}} pour cette période du calendrier.",
+    "DOWNLOADS_LOADING": "Chargement de l'activité des téléchargements…",
+    "DOWNLOADS_ERROR": "Impossible de charger l'activité des téléchargements.",
+    "DOWNLOADS_EMPTY": "Aucun téléchargement actif. Ajoutez un client dans Paramètres → Intégrations, puis synchronisez la file.",
+    "DOWNLOADS_CLIENTS_EMPTY": "Aucun client de téléchargement ajouté.",
+    "REQUESTS_LOADING": "Chargement des demandes…",
+    "REQUESTS_ERROR": "Impossible de charger les demandes.",
+    "REQUESTS_EMPTY": "Aucune demande trouvée.",
+    "REQUESTS_EMPTY_FILTER_HINT": "Essayez une autre recherche, un autre tri ou filtre d'état.",
+    "REQUESTS_EMPTY_SETUP_HINT": "Activez et testez Jellyseerr ou Overseerr dans Paramètres → Intégrations → Applications Seerr.",
+    "RETRY": "Réessayer"
+  },
   "GENRES": "Genres"
 }

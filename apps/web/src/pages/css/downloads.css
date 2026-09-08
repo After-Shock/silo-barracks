@@ -34,6 +34,21 @@
   font-weight: 950;
 }
 
+.downloads-board a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid rgba(var(--barracks-action-rgb), 0.42);
+  border-radius: 10px;
+  background: rgba(var(--barracks-action-rgb), 0.2);
+  color: var(--barracks-action);
+  font-weight: 950;
+  text-decoration: none;
+}
+
 .downloads-board button:hover {
   background: var(--barracks-action);
   color: var(--barracks-text-raised);
@@ -52,7 +67,7 @@
   align-items: center;
   gap: 12px;
   padding: 14px;
-  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 8%, transparent);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 14px;
   background: color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
 }
@@ -91,6 +106,36 @@
 .downloads-board .integration-empty-state {
   grid-column: 1 / -1;
   min-height: 150px;
+}
+
+.downloads-state {
+  display: grid;
+  min-height: 150px;
+  place-items: center;
+  gap: 8px;
+  padding: 22px;
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 12px;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-muted-raised);
+  font-weight: 750;
+  text-align: center;
+}
+
+.downloads-state.is-error {
+  border-color: var(--barracks-state-danger);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-state-danger);
+}
+
+.downloads-state button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--barracks-border-strong);
+  border-radius: 8px;
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+  font-weight: 800;
 }
 
 .downloads-board article > div {
@@ -463,9 +508,9 @@
 }
 
 .download-row-actions button.is-danger {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 38%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-danger) 32%, transparent);
-  color: var(--barracks-state-danger);
+  border-color: var(--barracks-state-danger-interactive);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-state-danger-interactive);
 }
 
 .download-progress-track {
@@ -557,7 +602,7 @@
 
 .downloads-summary,
 .downloads-board article {
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
   box-shadow: 0 12px 30px color-mix(in srgb, var(--barracks-surface-inset) 18%, transparent);
@@ -569,10 +614,10 @@
 }
 
 .downloads-board button {
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-strong);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-weight: 680;
 }
 

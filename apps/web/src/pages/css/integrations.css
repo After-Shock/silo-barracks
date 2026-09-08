@@ -254,10 +254,10 @@
   align-items: center;
   gap: 10px;
   padding: 9px 11px;
-  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 9%, transparent);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 11px;
-  background: color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   cursor: pointer;
   text-align: left;
   transition: all 0.16s ease;
@@ -405,7 +405,7 @@
   gap: 14px;
   align-content: start;
   padding: 18px;
-  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 9%, transparent);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 14px;
   background:
     radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--barracks-action) 24%, transparent), transparent 34%),
@@ -515,7 +515,7 @@
   width: 100%;
   min-width: 0;
   min-height: 42px;
-  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 12%, transparent);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 10px;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-raised);
@@ -578,9 +578,9 @@
 
 .integration-notice {
   padding: 10px 12px;
-  border: 1px solid color-mix(in srgb, var(--barracks-state-success) 28%, transparent);
+  border: 1px solid var(--barracks-state-success);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--barracks-state-success) 16%, transparent);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-success);
   font-weight: 850;
 }
@@ -620,9 +620,9 @@
 }
 
 .integration-actions button.is-danger {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 40%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-danger) 18%, transparent);
-  color: var(--barracks-state-danger);
+  border-color: var(--barracks-state-danger-interactive);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-state-danger-interactive);
 }
 
 .integration-message {
@@ -664,7 +664,7 @@
   gap: 10px;
   min-width: 0;
   padding: 12px;
-  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 9%, transparent);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 12px;
   background: color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
 }
@@ -735,17 +735,17 @@
 
 .integration-diagnostic-list span {
   padding: 7px 10px;
-  border: 1px solid color-mix(in srgb, var(--barracks-state-success) 28%, transparent);
+  border: 1px solid var(--barracks-state-success);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--barracks-state-success) 14%, transparent);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-success);
   font-size: 12px;
   font-weight: 850;
 }
 
 .integration-diagnostic-list span.is-error {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 30%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-danger) 18%, transparent);
+  border-color: var(--barracks-state-danger);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-danger);
 }
 
@@ -841,7 +841,7 @@
 .jellyfin-integration-card,
 .integration-subtabs,
 .integration-card {
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
   box-shadow: 0 12px 30px color-mix(in srgb, var(--barracks-surface-inset) 18%, transparent);
@@ -874,7 +874,7 @@
 .integration-health-grid article,
 .integration-health-grid .integration-empty-state,
 .integration-notice {
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-raised);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
   box-shadow: none;
@@ -897,10 +897,10 @@
 .integration-actions button,
 .client-adder button,
 .integration-events button {
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-strong);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-weight: 680;
 }
 
@@ -917,7 +917,7 @@
 
 .integration-fields input,
 .client-adder select {
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
 }

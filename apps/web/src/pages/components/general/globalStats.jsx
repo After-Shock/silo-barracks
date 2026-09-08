@@ -134,12 +134,12 @@ function GlobalStats(props) {
           sx={{
             "& .MuiPaper-root": {
               backgroundColor: `var(--barracks-canvas)`,
-              color: "var(--barracks-text-raised)",
+              color: "var(--barracks-text)",
               minWidth: "200px",
             },
             "& .MuiMenuItem-root": {
               "&:hover": {
-                backgroundColor: "var(--barracks-border-subtle)",
+                backgroundColor: "var(--barracks-surface-interactive)",
               },
             },
           }}

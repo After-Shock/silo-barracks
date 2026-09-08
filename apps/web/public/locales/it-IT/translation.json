@@ -365,5 +365,22 @@
     "TIMELINE_FILTERS_EMPTY": "Non sono disponibili utenti o librerie per la sequenza temporale.",
     "TIMELINE_SELECTION_EMPTY": "Seleziona un utente e almeno una libreria per visualizzare la sequenza temporale."
   },
+  "OPERATIONAL_STATES": {
+    "CALENDAR_LOADING": "Caricamento del calendario…",
+    "CALENDAR_ERROR": "Impossibile caricare i dati del calendario.",
+    "CALENDAR_EMPTY": "Nessun dato sulle uscite.",
+    "CALENDAR_EMPTY_HINT": "Aggiungi e testa Sonarr, Radarr o Lidarr in Impostazioni → Integrazioni, quindi avvia Sincronizza ora.",
+    "CALENDAR_FILTER_EMPTY": "Nessuna uscita di {{source}} trovata per questo periodo del calendario.",
+    "DOWNLOADS_LOADING": "Caricamento dell'attività dei download…",
+    "DOWNLOADS_ERROR": "Impossibile caricare l'attività dei download.",
+    "DOWNLOADS_EMPTY": "Nessun download attivo. Aggiungi un client in Impostazioni → Integrazioni, quindi sincronizza la coda.",
+    "DOWNLOADS_CLIENTS_EMPTY": "Nessun client di download aggiunto.",
+    "REQUESTS_LOADING": "Caricamento delle richieste…",
+    "REQUESTS_ERROR": "Impossibile caricare le richieste.",
+    "REQUESTS_EMPTY": "Nessuna richiesta trovata.",
+    "REQUESTS_EMPTY_FILTER_HINT": "Prova un'altra ricerca, un altro ordinamento o filtro di stato.",
+    "REQUESTS_EMPTY_SETUP_HINT": "Abilita e testa Jellyseerr o Overseerr in Impostazioni → Integrazioni → App Seerr.",
+    "RETRY": "Riprova"
+  },
   "GENRES": "Generi"
 }

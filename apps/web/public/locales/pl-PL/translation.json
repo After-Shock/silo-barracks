@@ -365,5 +365,22 @@
     "TIMELINE_FILTERS_EMPTY": "Brak użytkowników lub bibliotek dostępnych dla osi czasu.",
     "TIMELINE_SELECTION_EMPTY": "Wybierz użytkownika i co najmniej jedną bibliotekę, aby wyświetlić oś czasu."
   },
+  "OPERATIONAL_STATES": {
+    "CALENDAR_LOADING": "Wczytywanie kalendarza…",
+    "CALENDAR_ERROR": "Nie można wczytać danych kalendarza.",
+    "CALENDAR_EMPTY": "Brak danych o premierach.",
+    "CALENDAR_EMPTY_HINT": "Dodaj i przetestuj Sonarr, Radarr lub Lidarr w Ustawienia → Integracje, a następnie uruchom synchronizację.",
+    "CALENDAR_FILTER_EMPTY": "Nie znaleziono premier {{source}} dla tego okresu kalendarza.",
+    "DOWNLOADS_LOADING": "Wczytywanie aktywności pobierania…",
+    "DOWNLOADS_ERROR": "Nie można wczytać aktywności pobierania.",
+    "DOWNLOADS_EMPTY": "Brak aktywnych pobrań. Dodaj klienta w Ustawienia → Integracje, a następnie zsynchronizuj kolejkę.",
+    "DOWNLOADS_CLIENTS_EMPTY": "Nie dodano jeszcze klientów pobierania.",
+    "REQUESTS_LOADING": "Wczytywanie próśb…",
+    "REQUESTS_ERROR": "Nie można wczytać próśb.",
+    "REQUESTS_EMPTY": "Nie znaleziono próśb.",
+    "REQUESTS_EMPTY_FILTER_HINT": "Spróbuj innego wyszukiwania, sortowania lub filtra statusu.",
+    "REQUESTS_EMPTY_SETUP_HINT": "Włącz i przetestuj Jellyseerr lub Overseerr w Ustawienia → Integracje → Aplikacje Seerr.",
+    "RETRY": "Spróbuj ponownie"
+  },
   "GENRES": "Gatunki"
 }

@@ -60,12 +60,21 @@
 
 .automation-health-error,
 .automation-empty {
-  border: 1px solid color-mix(in srgb, var(--barracks-state-danger) 35%, transparent);
   border-radius: 14px;
   padding: 16px;
-  background: color-mix(in srgb, var(--barracks-state-danger) 18%, transparent);
-  color: var(--barracks-state-danger);
   font-weight: 800;
+}
+
+.automation-health-error {
+  border: 1px solid var(--barracks-state-danger);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-state-danger);
+}
+
+.automation-empty {
+  border-color: var(--barracks-border-inset);
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-state-unavailable);
 }
 
 .automation-summary-grid {
@@ -116,7 +125,7 @@
 }
 
 .automation-service-card.is-warning {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 30%, transparent);
+  border-color: var(--barracks-state-warning);
 }
 
 .automation-service-head {
@@ -217,7 +226,7 @@
   grid-column: 1 / -1;
   display: grid;
   gap: 4px;
-  color: var(--barracks-action);
+  color: var(--barracks-state-unavailable);
 }
 
 @media (max-width: 900px) {

@@ -365,5 +365,22 @@
     "TIMELINE_FILTERS_EMPTY": "Für die Zeitleiste sind keine Benutzer oder Mediatheken verfügbar.",
     "TIMELINE_SELECTION_EMPTY": "Wählen Sie einen Benutzer und mindestens eine Mediathek aus, um die Zeitleiste anzuzeigen."
   },
+  "OPERATIONAL_STATES": {
+    "CALENDAR_LOADING": "Kalender wird geladen…",
+    "CALENDAR_ERROR": "Kalenderdaten konnten nicht geladen werden.",
+    "CALENDAR_EMPTY": "Noch keine Veröffentlichungsdaten.",
+    "CALENDAR_EMPTY_HINT": "Fügen Sie Sonarr, Radarr oder Lidarr unter Einstellungen → Integrationen hinzu und testen Sie sie. Starten Sie anschließend die Synchronisierung.",
+    "CALENDAR_FILTER_EMPTY": "Keine {{source}}-Veröffentlichungen für diesen Kalenderzeitraum gefunden.",
+    "DOWNLOADS_LOADING": "Download-Aktivität wird geladen…",
+    "DOWNLOADS_ERROR": "Download-Aktivität konnte nicht geladen werden.",
+    "DOWNLOADS_EMPTY": "Keine aktiven Downloads. Fügen Sie unter Einstellungen → Integrationen einen Client hinzu und synchronisieren Sie die Warteschlange.",
+    "DOWNLOADS_CLIENTS_EMPTY": "Noch keine Download-Clients hinzugefügt.",
+    "REQUESTS_LOADING": "Anfragen werden geladen…",
+    "REQUESTS_ERROR": "Anfragen konnten nicht geladen werden.",
+    "REQUESTS_EMPTY": "Keine Anfragen gefunden.",
+    "REQUESTS_EMPTY_FILTER_HINT": "Versuchen Sie eine andere Suche, Sortierung oder Statusfilterung.",
+    "REQUESTS_EMPTY_SETUP_HINT": "Aktivieren und testen Sie Jellyseerr oder Overseerr unter Einstellungen → Integrationen → Seerr-Apps.",
+    "RETRY": "Erneut versuchen"
+  },
   "GENRES": "Genres"
 }

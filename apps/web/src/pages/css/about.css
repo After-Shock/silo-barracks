@@ -103,7 +103,7 @@
   gap: 4px 12px;
   min-height: 116px;
   padding: 16px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 64%, transparent);
 }
@@ -396,7 +396,7 @@
   display: grid;
   gap: 12px;
   padding: 16px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
 }

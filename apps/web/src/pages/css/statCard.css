@@ -301,7 +301,7 @@ input[type="number"] {
 .stats-overview .watch-stat-cards,
 .statistics-dashboard .watch-stat-cards {
   padding: 14px;
-  border: 1px solid var(--barracks-border-subtle);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background:
     linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.045), rgba(var(--barracks-accent-secondary-rgb), 0.025)),
@@ -335,7 +335,7 @@ input[type="number"] {
 .stats-overview .stat-card,
 .statistics-dashboard .stat-card {
   min-height: 142px;
-  border-color: var(--barracks-border-subtle) !important;
+  border-color: var(--barracks-border-inset) !important;
   border-radius: 8px !important;
   background:
     linear-gradient(145deg, color-mix(in srgb, var(--barracks-text-raised) 5%, transparent), rgba(var(--barracks-action-rgb), 0.035)),

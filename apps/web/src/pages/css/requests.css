@@ -1129,23 +1129,23 @@
   height: 22px;
   align-items: center;
   padding: 0 7px;
-  border: 1px solid color-mix(in srgb, var(--barracks-state-success) 28%, transparent);
+  border: 1px solid var(--barracks-state-success);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--barracks-state-success) 14%, transparent);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-success) !important;
   font-size: 11px !important;
   font-weight: 950 !important;
 }
 
 .requests-age-badge.is-day {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 34%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-danger) 22%, transparent);
+  border-color: var(--barracks-state-warning);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-warning) !important;
 }
 
 .requests-age-badge.is-week {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 34%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-danger) 20%, transparent);
+  border-color: var(--barracks-state-danger);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-danger) !important;
 }
 
@@ -1357,28 +1357,28 @@
 }
 
 .requests-availability b {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 26%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-danger) 18%, transparent);
+  border-color: var(--barracks-state-danger);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-danger);
 }
 
 .requests-availability.is-available b {
-  border-color: color-mix(in srgb, var(--barracks-state-success) 30%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-success) 18%, transparent);
+  border-color: var(--barracks-state-success);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-success);
 }
 
 .requests-availability.is-partially-available b,
 .requests-availability.is-partial b {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 30%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-danger) 18%, transparent);
+  border-color: var(--barracks-state-warning);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-warning);
 }
 
 .requests-availability.is-missing b,
 .requests-availability.is-error b {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 30%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-danger) 18%, transparent);
+  border-color: var(--barracks-state-danger);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-danger);
 }
 
@@ -1399,6 +1399,37 @@
   padding: 24px;
   color: var(--barracks-action);
   text-align: center;
+}
+
+.requests-state {
+  display: grid;
+  grid-column: 1 / -1;
+  min-height: 180px;
+  place-items: center;
+  gap: 8px;
+  padding: 24px;
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 12px;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-muted-raised);
+  font-weight: 750;
+  text-align: center;
+}
+
+.requests-state.is-error {
+  border-color: var(--barracks-state-danger);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-state-danger);
+}
+
+.requests-state button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--barracks-border-strong);
+  border-radius: 8px;
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+  font-weight: 800;
 }
 
 .requests-modal {
@@ -1570,8 +1601,8 @@
 
 .requests-detail-meta .is-status.is-approved,
 .requests-detail-meta .is-availability.is-available {
-  border-color: color-mix(in srgb, var(--barracks-state-success) 34%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-success) 20%, transparent);
+  border-color: var(--barracks-state-success);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-success);
 }
 
@@ -1579,14 +1610,14 @@
 .requests-detail-meta .is-status.is-declined,
 .requests-detail-meta .is-availability.is-missing,
 .requests-detail-meta .is-availability.is-error {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 36%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-danger) 22%, transparent);
+  border-color: var(--barracks-state-danger);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-danger);
 }
 
 .requests-detail-meta .is-availability {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 34%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-danger) 20%, transparent);
+  border-color: var(--barracks-state-warning);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-state-warning);
 }
 
@@ -2285,17 +2316,15 @@
 }
 
 .requests-page .requests-summary-grid article:nth-child(3) {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 34%, transparent);
+  border-color: var(--barracks-state-danger);
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--barracks-state-danger) 16%, transparent), color-mix(in srgb, var(--barracks-text-raised) 3%, transparent)),
-    color-mix(in srgb, var(--barracks-surface-inset) 90%, transparent);
+    linear-gradient(135deg, color-mix(in srgb, var(--barracks-surface-raised) 96%, transparent), color-mix(in srgb, var(--barracks-surface-inset) 94%, transparent));
 }
 
 .requests-page .requests-summary-grid article:nth-child(4) {
-  border-color: color-mix(in srgb, var(--barracks-state-success) 30%, transparent);
+  border-color: var(--barracks-state-success);
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--barracks-state-success) 13%, transparent), color-mix(in srgb, var(--barracks-text-raised) 3%, transparent)),
-    color-mix(in srgb, var(--barracks-surface-inset) 90%, transparent);
+    linear-gradient(135deg, color-mix(in srgb, var(--barracks-surface-raised) 96%, transparent), color-mix(in srgb, var(--barracks-surface-inset) 94%, transparent));
 }
 
 .requests-page .requests-summary-grid strong {
@@ -2585,7 +2614,7 @@
 .requests-board,
 .requests-control-bar,
 .requests-filter-strip {
-  border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
   box-shadow: 0 12px 30px color-mix(in srgb, var(--barracks-surface-inset) 18%, transparent);

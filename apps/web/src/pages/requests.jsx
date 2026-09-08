@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import ChatCheckFillIcon from "remixicon-react/ChatCheckFillIcon";
 import CheckboxCircleLineIcon from "remixicon-react/CheckboxCircleLineIcon";
 import CloseCircleLineIcon from "remixicon-react/CloseCircleLineIcon";
@@ -249,8 +250,10 @@ function RequestPoster({ request, large = false }) {
 }
 
 export default function Requests() {
+  const { t } = useTranslation();
   const [data, setData] = useState({ sources: [], requests: [], syncedAt: null });
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
   const [busyAction, setBusyAction] = useState("");
   const [mediaSearch, setMediaSearch] = useState("");
@@ -486,6 +489,7 @@ export default function Requests() {
   }
 
   async function loadRequests(force = false) {
+    setLoadError("");
     try {
       setLoading(true);
       const response = await axios.get("/api/requests", {
@@ -496,6 +500,9 @@ export default function Requests() {
       const badgeCount = Number(response.data?.stats?.badgeCount || 0);
       localStorage.setItem("jellyglance_request_badge_count", String(badgeCount));
       window.dispatchEvent(new CustomEvent("jellyglance-request-count", { detail: badgeCount }));
+    } catch (error) {
+      console.log("Unable to load requests", error);
+      setLoadError(t("OPERATIONAL_STATES.REQUESTS_ERROR"));
     } finally {
       setLoading(false);
     }
@@ -732,6 +739,14 @@ export default function Requests() {
   return (
     <div className="requests-page" data-theme-screen="requests">
       {actionMessage ? <div className="requests-action-message">{actionMessage}</div> : null}
+      {loading ? (
+        <div className="requests-state" role="status">{t("OPERATIONAL_STATES.REQUESTS_LOADING")}</div>
+      ) : loadError ? (
+        <div className="requests-state is-error" role="alert">
+          <strong>{loadError}</strong>
+          <button type="button" onClick={() => loadRequests(true)}>{t("OPERATIONAL_STATES.RETRY")}</button>
+        </div>
+      ) : null}
 
       <section className="requests-discovery">
         <div className="requests-discovery-head">
@@ -835,7 +850,7 @@ export default function Requests() {
       </section>
 
       <section className={`requests-board is-${queueView}`}>
-        {visibleRequests.map((request) => {
+        {!loading && !loadError ? visibleRequests.map((request) => {
           const age = getRequestAge(request.createdAt);
           return (
             <article
@@ -915,13 +930,13 @@ export default function Requests() {
               </div>
             </article>
           );
-        })}
+        }) : null}
 
-        {!visibleRequests.length ? (
+        {!loading && !loadError && !visibleRequests.length ? (
           <div className="requests-empty-state">
             <ChatCheckFillIcon size={30} />
-            <strong>No requests found</strong>
-            <span>{data.requests?.length ? "Try a different search, sort, or status filter." : "Enable and test Jellyseerr or Overseerr in Settings > Integrations > Seerr Apps."}</span>
+            <strong>{t("OPERATIONAL_STATES.REQUESTS_EMPTY")}</strong>
+            <span>{data.requests?.length ? t("OPERATIONAL_STATES.REQUESTS_EMPTY_FILTER_HINT") : t("OPERATIONAL_STATES.REQUESTS_EMPTY_SETUP_HINT")}</span>
           </div>
         ) : null}
       </section>
