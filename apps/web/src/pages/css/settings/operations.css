@@ -1,5 +1,206 @@
 @import '../variables.css';
 
+.settings-import-tabs {
+  display: inline-flex !important;
+  width: fit-content;
+  gap: 6px;
+  margin: 0 0 14px !important;
+  padding: 6px;
+  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 18%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
+}
+
+.settings-import-tabs .nav-link {
+  min-height: 38px;
+  border-radius: 10px !important;
+  color: var(--barracks-text-raised) !important;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.settings-import-tabs .nav-link.active {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--barracks-action) 90%, transparent), color-mix(in srgb, var(--barracks-focus-light) 62%, transparent)) !important;
+  color: var(--barracks-text-raised) !important;
+}
+
+.settings-import-pane {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.settings .backup-page,
+.settings .backup-panel,
+.settings .backup-file-grid,
+.settings .health-settings,
+.settings .health-panel,
+.settings .legacy-import-page,
+.settings .legacy-import-panel,
+.settings .legacy-import-review {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.settings .health-panel,
+.settings .settings-logs-table,
+.settings .legacy-import-review,
+.settings .backup-panel {
+  overflow-x: auto;
+}
+
+.settings-import-tabs {
+  border-color: var(--barracks-border-subtle);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--barracks-surface-inset) 18%, transparent);
+}
+
+.settings-import-tabs .nav-link {
+  border-radius: 8px !important;
+  font-weight: 680 !important;
+}
+
+.settings-import-tabs .nav-link.active {
+  background: var(--barracks-action) !important;
+  color: var(--barracks-text-raised) !important;
+}
+
+.server-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.server-job-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.server-job-filters button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--barracks-border-subtle);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
+  color: var(--barracks-text-raised);
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.server-job-filters button.is-active {
+  border-color: color-mix(in srgb, var(--barracks-focus-light) 46%, transparent);
+  background: color-mix(in srgb, var(--barracks-action) 18%, transparent);
+  color: var(--barracks-text-raised);
+}
+
+.settings-logs-page {
+  display: grid;
+  gap: 16px;
+  color: var(--barracks-text-raised);
+}
+
+.settings-logs-page h1 {
+  margin: 0 !important;
+  color: var(--barracks-text-raised);
+  font-size: clamp(32px, 3.6vw, 48px);
+  font-weight: 820 !important;
+  line-height: 1;
+}
+
+.settings-logs-table {
+  border: 1px solid color-mix(in srgb, var(--barracks-focus) 18%, transparent);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 84%, transparent);
+}
+
+.settings-logs-table .MuiTable-root {
+  min-width: 940px;
+}
+
+.settings-logs-table .MuiTableHead-root .MuiTableCell-root {
+  border-bottom: 1px solid color-mix(in srgb, var(--barracks-focus) 24%, transparent);
+  background: color-mix(in srgb, var(--barracks-surface-inset) 96%, transparent);
+  color: var(--barracks-text-raised) !important;
+  font-size: 11px;
+  font-weight: 780;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-logs-table .MuiTableBody-root .MuiTableRow-root {
+  background: color-mix(in srgb, var(--barracks-surface-inset) 58%, transparent);
+}
+
+.settings-logs-table .MuiTableBody-root .MuiTableRow-root:hover {
+  background: color-mix(in srgb, var(--barracks-focus) 8%, transparent);
+}
+
+.settings-logs-table .MuiTableCell-root {
+  border-bottom: 1px solid color-mix(in srgb, var(--barracks-focus) 16%, transparent) !important;
+  color: var(--barracks-text-raised) !important;
+  font-size: 13px;
+  font-weight: 620;
+}
+
+.settings-logs-table .MuiIconButton-root {
+  color: var(--barracks-focus-light);
+}
+
+.settings-logs-table .MuiIconButton-root:hover {
+  color: var(--barracks-focus-light);
+  background: color-mix(in srgb, var(--barracks-focus-light) 12%, transparent);
+}
+
+.settings-logs-table .badge {
+  min-width: 58px;
+  padding: 5px 8px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.settings-logs-empty {
+  color: var(--barracks-focus-light) !important;
+  font-style: italic;
+  text-align: center !important;
+}
+
+.settings-logs-page .pagination-buttons {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--barracks-focus) 18%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 84%, transparent);
+}
+
+.settings-logs-page .page-btn {
+  min-height: 34px;
+  border-color: color-mix(in srgb, var(--barracks-focus-light) 22%, transparent) !important;
+  background: color-mix(in srgb, var(--barracks-action) 82%, transparent) !important;
+  color: var(--barracks-text-raised) !important;
+  font-weight: 760 !important;
+}
+
+.settings-logs-page .page-btn:disabled {
+  border-color: color-mix(in srgb, var(--barracks-focus) 12%, transparent) !important;
+  background: color-mix(in srgb, var(--barracks-focus) 12%, transparent) !important;
+  color: color-mix(in srgb, var(--barracks-text-raised) 52%, transparent) !important;
+  opacity: 1;
+}
+
+.settings-logs-page .page-number {
+  min-width: 92px;
+  margin: 0;
+  padding: 0 10px;
+  border-inline: 1px solid color-mix(in srgb, var(--barracks-focus) 14%, transparent);
+  color: var(--barracks-text-raised);
+  font-size: 13px;
+  font-weight: 680;
+  white-space: nowrap;
+}
+
 .tasks {
   display: grid;
   gap: 18px;
@@ -184,41 +385,6 @@
   justify-content: center;
   gap: 7px;
   min-height: 40px;
-}
-
-.event-webhook-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-  gap: 12px;
-}
-
-.event-webhook-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  min-height: 110px;
-  padding: 14px;
-  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 17%, transparent);
-  border-radius: 14px;
-  background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--barracks-action) 14%, transparent), transparent 45%),
-    color-mix(in srgb, var(--barracks-surface-inset) 76%, transparent);
-}
-
-.event-webhook-card h5 {
-  margin: 0 0 5px;
-  color: var(--barracks-text-raised);
-  font-size: 15px;
-  font-weight: 950;
-}
-
-.event-webhook-card p {
-  margin: 0;
-  color: var(--barracks-focus-light);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.4;
 }
 
 .health-settings {
@@ -1381,5 +1547,136 @@
 
   .server-task-actions {
     justify-content: space-between;
+  }
+}
+
+@media (max-width: 1180px){
+
+  .health-hero {
+    display: grid;
+  }
+
+  .health-table article,
+.audit-table article {
+    grid-template-columns: 1fr;
+  }
+
+  .health-table strong,
+.health-table span,
+.health-table small,
+.health-table time {
+    white-space: normal;
+  }
+
+  .legacy-import-controls {
+    display: grid;
+    align-items: stretch;
+  }
+
+  .legacy-import-upload {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .legacy-import-upload-button {
+    grid-column: 1 / -1;
+  }
+
+  .legacy-import-review-header,
+.legacy-import-review-layout,
+.legacy-import-search,
+.legacy-import-user-row {
+    display: grid;
+  }
+
+  .legacy-import-unmatched-list {
+    max-height: 360px;
+  }
+}
+
+@media (max-width: 640px){
+
+  .legacy-import-panel,
+.legacy-import-review,
+.health-panel,
+.health-hero {
+    padding: 12px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--barracks-surface-inset) 74%, transparent);
+  }
+
+  .legacy-import-page .form-label {
+    color: var(--barracks-text-raised);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .legacy-import-page .form-control,
+.legacy-import-page .form-select {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .legacy-import-page .btn {
+    min-height: 44px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .health-hero span,
+.health-summary-grid span {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .health-hero h1 {
+    font-size: 24px !important;
+    line-height: 1.05 !important;
+  }
+
+  .health-hero p {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .legacy-import-page,
+.health-settings {
+    gap: 12px;
+  }
+
+  .legacy-import-upload,
+.legacy-import-latest,
+.legacy-import-review-header,
+.legacy-import-review-layout,
+.legacy-import-search,
+.legacy-import-user-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .legacy-import-latest strong,
+.legacy-import-upload strong,
+.legacy-import-unmatched-list strong,
+.legacy-import-results strong,
+.legacy-import-user-row strong,
+.legacy-import-user-row span {
+    white-space: normal;
+  }
+
+  .legacy-import-upload > svg,
+.legacy-import-latest svg {
+    justify-self: start;
+  }
+
+  .legacy-import-upload-button {
+    width: 100%;
+  }
+
+  .legacy-import-actions {
+    display: grid;
+  }
+
+  .health-check-grid article,
+.health-summary-grid article {
+    grid-template-columns: 30px minmax(0, 1fr);
   }
 }

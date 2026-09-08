@@ -16,7 +16,6 @@
     radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--barracks-accent-secondary) 9%, transparent), transparent 28%);
   color: var(--barracks-text-raised);
 }
-
 .settings-page-header {
   grid-column: 1 / -1;
   margin-bottom: 20px;
@@ -139,29 +138,6 @@
   background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent) !important;
   background-color: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent) !important;
   color: var(--barracks-text-raised) !important;
-}
-
-.webhook-placeholder-hint {
-  display: grid;
-  gap: 5px;
-  margin-top: 10px;
-  padding: 9px 11px;
-  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 18%, transparent);
-  border-radius: 9px;
-  background: color-mix(in srgb, var(--barracks-action) 8%, transparent);
-}
-
-.webhook-placeholder-hint strong {
-  color: var(--barracks-text-raised);
-  font-size: 11px;
-}
-
-.webhook-placeholder-hint span {
-  overflow-wrap: anywhere;
-  color: var(--barracks-accent-secondary);
-  font-family: monospace;
-  font-size: 11px;
-  line-height: 1.5;
 }
 
 .nav-order-settings {
@@ -392,53 +368,15 @@
   align-self: start;
 }
 
-.settings .integrations-settings-tab {
-  display: block !important;
-  min-height: 0 !important;
-  height: auto !important;
-  align-items: stretch !important;
-  justify-content: flex-start !important;
-}
-
-.settings-import-tabs {
-  display: inline-flex !important;
-  width: fit-content;
-  gap: 6px;
-  margin: 0 0 14px !important;
-  padding: 6px;
-  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 18%, transparent);
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
-}
-
-.settings-import-tabs .nav-link {
-  min-height: 38px;
-  border-radius: 10px !important;
-  color: var(--barracks-text-raised) !important;
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.settings-import-tabs .nav-link.active {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--barracks-action) 90%, transparent), color-mix(in srgb, var(--barracks-focus-light) 62%, transparent)) !important;
-  color: var(--barracks-text-raised) !important;
-}
-
-.settings-import-pane {
+.settings .settings-form,
+.settings .libraries,
+.settings .library-display-settings,
+.settings .libraries-container,
+.settings .jellyfin-admin-settings,
+.settings .jellyfin-admin-section {
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  overflow-x: hidden;
-}
-
-.settings :is(.settings-form, .libraries, .library-display-settings, .libraries-container, .backup-page, .backup-panel, .backup-file-grid, .webhooks-settings, .webhook-builder, .webhook-destination-grid, .notification-settings, .notification-panel, .newsletter-settings, .newsletter-settings-grid, .newsletter-layout, .health-settings, .health-panel, .legacy-import-page, .legacy-import-panel, .legacy-import-review, .jellyfin-admin-settings, .jellyfin-admin-section) {
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-}
-
-.settings :is(.health-panel, .settings-logs-table, .legacy-import-review, .backup-panel) {
-  overflow-x: auto;
 }
 
 .app-error-boundary {
@@ -465,10 +403,6 @@
   letter-spacing: 0;
 }
 
-.show-key {
-  margin-bottom: 20px;
-}
-
 .settings-form {
   color: var(--barracks-text-raised);
 }
@@ -480,40 +414,6 @@
   border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 8%, transparent);
   border-radius: 16px;
   background: color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
-}
-
-.jellyfin-connected-summary {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.jellyfin-connected-summary div {
-  min-width: 0;
-}
-
-.jellyfin-connected-summary span {
-  display: block;
-  margin-bottom: 4px;
-  color: var(--barracks-focus-light);
-  font-size: 11px;
-  font-weight: 950;
-  text-transform: uppercase;
-}
-
-.jellyfin-connected-summary strong {
-  display: block;
-  overflow: hidden;
-  color: var(--barracks-text-raised);
-  font-size: 14px;
-  font-weight: 850;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.jellyfin-connected-summary .btn {
-  flex: 0 0 auto;
 }
 
 .settings-form .row {
@@ -1324,131 +1224,8 @@
     grid-template-columns: 1fr;
   }
 
-  .jellyfin-connected-summary {
-    display: grid;
-    gap: 10px;
-  }
-
-  .jellyfin-connected-summary .btn {
-    width: 100%;
-  }
-
   .settings-section-header h2 {
     font-size: 24px;
-  }
-
-  .event-webhook-card {
-    border-radius: 13px;
-    padding: 12px;
-  }
-
-  .webhooks-hero,
-.webhook-builder-header,
-.webhook-builder-actions {
-    display: grid;
-  }
-
-  .webhooks-hero-stats,
-.webhook-form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .health-hero {
-    display: grid;
-  }
-
-  .health-table article,
-.audit-table article {
-    grid-template-columns: 1fr;
-  }
-
-  .health-table strong,
-.health-table span,
-.health-table small,
-.health-table time {
-    white-space: normal;
-  }
-
-  .newsletter-layout,
-.newsletter-settings-grid,
-.newsletter-form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .newsletter-tabs {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    padding: 7px;
-  }
-
-  .newsletter-tabs .nav-item,
-.newsletter-tabs .nav-link {
-    width: 100%;
-  }
-
-  .newsletter-actions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .newsletter-actions .btn {
-    justify-content: center;
-  }
-
-  .newsletter-preview-actions {
-    display: grid;
-    grid-template-columns: 1fr;
-    width: 100%;
-  }
-
-  .newsletter-preview-actions .btn {
-    justify-content: center;
-  }
-
-  .newsletter-preview-frame,
-.newsletter-preview-frame iframe {
-    min-height: 520px;
-  }
-
-  .notification-mode-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .notification-field-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .notification-actions {
-    display: grid;
-  }
-
-  .notification-actions .btn {
-    justify-content: center;
-  }
-
-  .legacy-import-controls {
-    display: grid;
-    align-items: stretch;
-  }
-
-  .legacy-import-upload {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-
-  .legacy-import-upload-button {
-    grid-column: 1 / -1;
-  }
-
-  .legacy-import-review-header,
-.legacy-import-review-layout,
-.legacy-import-search,
-.legacy-import-user-row {
-    display: grid;
-  }
-
-  .legacy-import-unmatched-list {
-    max-height: 360px;
   }
 }
 
@@ -1515,15 +1292,7 @@
     display: none;
   }
 
-  .settings-form,
-.event-webhook-card,
-.webhook-builder,
-.webhook-destination-card,
-.legacy-import-panel,
-.legacy-import-review,
-.newsletter-panel,
-.health-panel,
-.health-hero {
+  .settings-form {
     padding: 12px;
     border-radius: 12px;
     background: color-mix(in srgb, var(--barracks-surface-inset) 74%, transparent);
@@ -1545,8 +1314,7 @@
   }
 
   .settings-form .form-label,
-.form-row label,
-.legacy-import-page .form-label {
+.form-row label {
     color: var(--barracks-text-raised);
     font-size: 12px;
     font-weight: 900;
@@ -1554,17 +1322,14 @@
 
   .settings-form .form-control,
 .settings-form .form-select,
-.settings-form .input-group > .form-control,
-.legacy-import-page .form-control,
-.legacy-import-page .form-select {
+.settings-form .input-group > .form-control {
     min-height: 44px;
     font-size: 16px;
   }
 
   .settings .btn,
 .settings-form button[type="submit"],
-.settings-form .dropdown-toggle,
-.legacy-import-page .btn {
+.settings-form .dropdown-toggle {
     min-height: 44px;
     width: 100%;
     justify-content: center;
@@ -1590,99 +1355,24 @@
     overflow-y: auto;
   }
 
-  .settings-section-header,
-.webhooks-hero {
+  .settings-section-header {
     padding: 13px;
     border-radius: 13px;
   }
 
-  .settings-section-header span,
-.webhooks-hero span,
-.health-hero span,
-.health-summary-grid span {
+  .settings-section-header span {
     font-size: 10px;
     letter-spacing: 0.1em;
   }
 
-  .settings-section-header h2,
-.webhooks-hero h1,
-.health-hero h1 {
+  .settings-section-header h2 {
     font-size: 24px !important;
     line-height: 1.05 !important;
   }
 
-  .settings-section-header p,
-.webhooks-hero p,
-.health-hero p {
+  .settings-section-header p {
     font-size: 12px;
     line-height: 1.4;
-  }
-
-  .webhook-builder,
-.webhook-destination-card,
-.legacy-import-page,
-.newsletter-settings,
-.health-settings {
-    gap: 12px;
-  }
-
-  .webhook-template-strip,
-.webhook-task-check-grid,
-.webhook-destination-events {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .webhook-template-strip button,
-.webhook-task-check,
-.webhook-destination-events span {
-    justify-content: center;
-    min-height: 38px;
-    text-align: center;
-  }
-
-  .webhook-destination-top,
-.webhook-destination-actions,
-.legacy-import-upload,
-.legacy-import-latest,
-.legacy-import-review-header,
-.legacy-import-review-layout,
-.legacy-import-search,
-.legacy-import-user-row,
-.newsletter-panel-title,
-.newsletter-history article {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .webhook-destination-top p,
-.legacy-import-latest strong,
-.legacy-import-upload strong,
-.legacy-import-unmatched-list strong,
-.legacy-import-results strong,
-.legacy-import-user-row strong,
-.legacy-import-user-row span,
-.newsletter-history strong,
-.newsletter-history span {
-    white-space: normal;
-  }
-
-  .legacy-import-upload > svg,
-.legacy-import-latest svg {
-    justify-self: start;
-  }
-
-  .legacy-import-upload-button {
-    width: 100%;
-  }
-
-  .legacy-import-actions {
-    display: grid;
-  }
-
-  .health-check-grid article,
-.health-summary-grid article {
-    grid-template-columns: 30px minmax(0, 1fr);
   }
 }
 
@@ -1736,7 +1426,6 @@
 }
 
 .settings-eyebrow,
-.jellyfin-connected-summary span,
 .settings-chip {
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -1747,7 +1436,6 @@
 }
 
 .settings > .nav-pills,
-.settings-import-tabs,
 .settings-form,
 .app-error-boundary {
   border-color: var(--barracks-border-subtle);
@@ -1757,7 +1445,6 @@
 }
 
 .settings > .nav-pills .nav-link,
-.settings-import-tabs .nav-link,
 .settings-form .form-control,
 .settings-form .form-select,
 .settings-form .input-group > .form-control,
@@ -1780,7 +1467,6 @@
 }
 
 .settings > .nav-pills .nav-link.active,
-.settings-import-tabs .nav-link.active,
 .settings-form .input-group > .btn,
 .settings .btn-primary,
 .settings .submit,
@@ -1809,139 +1495,6 @@
   border-color: var(--barracks-border-subtle);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
-}
-
-.server-action-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.server-job-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-}
-
-.server-job-filters button {
-  min-height: 34px;
-  padding: 0 12px;
-  border: 1px solid var(--barracks-border-subtle);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
-  color: var(--barracks-text-raised);
-  font-size: 12px;
-  font-weight: 720;
-}
-
-.server-job-filters button.is-active {
-  border-color: color-mix(in srgb, var(--barracks-focus-light) 46%, transparent);
-  background: color-mix(in srgb, var(--barracks-action) 18%, transparent);
-  color: var(--barracks-text-raised);
-}
-
-.settings-logs-page {
-  display: grid;
-  gap: 16px;
-  color: var(--barracks-text-raised);
-}
-
-.settings-logs-page h1 {
-  margin: 0 !important;
-  color: var(--barracks-text-raised);
-  font-size: clamp(32px, 3.6vw, 48px);
-  font-weight: 820 !important;
-  line-height: 1;
-}
-
-.settings-logs-table {
-  border: 1px solid color-mix(in srgb, var(--barracks-focus) 18%, transparent);
-  background: color-mix(in srgb, var(--barracks-surface-inset) 84%, transparent);
-}
-
-.settings-logs-table .MuiTable-root {
-  min-width: 940px;
-}
-
-.settings-logs-table .MuiTableHead-root .MuiTableCell-root {
-  border-bottom: 1px solid color-mix(in srgb, var(--barracks-focus) 24%, transparent);
-  background: color-mix(in srgb, var(--barracks-surface-inset) 96%, transparent);
-  color: var(--barracks-text-raised) !important;
-  font-size: 11px;
-  font-weight: 780;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.settings-logs-table .MuiTableBody-root .MuiTableRow-root {
-  background: color-mix(in srgb, var(--barracks-surface-inset) 58%, transparent);
-}
-
-.settings-logs-table .MuiTableBody-root .MuiTableRow-root:hover {
-  background: color-mix(in srgb, var(--barracks-focus) 8%, transparent);
-}
-
-.settings-logs-table .MuiTableCell-root {
-  border-bottom: 1px solid color-mix(in srgb, var(--barracks-focus) 16%, transparent) !important;
-  color: var(--barracks-text-raised) !important;
-  font-size: 13px;
-  font-weight: 620;
-}
-
-.settings-logs-table .MuiIconButton-root {
-  color: var(--barracks-focus-light);
-}
-
-.settings-logs-table .MuiIconButton-root:hover {
-  color: var(--barracks-focus-light);
-  background: color-mix(in srgb, var(--barracks-focus-light) 12%, transparent);
-}
-
-.settings-logs-table .badge {
-  min-width: 58px;
-  padding: 5px 8px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-}
-
-.settings-logs-empty {
-  color: var(--barracks-focus-light) !important;
-  font-style: italic;
-  text-align: center !important;
-}
-
-.settings-logs-page .pagination-buttons {
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--barracks-focus) 18%, transparent);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--barracks-surface-inset) 84%, transparent);
-}
-
-.settings-logs-page .page-btn {
-  min-height: 34px;
-  border-color: color-mix(in srgb, var(--barracks-focus-light) 22%, transparent) !important;
-  background: color-mix(in srgb, var(--barracks-action) 82%, transparent) !important;
-  color: var(--barracks-text-raised) !important;
-  font-weight: 760 !important;
-}
-
-.settings-logs-page .page-btn:disabled {
-  border-color: color-mix(in srgb, var(--barracks-focus) 12%, transparent) !important;
-  background: color-mix(in srgb, var(--barracks-focus) 12%, transparent) !important;
-  color: color-mix(in srgb, var(--barracks-text-raised) 52%, transparent) !important;
-  opacity: 1;
-}
-
-.settings-logs-page .page-number {
-  min-width: 92px;
-  margin: 0;
-  padding: 0 10px;
-  border-inline: 1px solid color-mix(in srgb, var(--barracks-focus) 14%, transparent);
-  color: var(--barracks-text-raised);
-  font-size: 13px;
-  font-weight: 680;
-  white-space: nowrap;
 }
 
 .jellyfin-admin-settings {

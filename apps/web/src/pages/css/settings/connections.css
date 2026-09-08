@@ -1,5 +1,127 @@
 @import '../variables.css';
 
+.event-webhook-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 12px;
+}
+
+.event-webhook-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 110px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 17%, transparent);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--barracks-action) 14%, transparent), transparent 45%),
+    color-mix(in srgb, var(--barracks-surface-inset) 76%, transparent);
+}
+
+.event-webhook-card h5 {
+  margin: 0 0 5px;
+  color: var(--barracks-text-raised);
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.event-webhook-card p {
+  margin: 0;
+  color: var(--barracks-focus-light);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.webhook-placeholder-hint {
+  display: grid;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 9px 11px;
+  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 18%, transparent);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--barracks-action) 8%, transparent);
+}
+
+.webhook-placeholder-hint strong {
+  color: var(--barracks-text-raised);
+  font-size: 11px;
+}
+
+.webhook-placeholder-hint span {
+  overflow-wrap: anywhere;
+  color: var(--barracks-accent-secondary);
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.settings .integrations-settings-tab {
+  display: block !important;
+  min-height: 0 !important;
+  height: auto !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+}
+
+.settings .webhooks-settings,
+.settings .webhook-builder,
+.settings .webhook-destination-grid,
+.settings .notification-settings,
+.settings .notification-panel,
+.settings .newsletter-settings,
+.settings .newsletter-settings-grid,
+.settings .newsletter-layout {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.show-key {
+  margin-bottom: 20px;
+}
+
+.jellyfin-connected-summary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.jellyfin-connected-summary div {
+  min-width: 0;
+}
+
+.jellyfin-connected-summary span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--barracks-focus-light);
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.jellyfin-connected-summary strong {
+  display: block;
+  overflow: hidden;
+  color: var(--barracks-text-raised);
+  font-size: 14px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jellyfin-connected-summary .btn {
+  flex: 0 0 auto;
+}
+
+.jellyfin-connected-summary span {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
 .webhooks-settings {
   display: grid;
   gap: 18px;
@@ -740,4 +862,157 @@
   max-width: 360px;
   font-size: 13px;
   font-weight: 750;
+}
+
+@media (max-width: 1180px){
+
+  .jellyfin-connected-summary {
+    display: grid;
+    gap: 10px;
+  }
+
+  .jellyfin-connected-summary .btn {
+    width: 100%;
+  }
+
+  .event-webhook-card {
+    border-radius: 13px;
+    padding: 12px;
+  }
+
+  .webhooks-hero,
+.webhook-builder-header,
+.webhook-builder-actions {
+    display: grid;
+  }
+
+  .webhooks-hero-stats,
+.webhook-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .newsletter-layout,
+.newsletter-settings-grid,
+.newsletter-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .newsletter-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 7px;
+  }
+
+  .newsletter-tabs .nav-item,
+.newsletter-tabs .nav-link {
+    width: 100%;
+  }
+
+  .newsletter-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .newsletter-actions .btn {
+    justify-content: center;
+  }
+
+  .newsletter-preview-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .newsletter-preview-actions .btn {
+    justify-content: center;
+  }
+
+  .newsletter-preview-frame,
+.newsletter-preview-frame iframe {
+    min-height: 520px;
+  }
+
+  .notification-mode-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .notification-field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-actions {
+    display: grid;
+  }
+
+  .notification-actions .btn {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px){
+
+  .event-webhook-card,
+.webhook-builder,
+.webhook-destination-card,
+.newsletter-panel {
+    padding: 12px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--barracks-surface-inset) 74%, transparent);
+  }
+
+  .webhooks-hero {
+    padding: 13px;
+    border-radius: 13px;
+  }
+
+  .webhooks-hero span {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .webhooks-hero h1 {
+    font-size: 24px !important;
+    line-height: 1.05 !important;
+  }
+
+  .webhooks-hero p {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .webhook-builder,
+.webhook-destination-card,
+.newsletter-settings {
+    gap: 12px;
+  }
+
+  .webhook-template-strip,
+.webhook-task-check-grid,
+.webhook-destination-events {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .webhook-template-strip button,
+.webhook-task-check,
+.webhook-destination-events span {
+    justify-content: center;
+    min-height: 38px;
+    text-align: center;
+  }
+
+  .webhook-destination-top,
+.webhook-destination-actions,
+.newsletter-panel-title,
+.newsletter-history article {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .webhook-destination-top p,
+.newsletter-history strong,
+.newsletter-history span {
+    white-space: normal;
+  }
 }
