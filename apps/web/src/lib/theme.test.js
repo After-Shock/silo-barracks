@@ -532,6 +532,40 @@ test("resolveTheme keeps normal and muted text readable for seeded saturated pal
   }
 });
 
+test("resolveTheme keeps action foreground readable on vivid midtone canvases", () => {
+  const palettes = [
+    {
+      name: "vivid blue canvas",
+      primary: "#e08a2e",
+      secondary: "#2ac6d8",
+      background: "#2e78d6",
+      surface: "#2083af",
+    },
+    {
+      name: "vivid cyan canvas",
+      primary: "#d650a0",
+      secondary: "#f3c243",
+      background: "#2078c9",
+      surface: "#2783af",
+    },
+    {
+      name: "vivid slate canvas",
+      primary: "#22aa99",
+      secondary: "#ccaa22",
+      background: "#557777",
+      surface: "#779999",
+    },
+  ];
+
+  for (const palette of palettes) {
+    const { tokens } = resolveTheme(palette);
+    assert.ok(
+      contrastRatio(tokens.actionForeground, tokens.canvas) >= 4.5,
+      `${palette.name}: action foreground contrast`,
+    );
+  }
+});
+
 test("resolveTheme gives vivid custom palettes separate readable muted text roles", () => {
   const { tokens } = resolveTheme({
     primary: "#8caaac",

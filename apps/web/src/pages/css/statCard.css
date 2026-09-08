@@ -8,7 +8,7 @@
   background:
     linear-gradient(145deg, rgba(var(--barracks-action-rgb), 0.045), color-mix(in srgb, var(--barracks-text-raised) 2%, transparent)),
     color-mix(in srgb, var(--barracks-surface-inset) 58%, transparent);
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.1);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 14px;
   padding: 12px;
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
@@ -20,7 +20,7 @@
 
 .statistics-dashboard .watch-stat-cards {
   padding: 16px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.14);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 16px;
   background:
     radial-gradient(circle at 12% 0%, rgba(var(--barracks-action-rgb), 0.08), transparent 34%),
@@ -45,7 +45,7 @@
 
 .stat-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(var(--barracks-action-rgb), 0.28) !important;
+  border-color: var(--barracks-border-strong) !important;
 }
 
 .stat-card-overlay {
@@ -67,7 +67,7 @@
   height: 130px;
   place-items: center;
   overflow: hidden;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 10px;
   background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
 }
@@ -346,7 +346,7 @@ input[type="number"] {
 .stats-overview .stat-card:hover,
 .statistics-dashboard .stat-card:hover {
   transform: translateY(-1px);
-  border-color: rgba(var(--barracks-action-rgb), 0.28) !important;
+  border-color: var(--barracks-border-strong) !important;
 }
 
 .stats-overview .stat-card-overlay,

@@ -23,7 +23,7 @@ const calendarSourceDefaults = [
 
 function appIcon(app) {
   const slug = String(app.slug || app.name || "sonarr").toLowerCase();
-  return <img src={iconUrl(slug)} alt="" loading="lazy" decoding="async" />;
+  return <img src={iconUrl(slug)} alt="" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.style.display = "none"; }} />;
 }
 
 function addDays(days) {
@@ -85,7 +85,7 @@ const sampleReleases = [
 
 function ReleaseArtwork({ release, size = 18 }) {
   if (release?.posterUrl) {
-    return <img src={release.posterUrl} alt="" loading="lazy" decoding="async" />;
+    return <img src={release.posterUrl} alt="" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.style.display = "none"; }} />;
   }
   return release?.type === "tv" ? <TvLineIcon size={size} /> : <FilmLineIcon size={size} />;
 }

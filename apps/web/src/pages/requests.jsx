@@ -237,9 +237,11 @@ function RequestPoster({ request, large = false }) {
         alt=""
         loading={large ? undefined : "lazy"}
         decoding="async"
-        onError={() => {
+        onError={(event) => {
           if (posterIndex < urls.length - 1) {
             setPosterIndex((current) => current + 1);
+          } else {
+            event.currentTarget.style.display = "none";
           }
         }}
       />

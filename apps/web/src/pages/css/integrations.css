@@ -44,7 +44,7 @@
 .integration-events,
 .jellyfin-integration-card,
 .integration-subtabs {
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 16px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
   box-shadow: 0 22px 60px color-mix(in srgb, var(--barracks-surface-inset) 28%, transparent);
@@ -65,7 +65,7 @@
   align-items: center;
   gap: 16px;
   padding: 16px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 16px;
   background:
     linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.12), color-mix(in srgb, var(--barracks-text-raised) 3%, transparent)),
@@ -125,15 +125,15 @@
   justify-items: center;
   gap: 3px;
   padding: 12px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.34);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 14px;
-  background: rgba(var(--barracks-action-rgb), 0.13);
+  background: var(--barracks-surface-raised);
 }
 
 .integrations-status svg {
   width: 24px;
   height: 24px;
-  color: var(--barracks-action);
+  color: var(--barracks-text-raised);
 }
 
 .integrations-status strong {
@@ -160,7 +160,7 @@
 }
 
 .integration-subtabs button.is-active {
-  border-color: rgba(var(--barracks-action-rgb), 0.42);
+  border-color: var(--barracks-border-strong);
   background: linear-gradient(90deg, rgba(var(--barracks-action-rgb), 0.86), rgba(var(--barracks-action-rgb), 0.56));
   color: var(--barracks-text-raised);
   box-shadow: 0 14px 28px rgba(var(--barracks-action-rgb), 0.18);
@@ -216,7 +216,7 @@
   display: grid;
   gap: 12px;
   padding: 14px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 14px;
   background:
     linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.06), transparent),
@@ -264,16 +264,16 @@
 }
 
 .integration-agent-choice:hover {
-  border-color: rgba(var(--barracks-action-rgb), 0.4);
-  background: rgba(var(--barracks-action-rgb), 0.08);
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .integration-agent-choice.is-selected {
-  border-color: rgba(var(--barracks-action-rgb), 0.6);
-  background:
-    linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.15), rgba(var(--barracks-action-rgb), 0.06));
-  box-shadow: 0 0 0 1px rgba(var(--barracks-action-rgb), 0.18) inset;
-  color: var(--barracks-text-raised);
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  box-shadow: 0 0 0 1px var(--barracks-border-strong) inset;
+  color: var(--barracks-text-interactive);
 }
 
 .integration-agent-choice-icon {
@@ -282,9 +282,9 @@
   height: 38px;
   place-items: center;
   overflow: hidden;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.32);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 9px;
-  background: rgba(var(--barracks-action-rgb), 0.14);
+  background: var(--barracks-surface-raised);
 }
 
 .integration-agent-choice-icon img,
@@ -354,7 +354,7 @@
   align-items: center;
   gap: 14px;
   padding: 14px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 14px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
 }
@@ -391,10 +391,10 @@
   justify-content: center;
   gap: 8px;
   padding: 0 14px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.36);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 8px;
-  background: rgba(var(--barracks-action-rgb), 0.34);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-weight: 950;
   text-decoration: none;
 }
@@ -455,7 +455,7 @@
   width: 58px;
   height: 58px;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--barracks-action) 42%, color-mix(in srgb, var(--barracks-text-raised) 12%, transparent));
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 14px;
   background: color-mix(in srgb, var(--barracks-text-raised) 6%, transparent);
   box-shadow: 0 14px 32px color-mix(in srgb, var(--barracks-surface-inset) 26%, transparent);
@@ -542,10 +542,10 @@
   justify-content: center;
   gap: 8px;
   min-height: 38px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.42);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 10px;
-  background: rgba(var(--barracks-action-rgb), 0.2);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-weight: 950;
 }
 
@@ -607,10 +607,10 @@
   gap: 8px;
   min-height: 38px;
   padding: 0 16px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.42);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 10px;
-  background: rgba(var(--barracks-action-rgb), 0.2);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-weight: 950;
 }
 
@@ -650,9 +650,9 @@
 .integration-health-grid .integration-empty-state {
   grid-column: 1 / -1;
   padding: 18px;
-  border: 1px dashed rgba(var(--barracks-action-rgb), 0.28);
+  border: 1px dashed var(--barracks-border-inset);
   border-radius: 12px;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-weight: 850;
   text-align: center;
 }
@@ -693,15 +693,23 @@
 .integration-health-grid span,
 .integration-health-grid em,
 .integration-health-grid small {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 800;
 }
 
 .integration-health-grid em {
   margin-top: 2px;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   font-style: normal;
+}
+
+.integration-health-grid article.is-ok em {
+  color: var(--barracks-state-success);
+}
+
+.integration-health-grid article.is-error em {
+  color: var(--barracks-state-danger);
 }
 
 .integration-uptime-timeline {

@@ -8,7 +8,7 @@
 
 .downloads-summary,
 .downloads-board article {
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 16px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
   box-shadow: 0 22px 60px color-mix(in srgb, var(--barracks-surface-inset) 28%, transparent);
@@ -27,10 +27,10 @@
   gap: 8px;
   min-height: 38px;
   padding: 0 16px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.42);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 10px;
-  background: rgba(var(--barracks-action-rgb), 0.2);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-weight: 950;
 }
 
@@ -41,10 +41,10 @@
   gap: 8px;
   min-height: 38px;
   padding: 0 16px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.42);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 10px;
-  background: rgba(var(--barracks-action-rgb), 0.2);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-weight: 950;
   text-decoration: none;
 }
@@ -79,7 +79,7 @@
 }
 
 .download-summary-card span {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   font-weight: 900;
 }
 
@@ -144,7 +144,7 @@
 }
 
 .downloads-board span {
-  color: var(--barracks-action);
+  color: var(--barracks-text-inset);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.12em;
@@ -153,7 +153,7 @@
 
 .downloads-board p {
   margin: 0;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-weight: 800;
 }
 
@@ -177,7 +177,7 @@
   align-items: center;
   gap: 18px;
   padding: 16px 18px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 16px;
   background:
     linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.14), rgba(var(--barracks-accent-secondary-rgb), 0.05)),
@@ -216,9 +216,9 @@
   justify-items: center;
   gap: 3px;
   padding: 12px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.34);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 14px;
-  background: rgba(var(--barracks-action-rgb), 0.14);
+  background: var(--barracks-surface-raised);
 }
 
 .download-header-stat svg {
@@ -244,7 +244,7 @@
 .download-add-bar,
 .download-count-grid article,
 .download-panel {
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.16);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 14px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
   box-shadow: 0 16px 42px color-mix(in srgb, var(--barracks-surface-inset) 24%, transparent);
@@ -295,7 +295,7 @@
   width: 100%;
   min-width: 0;
   min-height: 42px;
-  border: 1px solid color-mix(in srgb, var(--barracks-action) 18%, transparent);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-raised);
@@ -311,7 +311,7 @@
   justify-content: center;
   gap: 8px !important;
   padding: 0 16px;
-  border: 1px solid color-mix(in srgb, var(--barracks-action) 18%, transparent);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 86%, transparent);
   color: var(--barracks-text-raised);
@@ -337,7 +337,7 @@
 }
 
 .download-add-button {
-  border-color: color-mix(in srgb, var(--barracks-action) 28%, transparent);
+  border-color: var(--barracks-border-strong);
   background: var(--barracks-action);
   color: var(--barracks-action-text);
 }
@@ -369,7 +369,7 @@
 }
 
 .download-count-grid article.is-active {
-  border-color: color-mix(in srgb, var(--barracks-action) 76%, transparent);
+  border-color: var(--barracks-border-strong);
 }
 
 .download-count-grid strong {
@@ -478,7 +478,7 @@
 .download-client-row span:not(.integration-status-light):not(.download-client-icon) {
   display: block;
   margin-top: 3px;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-size: 12px;
   font-weight: 750;
 }
@@ -491,7 +491,7 @@
 }
 
 .download-row-actions small {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-size: 13px;
   font-weight: 950;
 }
@@ -501,10 +501,10 @@
   width: 30px;
   height: 30px;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--barracks-action) 22%, transparent);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 90%, transparent);
-  color: var(--barracks-action);
+  color: var(--barracks-text-inset);
 }
 
 .download-row-actions button.is-danger {

@@ -7,10 +7,10 @@
   justify-content: center;
   gap: 8px;
   padding: 0 14px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.36);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 8px;
-  background: rgba(var(--barracks-action-rgb), 0.34);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
   font-weight: 950;
   text-decoration: none;
 }
@@ -24,7 +24,7 @@
 .wizarr-dashboard article,
 .wizarr-create-card,
 .wizarr-invite-card {
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 84%, transparent);
   box-shadow: 0 16px 38px color-mix(in srgb, var(--barracks-surface-inset) 22%, transparent);
@@ -52,7 +52,7 @@
 }
 
 .wizarr-dashboard span {
-  color: var(--barracks-action);
+  color: var(--barracks-text-inset);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.12em;
@@ -60,7 +60,7 @@
 }
 
 .wizarr-dashboard small {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-size: 12px;
   font-weight: 800;
 }
@@ -99,7 +99,7 @@
   display: grid;
   gap: 10px;
   padding: 12px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.13);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 42%, transparent);
 }
@@ -125,10 +125,10 @@
 .wizarr-form-heading button {
   min-height: 28px;
   padding: 0 10px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.26);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 8px;
-  background: rgba(var(--barracks-action-rgb), 0.22);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-size: 11px;
   font-weight: 950;
 }
@@ -143,7 +143,7 @@
 .wizarr-create-card input[type="text"],
 .wizarr-create-card input:not([type]) {
   min-height: 42px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.24);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-raised);
@@ -185,10 +185,10 @@
   gap: 4px;
   min-height: 62px;
   padding: 11px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
-  color: var(--barracks-action);
+  color: var(--barracks-text-inset);
   text-align: left;
   transition:
     border-color 160ms ease,
@@ -198,15 +198,13 @@
 
 .wizarr-choice-grid button:hover {
   transform: translateY(-1px);
-  border-color: rgba(var(--barracks-action-rgb), 0.38);
+  border-color: var(--barracks-border-strong);
 }
 
 .wizarr-choice-grid button.is-selected {
-  border-color: rgba(var(--barracks-action-rgb), 0.56);
-  background:
-    linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.42), rgba(var(--barracks-action-rgb), 0.14)),
-    color-mix(in srgb, var(--barracks-surface-inset) 92%, transparent);
-  color: var(--barracks-text-raised);
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
 }
 
@@ -242,10 +240,10 @@
   align-items: center;
   gap: 8px;
   padding: 0 10px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
-  color: var(--barracks-action);
+  color: var(--barracks-text-inset);
   letter-spacing: 0;
   text-transform: none;
 }
@@ -254,7 +252,7 @@
   display: grid;
   gap: 10px;
   padding: 12px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.14);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background:
     linear-gradient(135deg, rgba(var(--barracks-accent-secondary-rgb), 0.08), transparent 50%),
@@ -299,7 +297,7 @@
   display: grid;
   gap: 12px;
   padding: 14px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 68%, transparent);
 }
@@ -330,10 +328,10 @@
   align-items: center;
   gap: 8px;
   padding: 0 12px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.2);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: var(--barracks-surface-inset);
-  color: var(--barracks-action);
+  color: var(--barracks-text-inset);
 }
 
 .wizarr-search input {
@@ -355,18 +353,18 @@
 .wizarr-filter-row button {
   min-height: 34px;
   padding: 0 12px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
-  color: var(--barracks-action);
+  color: var(--barracks-text-inset);
   font-size: 12px;
   font-weight: 950;
 }
 
 .wizarr-filter-row button.is-active {
-  border-color: rgba(var(--barracks-action-rgb), 0.5);
-  background: rgba(var(--barracks-action-rgb), 0.5);
-  color: var(--barracks-text-raised);
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .wizarr-invite-list {
@@ -423,7 +421,7 @@
 .wizarr-invite-card p,
 .wizarr-invite-meta span {
   margin: 0;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-size: 12px;
   font-weight: 800;
 }
@@ -455,10 +453,10 @@
   height: 38px;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.26);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 8px;
-  background: rgba(var(--barracks-action-rgb), 0.22);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .wizarr-invite-actions .is-danger {

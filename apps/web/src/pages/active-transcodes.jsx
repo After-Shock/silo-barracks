@@ -79,7 +79,7 @@ function JobCard({ job, kind }) {
   return (
     <article className={`transcode-job-card is-${kind}`} style={bannerStyle}>
       <div className="transcode-job-thumbnail">
-        {job.thumbnailUrl ? <img src={job.thumbnailUrl} alt="" loading="lazy" decoding="async" /> : <span>{job.title.slice(0, 2)}</span>}
+        {job.thumbnailUrl ? <img src={job.thumbnailUrl} alt="" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.style.display = "none"; }} /> : <span>{job.title.slice(0, 2)}</span>}
       </div>
       <div className="transcode-job-main">
         <span className="transcode-job-kicker">{job.library || job.worker || "Tdarr"}</span>
@@ -198,7 +198,7 @@ export default function ActiveTranscodes() {
         </button>
       </header>
 
-      {error ? <div className="transcodes-error">{error}</div> : null}
+      {error ? <div className="transcodes-error" role="alert">{error}</div> : null}
 
       <section className="transcode-summary-grid">
         <article>

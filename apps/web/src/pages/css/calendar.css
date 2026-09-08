@@ -11,7 +11,7 @@
 
 .calendar-toolbar,
 .calendar-shell {
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 16px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
   box-shadow: 0 22px 60px color-mix(in srgb, var(--barracks-surface-inset) 28%, transparent);
@@ -30,16 +30,16 @@
   gap: 8px;
   min-height: 38px;
   padding: 0 16px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.42);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 10px;
-  background: rgba(var(--barracks-action-rgb), 0.2);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-weight: 950;
 }
 
 .calendar-toolbar button:hover {
   background: var(--barracks-action);
-  color: var(--barracks-text-raised);
+  color: var(--barracks-action-text);
 }
 
 .calendar-toolbar {
@@ -53,10 +53,10 @@
   gap: 8px;
   min-height: 38px;
   padding: 0 16px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.42);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 10px;
-  background: rgba(var(--barracks-action-rgb), 0.2);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-weight: 950;
   text-decoration: none;
 }
@@ -76,7 +76,7 @@
   gap: 2px 8px;
   min-width: 0;
   padding: 12px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 14px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 76%, transparent);
   color: inherit;
@@ -90,21 +90,22 @@
 .calendar-source-strip button:hover,
 .calendar-source-strip button:focus-visible,
 .calendar-source-strip button.is-selected {
-  border-color: rgba(var(--barracks-action-rgb), 0.74);
-  background: rgba(var(--barracks-action-rgb), 0.2);
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   transform: translateY(-1px);
 }
 
 .calendar-source-strip button.is-active {
-  border-color: rgba(var(--barracks-action-rgb), 0.42);
-  background: rgba(var(--barracks-action-rgb), 0.12);
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .calendar-source-strip button.is-active.is-selected {
-  border-color: rgba(var(--barracks-action-rgb), 0.82);
-  background:
-    linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.24), rgba(var(--barracks-accent-secondary-rgb), 0.07)),
-    color-mix(in srgb, var(--barracks-surface-inset) 86%, transparent);
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .calendar-source-icon {
@@ -113,7 +114,7 @@
   width: 36px;
   height: 36px;
   place-items: center;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 10px;
   background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
 }
@@ -126,7 +127,7 @@
 
 .calendar-source-strip small {
   grid-column: 2;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-size: 12px;
   font-weight: 850;
 }
@@ -156,7 +157,7 @@
 
 .calendar-layout,
 .calendar-lower-grid article {
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.16);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 16px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
   box-shadow: 0 18px 46px color-mix(in srgb, var(--barracks-surface-inset) 24%, transparent);
@@ -274,15 +275,15 @@
   gap: 1px;
   overflow: hidden;
   min-width: 0;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.14);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 14px;
-  background: rgba(var(--barracks-action-rgb), 0.12);
+  background: var(--barracks-surface-inset);
 }
 
 .calendar-weekday {
   padding: 10px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 96%, transparent);
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-size: 11px;
   font-weight: 950;
   letter-spacing: 0.13em;
@@ -331,8 +332,9 @@
   height: 22px;
   place-items: center;
   border-radius: 999px;
-  background: rgba(var(--barracks-action-rgb), 0.24);
-  color: var(--barracks-action);
+  border: 1px solid var(--barracks-border-raised);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   font-size: 11px;
   font-weight: 950;
 }
@@ -358,18 +360,19 @@
   overflow: hidden;
   padding: 3px 6px;
   box-sizing: border-box;
-  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 8%, transparent);
-  border-left: 3px solid rgba(var(--barracks-action-rgb), 0.7);
+  border: 1px solid var(--barracks-border-raised);
+  border-left: 3px solid var(--barracks-border-raised);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
+  background: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
   text-align: left;
 }
 
 .calendar-event-pill:hover,
 .calendar-event-pill:focus {
-  border-color: rgba(var(--barracks-action-rgb), 0.52);
-  background: rgba(var(--barracks-action-rgb), 0.17);
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .calendar-event-pill.is-radarr-movie {
@@ -383,7 +386,7 @@
 }
 
 .calendar-event-pill.is-sonarr-tv {
-  border-left-color: var(--barracks-action);
+  border-left-color: var(--barracks-state-live);
 }
 
 .calendar-event-pill.is-sonarr-tv:hover,
@@ -403,12 +406,12 @@
   height: 21px;
   border-radius: 4px;
   object-fit: cover;
-  color: var(--barracks-action);
+  color: var(--barracks-text-raised);
 }
 
 .calendar-event-pill span {
   min-width: 0;
-  color: var(--barracks-action);
+  color: var(--barracks-text-raised);
   font-size: 9px;
   font-weight: 950;
   white-space: nowrap;
@@ -421,7 +424,7 @@
 
 .calendar-event-pill.is-sonarr-tv span,
 .calendar-event-pill.is-sonarr-tv svg {
-  color: var(--barracks-action);
+  color: var(--barracks-state-live);
 }
 
 .calendar-event-pill strong {
@@ -436,10 +439,10 @@
 
 .calendar-day-more-button {
   height: 27px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.24);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 8px;
-  background: rgba(var(--barracks-action-rgb), 0.12);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-size: 11px;
   font-weight: 950;
   text-align: center;
@@ -447,9 +450,9 @@
 
 .calendar-day-more-button:hover,
 .calendar-day-more-button:focus {
-  border-color: rgba(var(--barracks-action-rgb), 0.52);
-  background: rgba(var(--barracks-action-rgb), 0.22);
-  color: var(--barracks-text-raised);
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .calendar-empty-state,
@@ -459,10 +462,10 @@
   place-items: center;
   gap: 8px;
   padding: 20px;
-  border: 1px dashed rgba(var(--barracks-action-rgb), 0.2);
+  border: 1px dashed var(--barracks-border-inset);
   border-radius: 14px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 48%, transparent);
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   text-align: center;
 }
 
@@ -543,7 +546,7 @@
 }
 
 .calendar-status-list small {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-size: 12px;
   font-weight: 800;
 }
@@ -580,27 +583,27 @@
   gap: 22px;
   width: min(840px, 100%);
   padding: 18px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.34);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 20px;
   background:
     radial-gradient(circle at 20% 0%, rgba(var(--barracks-action-rgb), 0.22), transparent 34%),
-    color-mix(in srgb, var(--barracks-surface-inset) 96%, transparent);
+    var(--barracks-surface-raised);
   box-shadow: 0 28px 90px color-mix(in srgb, var(--barracks-surface-inset) 52%, transparent);
 }
 
 .calendar-preview-modal.is-radarr-movie {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 42%, transparent);
+  border-color: var(--barracks-state-danger);
   background:
     radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--barracks-state-danger) 20%, transparent), transparent 34%),
-    color-mix(in srgb, var(--barracks-surface-inset) 96%, transparent);
+    var(--barracks-surface-raised);
   box-shadow: 0 28px 90px color-mix(in srgb, var(--barracks-surface-inset) 52%, transparent), 0 0 0 1px color-mix(in srgb, var(--barracks-state-danger) 8%, transparent);
 }
 
 .calendar-preview-modal.is-sonarr-tv {
-  border-color: color-mix(in srgb, var(--barracks-action) 42%, transparent);
+  border-color: var(--barracks-state-live);
   background:
     radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--barracks-action) 18%, transparent), transparent 34%),
-    color-mix(in srgb, var(--barracks-surface-inset) 96%, transparent);
+    var(--barracks-surface-raised);
   box-shadow: 0 28px 90px color-mix(in srgb, var(--barracks-surface-inset) 52%, transparent), 0 0 0 1px color-mix(in srgb, var(--barracks-action) 8%, transparent);
 }
 
@@ -623,20 +626,20 @@
   aspect-ratio: 2 / 3;
   place-items: center;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 10%, transparent);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 16px;
-  background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
 }
 
 .calendar-preview-modal.is-radarr-movie .calendar-preview-art {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 34%, transparent);
+  border-color: var(--barracks-state-danger);
   color: var(--barracks-state-danger);
 }
 
 .calendar-preview-modal.is-sonarr-tv .calendar-preview-art {
-  border-color: color-mix(in srgb, var(--barracks-action) 34%, transparent);
-  color: var(--barracks-action);
+  border-color: var(--barracks-state-live);
+  color: var(--barracks-state-live);
 }
 
 .calendar-preview-art img {
@@ -659,7 +662,7 @@
 }
 
 .calendar-preview-copy > span {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.14em;
@@ -671,7 +674,7 @@
 }
 
 .calendar-preview-modal.is-sonarr-tv .calendar-preview-copy > span {
-  color: var(--barracks-action);
+  color: var(--barracks-state-live);
 }
 
 .calendar-preview-copy h2 {
@@ -684,7 +687,7 @@
 
 .calendar-preview-copy p {
   margin: 0;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   font-size: 14px;
   font-weight: 750;
   line-height: 1.5;
@@ -699,23 +702,23 @@
 
 .calendar-preview-copy dl div {
   padding: 11px;
-  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 8%, transparent);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
+  background: var(--barracks-surface-raised);
 }
 
 .calendar-preview-modal.is-radarr-movie .calendar-preview-copy dl div {
-  border-color: color-mix(in srgb, var(--barracks-state-danger) 16%, transparent);
-  background: color-mix(in srgb, var(--barracks-state-danger) 6%, transparent);
+  border-color: var(--barracks-state-danger);
+  background: var(--barracks-surface-raised);
 }
 
 .calendar-preview-modal.is-sonarr-tv .calendar-preview-copy dl div {
-  border-color: color-mix(in srgb, var(--barracks-action) 16%, transparent);
-  background: color-mix(in srgb, var(--barracks-action) 6%, transparent);
+  border-color: var(--barracks-state-live);
+  background: var(--barracks-surface-raised);
 }
 
 .calendar-preview-copy dt {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   font-size: 10px;
   font-weight: 950;
   letter-spacing: 0.14em;
@@ -737,11 +740,11 @@
   position: relative;
   width: min(620px, 100%);
   padding: 20px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.34);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 18px;
   background:
     radial-gradient(circle at 20% 0%, rgba(var(--barracks-action-rgb), 0.18), transparent 34%),
-    color-mix(in srgb, var(--barracks-surface-inset) 97%, transparent);
+    var(--barracks-surface-raised);
   box-shadow: 0 28px 90px color-mix(in srgb, var(--barracks-surface-inset) 52%, transparent);
 }
 
@@ -751,7 +754,7 @@
 }
 
 .calendar-day-modal-header span {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 950;
   letter-spacing: 0.16em;
@@ -767,7 +770,7 @@
 
 .calendar-day-modal-header p {
   margin: 0;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted-raised);
   font-size: 13px;
   font-weight: 800;
 }
@@ -821,14 +824,15 @@
 }
 
 .calendar-shell article > span {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-size: 13px;
   font-weight: 950;
 }
 
 .calendar-shell .is-today {
-  border-color: rgba(var(--barracks-action-rgb), 0.5);
-  background: rgba(var(--barracks-action-rgb), 0.18);
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .calendar-event {
@@ -837,13 +841,13 @@
   align-items: center;
   gap: 3px 7px;
   padding: 8px;
-  border: 1px solid color-mix(in srgb, var(--barracks-action) 20%, transparent);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 10px;
-  background: rgba(var(--barracks-accent-secondary-rgb), 0.1);
+  background: var(--barracks-surface-inset);
 }
 
 .calendar-event svg {
-  color: var(--barracks-action);
+  color: var(--barracks-text-inset);
 }
 
 .calendar-event strong {
@@ -857,7 +861,7 @@
 
 .calendar-event small {
   grid-column: 2;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-weight: 850;
 }
 

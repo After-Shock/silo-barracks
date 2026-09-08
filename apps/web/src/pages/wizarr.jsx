@@ -220,7 +220,7 @@ export default function WizarrPage() {
       </section>
 
       {notice ? <div className="integration-notice">{notice}</div> : null}
-      {error ? <div className="integration-notice is-error">{error}</div> : null}
+      {error ? <div className="integration-notice is-error" role="alert">{error}</div> : null}
 
       {!error ? (
         <section className="wizarr-dashboard">

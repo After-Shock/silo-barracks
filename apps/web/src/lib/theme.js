@@ -138,7 +138,7 @@ export function ensureContrast(foreground, background, minimum = 3) {
     return candidate;
   }
 
-  const adjustments = [TEXT_LIGHT, TEXT_DARK]
+  const adjustments = [TEXT_LIGHT, TEXT_DARK, PURE_TEXT_LIGHT, PURE_TEXT_DARK]
     .map((endpoint) => contrastAdjustment(candidate, endpoint, backdrop, threshold))
     .filter(Boolean)
     .sort((first, second) => first.weight - second.weight);
@@ -146,9 +146,10 @@ export function ensureContrast(foreground, background, minimum = 3) {
     return adjustments[0].color;
   }
 
-  const lightContrast = contrastRatio(TEXT_LIGHT, backdrop);
-  const darkContrast = contrastRatio(TEXT_DARK, backdrop);
-  return lightContrast >= darkContrast ? TEXT_LIGHT : TEXT_DARK;
+  const endpointContrasts = [TEXT_LIGHT, TEXT_DARK, PURE_TEXT_LIGHT, PURE_TEXT_DARK]
+    .map((endpoint) => ({ endpoint, contrast: contrastRatio(endpoint, backdrop) }))
+    .sort((first, second) => second.contrast - first.contrast);
+  return endpointContrasts[0].endpoint;
 }
 
 function closestMixToward(color, background, minimum = 4.5) {

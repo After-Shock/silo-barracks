@@ -117,7 +117,7 @@ export default function AutomationHealth() {
         </button>
       </header>
 
-      {error ? <div className="automation-health-error">{error}</div> : null}
+      {error ? <div className="automation-health-error" role="alert">{error}</div> : null}
 
       <section className="automation-summary-grid">
         <article><RadarLineIcon /><strong>{formatNumber(data.stats?.services)}</strong><span>Services</span></article>

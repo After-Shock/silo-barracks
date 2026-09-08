@@ -173,7 +173,7 @@
   display: grid;
   gap: 14px;
   padding: 16px;
-  border: 1px solid color-mix(in srgb, var(--barracks-action) 22%, transparent);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
 }
@@ -211,7 +211,7 @@
   align-items: center;
   min-height: 38px;
   padding: 0 10px 0 12px;
-  border: 1px solid color-mix(in srgb, var(--barracks-action) 24%, transparent);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background-color: var(--barracks-surface-inset);
   color: var(--barracks-text-raised);
@@ -255,7 +255,7 @@
   max-height: 310px;
   overflow-y: auto;
   padding: 6px;
-  border: 1px solid color-mix(in srgb, var(--barracks-action) 22%, transparent);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: var(--barracks-surface-inset);
   box-shadow: 0 20px 48px color-mix(in srgb, var(--barracks-surface-inset) 34%, transparent);
@@ -286,7 +286,7 @@
 
 .about-release-empty,
 .about-release-card {
-  border: 1px solid color-mix(in srgb, var(--barracks-action) 22%, transparent);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
 }
@@ -334,7 +334,7 @@
 
 .about-release-card header span {
   padding: 3px 8px;
-  border: 1px solid color-mix(in srgb, var(--barracks-action) 36%, transparent);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 999px;
   color: var(--barracks-action);
   font-size: 11px;
@@ -522,7 +522,7 @@
   gap: 10px;
   min-height: 50px;
   padding: 7px;
-  border: 1px solid color-mix(in srgb, var(--barracks-action) 16%, transparent);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
   color: var(--barracks-text-raised);
@@ -534,7 +534,7 @@
   grid-template-columns: 48px minmax(0, 1fr);
   min-height: 64px;
   padding: 9px;
-  border-color: rgba(var(--barracks-action-rgb), 0.32);
+  border-color: var(--barracks-border-strong);
   background:
     linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.2), rgba(var(--barracks-action-rgb), 0.08)),
     color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
@@ -542,7 +542,7 @@
 
 .about-owner-card:hover,
 .about-contributor-list a:hover {
-  border-color: rgba(var(--barracks-action-rgb), 0.34);
+  border-color: var(--barracks-border-strong);
   background: rgba(var(--barracks-action-rgb), 0.12);
   transform: translateY(-1px);
 }
@@ -551,7 +551,7 @@
 .about-contributor-list img {
   width: 38px;
   height: 38px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.3);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 999px;
   object-fit: cover;
   background: color-mix(in srgb, var(--barracks-text-raised) 8%, transparent);

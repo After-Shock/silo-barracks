@@ -16,7 +16,7 @@ const iconUrl = (slug) => `https://cdn.jsdelivr.net/gh/selfhst/icons/svg/${slug}
 
 function clientIcon(client) {
   if (!client.slug) return null;
-  return <img src={iconUrl(client.slug)} alt="" loading="lazy" decoding="async" />;
+  return <img src={iconUrl(client.slug)} alt="" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.style.display = "none"; }} />;
 }
 
 function normalizeName(value = "") {

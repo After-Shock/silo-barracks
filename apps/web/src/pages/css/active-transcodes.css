@@ -138,9 +138,9 @@
 }
 
 .transcode-tabs button.is-active {
-  border-color: rgba(var(--barracks-action-rgb), 0.42);
-  background: rgba(var(--barracks-action-rgb), 0.18);
-  color: var(--barracks-action);
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .transcode-list {
@@ -297,17 +297,17 @@
   align-items: center;
   gap: 7px;
   min-height: 28px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.24);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 999px;
   padding: 6px 10px;
-  background: rgba(var(--barracks-action-rgb), 0.12);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
   font-size: 12px;
   font-weight: 760;
 }
 
 .transcode-history-details b {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;

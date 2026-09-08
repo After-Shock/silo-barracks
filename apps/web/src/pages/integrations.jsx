@@ -276,7 +276,7 @@ function IntegrationCard({ app, type, onChange, onRemove, onSave, onTest, onCopy
           </span>
         </label>
       </div>
-      {app.message ? <p className={`integration-message ${app.messageType === "error" ? "is-error" : ""}`}>{app.message}</p> : null}
+      {app.message ? <p className={`integration-message ${app.messageType === "error" ? "is-error" : ""}`} role={app.messageType === "error" ? "alert" : "status"}>{app.message}</p> : null}
       <div className="integration-actions">
         <button type="button" onClick={() => onTest(app.instanceId)}>
           Test

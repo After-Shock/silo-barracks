@@ -13,7 +13,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 18px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.18);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 16px;
   padding: 24px;
   background:
@@ -50,11 +50,11 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.28);
+  border: 1px solid var(--barracks-border-strong);
   border-radius: 10px;
   padding: 10px 13px;
-  background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-weight: 850;
 }
 
@@ -72,6 +72,7 @@
 }
 
 .automation-empty {
+  border: 1px solid var(--barracks-border-inset);
   border-color: var(--barracks-border-inset);
   background: var(--barracks-surface-inset);
   color: var(--barracks-state-unavailable);
@@ -85,7 +86,7 @@
 
 .automation-summary-grid article,
 .automation-service-card {
-  border: 1px solid rgba(var(--barracks-action-rgb), 0.16);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 14px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 76%, transparent);
   box-shadow: 0 20px 50px color-mix(in srgb, var(--barracks-surface-inset) 22%, transparent);
@@ -107,7 +108,7 @@
 }
 
 .automation-summary-grid span {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-size: 12px;
   font-weight: 800;
 }
@@ -126,6 +127,7 @@
 
 .automation-service-card.is-warning {
   border-color: var(--barracks-state-warning);
+  background: var(--barracks-surface-raised);
 }
 
 .automation-service-head {
@@ -140,8 +142,8 @@
   height: 42px;
   place-items: center;
   border-radius: 12px;
-  background: rgba(var(--barracks-action-rgb), 0.16);
-  color: var(--barracks-action);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-state-warning);
 }
 
 .automation-service-head h2 {
@@ -165,7 +167,7 @@
 .automation-service-metrics span,
 .automation-list p,
 .automation-issues p {
-  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 8%, transparent);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 10px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 46%, transparent);
 }
@@ -174,7 +176,7 @@
   display: grid;
   gap: 2px;
   padding: 11px;
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-size: 12px;
   font-weight: 800;
 }
@@ -216,7 +218,7 @@
 
 .automation-list small,
 .automation-issues span {
-  color: var(--barracks-action);
+  color: var(--barracks-text-muted);
   font-size: 12px;
   font-weight: 750;
   text-align: right;
