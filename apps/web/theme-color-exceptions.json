@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "path": "apps/web/src/lib/platform-icons.jsx",
+    "values": [
+      "#a52714",
+      "#055524",
+      "#ea6100",
+      "#3e2723",
+      "#263238",
+      "#fff",
+      "#db4437",
+      "#0f9d58",
+      "#ffcd40",
+      "#f1f1f1",
+      "#4285f4"
+    ],
+    "reason": "Official Google Chrome SVG artwork embedded for the browser activity icon."
+  }
+]

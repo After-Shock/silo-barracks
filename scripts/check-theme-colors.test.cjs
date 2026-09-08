@@ -537,6 +537,23 @@ test("excludes public, generated, dependency, and theme resolver sources by defa
   }
 });
 
+test("excludes source test vectors from the default audit while preserving explicit scans", () => {
+  const fixture = createFixture();
+  try {
+    const testSource = fixture.write("apps/web/src/lib/theme.test.js", "const fixtureColor = { color: \"#abc\" };\n");
+    fixture.write("apps/web/src/lib/production.js", "const productionColor = { color: \"#def\" };\n");
+    const defaultResult = fixture.audit();
+    assert.deepEqual(defaultResult.scannedFiles, ["apps/web/src/lib/production.js"]);
+    assert.deepEqual(values(defaultResult), ["#def"]);
+
+    const explicitResult = fixture.audit([testSource]);
+    assert.deepEqual(explicitResult.scannedFiles, ["apps/web/src/lib/theme.test.js"]);
+    assert.deepEqual(values(explicitResult), ["#abc"]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
 test("directory and exact-file arguments constrain recursive scans", () => {
   const fixture = createFixture();
   try {

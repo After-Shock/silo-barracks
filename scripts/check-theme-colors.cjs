@@ -138,9 +138,12 @@ function isInsideRoot(root, target) {
   return relative === "" || (relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative));
 }
 
-function isExcluded(relative) {
+function isExcluded(relative, explicit = false) {
   const segments = relative.split("/");
   if (segments.includes("node_modules") || segments.includes("dist") || segments.includes("generated")) {
+    return true;
+  }
+  if (!explicit && /\.test\.(?:js|jsx)$/i.test(relative)) {
     return true;
   }
   if (relative === "apps/web/src/lib/theme.js" || relative === "apps/web/public" || relative.startsWith("apps/web/public/")) {
@@ -182,7 +185,7 @@ function collectFiles(root, realRoot, requestedFiles) {
       return;
     }
     const relative = relativePath(root, target);
-    if (relative && isExcluded(relative)) return;
+    if (relative && isExcluded(relative, explicit)) return;
     const stat = fs.lstatSync(target);
     let realTarget;
     try {
