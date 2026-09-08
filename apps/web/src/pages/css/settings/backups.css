@@ -3,7 +3,7 @@
 .backup-page {
   display: grid;
   gap: 12px;
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
 }
 
 .backup-hero,
@@ -11,11 +11,11 @@
 .backup-summary-grid article,
 .backup-file-card,
 .backup-empty-state {
-  border: 1px solid rgba(var(--primary-light-rgb), 0.16);
+  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 16%, transparent);
   background:
-    radial-gradient(circle at 12% 0%, rgba(var(--secondary-rgb), 0.11), transparent 30%),
-    radial-gradient(circle at 88% 0%, rgba(var(--primary-rgb), 0.14), transparent 34%),
-    rgba(7, 10, 16, 0.88);
+    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--barracks-accent-secondary) 11%, transparent), transparent 30%),
+    radial-gradient(circle at 88% 0%, color-mix(in srgb, var(--barracks-action) 14%, transparent), transparent 34%),
+    color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
 }
 
 .backup-hero {
@@ -31,7 +31,7 @@
 .backup-panel-heading > span,
 .backup-summary-grid span {
   display: block;
-  color: #9db5d4;
+  color: var(--barracks-focus-light);
   font-size: 10px;
   font-weight: 760;
   letter-spacing: 0.1em;
@@ -40,7 +40,7 @@
 
 .backup-hero h1 {
   margin: 4px 0 6px !important;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: clamp(1.55rem, 2.2vw, 2.6rem);
   font-weight: 760;
   line-height: 1;
@@ -49,7 +49,7 @@
 .backup-hero p {
   max-width: 620px;
   margin: 0;
-  color: #aab8cc;
+  color: var(--barracks-text-raised);
   font-size: 13px;
   font-weight: 560;
   line-height: 1.35;
@@ -87,10 +87,10 @@
 
 .backup-upload-button {
   cursor: pointer;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.35);
+  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 35%, transparent);
   padding: 0 11px;
-  color: #f8fafc;
-  background: rgba(var(--primary-light-rgb), 0.12);
+  color: var(--barracks-text-raised);
+  background: color-mix(in srgb, var(--barracks-focus-light) 12%, transparent);
 }
 
 .backup-upload-button input {
@@ -116,7 +116,7 @@
 .backup-summary-grid svg {
   width: 28px;
   height: 28px;
-  color: var(--primary-light-color);
+  color: var(--barracks-focus-light);
 }
 
 .backup-summary-grid article > div {
@@ -128,7 +128,7 @@
 
 .backup-summary-grid strong {
   display: block;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 20px;
   font-weight: 760;
   line-height: 1;
@@ -138,7 +138,7 @@
 .backup-summary-grid small {
   display: block;
   overflow: hidden;
-  color: #9fadbf;
+  color: var(--barracks-focus-light);
   font-size: 10px;
   font-weight: 650;
   text-overflow: ellipsis;
@@ -162,12 +162,12 @@
 }
 
 .backup-panel-heading svg {
-  color: var(--primary-light-color);
+  color: var(--barracks-focus-light);
 }
 
 .backup-panel-heading h2 {
   margin: 0 !important;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 18px;
   font-weight: 760;
 }
@@ -181,17 +181,17 @@
 .backup-table-chip {
   gap: 6px;
   min-height: 32px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.28);
+  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 28%, transparent);
   border-radius: 999px;
   padding: 0 9px;
-  color: #f8fafc;
-  background: rgba(var(--primary-light-rgb), 0.12);
+  color: var(--barracks-text-raised);
+  background: color-mix(in srgb, var(--barracks-focus-light) 12%, transparent);
 }
 
 .backup-table-chip.is-excluded {
-  border-color: rgba(248, 113, 113, 0.34);
-  color: #fecaca;
-  background: rgba(248, 113, 113, 0.1);
+  border-color: color-mix(in srgb, var(--barracks-state-danger) 34%, transparent);
+  color: var(--barracks-text-raised);
+  background: color-mix(in srgb, var(--barracks-state-danger) 10%, transparent);
 }
 
 .backup-table-chip span {
@@ -200,7 +200,7 @@
 }
 
 .backup-table-chip small {
-  color: #9fadbf;
+  color: var(--barracks-focus-light);
   font-size: 9px;
   font-weight: 650;
 }
@@ -224,10 +224,10 @@
   width: 38px;
   height: 38px;
   place-items: center;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.25);
+  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 25%, transparent);
   border-radius: 8px;
-  color: var(--primary-light-color);
-  background: rgba(var(--primary-light-rgb), 0.11);
+  color: var(--barracks-focus-light);
+  background: color-mix(in srgb, var(--barracks-focus-light) 11%, transparent);
 }
 
 .backup-file-main {
@@ -237,7 +237,7 @@
 .backup-file-main h3 {
   overflow: hidden;
   margin: 0 0 5px !important;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 13px;
   font-weight: 760;
   text-overflow: ellipsis;
@@ -247,16 +247,16 @@
 .backup-file-meta {
   flex-wrap: wrap;
   gap: 6px;
-  color: #9fadbf;
+  color: var(--barracks-focus-light);
   font-size: 10px;
   font-weight: 650;
 }
 
 .backup-file-meta span {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 8%, transparent);
   border-radius: 999px;
   padding: 3px 7px;
-  background: rgba(255, 255, 255, 0.035);
+  background: color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
 }
 
 .backup-file-actions {
@@ -278,16 +278,16 @@
   gap: 6px;
   border-radius: 8px;
   padding: 18px;
-  color: #aab7c8;
+  color: var(--barracks-text-raised);
   text-align: center;
 }
 
 .backup-empty-state svg {
-  color: var(--primary-light-color);
+  color: var(--barracks-focus-light);
 }
 
 .backup-empty-state strong {
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 14px;
   font-weight: 760;
 }

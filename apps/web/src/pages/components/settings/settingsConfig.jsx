@@ -174,10 +174,10 @@ function ThemePresetPreview({ label, theme }) {
     <div
       className="general-theme-preview"
       style={{
-        "--preview-primary": theme.primary,
-        "--preview-secondary": theme.secondary,
-        "--preview-background": theme.background,
-        "--preview-surface": theme.surface,
+        "--barracks-preview-primary": theme.primary,
+        "--barracks-preview-secondary": theme.secondary,
+        "--barracks-preview-background": theme.background,
+        "--barracks-preview-surface": theme.surface,
       }}
     >
       <div className="general-theme-preview-sidebar">
