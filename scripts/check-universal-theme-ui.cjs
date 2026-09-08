@@ -52,12 +52,35 @@ function fleet(partial) {
   return { updatedAt: "2026-09-07T12:00:00.000Z", partial, totalActiveStreams: 1, activeStreams: 1, playingStreams: 1, pausedStreams: 0, servers };
 }
 
+async function continueOrBlock(route, state, method, url) {
+  const requestLabel = `${method} ${url.pathname}`;
+  if (mutationMethods.has(method)) {
+    state.continuedMutations.push(requestLabel);
+    return route.fulfill(json({ error: "mutation continuation blocked" }, 418));
+  }
+  return route.continue();
+}
+
+async function assertMutationContinuationGuard() {
+  const probeState = { continuedMutations: [] };
+  let continueCalls = 0;
+  let fulfillCalls = 0;
+  const probeRoute = {
+    continue: async () => { continueCalls += 1; },
+    fulfill: async () => { fulfillCalls += 1; },
+  };
+  await continueOrBlock(probeRoute, probeState, "POST", new URL(`${ORIGIN}/__qa__/mutation-probe`));
+  assert.deepEqual(probeState.continuedMutations, ["POST /__qa__/mutation-probe"]);
+  assert.equal(continueCalls, 0, "the mutation probe must never reach route.continue");
+  assert.equal(fulfillCalls, 1, "the mutation probe must be terminated by the fixture guard");
+}
+
 function createDispatcher() {
   const state = { fleetMode: "connected", automationMode: "healthy", delayLibrary: false, continuedMutations: [], blockedMutations: [], forbiddenActions: [], unhandledReads: [], libraryPages: [] };
   async function dispatch(route) {
     const req = route.request(); const url = new URL(req.url());
-    if (url.origin !== ORIGIN) return route.continue();
     const method = req.method().toUpperCase(); const p = url.pathname.replace(/\/$/, "") || "/";
+    if (url.origin !== ORIGIN) return continueOrBlock(route, state, method, url);
     // Socket.IO polling writes transport frames even during read-only pages.
     // Terminate those frames in the fixture layer so none reach the live app.
     if (p === "/socket.io" && method === "POST") return route.fulfill({ status: 200, contentType: "text/plain", body: "ok" });
@@ -133,7 +156,7 @@ function createDispatcher() {
     if (body !== undefined) return route.fulfill(json(body));
     if (mutationMethods.has(method)) { state.blockedMutations.push(`${method} ${p}`); return route.fulfill(json({ error: "unhandled mutation" }, 418)); }
     if (method === "GET" && dataPrefixes.some(prefix => p === prefix || p.startsWith(`${prefix}/`))) { state.unhandledReads.push(`${method} ${p}`); return route.fulfill(json({ error: "unhandled read" }, 418)); }
-    return route.continue();
+    return continueOrBlock(route, state, method, url);
   }
   return { state, dispatch };
 }
@@ -191,7 +214,16 @@ async function captureSamples(page, label, viewport) {
 async function stateMatrix(page, fixtures, errors) {
   const vp = viewports[0]; const start = errors.length;
   await gotoReady(page, "/settings/general", "settings", vp); assert.ok(await page.locator('input[type="text"],input[type="color"]').count()); assert.ok(await page.locator("select").count()); const hex = page.getByLabel("Primary hex colour"); await hex.fill("#4ade80"); assert.equal((await hex.inputValue()).toLowerCase(), "#4ade80"); await page.getByText("Theme preview not applied", { exact: true }).waitFor({ state: "visible" });
-  await gotoReady(page, "/", "home", vp); await openTheme(page, vp); assert.notEqual(await page.getByTestId("theme-menu").evaluate(n => getComputedStyle(n).backgroundColor), "rgba(0, 0, 0, 0)"); assert.notEqual(await page.locator(".profile-theme-select-menu").evaluate(n => getComputedStyle(n).backgroundColor), "rgba(0, 0, 0, 0)"); await page.keyboard.press("Escape"); const nav = page.locator('.desktop-navigation a[aria-label="Activity"]'); await nav.waitFor({ state: "visible" }); await nav.hover(); assert.equal(await nav.getAttribute("title"), "Activity");
+  await gotoReady(page, "/", "home", vp); await openTheme(page, vp); assert.notEqual(await page.getByTestId("theme-menu").evaluate(n => getComputedStyle(n).backgroundColor), "rgba(0, 0, 0, 0)"); assert.notEqual(await page.locator(".profile-theme-select-menu").evaluate(n => getComputedStyle(n).backgroundColor), "rgba(0, 0, 0, 0)"); await page.keyboard.press("Escape");
+  const nav = page.locator('.desktop-navigation a[aria-label="Activity"]'); await nav.waitFor({ state: "visible" }); await nav.hover();
+  const tooltip = page.getByRole("tooltip").filter({ hasText: "Activity" }); await tooltip.waitFor({ state: "visible" });
+  const tooltipTokens = await tooltip.locator(".tooltip-inner").evaluate(node => {
+    const probe = document.createElement("span"); const root = getComputedStyle(document.documentElement); document.body.append(probe);
+    probe.style.backgroundColor = root.getPropertyValue("--barracks-surface-inset"); const expectedBackground = getComputedStyle(probe).backgroundColor;
+    probe.style.color = root.getPropertyValue("--barracks-text-inset"); const expectedColor = getComputedStyle(probe).color; probe.remove();
+    const actual = getComputedStyle(node); return { background: actual.backgroundColor, color: actual.color, border: actual.borderColor, expectedBackground, expectedColor };
+  });
+  assert.equal(tooltipTokens.background, tooltipTokens.expectedBackground); assert.equal(tooltipTokens.color, tooltipTokens.expectedColor); assert.notEqual(tooltipTokens.border, "rgba(0, 0, 0, 0)");
   await gotoReady(page, "/activity", "activity", vp); await page.locator('[role="table"],table').first().waitFor({ state: "visible" }); await page.locator(".MuiTablePagination-root,[aria-label*='pagination' i]").first().waitFor({ state: "visible" });
   fixtures.state.delayLibrary = true; const navPromise = page.goto(`${BASE_URL}/libraries/fixture-library`, { waitUntil: "domcontentloaded", timeout: 30000 }); await page.locator('[data-theme-screen="library-detail"][aria-busy="true"]').waitFor({ state: "visible" }); await navPromise; await page.getByRole("heading", { name: "Fixture Library" }).waitFor({ state: "visible" }); fixtures.state.delayLibrary = false;
   await gotoReady(page, "/requests", "requests", vp); await page.locator(".requests-empty-state").waitFor({ state: "visible" });
@@ -213,6 +245,7 @@ async function switching(page, viewport, errors) {
 }
 
 async function main() {
+  await assertMutationContinuationGuard(); console.log("PASS mutation continuation guard probe");
   fs.mkdirSync(QA_DIR, { recursive: true }); const { chromium } = require(process.env.BARRACKS_PLAYWRIGHT || "playwright"); const fixtures = createDispatcher(); activeFixtureState = fixtures.state; const browser = await chromium.launch({ headless: true, executablePath: process.env.BARRACKS_CHROMIUM });
   try {
     const context = await browser.newContext({ viewport: viewports[0] }); const token = getToken(); await context.addInitScript(value => { localStorage.setItem("token", value); localStorage.removeItem("config"); localStorage.setItem("jellyglance_first_run_extras", "false"); localStorage.setItem("i18nextLng", "en-US"); }, token); await context.route("**/*", fixtures.dispatch); const page = await context.newPage(); const errors = watchErrors(page);
@@ -223,7 +256,7 @@ async function main() {
       for (const [routePath, name] of integrationSettings) { for (const viewport of viewports) await checkSettings(page, routePath, "integrations", viewport, errors, name); console.log(`PASS Settings integration ${name} desktop/mobile`); }
     }
     if (phase !== "themes") await stateMatrix(page, fixtures, errors);
-    if (phase === "states") { assert.deepEqual(fixtures.state.blockedMutations, []); assert.deepEqual(fixtures.state.forbiddenActions, []); assert.deepEqual(fixtures.state.unhandledReads, []); assert.deepEqual(errors, []); console.log("PASS state matrix"); return; }
+    if (phase === "states") { assert.deepEqual(fixtures.state.continuedMutations, []); assert.deepEqual(fixtures.state.blockedMutations, []); assert.deepEqual(fixtures.state.forbiddenActions, []); assert.deepEqual(fixtures.state.unhandledReads, []); assert.deepEqual(errors, []); console.log("PASS state matrix"); return; }
     await switching(page, viewports[0], errors); await captureSamples(page, "malformed", viewports[0]);
     await page.evaluate(() => localStorage.removeItem("silo_barracks_theme")); await page.reload({ waitUntil: "domcontentloaded" }); await captureSamples(page, "default", viewports[0]); await gotoReady(page, "/", "home", viewports[0]); await openTheme(page, viewports[0]); const custom = page.getByTestId("theme-color-primary"); await custom.fill("#4ade80"); await page.waitForFunction(() => getComputedStyle(document.documentElement).getPropertyValue("--barracks-action").trim().toLowerCase() === "#4ade80"); await page.keyboard.press("Escape"); await captureSamples(page, "custom", viewports[0]);
     for (const name of ["ocean", "mono"]) { await gotoReady(page, "/", "home", viewports[0]); await preset(page, viewports[0], name); for (const [routePath, screen] of routes) await check(page, routePath, screen, viewports[0], errors, name); console.log(`PASS ${name} top-level route screenshots`); }
@@ -231,4 +264,4 @@ async function main() {
     console.log(JSON.stringify({ status: "PASS", routeStateChecks: routes.length * 2 + settings.length * 2 + integrationSettings.length * 2, themedTopLevelChecks: routes.length * 2, stateTests: 10, continuedMutations: [], blockedMutations: [], forbiddenActions: [], unhandledReads: [], screenshotDir: QA_DIR }));
   } finally { await browser.close(); }
 }
-main().catch(error => { console.error(error.stack || error.message); if (activeFixtureState) console.error(JSON.stringify({ blockedMutations: activeFixtureState.blockedMutations, forbiddenActions: activeFixtureState.forbiddenActions, unhandledReads: activeFixtureState.unhandledReads })); process.exitCode = 1; });
+main().catch(error => { console.error(error.stack || error.message); if (activeFixtureState) console.error(JSON.stringify({ continuedMutations: activeFixtureState.continuedMutations, blockedMutations: activeFixtureState.blockedMutations, forbiddenActions: activeFixtureState.forbiddenActions, unhandledReads: activeFixtureState.unhandledReads })); process.exitCode = 1; });
