@@ -4,6 +4,12 @@ import Config from "../lib/config";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import "./css/settings/settings.css";
+import "./css/settings/security.css";
+import "./css/settings/operations.css";
+import "./css/settings/connections.css";
+import "./css/settings/apiKeys.css";
+import "./css/settings/backups.css";
+import "./css/settings/version.css";
 import { Trans } from "react-i18next";
 import ErrorBoundary from "./components/general/ErrorBoundary";
 import Loading from "./components/general/loading";
@@ -419,7 +425,12 @@ export default function Settings() {
   }
 
   return (
-    <div className="settings has-mobile-settings-menu">
+    <div
+      className="settings has-mobile-settings-menu"
+      data-theme-screen="settings"
+      data-theme-active-tab={settingsTabPaths[activeTab] || "general"}
+      data-theme-active-integration-tab={activeTab === "tabIntegrations" ? activeIntegrationTab : undefined}
+    >
       <div className="settings-mobile-menu">
         <div className="settings-mobile-menu-list" role="tablist" aria-label="Settings sections">
           {settingsTabItems.filter(({ key }) => !isSilo || !['tabJellyfinDevices', 'tabJellyfinPlugins'].includes(key)).map(({ key, Icon, label }) => (

@@ -1,0 +1,275 @@
+@import '../variables.css';
+
+.security-page {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.security-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+  gap: 18px;
+  align-items: stretch;
+  padding: 18px;
+  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 18%, transparent);
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--barracks-action) 16%, transparent), color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent)),
+    color-mix(in srgb, var(--barracks-surface-inset) 70%, transparent);
+}
+
+.security-hero span,
+.security-auth-header > div > span {
+  color: var(--barracks-focus-light);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.security-hero h1 {
+  margin: 5px 0 8px;
+  color: var(--barracks-text-raised);
+  font-size: clamp(34px, 3.8vw, 54px);
+  font-weight: 950;
+  line-height: 0.98;
+}
+
+.security-hero p {
+  max-width: 680px;
+  margin: 0;
+  color: var(--barracks-text-raised);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.security-current-stack {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.security-current-stack article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 5px 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 16%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 58%, transparent);
+}
+
+.security-current-stack svg {
+  grid-row: span 2;
+  color: var(--barracks-focus-light);
+}
+
+.security-current-stack span {
+  overflow: hidden;
+  color: var(--barracks-focus-light);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.security-current-stack strong {
+  overflow: hidden;
+  color: var(--barracks-text-raised);
+  font-size: 13px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.security-status-alert {
+  margin: 0;
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+.security-auth-form {
+  display: grid;
+  gap: 18px;
+}
+
+.security-privacy-form {
+  margin-bottom: 0;
+}
+
+.security-auth-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.security-auth-header h2 {
+  margin: 10px 0 4px;
+  color: var(--barracks-text-raised);
+  font-size: clamp(24px, 2.4vw, 36px);
+  font-weight: 950;
+}
+
+.security-auth-header p,
+.security-auth-panel p {
+  margin: 0;
+  color: var(--barracks-text-raised);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.security-auth-header > strong {
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 22%, transparent);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 50%, transparent);
+  color: var(--barracks-accent-secondary);
+  white-space: nowrap;
+}
+
+.security-auth-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+}
+
+.security-privacy-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+}
+
+.security-auth-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 86px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 10%, transparent);
+  border-radius: 15px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--barracks-text-raised) 6%, transparent), color-mix(in srgb, var(--barracks-text-raised) 2%, transparent)),
+    color-mix(in srgb, var(--barracks-surface-inset) 54%, transparent);
+  color: var(--barracks-text-raised);
+  text-align: left;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.security-auth-card:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--barracks-focus-light) 36%, transparent);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--barracks-action) 14%, transparent), color-mix(in srgb, var(--barracks-text-raised) 3%, transparent)),
+    color-mix(in srgb, var(--barracks-surface-inset) 70%, transparent);
+}
+
+.security-auth-card svg {
+  color: var(--barracks-focus-light);
+}
+
+.security-auth-card strong,
+.security-auth-panel strong {
+  display: block;
+  color: var(--barracks-text-raised);
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.security-auth-card small {
+  display: block;
+  margin-top: 4px;
+  color: var(--barracks-focus-light);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.security-auth-card.is-active {
+  border-color: color-mix(in srgb, var(--barracks-focus-light) 68%, transparent);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--barracks-action) 28%, transparent), color-mix(in srgb, var(--barracks-focus-light) 8%, transparent)),
+    color-mix(in srgb, var(--barracks-surface-inset) 84%, transparent);
+  box-shadow: 0 18px 40px color-mix(in srgb, var(--barracks-action) 12%, transparent);
+}
+
+.security-auth-panel {
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 16%, transparent);
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--barracks-text-raised) 3%, transparent);
+}
+
+.security-auth-panel .row:last-child {
+  margin-bottom: 0 !important;
+}
+
+.security-form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.security-form-actions .btn {
+  min-width: 180px;
+}
+
+.security-users-link {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 14px;
+  padding: 10px 13px;
+  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 38%, transparent);
+  border-radius: 12px;
+  color: var(--barracks-accent-secondary);
+  font-weight: 950;
+  text-decoration: none;
+}
+
+.security-users-link:hover {
+  background: color-mix(in srgb, var(--barracks-action) 16%, transparent);
+  color: var(--barracks-text-raised);
+}
+
+.settings-form .btn-group .btn {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--barracks-text-raised) !important;
+  font-weight: 850;
+}
+
+.settings-form .btn-group .btn.active,
+.settings-form .btn-group .btn-check:checked + .btn {
+  background: linear-gradient(90deg, var(--barracks-action), var(--barracks-focus-light)) !important;
+  color: var(--barracks-text-raised) !important;
+}
+
+.settings .btn-outline-primary,
+.settings .btn-outline-secondary {
+  border-color: color-mix(in srgb, var(--barracks-focus-light) 36%, transparent) !important;
+  color: var(--barracks-text-raised) !important;
+}
+
+.settings .dropdown-item,
+.settings .dropdown-menu {
+  background-color: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-raised) !important;
+}
+
+.settings .dropdown-item:hover {
+  background-color: color-mix(in srgb, var(--barracks-action) 72%, transparent) !important;
+  color: var(--barracks-text-raised) !important;
+}
+
+.settings .text-muted,
+.settings .form-text {
+  color: var(--barracks-text-raised) !important;
+}
+
+.settings .text-muted small,
+.settings small.text-muted {
+  color: var(--barracks-text-raised) !important;
+}
