@@ -190,10 +190,15 @@
 
 .security-auth-card.is-active {
   border-color: color-mix(in srgb, var(--barracks-focus-light) 68%, transparent);
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--barracks-action) 28%, transparent), color-mix(in srgb, var(--barracks-focus-light) 8%, transparent)),
-    color-mix(in srgb, var(--barracks-surface-inset) 84%, transparent);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
   box-shadow: 0 18px 40px color-mix(in srgb, var(--barracks-action) 12%, transparent);
+}
+
+.security-auth-card.is-active strong,
+.security-auth-card.is-active small,
+.security-auth-card.is-active svg {
+  color: var(--barracks-action-text);
 }
 
 .security-auth-panel {
@@ -229,8 +234,8 @@
 }
 
 .security-users-link:hover {
-  background: color-mix(in srgb, var(--barracks-action) 16%, transparent);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
 .settings-form .btn-group .btn {
@@ -243,8 +248,8 @@
 
 .settings-form .btn-group .btn.active,
 .settings-form .btn-group .btn-check:checked + .btn {
-  background: linear-gradient(90deg, var(--barracks-action), var(--barracks-focus-light)) !important;
-  color: var(--barracks-text-raised) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .settings .btn-outline-primary,
@@ -260,8 +265,8 @@
 }
 
 .settings .dropdown-item:hover {
-  background-color: color-mix(in srgb, var(--barracks-action) 72%, transparent) !important;
-  color: var(--barracks-text-raised) !important;
+  background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
 }
 
 .settings .text-muted,
@@ -426,8 +431,8 @@
 }
 
 .security-users-link:hover {
-  background: color-mix(in srgb, var(--barracks-action) 18%, transparent) !important;
-  color: var(--barracks-text-raised) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .security-auth-header > strong {
@@ -438,6 +443,7 @@
 
 .security-auth-card.is-active {
   border-color: color-mix(in srgb, var(--barracks-focus-light) 46%, transparent);
-  background: color-mix(in srgb, var(--barracks-action) 12%, transparent);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
   box-shadow: none;
 }

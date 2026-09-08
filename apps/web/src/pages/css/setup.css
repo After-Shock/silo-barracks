@@ -378,7 +378,8 @@
 
 .setup-step.is-active {
   border-color: color-mix(in srgb, var(--barracks-action) 28%, transparent);
-  background: color-mix(in srgb, var(--barracks-action) 10%, transparent);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   box-shadow: 0 0 28px color-mix(in srgb, var(--barracks-action) 10%, transparent);
   opacity: 1;
 }
@@ -413,7 +414,7 @@
 
 .setup-step.is-active .setup-step-icon {
   border-color: var(--barracks-action);
-  background: color-mix(in srgb, var(--barracks-action) 16%, transparent);
+  background: var(--barracks-surface-interactive);
   color: var(--barracks-action);
 }
 
@@ -469,7 +470,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--barracks-action), var(--barracks-focus-light), var(--barracks-action));
+  background: var(--barracks-action);
   box-shadow: 0 0 18px color-mix(in srgb, var(--barracks-action) 35%, transparent);
   transition: width 300ms ease;
 }
@@ -657,8 +658,14 @@
 
 .setup-auth-option.is-active {
   border-color: color-mix(in srgb, var(--barracks-action) 42%, transparent);
-  background: color-mix(in srgb, var(--barracks-action) 10%, transparent);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--barracks-text-raised) 5%, transparent), 0 0 24px color-mix(in srgb, var(--barracks-action) 8%, transparent);
+}
+
+.setup-auth-option.is-active strong,
+.setup-auth-option.is-active small {
+  color: var(--barracks-text-interactive);
 }
 
 .setup-auth-summary {
@@ -670,19 +677,18 @@
   padding: 14px;
   border: 1px solid color-mix(in srgb, var(--barracks-action) 26%, transparent);
   border-radius: 16px;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--barracks-action) 13%, transparent), color-mix(in srgb, var(--barracks-text-raised) 4%, transparent)),
-    color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .setup-auth-summary strong {
-  color: var(--barracks-text-raised);
+  color: var(--barracks-text-interactive);
   font-size: 14px;
 }
 
 .setup-auth-summary small {
   max-width: 460px;
-  color: var(--barracks-focus-light);
+  color: var(--barracks-text-interactive);
   font-size: 12px;
   line-height: 1.55;
 }
@@ -697,8 +703,8 @@
   padding: 8px 14px;
   border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 44%, transparent);
   border-radius: 14px;
-  background: color-mix(in srgb, var(--barracks-action) 20%, transparent);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   box-shadow: 0 14px 34px color-mix(in srgb, var(--barracks-action) 18%, transparent);
   font-size: 28px;
   font-weight: 950;
@@ -715,7 +721,7 @@
   padding: 14px;
   border: 1px solid color-mix(in srgb, var(--barracks-action) 24%, transparent);
   border-radius: 16px;
-  background: color-mix(in srgb, var(--barracks-action) 8%, transparent);
+  background: var(--barracks-surface-interactive);
   text-align: center;
 }
 
@@ -742,13 +748,14 @@
   color: var(--barracks-text-raised) !important;
   font-size: 12px !important;
   font-weight: 850 !important;
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 .quick-connect-refresh-button:hover,
-.quick-connect-refresh-button:focus {
+.quick-connect-refresh-button:focus-visible {
   border-color: color-mix(in srgb, var(--barracks-focus-light) 50%, transparent) !important;
-  background: color-mix(in srgb, var(--barracks-action) 18%, transparent) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .quick-connect-status {
@@ -763,7 +770,8 @@
   padding: 12px 14px;
   border: 1px solid color-mix(in srgb, var(--barracks-action) 22%, transparent);
   border-radius: 15px;
-  background: color-mix(in srgb, var(--barracks-action) 7%, transparent);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   cursor: pointer;
 }
 
@@ -833,8 +841,8 @@
   min-height: 46px;
   border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 42%, transparent) !important;
   border-radius: 14px !important;
-  background: color-mix(in srgb, var(--barracks-action) 12%, transparent) !important;
-  color: var(--barracks-text) !important;
+  background: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
   font-size: 13px !important;
   font-weight: 900 !important;
 }
@@ -886,12 +894,15 @@
 }
 
 .inputbox input:hover,
-.inputbox input:focus,
-.inputbox .form-control:hover,
-.inputbox .form-control:focus {
+.inputbox .form-control:hover {
   border-color: color-mix(in srgb, var(--barracks-action) 55%, transparent) !important;
   background: color-mix(in srgb, var(--barracks-text-raised) 8%, transparent) !important;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--barracks-action) 12%, transparent) !important;
+}
+
+.inputbox input:focus-visible,
+.inputbox .form-control:focus-visible {
+  outline: 2px solid var(--barracks-focus) !important;
+  box-shadow: 0 0 0 3px var(--barracks-focus-light), 0 0 0 4px var(--barracks-focus-dark) !important;
 }
 
 .login-show-password {
@@ -909,7 +920,7 @@
   border-radius: 12px !important;
   background: transparent !important;
   color: var(--barracks-text-raised) !important;
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 .login-show-password svg {
@@ -928,9 +939,8 @@
   margin-top: 2px;
   border: none !important;
   border-radius: 14px !important;
-  outline: none !important;
-  background: linear-gradient(90deg, var(--barracks-action), var(--barracks-focus-light)) !important;
-  color: var(--barracks-text-raised) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
   box-shadow: 0 16px 36px color-mix(in srgb, var(--barracks-action) 24%, transparent);
   font-size: 14px !important;
   font-weight: 900 !important;
@@ -938,9 +948,9 @@
 }
 
 .setup-button:hover,
-.setup-button:focus {
-  background: linear-gradient(90deg, var(--barracks-focus-light), var(--barracks-action)) !important;
-  color: var(--barracks-text-raised) !important;
+.setup-button:focus-visible {
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
   box-shadow: 0 18px 44px color-mix(in srgb, var(--barracks-action) 32%, transparent);
 }
 
@@ -974,8 +984,8 @@
 
 .setup-extra-tabs button.is-active {
   border-color: color-mix(in srgb, var(--barracks-focus-light) 50%, transparent);
-  background: color-mix(in srgb, var(--barracks-action) 22%, transparent);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
 .setup-extra-panel {
@@ -1081,8 +1091,8 @@
 
 .setup-import-source-tabs button.is-active {
   border-color: color-mix(in srgb, var(--barracks-focus-light) 42%, transparent);
-  background: linear-gradient(90deg, color-mix(in srgb, var(--barracks-action) 84%, transparent), color-mix(in srgb, var(--barracks-focus-light) 54%, transparent));
-  color: var(--barracks-text-raised);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
   box-shadow: 0 14px 28px color-mix(in srgb, var(--barracks-action) 16%, transparent);
 }
 
@@ -1258,8 +1268,8 @@
 
   .setup-mobile-step.is-active {
     border-color: color-mix(in srgb, var(--barracks-action) 34%, transparent);
-    background: color-mix(in srgb, var(--barracks-action) 12%, transparent);
-    color: var(--barracks-action);
+    background: var(--barracks-action);
+    color: var(--barracks-action-text);
   }
 
   .setup-mobile-step.is-done {

@@ -20,8 +20,8 @@
 }
 
 .settings-import-tabs .nav-link.active {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--barracks-action) 90%, transparent), color-mix(in srgb, var(--barracks-focus-light) 62%, transparent)) !important;
-  color: var(--barracks-text-raised) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .settings-import-pane {
@@ -65,7 +65,7 @@
 
 .settings-import-tabs .nav-link.active {
   background: var(--barracks-action) !important;
-  color: var(--barracks-text-raised) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .server-action-row {
@@ -93,8 +93,8 @@
 
 .server-job-filters button.is-active {
   border-color: color-mix(in srgb, var(--barracks-focus-light) 46%, transparent);
-  background: color-mix(in srgb, var(--barracks-action) 18%, transparent);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
 .settings-logs-page {
@@ -150,8 +150,8 @@
 }
 
 .settings-logs-table .MuiIconButton-root:hover {
-  color: var(--barracks-focus-light);
-  background: color-mix(in srgb, var(--barracks-focus-light) 12%, transparent);
+  color: var(--barracks-text-interactive);
+  background: var(--barracks-surface-interactive);
 }
 
 .settings-logs-table .badge {
@@ -178,8 +178,8 @@
 .settings-logs-page .page-btn {
   min-height: 34px;
   border-color: color-mix(in srgb, var(--barracks-focus-light) 22%, transparent) !important;
-  background: color-mix(in srgb, var(--barracks-action) 82%, transparent) !important;
-  color: var(--barracks-text-raised) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
   font-weight: 760 !important;
 }
 
@@ -711,8 +711,8 @@
   border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 35%, transparent);
   border-radius: 10px;
   padding: 0 14px;
-  background: color-mix(in srgb, var(--barracks-focus-light) 12%, transparent);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   cursor: pointer;
   font-weight: 900;
   white-space: nowrap;
@@ -842,7 +842,8 @@
 .legacy-import-unmatched-list button.is-selected,
 .legacy-import-results button.is-selected {
   border-color: color-mix(in srgb, var(--barracks-focus-light) 48%, transparent);
-  background: color-mix(in srgb, var(--barracks-action) 18%, transparent);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
 .legacy-import-unmatched-list strong,

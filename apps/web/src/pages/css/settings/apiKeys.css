@@ -87,8 +87,8 @@
   min-height: 38px;
   border: 0 !important;
   border-radius: 11px !important;
-  background: linear-gradient(90deg, var(--barracks-action), var(--barracks-focus-light)) !important;
-  color: var(--barracks-text-raised) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
   font-weight: 950 !important;
 }
 

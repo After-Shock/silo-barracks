@@ -128,9 +128,8 @@
 }
 
 .settings > .nav-pills .nav-link.active {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--barracks-action) 90%, transparent), color-mix(in srgb, var(--barracks-focus-light) 62%, transparent)) !important;
-  background-color: var(--barracks-action) !important;
-  color: var(--barracks-text-raised) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .settings > .nav-pills .nav-link:not(.active):hover,
@@ -227,7 +226,8 @@
 .nav-order-row:hover,
 .nav-order-row:focus-within {
   border-color: color-mix(in srgb, var(--barracks-focus-light) 38%, transparent);
-  background: color-mix(in srgb, var(--barracks-action) 14%, transparent);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .nav-order-row.is-dragging {
@@ -264,8 +264,8 @@
   margin: 0;
   border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 28%, transparent);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--barracks-action) 13%, transparent);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   cursor: pointer;
   transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, opacity 0.18s ease;
 }
@@ -273,8 +273,8 @@
 .nav-order-visibility:hover,
 .nav-order-visibility:focus-visible {
   border-color: color-mix(in srgb, var(--barracks-focus-light) 58%, transparent);
-  background: color-mix(in srgb, var(--barracks-action) 25%, transparent);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
 .nav-order-visibility[aria-pressed="false"] {
@@ -379,7 +379,7 @@
   max-width: 100%;
 }
 
-.app-error-boundary {
+.settings .app-error-boundary {
   display: grid;
   gap: 6px;
   padding: 18px;
@@ -389,7 +389,7 @@
   color: var(--barracks-text-raised);
 }
 
-.app-error-boundary strong {
+.settings .app-error-boundary strong {
   color: var(--barracks-text-raised);
   font-size: 16px;
   font-weight: 950;
@@ -475,11 +475,11 @@
   border-radius: 0 11px 11px 0 !important;
 }
 
-.settings-form .form-control:focus,
-.settings-form .form-select:focus,
-.settings-form .input-group > .form-control:focus {
-  border-color: color-mix(in srgb, var(--barracks-focus-light) 62%, transparent) !important;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--barracks-action) 18%, transparent) !important;
+.settings-form .form-control:focus-visible,
+.settings-form .form-select:focus-visible,
+.settings-form .input-group > .form-control:focus-visible {
+  outline: 2px solid var(--barracks-focus) !important;
+  box-shadow: 0 0 0 3px var(--barracks-focus-light), 0 0 0 4px var(--barracks-focus-dark) !important;
 }
 
 .settings-form .input-group > .btn,
@@ -487,8 +487,8 @@
 .settings .submit {
   border: 0 !important;
   border-radius: 11px !important;
-  background: linear-gradient(90deg, var(--barracks-action), var(--barracks-focus-light)) !important;
-  color: var(--barracks-text-raised) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
   font-weight: 900 !important;
 }
 
@@ -497,15 +497,15 @@
   min-width: 110px;
   border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 38%, transparent) !important;
   border-radius: 11px !important;
-  background: color-mix(in srgb, var(--barracks-action) 16%, transparent) !important;
-  color: var(--barracks-focus-light) !important;
+  background: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
   font-weight: 900 !important;
 }
 
 .settings-form .btn-outline-success[type="submit"]:hover,
 .settings-form button[type="submit"]:hover {
-  background: linear-gradient(90deg, var(--barracks-action), var(--barracks-focus-light)) !important;
-  color: var(--barracks-text-raised) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .settings-form .btn-group,
@@ -968,8 +968,8 @@
 
 .kiosk-settings-toggle button.is-enabled {
   border-color: color-mix(in srgb, var(--barracks-focus-light) 38%, transparent);
-  background: color-mix(in srgb, var(--barracks-action) 18%, transparent);
-  color: var(--barracks-text-raised);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
 .kiosk-widget-heading {
@@ -1168,8 +1168,8 @@
 
   .settings-mobile-menu-list button.is-active {
     border-color: color-mix(in srgb, var(--barracks-focus-light) 52%, transparent);
-    background: linear-gradient(90deg, color-mix(in srgb, var(--barracks-action) 82%, transparent), color-mix(in srgb, var(--barracks-focus-light) 48%, transparent));
-    color: var(--barracks-text-raised);
+    background: var(--barracks-action);
+    color: var(--barracks-action-text);
   }
 
   .has-mobile-settings-menu > .nav-pills {
@@ -1437,7 +1437,7 @@
 
 .settings > .nav-pills,
 .settings-form,
-.app-error-boundary {
+.settings .app-error-boundary {
   border-color: var(--barracks-border-subtle);
   border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
@@ -1473,20 +1473,20 @@
 .settings-form .btn-group .btn.active,
 .settings-form .btn-group .btn-check:checked + .btn {
   background: var(--barracks-action) !important;
-  color: var(--barracks-text-raised) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .settings-form .btn-outline-success[type="submit"],
 .settings-form button[type="submit"] {
   border-color: var(--barracks-border-subtle) !important;
-  background: color-mix(in srgb, var(--barracks-text-raised) 5%, transparent) !important;
-  color: var(--barracks-text-raised) !important;
+  background: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
 }
 
 .settings-form .btn-outline-success[type="submit"]:hover,
 .settings-form button[type="submit"]:hover {
-  background: color-mix(in srgb, var(--barracks-action) 18%, transparent) !important;
-  color: var(--barracks-text-raised) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .settings-form .btn-group,
