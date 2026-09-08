@@ -29,9 +29,23 @@ require every optional OpenAPI field or reject future diagnostic strings.
 - The configured live Silo returned discovery 404 and healthy retained v1 health
   on September 8, 2026. No production Silo upgrade, upstream mutation, or Barracks
   deployment has been performed for this change.
-- V2 is exercised against synthetic native HTTP fixtures, not a running v2 Silo.
-  Revalidate against the intended build on a dedicated v2 test connection before
-  release. Observe the approved one-day canary and intentional test-server outage.
+- The pinned source was also built and exercised through Silo's official disposable
+  playback harness and real v2 router on September 8, 2026. Barracks negotiated v2,
+  retained the health identity, resolved the API-key owner's primary profile, and
+  read admin users, libraries, catalog items, and a synthetic active-session
+  projection. The mapped card retained title, DirectPlay state, client build, and
+  target audio channels. Silo's own playback smoke passed login, capability,
+  start/replay, media bytes, progress, installation fencing, stop, and stop replay.
+  This is a real-router integration test, but not the approved one-day deployed-server
+  observation; complete that observation and an intentional interruption before
+  expanding rollout.
+- The harness's newer initial-playback flow did not appear in the
+  `playback_sessions_sync` projection consumed by `/api/v2/admin/sessions` during
+  this test. The monitoring read was therefore checked with a disposable synthetic
+  projection row. Recheck that projection on the actual Silo build used for rollout.
+- The source-built canary reported `server_version: "unavailable"` because it had
+  no release build number; Barracks correctly selected v2 from `api_major` and the
+  validated contract digest rather than version text.
 - API negotiation is cached until a connection URL/key change or process restart.
   Restart Barracks after upgrading an upstream server's API version.
 - History backfill, fleet history storage, analytics and playback controls are
