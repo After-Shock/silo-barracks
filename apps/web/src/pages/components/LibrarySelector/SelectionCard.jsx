@@ -14,10 +14,10 @@ import baseUrl from "../../../lib/baseurl";
 function SelectionCard(props) {
   const [imageLoaded, setImageLoaded] = useState(true);
   const [checked, setChecked] = useState(props.data.Tracked);
-  const SeriesIcon = <TvLineIcon size={"50%"} color="white" />;
-  const MovieIcon = <FilmLineIcon size={"50%"} color="white" />;
-  const MusicIcon = <FileMusicLineIcon size={"50%"} color="white" />;
-  const MixedIcon = <CheckboxMultipleBlankLineIcon size={"50%"} color="white" />;
+  const SeriesIcon = <TvLineIcon size={"50%"} color="var(--barracks-text-overlay)" />;
+  const MovieIcon = <FilmLineIcon size={"50%"} color="var(--barracks-text-overlay)" />;
+  const MusicIcon = <FileMusicLineIcon size={"50%"} color="var(--barracks-text-overlay)" />;
+  const MixedIcon = <CheckboxMultipleBlankLineIcon size={"50%"} color="var(--barracks-text-overlay)" />;
   const token = localStorage.getItem("token");
 
   const libraryType =
@@ -65,7 +65,9 @@ function SelectionCard(props) {
           <Card.Img
             variant="top"
             className="library-card-banner default_library_image"
-            src={baseUrl + "/proxy/Items/Images/Primary?id=" + props.data.Id + "&fillWidth=800&quality=50"}
+            src={baseUrl + "/proxy/Items/Images/Primary?id=" + props.data.Id + "&fillWidth=520&quality=48"}
+            loading="lazy"
+            decoding="async"
             onError={() => setImageLoaded(false)}
           />
         ) : (

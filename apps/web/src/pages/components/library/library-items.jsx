@@ -119,7 +119,7 @@ function LibraryItems(props) {
       // Debounce: only run after scroll settles for 100ms
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
-        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoadingMoreRef.current && hasMore) {
+        if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100 && !isLoadingMoreRef.current && hasMore) {
           setIsLoadingMore(true);
           const nextPage = currentPage + 1;
           setCurrentPage(nextPage);

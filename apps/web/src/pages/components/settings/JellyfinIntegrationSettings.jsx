@@ -52,7 +52,7 @@ export default function JellyfinIntegrationSettings({ compact = false, firstRun 
       .then((response) => {
         console.log("Config updated successfully:", response.data);
         setIsSubmitted("Success");
-        setSubmissionMessage("Successfully updated Jellyfin connection");
+        setSubmissionMessage("Successfully updated Silo connection");
         Config.setConfig();
         if (firstRun) {
           setIsEditingConnection(false);
@@ -62,7 +62,7 @@ export default function JellyfinIntegrationSettings({ compact = false, firstRun 
         const errorMessage = error.response?.data?.errorMessage || error.message;
         console.log("Error updating config:", errorMessage);
         setIsSubmitted("Failed");
-        setSubmissionMessage(`Error updating Jellyfin connection: ${errorMessage}`);
+        setSubmissionMessage(`Error updating Silo connection: ${errorMessage}`);
       });
   }
 
@@ -84,7 +84,7 @@ export default function JellyfinIntegrationSettings({ compact = false, firstRun 
         </span>
         <div>
           <p>Media server</p>
-          <h2>{config?.IS_JELLYFIN ? "Jellyfin" : "Emby"} Connection</h2>
+          <h2>{config?.IS_SILO ? "Silo Server" : config?.IS_JELLYFIN ? "Jellyfin" : "Emby"} Connection</h2>
           <span>
             {firstRun
               ? "Already connected for setup. Re-enter details only if you want to replace the saved media server connection."
@@ -106,7 +106,7 @@ export default function JellyfinIntegrationSettings({ compact = false, firstRun 
       ) : (
         <Form onSubmit={handleFormSubmit} className="settings-form integration-settings-form">
           <Form.Group as={Row} className="mb-3">
-            <Form.Label column>{config?.IS_JELLYFIN ? "Jellyfin URL" : "Emby URL"}</Form.Label>
+            <Form.Label column>{config?.IS_SILO ? "Silo Server URL" : config?.IS_JELLYFIN ? "Jellyfin URL" : "Emby URL"}</Form.Label>
             <Col sm="10">
               <Form.Control
                 id="JF_HOST"

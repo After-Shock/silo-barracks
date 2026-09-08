@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
-import { Button, Modal, Nav, Navbar as BootstrapNavbar } from "react-bootstrap";
+import { Button, Modal, Nav, Navbar as BootstrapNavbar, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
 import axios from "../../../lib/axios_instance";
 import { navData } from "../../../lib/navdata";
 import LogoutBoxLineIcon from "remixicon-react/LogoutBoxLineIcon";
 import AccountCircleLineIcon from "remixicon-react/AccountCircleLineIcon";
+import ArrowLeftSLineIcon from "remixicon-react/ArrowLeftSLineIcon";
+import ArrowRightSLineIcon from "remixicon-react/ArrowRightSLineIcon";
 import MagicLineIcon from "remixicon-react/MagicLineIcon";
 import MenuLineIcon from "remixicon-react/MenuLineIcon";
-import logo_dark from "../../images/icon-b-512.png";
-import projectText from "../../images/project-text.png";
+import logo_dark from "../../../../public/brand/barracks-mark.svg";
 import "../../css/navbar.css";
 import VersionCard from "./version-card";
-import { OPEN_WHATS_NEW_EVENT } from "./WhatsNewModal";
+import { OPEN_WHATS_NEW_EVENT } from "../../../lib/events";
 import { Trans } from "react-i18next";
 import baseUrl from "../../../lib/baseurl";
 import socket from "../../../socket";
@@ -19,10 +20,30 @@ import { slugifyUserName } from "../../../lib/userProfile";
 import Config from "../../../lib/config";
 import { FONT_WEIGHT_OPTIONS, getStoredFontWeight, saveFontWeightPreference } from "../../../lib/appearance";
 import { DEFAULT_THEME, THEME_PRESETS, getStoredTheme, resetTheme, saveTheme } from "../../../lib/theme";
+import { applyNavOrder, getStoredHiddenNavLinks, getStoredNavOrder, LOCKED_NAV_LINKS } from "../../../lib/nav-order";
+import useFleet from "../../../lib/use-fleet";
+
+function getTokenPayload() {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  try {
+    return JSON.parse(window.atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+  } catch {
+    return null;
+  }
+}
 
 function getCachedConfig() {
   try {
-    return JSON.parse(localStorage.getItem("config") || "{}");
+    const config = JSON.parse(localStorage.getItem("config") || "{}");
+    // Merge jellyfinUser from the JWT token so the avatar is always available
+    const tokenUser = getTokenPayload()?.user;
+    if (tokenUser?.jellyfinUser && !config.settings?.auth?.jellyfinUser) {
+      config.settings = config.settings || {};
+      config.settings.auth = config.settings.auth || {};
+      config.settings.auth.jellyfinUser = tokenUser.jellyfinUser;
+    }
+    return config;
   } catch {
     return {};
   }
@@ -31,6 +52,43 @@ function getCachedConfig() {
 const REQUEST_NAV_AVAILABLE_KEY = "jellyglance_request_nav_available";
 const DOWNLOAD_NAV_AVAILABLE_KEY = "jellyglance_download_nav_available";
 const WIZARR_NAV_AVAILABLE_KEY = "jellyglance_wizarr_nav_available";
+const TDARR_NAV_AVAILABLE_KEY = "jellyglance_tdarr_nav_available";
+const AUTOMATION_HEALTH_NAV_AVAILABLE_KEY = "jellyglance_automation_health_nav_available";
+const NAV_COLLAPSED_KEY = "jellyglance_nav_collapsed";
+const INTEGRATIONS_CACHE_TTL_MS = 10000;
+
+let integrationsCache = null;
+let integrationsCacheAt = 0;
+let integrationsRequest = null;
+
+async function loadNavbarIntegrations() {
+  const now = Date.now();
+  if (integrationsCache && now - integrationsCacheAt < INTEGRATIONS_CACHE_TTL_MS) {
+    return integrationsCache;
+  }
+
+  if (!integrationsRequest) {
+    integrationsRequest = axios
+      .get("/api/integrations", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
+      .then((response) => {
+        integrationsCache = response.data || { arrApps: [], clients: [], thirdParty: [] };
+        integrationsCacheAt = Date.now();
+        return integrationsCache;
+      })
+      .finally(() => {
+        integrationsRequest = null;
+      });
+  }
+
+  return integrationsRequest;
+}
+
+function clearNavbarIntegrationsCache() {
+  integrationsCache = null;
+  integrationsCacheAt = 0;
+}
 
 function getCachedRequestNavAvailable() {
   return localStorage.getItem(REQUEST_NAV_AVAILABLE_KEY) === "true";
@@ -42,6 +100,18 @@ function getCachedDownloadNavAvailable() {
 
 function getCachedWizarrNavAvailable() {
   return localStorage.getItem(WIZARR_NAV_AVAILABLE_KEY) === "true";
+}
+
+function getCachedTdarrNavAvailable() {
+  return localStorage.getItem(TDARR_NAV_AVAILABLE_KEY) === "true";
+}
+
+function getCachedAutomationHealthNavAvailable() {
+  return localStorage.getItem(AUTOMATION_HEALTH_NAV_AVAILABLE_KEY) === "true";
+}
+
+function getCachedNavCollapsed() {
+  return localStorage.getItem(NAV_COLLAPSED_KEY) === "true";
 }
 
 function isConfiguredSeerrApp(app) {
@@ -83,12 +153,32 @@ function getWizarrAvailabilityFromIntegrations(integrations) {
   return Array.isArray(integrations?.thirdParty) && integrations.thirdParty.some(isConfiguredWizarrApp);
 }
 
+function isConfiguredTdarrApp(app) {
+  const name = String(app?.name || app?.slug || "").toLowerCase();
+  const values = app?.values || {};
+  return name.includes("tdarr") && Boolean(app?.connected) && Boolean(String(values.url || "").trim());
+}
+
+function getTdarrAvailabilityFromIntegrations(integrations) {
+  return Array.isArray(integrations?.thirdParty) && integrations.thirdParty.some(isConfiguredTdarrApp);
+}
+
+function isConfiguredAutomationHealthApp(app) {
+  const name = String(app?.name || app?.slug || "").toLowerCase();
+  const values = app?.values || {};
+  return (name.includes("bazarr") || name.includes("prowlarr")) && Boolean(app?.connected) && Boolean(String(values.url || "").trim()) && Boolean(String(values.secret || "").trim());
+}
+
+function getAutomationHealthAvailabilityFromIntegrations(integrations) {
+  return Array.isArray(integrations?.arrApps) && integrations.arrApps.some(isConfiguredAutomationHealthApp);
+}
+
 function isNavItemActive(item, location) {
   const pathname = location.pathname.toLocaleLowerCase();
   const navPath = String(item.link || "").split("?")[0].toLocaleLowerCase();
 
   if (item.link === "settings") {
-    return pathname === "/settings";
+    return pathname === "/settings" || pathname.startsWith("/settings/");
   }
 
   return (
@@ -104,13 +194,20 @@ export default function Navbar() {
   const [customTheme, setCustomTheme] = useState(() => getStoredTheme());
   const [fontWeightPreference, setFontWeightPreference] = useState(() => getStoredFontWeight());
   const [activeStreamCount, setActiveStreamCount] = useState(0);
+  const { snapshot: fleetSnapshot } = useFleet(config?.IS_SILO === true);
   const [activeDownloadCount, setActiveDownloadCount] = useState(() => Number(localStorage.getItem("jellyglance_active_download_count") || 0));
+  const [activeTranscodeCount, setActiveTranscodeCount] = useState(() => Number(localStorage.getItem("jellyglance_active_transcode_count") || 0));
   const [requestBadgeCount, setRequestBadgeCount] = useState(() => Number(localStorage.getItem("jellyglance_request_badge_count") || 0));
   const [showRequestsNav, setShowRequestsNav] = useState(() => getCachedRequestNavAvailable());
   const [showDownloadsNav, setShowDownloadsNav] = useState(() => getCachedDownloadNavAvailable());
   const [showWizarrNav, setShowWizarrNav] = useState(() => getCachedWizarrNavAvailable());
+  const [showTdarrNav, setShowTdarrNav] = useState(() => getCachedTdarrNavAvailable());
+  const [showAutomationHealthNav, setShowAutomationHealthNav] = useState(() => getCachedAutomationHealthNavAvailable());
+  const [navOrder, setNavOrder] = useState(() => getStoredNavOrder(navData));
+  const [hiddenNavLinks, setHiddenNavLinks] = useState(() => getStoredHiddenNavLinks(navData));
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+  const [isNavCollapsed, setIsNavCollapsed] = useState(() => getCachedNavCollapsed());
   const authMode = config?.settings?.auth?.mode || (config?.requireLogin === false ? "quick-connect" : "local");
   const authLabel =
     config?.settings?.auth?.label ||
@@ -118,10 +215,15 @@ export default function Navbar() {
   const jellyfinUser = config?.settings?.auth?.jellyfinUser;
   const canUploadAvatar = authMode === "local" || authMode === "oidc";
   const accountName = jellyfinUser?.name || config?.username || authLabel;
-  const accountRole = authMode === "quick-connect" ? "Jellyfin User" : authMode === "oidc" ? "OIDC User" : "Local User";
   const currentRole = config?.settings?.auth?.role || "Viewer";
-  const showServerManagementNav = currentRole === "Owner" || currentRole === "Admin";
-  const jellyfinAvatar = jellyfinUser?.id ? `${baseUrl}/proxy/Users/Images/Primary?id=${jellyfinUser.id}&fillWidth=160&quality=80` : "";
+  const isJellyfinAdmin = currentRole === "Owner" || currentRole === "Admin";
+  const accountRole = authMode === "quick-connect" ? (isJellyfinAdmin ? "Jellyfin Admin" : "Jellyfin User") : authMode === "oidc" ? "OIDC User" : "Local User";
+  const showServerManagementNav = isJellyfinAdmin && config?.IS_SILO !== true;
+  const jellyfinUserId = jellyfinUser?.id || jellyfinUser?.Id || jellyfinUser?.userId || jellyfinUser?.UserId;
+  const jellyfinImageTag = jellyfinUser?.primaryImageTag || jellyfinUser?.PrimaryImageTag || jellyfinUser?.imageTags?.Primary || jellyfinUser?.ImageTags?.Primary;
+  const jellyfinAvatar = jellyfinUserId
+    ? `${baseUrl}/proxy/Users/Images/Primary/?id=${encodeURIComponent(jellyfinUserId)}${jellyfinImageTag ? `&tag=${encodeURIComponent(jellyfinImageTag)}` : ""}&fillWidth=160&quality=80`
+    : "";
   const avatarSrc = jellyfinAvatar || (canUploadAvatar ? customAvatar : "");
   const activeThemePreset = THEME_PRESETS.find(
     (preset) =>
@@ -132,14 +234,20 @@ export default function Navbar() {
   );
   const visibleNavData = useMemo(
     () =>
-      navData.filter((item) => {
-        if (item.link === "requests") return showRequestsNav;
-        if (item.link === "downloads") return showDownloadsNav;
-        if (item.link === "wizarr") return showWizarrNav;
-        if (item.link === "server-management") return showServerManagementNav;
-        return true;
-      }),
-    [showDownloadsNav, showRequestsNav, showServerManagementNav, showWizarrNav]
+      applyNavOrder(
+        navData.filter((item) => {
+          if (!LOCKED_NAV_LINKS.has(item.link) && hiddenNavLinks.includes(item.link)) return false;
+          if (item.link === "requests") return showRequestsNav;
+          if (item.link === "downloads") return showDownloadsNav;
+          if (item.link === "active-transcodes") return showTdarrNav;
+          if (item.link === "automation-health") return showAutomationHealthNav;
+          if (item.link === "wizarr") return showWizarrNav;
+          if (item.link === "server-management") return showServerManagementNav;
+          return true;
+        }),
+        navOrder
+      ),
+    [hiddenNavLinks, navOrder, showAutomationHealthNav, showDownloadsNav, showRequestsNav, showServerManagementNav, showTdarrNav, showWizarrNav]
   );
 
   const handleLogout = () => {
@@ -159,6 +267,64 @@ export default function Navbar() {
   const location = useLocation();
 
   useEffect(() => {
+    localStorage.setItem(NAV_COLLAPSED_KEY, String(isNavCollapsed));
+    document.documentElement.style.setProperty("--jg-sidebar-width", isNavCollapsed ? "78px" : "250px");
+  }, [isNavCollapsed]);
+
+  useEffect(() => {
+    function handleNavCollapsedUpdate(event) {
+      setIsNavCollapsed(Boolean(event.detail));
+    }
+
+    window.addEventListener("jellyglance-nav-collapsed-updated", handleNavCollapsedUpdate);
+    return () => window.removeEventListener("jellyglance-nav-collapsed-updated", handleNavCollapsedUpdate);
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const setAutomationHealthAvailability = (integrations) => {
+      const nextAvailable = getAutomationHealthAvailabilityFromIntegrations(integrations);
+      localStorage.setItem(AUTOMATION_HEALTH_NAV_AVAILABLE_KEY, String(nextAvailable));
+      if (isMounted) {
+        setShowAutomationHealthNav(nextAvailable);
+      }
+    };
+
+    const refreshAutomationHealthAvailability = async () => {
+      if (!localStorage.getItem("token")) {
+        setAutomationHealthAvailability({ arrApps: [] });
+        return;
+      }
+
+      try {
+        setAutomationHealthAvailability(await loadNavbarIntegrations());
+      } catch {
+        if (isMounted) {
+          setShowAutomationHealthNav(getCachedAutomationHealthNavAvailable());
+        }
+      }
+    };
+
+    const handleIntegrationsUpdated = (event) => {
+      if (event.detail) {
+        setAutomationHealthAvailability(event.detail);
+        return;
+      }
+      clearNavbarIntegrationsCache();
+      refreshAutomationHealthAvailability();
+    };
+
+    const startupTimer = window.setTimeout(refreshAutomationHealthAvailability, 500);
+    window.addEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+    return () => {
+      isMounted = false;
+      window.removeEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+      window.clearTimeout(startupTimer);
+    };
+  }, []);
+
+  useEffect(() => {
     let isMounted = true;
 
     const refreshConfig = async () => {
@@ -167,7 +333,7 @@ export default function Navbar() {
         return;
       }
 
-      const freshConfig = await Config.getConfig(true);
+      const freshConfig = await Config.getConfig();
       if (isMounted && !freshConfig?.response) {
         setConfig(freshConfig);
       }
@@ -185,15 +351,38 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    const refreshNavOrder = () => setNavOrder(getStoredNavOrder(navData));
+    const refreshNavVisibility = () => setHiddenNavLinks(getStoredHiddenNavLinks(navData));
+
+    window.addEventListener("jellyglance-nav-order-updated", refreshNavOrder);
+    window.addEventListener("jellyglance-nav-visibility-updated", refreshNavVisibility);
+    window.addEventListener("storage", refreshNavOrder);
+    window.addEventListener("storage", refreshNavVisibility);
+    return () => {
+      window.removeEventListener("jellyglance-nav-order-updated", refreshNavOrder);
+      window.removeEventListener("jellyglance-nav-visibility-updated", refreshNavVisibility);
+      window.removeEventListener("storage", refreshNavOrder);
+      window.removeEventListener("storage", refreshNavVisibility);
+    };
+  }, []);
+
+  useEffect(() => {
     const handleSessions = (sessionData) => {
-      if (Array.isArray(sessionData)) {
+      if (!config?.IS_SILO && Array.isArray(sessionData)) {
         setActiveStreamCount(sessionData.filter((session) => session.NowPlayingItem !== undefined).length);
       }
     };
 
     socket.on("sessions", handleSessions);
     return () => socket.off("sessions", handleSessions);
-  }, []);
+  }, [config?.IS_SILO]);
+
+  useEffect(() => {
+    if (config?.IS_SILO) {
+      setActiveStreamCount(Number.isFinite(fleetSnapshot?.totalActiveStreams)
+        ? fleetSnapshot.totalActiveStreams : 0);
+    }
+  }, [config?.IS_SILO, fleetSnapshot?.totalActiveStreams]);
 
   useEffect(() => {
     const handleDownloadCount = (event) => {
@@ -217,10 +406,7 @@ export default function Navbar() {
       }
 
       try {
-        const response = await axios.get("/api/integrations", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        setDownloadAvailability(response.data || { clients: [] });
+        setDownloadAvailability(await loadNavbarIntegrations());
       } catch {
         setShowDownloadsNav(getCachedDownloadNavAvailable());
       }
@@ -231,10 +417,11 @@ export default function Navbar() {
         setDownloadAvailability(event.detail);
         return;
       }
+      clearNavbarIntegrationsCache();
       refreshDownloadAvailability();
     };
 
-    refreshDownloadAvailability();
+    const startupTimer = window.setTimeout(refreshDownloadAvailability, 500);
     window.addEventListener("jellyglance-download-count", handleDownloadCount);
     window.addEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
     window.addEventListener("storage", handleDownloadCount);
@@ -242,6 +429,7 @@ export default function Navbar() {
       window.removeEventListener("jellyglance-download-count", handleDownloadCount);
       window.removeEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
       window.removeEventListener("storage", handleDownloadCount);
+      window.clearTimeout(startupTimer);
     };
   }, []);
 
@@ -263,10 +451,7 @@ export default function Navbar() {
       }
 
       try {
-        const response = await axios.get("/api/integrations", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        setWizarrAvailability(response.data || { thirdParty: [] });
+        setWizarrAvailability(await loadNavbarIntegrations());
       } catch {
         if (isMounted) {
           setShowWizarrNav(getCachedWizarrNavAvailable());
@@ -279,14 +464,103 @@ export default function Navbar() {
         setWizarrAvailability(event.detail);
         return;
       }
+      clearNavbarIntegrationsCache();
       refreshWizarrAvailability();
     };
 
-    refreshWizarrAvailability();
+    const startupTimer = window.setTimeout(refreshWizarrAvailability, 500);
     window.addEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
     return () => {
       isMounted = false;
       window.removeEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+      window.clearTimeout(startupTimer);
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const setTranscodeAvailability = (integrations) => {
+      const nextAvailable = getTdarrAvailabilityFromIntegrations(integrations);
+      localStorage.setItem(TDARR_NAV_AVAILABLE_KEY, String(nextAvailable));
+      if (isMounted) {
+        setShowTdarrNav(nextAvailable);
+        if (!nextAvailable) {
+          setActiveTranscodeCount(0);
+        }
+      }
+      return nextAvailable;
+    };
+
+    const setSafeTranscodeCount = (value) => {
+      const nextCount = Number(value || 0);
+      if (isMounted) {
+        setActiveTranscodeCount(Number.isFinite(nextCount) ? nextCount : 0);
+      }
+    };
+
+    const refreshTranscodeAvailability = async () => {
+      if (!localStorage.getItem("token")) {
+        setTranscodeAvailability({ thirdParty: [] });
+        return false;
+      }
+
+      try {
+        return setTranscodeAvailability(await loadNavbarIntegrations());
+      } catch {
+        if (isMounted) {
+          setShowTdarrNav(getCachedTdarrNavAvailable());
+        }
+        return getCachedTdarrNavAvailable();
+      }
+    };
+
+    const refreshTranscodeCount = async () => {
+      if (!localStorage.getItem("token")) {
+        setTranscodeAvailability({ thirdParty: [] });
+        return;
+      }
+      try {
+        const response = await axios.get("/api/tdarr/transcodes", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        const nextCount = Number(response.data?.stats?.active || response.data?.active?.length || 0);
+        localStorage.setItem("jellyglance_active_transcode_count", String(nextCount));
+        setSafeTranscodeCount(nextCount);
+      } catch {
+        setSafeTranscodeCount(localStorage.getItem("jellyglance_active_transcode_count"));
+      }
+    };
+
+    const handleTranscodeCount = (event) => setSafeTranscodeCount(event.detail ?? localStorage.getItem("jellyglance_active_transcode_count"));
+    const handleIntegrationsUpdated = (event) => {
+      const hasTdarr = event.detail ? setTranscodeAvailability(event.detail) : getCachedTdarrNavAvailable();
+      if (!event.detail) {
+        clearNavbarIntegrationsCache();
+        refreshTranscodeAvailability();
+      }
+      if (hasTdarr) {
+        refreshTranscodeCount();
+      }
+    };
+
+    const startupTimer = window.setTimeout(() => {
+      refreshTranscodeAvailability().then((hasTdarr) => {
+        if (hasTdarr) refreshTranscodeCount();
+      });
+    }, 650);
+    const intervalId = setInterval(refreshTranscodeCount, 60000);
+    window.addEventListener("jellyglance-transcode-count", handleTranscodeCount);
+    window.addEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+    window.addEventListener("storage", handleTranscodeCount);
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+      window.clearTimeout(startupTimer);
+      window.removeEventListener("jellyglance-transcode-count", handleTranscodeCount);
+      window.removeEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+      window.removeEventListener("storage", handleTranscodeCount);
     };
   }, []);
 
@@ -315,10 +589,7 @@ export default function Navbar() {
       }
 
       try {
-        const response = await axios.get("/api/integrations", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        const nextAvailable = getRequestAvailabilityFromIntegrations(response.data || {});
+        const nextAvailable = getRequestAvailabilityFromIntegrations(await loadNavbarIntegrations());
         localStorage.setItem(REQUEST_NAV_AVAILABLE_KEY, String(nextAvailable));
         if (isMounted) {
           setShowRequestsNav(nextAvailable);
@@ -368,12 +639,16 @@ export default function Navbar() {
         if (!nextAvailable) {
           return;
         }
+      } else {
+        clearNavbarIntegrationsCache();
       }
       refreshRequestCount();
     };
 
-    refreshRequestAvailability();
-    refreshRequestCount();
+    const startupTimer = window.setTimeout(() => {
+      refreshRequestAvailability();
+      refreshRequestCount();
+    }, 650);
     const intervalId = setInterval(refreshRequestCount, 60000);
     window.addEventListener("jellyglance-request-count", handleRequestCount);
     window.addEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
@@ -382,6 +657,7 @@ export default function Navbar() {
     return () => {
       isMounted = false;
       clearInterval(intervalId);
+      window.clearTimeout(startupTimer);
       window.removeEventListener("jellyglance-request-count", handleRequestCount);
       window.removeEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
       window.removeEventListener("storage", handleRequestCount);
@@ -431,6 +707,7 @@ export default function Navbar() {
   const getNavBadgeCount = (link) => {
     if (link === "") return activeStreamCount;
     if (link === "downloads") return activeDownloadCount;
+    if (link === "active-transcodes") return activeTranscodeCount;
     if (link === "requests") return requestBadgeCount;
     return 0;
   };
@@ -450,9 +727,15 @@ export default function Navbar() {
         </button>
         <Link className="mobile-app-brand" to="/">
           <img src={logo_dark} alt="" />
-          <img src={projectText} alt="JellyGlance" />
+          <strong className="silo-wordmark">Silo Barracks</strong>
         </Link>
-        <button className="mobile-app-account" type="button" onClick={() => setShowAccount(true)} aria-label="Open account settings">
+        <button
+          className="mobile-app-account"
+          type="button"
+          onClick={() => setShowAccount(true)}
+          aria-label="Open account settings"
+          data-testid="theme-account-mobile"
+        >
           {avatarSrc ? <img src={avatarSrc} alt="" onError={(event) => (event.currentTarget.style.display = "none")} /> : <AccountCircleLineIcon />}
         </button>
       </div>
@@ -513,67 +796,108 @@ export default function Navbar() {
         </nav>
       </div>
 
-      <BootstrapNavbar variant="dark" className="desktop-navigation d-flex flex-column py-0 text-center sticky-top" id="primary-navigation">
+      <BootstrapNavbar variant="dark" className={`desktop-navigation d-flex flex-column py-0 text-center sticky-top ${isNavCollapsed ? "is-collapsed" : ""}`} id="primary-navigation">
       <div className="sticky-top py-md-3">
-        <BootstrapNavbar.Brand as={Link} to={"/"} className="d-none d-md-inline">
-          <img src={logo_dark} style={{ height: "52px" }} className="px-2" alt="" />
-          <img src={projectText} className="navbar-wordmark" alt="JellyGlance" />
+        <div className="navbar-brand-row">
+          <BootstrapNavbar.Brand as={Link} to={"/"} className="d-none d-md-inline">
+          <img src={logo_dark} className="navbar-brand-icon px-2" alt="" />
+          <strong className="silo-wordmark">Silo Barracks</strong>
         </BootstrapNavbar.Brand>
+        </div>
 
         <Nav className="flex-row flex-md-column w-100">
           {visibleNavData.map((item) => {
             const isActive = isNavItemActive(item, location);
+            const badgeCount =
+              item.link === ""
+                ? activeStreamCount
+                : item.link === "downloads"
+                ? activeDownloadCount
+                : item.link === "active-transcodes"
+                ? activeTranscodeCount
+                : item.link === "requests"
+                ? requestBadgeCount
+                : 0;
+            const navLabel = item.label || (typeof item.text === "string" ? item.text : "");
             return (
-              <Nav.Link
-                as={Link}
+              <OverlayTrigger
                 key={item.id}
-                className={`navitem${isActive ? " active" : ""} p-2`} // add the "active" class if the link is active
-                to={item.link}
-                onClick={() => setIsMobileNavOpen(false)}
+                placement="right"
+                overlay={
+                  <Tooltip id={`nav-tooltip-${item.id}`} className="barracks-nav-tooltip">
+                    {navLabel}
+                  </Tooltip>
+                }
               >
-                {item.icon}
-                <span className="nav-text">
-                  <span>{item.text}</span>
-                  {item.link === "" && activeStreamCount > 0 ? (
-                    <span className="nav-live-count" aria-label={`${activeStreamCount} active streams`}>
-                      {activeStreamCount}
-                    </span>
-                  ) : null}
-                  {item.link === "downloads" && activeDownloadCount > 0 ? (
-                    <span className="nav-live-count" aria-label={`${activeDownloadCount} active downloads`}>
-                      {activeDownloadCount}
-                    </span>
-                  ) : null}
-                  {item.link === "requests" && requestBadgeCount > 0 ? (
-                    <span className="nav-live-count" aria-label={`${requestBadgeCount} pending or failed requests`}>
-                      {requestBadgeCount}
-                    </span>
-                  ) : null}
-                </span>
-              </Nav.Link>
+                <Nav.Link
+                  as={Link}
+                  className={`navitem${isActive ? " active" : ""} p-2`} // add the "active" class if the link is active
+                  to={item.link}
+                  onClick={() => setIsMobileNavOpen(false)}
+                  aria-label={navLabel}
+                >
+                  {item.icon}
+                  {badgeCount > 0 ? <span className="nav-icon-badge">{badgeCount}</span> : null}
+                  <span className="nav-text">
+                    <span>{item.text}</span>
+                    {item.link === "" && activeStreamCount > 0 ? (
+                      <span className="nav-live-count" aria-label={`${activeStreamCount} active streams`}>
+                        {activeStreamCount}
+                      </span>
+                    ) : null}
+                    {item.link === "downloads" && activeDownloadCount > 0 ? (
+                      <span className="nav-live-count" aria-label={`${activeDownloadCount} active downloads`}>
+                        {activeDownloadCount}
+                      </span>
+                    ) : null}
+                    {item.link === "active-transcodes" && activeTranscodeCount > 0 ? (
+                      <span className="nav-live-count" aria-label={`${activeTranscodeCount} active transcodes`}>
+                        {activeTranscodeCount}
+                      </span>
+                    ) : null}
+                    {item.link === "requests" && requestBadgeCount > 0 ? (
+                      <span className="nav-live-count" aria-label={`${requestBadgeCount} pending or failed requests`}>
+                        {requestBadgeCount}
+                      </span>
+                    ) : null}
+                  </span>
+                </Nav.Link>
+              </OverlayTrigger>
             );
           })}
           <div className="navbar-inline-footer">
-            <button className="navitem account-navitem p-2" type="button" onClick={() => setShowAccount(true)}>
-              <span className="account-nav-avatar">
-                {avatarSrc ? (
-                  <img src={avatarSrc} alt="" onError={(event) => (event.currentTarget.style.display = "none")} />
-                ) : (
-                  <AccountCircleLineIcon />
-                )}
-              </span>
-              <span className="account-nav-copy">
-                <strong>{accountName}</strong>
-                <small>{accountRole}</small>
-              </span>
-            </button>
-            <button className="navitem footer-logout p-2" type="button" onClick={handleLogout}>
-              <LogoutBoxLineIcon />
-              <span className="nav-text">
-                <Trans i18nKey="MENU_TABS.LOGOUT" />
-              </span>
-            </button>
-            <VersionCard />
+            <div className="navbar-footer-account-row">
+              <button
+                className="navitem account-navitem p-2"
+                type="button"
+                onClick={() => setShowAccount(true)}
+                data-testid="theme-account-desktop"
+              >
+                <span className="account-nav-avatar">
+                  {avatarSrc ? (
+                    <img src={avatarSrc} alt="" onError={(event) => (event.currentTarget.style.display = "none")} />
+                  ) : (
+                    <AccountCircleLineIcon />
+                  )}
+                </span>
+                <span className="account-nav-copy">
+                  <strong>{accountName}</strong>
+                  <small>{accountRole}</small>
+                </span>
+              </button>
+              <button
+                type="button"
+                className="navbar-collapse-toggle"
+                onClick={() => setIsNavCollapsed((current) => !current)}
+                aria-label={isNavCollapsed ? "Expand side menu" : "Collapse side menu"}
+                title={isNavCollapsed ? "Expand side menu" : "Collapse side menu"}
+              >
+                {isNavCollapsed ? <ArrowRightSLineIcon size={20} /> : <ArrowLeftSLineIcon size={20} />}
+              </button>
+            </div>
+            <div className="navbar-version-row">
+              <VersionCard />
+            </div>
           </div>
         </Nav>
       </div>
@@ -591,7 +915,7 @@ export default function Navbar() {
             </div>
             <div>
               <strong>{accountName}</strong>
-              <span>{authLabel}</span>
+              <span>{accountRole}</span>
             </div>
           </div>
 
@@ -606,7 +930,7 @@ export default function Navbar() {
             <MagicLineIcon size={18} />
             <span>
               <strong>What&apos;s new</strong>
-              <small>Open the latest JellyGlance update notes.</small>
+              <small>Open the latest Silo Barracks update notes.</small>
             </span>
           </button>
 
@@ -636,7 +960,7 @@ export default function Navbar() {
             <div className="profile-theme-header">
               <div>
                 <h3 id="profile-theme-heading">Custom colours</h3>
-                <span>Theme JellyGlance from this account.</span>
+                <span>Theme Silo Barracks from this account.</span>
               </div>
               <button className="profile-theme-reset" type="button" onClick={handleThemeReset}>
                 Reset
@@ -650,6 +974,7 @@ export default function Navbar() {
                 type="button"
                 onClick={() => setIsThemeMenuOpen((open) => !open)}
                 aria-expanded={isThemeMenuOpen}
+                data-testid="theme-menu"
               >
                 <span className="profile-theme-preset-swatches" aria-hidden="true">
                   <i style={{ backgroundColor: activeThemePreset?.primary || customTheme.primary }} />
@@ -671,6 +996,7 @@ export default function Navbar() {
                       onClick={() => handleThemePreset(preset)}
                       role="option"
                       aria-selected={activeThemePreset?.name === preset.name}
+                      data-testid={preset.name === "Ocean" ? "theme-preset-ocean" : preset.name === "Mono" ? "theme-preset-mono" : undefined}
                     >
                       <span className="profile-theme-preset-swatches" aria-hidden="true">
                         <i style={{ backgroundColor: preset.primary }} />
@@ -699,6 +1025,7 @@ export default function Navbar() {
                       value={customTheme[key] || DEFAULT_THEME[key]}
                       onChange={(event) => handleThemeChange(key, event.target.value)}
                       aria-label={`${label} colour`}
+                      data-testid={key === "primary" ? "theme-color-primary" : undefined}
                     />
                     <input
                       type="text"
@@ -715,12 +1042,14 @@ export default function Navbar() {
           </section>
         </Modal.Body>
         <Modal.Footer>
-          <Button as={Link} to={profilePath} variant="outline-secondary" onClick={() => setShowAccount(false)}>
-            View profile
-          </Button>
-          <Button variant="outline-secondary" onClick={() => setShowAccount(false)}>
-            Close
-          </Button>
+          <div className="profile-modal-secondary-actions">
+            <Button as={Link} to={profilePath} variant="outline-secondary" onClick={() => setShowAccount(false)}>
+              View profile
+            </Button>
+            <Button variant="outline-secondary" onClick={() => setShowAccount(false)}>
+              Close
+            </Button>
+          </div>
           <Button className="profile-logout-button" onClick={handleLogout}>
             Log out
           </Button>

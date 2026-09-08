@@ -18,14 +18,14 @@ function ItemStatComponent(props) {
   const backgroundImage = `/proxy/Items/Images/Backdrop?id=${props.data[0].Id}&fillWidth=300&quality=10`;
 
   const cardStyle = {
-    backgroundImage: `url(${backgroundImage}), linear-gradient(to right, var(--secondary-color), var(--primary-color))`,
+    backgroundImage: `url(${backgroundImage}), linear-gradient(to right, var(--barracks-accent-secondary), var(--barracks-action))`,
     height: "100%",
     backgroundSize: "cover",
   };
 
   const cardBgStyle = {
     backdropFilter: props.base_url ? "blur(5px)" : "blur(0px)",
-    backgroundColor: "rgb(0, 0, 0, 0.6)",
+    backgroundColor: "var(--barracks-scrim)",
     height: "100%",
   };
 
@@ -34,6 +34,8 @@ function ItemStatComponent(props) {
   }
 
   const renderItemName = (item) => {
+    const mediaItemId = item.Id || item.ItemId || item.NowPlayingItemId || item.jellyglanceItemId;
+
     if (item.UserId) {
       return (
         <Link to={`/users/${item.UserId}`} className="item-name">
@@ -45,12 +47,16 @@ function ItemStatComponent(props) {
     }
 
     if (!item.Client && !props.icon) {
-      return (
-        <Link to={`/libraries/item/${item.Id}`} className="item-name">
+      return mediaItemId ? (
+        <Link to={`/libraries/item/${mediaItemId}`} className="item-name">
           <Tooltip title={item.Name}>
             <span className="item-text">{item.Name}</span>
           </Tooltip>
         </Link>
+      ) : (
+        <Tooltip title={item.Name}>
+          <span className="item-text">{item.Name}</span>
+        </Tooltip>
       );
     }
 

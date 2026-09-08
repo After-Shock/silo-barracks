@@ -65,6 +65,9 @@ class TaskScheduler {
     };
 
     // Initialize tasks with default intervals
+    for (const task of Object.keys(this.defaultIntervals)) {
+      if (!require('./provider').isSupportedTask(task)) delete this.defaultIntervals[task];
+    }
     this.initializeTasks();
   }
 

@@ -1,11 +1,11 @@
 @import "../variables.css";
 
 .activity-mrt-paper {
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
 }
 
 .activity-mrt-paper .MuiTable-root {
-  min-width: 980px;
+  min-width: 1120px;
 }
 
 .activity-mrt-paper .MuiTableHead-root .MuiTableRow-root {
@@ -14,12 +14,12 @@
 
 .activity-mrt-paper .MuiTableHead-root .MuiButtonBase-root,
 .activity-mrt-paper .MuiTableHead-root .MuiSvgIcon-root {
-  color: #7f8b9b !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .activity-mrt-paper .MuiTableHead-root .Mui-active,
 .activity-mrt-paper .MuiTableSortLabel-icon {
-  color: var(--primary-light-color) !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .activity-mrt-paper .MuiTableBody-root .MuiTableRow-root {
@@ -27,7 +27,8 @@
 }
 
 .activity-mrt-paper .MuiToolbar-root {
-  color: #dbe6f7;
+  border-color: var(--barracks-border-inset);
+  color: var(--barracks-text-inset);
 }
 
 .activity-table-toolbar-title {
@@ -35,7 +36,7 @@
   align-items: center;
   min-height: 28px;
   padding-left: 4px;
-  color: #9ca8b8;
+  color: var(--barracks-text-inset);
   font-size: 12px;
   font-weight: 720;
   letter-spacing: 0.04em;
@@ -46,51 +47,88 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 7px;
   padding: 2px 5px 2px 10px;
-  background: rgba(255, 255, 255, 0.045);
+  background: var(--barracks-surface-inset);
 }
 
 .activity-table-actions-label {
-  color: #c8d2df;
+  color: var(--barracks-text-inset);
   font-size: 12px;
   font-weight: 700;
 }
 
 .activity-table-actions .MuiIconButton-root {
-  color: #e7edf6 !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .activity-table-actions .MuiIconButton-root:hover {
-  background: rgba(var(--primary-rgb), 0.16) !important;
+  border-color: var(--barracks-action) !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
 }
 
-.activity-mrt-paper .MuiCheckbox-root {
-  color: #8e63a4 !important;
+.activity-mrt-paper .MuiTableHead-root .MuiCheckbox-root {
+  color: var(--barracks-text-inset) !important;
 }
 
-.activity-mrt-paper a,
-.activity-table-link {
-  color: #f8fafc !important;
+.activity-mrt-paper :where(a:not(.activity-client-link):not(.activity-method-pill)),
+.activity-table-link:not(.activity-client-link):not(.activity-method-pill) {
+  color: inherit !important;
   text-decoration: none !important;
 }
 
-.activity-table-link:hover,
+.activity-table-link:not(.activity-client-link):not(.activity-method-pill):hover,
 .activity-title-link:hover {
-  color: var(--primary-light-color) !important;
+  color: inherit !important;
+  text-decoration: underline !important;
 }
 
 .activity-user-link {
-  color: #dfe7f2 !important;
+  display: inline-grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  max-width: 100%;
+  color: var(--barracks-text-raised) !important;
   font-weight: 680;
+}
+
+.activity-user-link span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-user-avatar,
+.activity-user-avatar-fallback {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 50%;
+  background: var(--barracks-surface-inset);
+  box-shadow: var(--barracks-shadow);
+}
+
+.activity-user-avatar {
+  display: block;
+  object-fit: cover;
+}
+
+.activity-user-avatar-fallback {
+  display: grid;
+  place-items: center;
+  color: var(--barracks-text-inset);
+  font-size: 13px;
+  font-weight: 850;
 }
 
 .activity-title-link {
   display: block;
   max-width: 100%;
   overflow: hidden;
-  color: #e7edf6 !important;
+  color: var(--barracks-text-raised) !important;
   font-weight: 650;
   text-overflow: ellipsis;
 }
@@ -107,10 +145,10 @@
 .activity-poster-fallback {
   width: 42px;
   height: 62px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 5px;
-  background: linear-gradient(145deg, rgba(var(--primary-rgb), 0.18), rgba(12, 17, 25, 0.95));
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.26);
+  background: var(--barracks-surface-inset);
+  box-shadow: var(--barracks-shadow);
 }
 
 .activity-poster-image {
@@ -121,29 +159,54 @@
 .activity-poster-fallback {
   display: grid;
   place-items: center;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--barracks-text-inset);
   font-size: 18px;
   font-weight: 760;
 }
 
 .activity-title-copy {
-  display: block;
+  display: grid;
+  gap: 4px;
   min-width: 0;
+  overflow: hidden;
+}
+
+.activity-title-copy strong,
+.activity-title-copy small {
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.activity-title-copy strong {
+  color: var(--barracks-text-raised);
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.activity-title-copy small {
+  color: var(--barracks-text-muted-raised);
+  font-size: 11px;
+  font-weight: 680;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .activity-client-link {
   display: inline-flex;
   align-items: center;
-  border: 1px solid rgba(var(--secondary-rgb), 0.22);
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--barracks-action);
   border-radius: 6px;
   padding: 4px 8px;
-  color: #adddeb !important;
-  background: rgba(var(--secondary-rgb), 0.08);
+  color: var(--barracks-text-interactive) !important;
+  background: var(--barracks-surface-interactive);
   font-size: 12px;
   font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .activity-method-pill {
@@ -152,37 +215,56 @@
   min-height: 26px;
   border-radius: 6px;
   padding: 4px 8px;
-  color: #c9ead3 !important;
-  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid var(--barracks-state-success);
+  color: var(--barracks-state-success) !important;
+  background: var(--barracks-surface-raised);
   font-size: 12px;
   font-weight: 650;
   text-decoration: none !important;
+  white-space: nowrap;
 }
 
 .activity-method-pill.is-transcode {
-  color: #adddeb !important;
-  background: rgba(var(--secondary-rgb), 0.1);
+  border-color: var(--barracks-state-warning);
+  color: var(--barracks-state-warning) !important;
 }
 
 .activity-method-pill.is-stream {
-  color: #e5d7f1 !important;
-  background: rgba(var(--primary-light-rgb), 0.1);
+  border-color: var(--barracks-state-live);
+  color: var(--barracks-state-live) !important;
 }
 
 .activity-method-pill.is-empty {
-  color: #8793a3 !important;
-  background: rgba(148, 163, 184, 0.08);
+  border-color: var(--barracks-state-unavailable);
+  color: var(--barracks-state-unavailable) !important;
 }
 
 .activity-date-cell {
   display: block;
-  color: #b9c5d4;
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   line-height: 1.35;
 }
 
+.activity-device-cell,
+.activity-ip-cell,
+.activity-ip-link {
+  display: block;
+  overflow: hidden;
+  color: var(--barracks-text-raised);
+  font-size: 12px;
+  font-weight: 620;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-ip-link {
+  color: inherit !important;
+  text-decoration: underline !important;
+}
+
 .activity-duration-cell {
-  color: #dfe7f2;
+  color: var(--barracks-text-raised);
   font-weight: 650;
 }
 
@@ -191,10 +273,10 @@
   min-width: 26px;
   height: 26px;
   place-items: center;
-  border: 1px solid var(--surface-border-color);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 6px;
-  color: #d9e2ee;
-  background: rgba(255, 255, 255, 0.045);
+  color: var(--barracks-text-inset);
+  background: var(--barracks-surface-inset);
   font-weight: 650;
 }
 
@@ -205,65 +287,64 @@
 
 .activity-mrt-paper + .MuiBox-root .MuiPaginationItem-root,
 .activity-table-shell .MuiPaginationItem-root {
-  border-color: var(--surface-border-color) !important;
-  color: #dbe6f7 !important;
-  background: rgba(8, 12, 18, 0.74) !important;
+  border-color: var(--barracks-border-strong) !important;
+  color: var(--barracks-text-interactive) !important;
+  background: var(--barracks-surface-interactive) !important;
 }
 
 .activity-mrt-paper + .MuiBox-root .Mui-selected,
 .activity-table-shell .MuiPaginationItem-root.Mui-selected {
-  border-color: rgba(var(--primary-light-rgb), 0.42) !important;
-  color: #fff !important;
-  background: rgba(var(--primary-rgb), 0.18) !important;
+  border-color: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
+  background: var(--barracks-action) !important;
 }
 
 .activity-table {
-  background-color: var(--secondary-background-color);
-  color: white !important;
+  background-color: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised) !important;
 }
 
-td,
-th,
-td > button {
-  color: white !important;
-  background-color: var(--tertiary-background-color);
+.activity-table :is(td, th, td > button) {
+  color: var(--barracks-text-interactive) !important;
+  background-color: var(--barracks-surface-interactive);
 }
 
-th {
-  color: white !important;
-  background-color: rgba(200, 200, 200, 0.2);
+.activity-table th {
+  color: var(--barracks-text-inset) !important;
+  background-color: var(--barracks-surface-inset);
 }
 
 .activity-client:hover {
-  color: var(--secondary-color) !important;
+  color: var(--barracks-text-interactive) !important;
 }
 .activity-client:hover > span {
   cursor: pointer;
-  color: var(--secondary-color) !important;
+  color: var(--barracks-text-interactive) !important;
 }
 
-td > a {
-  color: white;
+.activity-table td > a {
+  color: var(--barracks-text-interactive);
 }
 
-td:hover > a {
-  color: var(--secondary-color);
+.activity-table td:hover > a {
+  color: inherit;
 }
 
 .page-number {
   margin-inline: 10px;
-  color: white;
+  color: var(--barracks-text-raised);
 }
 
-select option {
-  background-color: var(--secondary-background-color);
+.activity-table-shell select option {
+  background-color: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   outline: unset;
   width: 100%;
   border: none;
 }
 
 .pagination-range .items {
-  background-color: rgb(255, 255, 255, 0.1);
+  background-color: var(--barracks-surface-inset);
   padding-inline: 10px;
 }
 
@@ -275,9 +356,9 @@ select option {
 .pagination-range {
   width: 130px;
   height: 35px;
-  color: white;
+  color: var(--barracks-text-raised);
   display: flex;
-  background-color: var(--secondary-background-color);
+  background-color: var(--barracks-surface-raised);
   border-radius: 8px;
   font-size: 1.2em;
   align-self: flex-end;
@@ -289,51 +370,53 @@ select option {
   outline: none;
   border: none;
   border-radius: 8px;
-  background-color: rgb(255, 255, 255, 0.1);
-  color: white;
+  background-color: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
   font-size: 1em;
 }
 
 .page-btn {
-  background-color: var(--primary-color) !important;
-  border-color: var(--primary-color) !important;
+  background-color: var(--barracks-action) !important;
+  border-color: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
 }
 
 .MuiTableCell-head > .Mui-active,
 .MuiTableSortLabel-icon {
-  color: var(--secondary-color) !important;
+  color: var(--barracks-text-inset) !important;
 }
 
 .MuiTableCell-head :hover {
-  color: var(--secondary-color) !important;
+  color: var(--barracks-text-inset) !important;
 }
 
-.modal-header {
-  color: white;
+.activity-delete-modal .modal-header {
+  color: var(--barracks-text-overlay);
   border-bottom: none !important;
 }
 
-.modal-footer {
+.activity-delete-modal .modal-footer {
   border-top: none !important;
 }
 
-.modal-content {
-  background-color: var(--secondary-background-color) !important;
+.activity-delete-modal .modal-content {
+  background-color: var(--barracks-overlay) !important;
+  color: var(--barracks-text-overlay);
 }
 
-::-webkit-scrollbar {
+.activity-table-shell ::-webkit-scrollbar {
   width: 10px; /* set scrollbar width */
 }
 
-::-webkit-scrollbar-track {
+.activity-table-shell ::-webkit-scrollbar-track {
   background-color: transparent; /* set track color */
 }
 
-::-webkit-scrollbar-thumb {
-  background-color: #8888884d; /* set thumb color */
+.activity-table-shell ::-webkit-scrollbar-thumb {
+  background-color: var(--barracks-border-raised); /* set thumb color */
   border-radius: 5px; /* round corners */
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background-color: #88888883; /* set thumb color */
+.activity-table-shell ::-webkit-scrollbar-thumb:hover {
+  background-color: var(--barracks-border-strong); /* set thumb color */
 }

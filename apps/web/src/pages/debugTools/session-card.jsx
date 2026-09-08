@@ -63,14 +63,15 @@ function SessionCard(props) {
       props.data.session.NowPlayingItem.SeriesId
         ? props.data.session.NowPlayingItem.SeriesId
         : props.data.session.NowPlayingItem.Id
-    }&fillHeight=320&fillWidth=213&quality=80), linear-gradient(to right, var(--secondary-color), var(--primary-color))`,
+    }&fillHeight=320&fillWidth=213&quality=80)`,
+    backgroundColor: "var(--barracks-surface-inset)",
     height: "100%",
     backgroundSize: "cover",
   };
 
   const cardBgStyle = {
     backdropFilter: "blur(5px)",
-    backgroundColor: "rgb(0, 0, 0, 0.6)",
+    backgroundColor: "var(--barracks-scrim)",
     height: "100%",
   };
 

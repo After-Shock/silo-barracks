@@ -1,0 +1,750 @@
+{
+  "health": {
+    "operationId": "health",
+    "method": "GET",
+    "path": "/api/v1/health",
+    "responses": [
+      {
+        "status": 200,
+        "body": {
+          "status": "ok",
+          "server_id": "fixture-silo",
+          "server_name": "Silo contract fixture"
+        }
+      }
+    ]
+  },
+  "getSystemInfo": {
+    "operationId": "getSystemInfo",
+    "method": "GET",
+    "path": "/api/v2/system/info",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "SystemInfo",
+        "body": {
+          "server_version": "fixture-2.0.0",
+          "api_major": 2,
+          "contract_digest": "e0cabb6c0a2535e05aab38cdc5823fa73dbf808ebff17332d7d372947abe5310",
+          "links": {
+            "openapi": "https://siloserver.org/contracts/api/v2/openapi.json",
+            "capabilities": "https://siloserver.org/api/v2/capabilities"
+          }
+        }
+      }
+    ]
+  },
+  "getAdminPlaybackSessionCapabilities": {
+    "operationId": "getAdminPlaybackSessionCapabilities",
+    "method": "GET",
+    "path": "/api/v2/admin/sessions/capabilities",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "AdminPlaybackSessionCapabilitiesOutputBody",
+        "body": {
+          "available": true,
+          "node_observations": true,
+          "effective_play_method": true,
+          "effective_play_method_values": ["direct", "remux", "transcode"],
+          "is_jellyfin_client": true,
+          "transcode_hw_accel": true,
+          "tone_map_mode": true,
+          "tone_map_mode_values": ["none", "hdr10", "dolby_vision"],
+          "client_build": true,
+          "client_channel": true,
+          "target_audio_channels": true,
+          "node_routing": true
+        }
+      }
+    ]
+  },
+  "listAdminPlaybackSessions": {
+    "operationId": "listAdminPlaybackSessions",
+    "method": "GET",
+    "path": "/api/v2/admin/sessions",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "CollectionAdminPlaybackSession",
+        "query": {"limit": 1},
+        "body": {
+          "items": [
+            {
+              "session_id": "session-1",
+              "user_id": "user-1",
+              "username": "alice",
+              "profile_id": "profile-1",
+              "media_file_id": "file-heat",
+              "requested_media_file_id": "file-heat",
+              "media_title": "Heat",
+              "media_type": "movie",
+              "play_method": "direct",
+              "reporting_node": "node-a",
+              "file_duration": null,
+              "started_at": "2026-09-08T13:00:00Z",
+              "updated_at": "2026-09-08T13:01:00Z",
+              "position_seconds": 61.25,
+              "is_paused": false,
+              "has_playback_control": true,
+              "audio_track_index": 0,
+              "transcode_audio": false,
+              "stream_bitrate_kbps": null,
+              "target_bitrate_kbps": null,
+              "source_bitrate_kbps": 24000,
+              "source_audio_channels": 6,
+              "content_id": "movie:heat-1995",
+              "client_name": "Silo Web",
+              "client_version": "fixture-client"
+            }
+          ],
+          "page": {"has_more": true, "next_cursor": "sessions-page-2"}
+        }
+      },
+      {
+        "status": 200,
+        "schema": "CollectionAdminPlaybackSession",
+        "query": {"cursor": "sessions-page-2", "limit": 1},
+        "body": {"items": [], "page": {"has_more": false}}
+      }
+    ]
+  },
+  "listAdminUsers": {
+    "operationId": "listAdminUsers",
+    "method": "GET",
+    "path": "/api/v2/admin/users",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "AdminUserCollection",
+        "query": {"limit": 1},
+        "body": {
+          "items": [
+            {
+              "id": "user-1",
+              "username": "alice",
+              "email": "alice@example.test",
+              "role": "admin",
+              "permissions": ["admin"],
+              "enabled": true,
+              "library_ids": ["library-movies"],
+              "max_playback_quality": null,
+              "max_streams": null,
+              "max_transcodes": null,
+              "transcode_allowed": true,
+              "audio_transcode_allowed": true,
+              "max_profiles": 4,
+              "download_allowed": false,
+              "download_transcode_allowed": false,
+              "requests_allowed": true,
+              "access_group_id": null,
+              "effective_policy": {
+                "library_ids": [],
+                "max_playback_quality": "",
+                "max_streams": 0,
+                "max_transcodes": 0,
+                "transcode_allowed": true,
+                "audio_transcode_allowed": true,
+                "download_allowed": false,
+                "download_transcode_allowed": false,
+                "requests_allowed": true,
+                "permissions": ["admin"]
+              },
+              "created_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-09-08T12:00:00Z",
+              "last_active_at": null
+            }
+          ],
+          "page": {"has_more": true, "next_cursor": "users-page-2"}
+        }
+      },
+      {
+        "status": 200,
+        "schema": "AdminUserCollection",
+        "query": {"cursor": "users-page-2", "limit": 1},
+        "body": {"items": [], "page": {"has_more": false}}
+      }
+    ]
+  },
+  "listSessions": {
+    "operationId": "listSessions",
+    "method": "GET",
+    "path": "/api/v2/auth/sessions",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "LoginSessionCollection",
+        "query": {"limit": 1},
+        "body": {
+          "items": [
+            {
+              "id": "login-1",
+              "device_name": "Fixture browser",
+              "ip_address": "192.0.2.10",
+              "created_at": "2026-09-08T12:00:00Z",
+              "expires_at": "2026-09-09T12:00:00Z"
+            }
+          ],
+          "page": {"has_more": true, "next_cursor": "login-page-2"}
+        }
+      },
+      {
+        "status": 200,
+        "schema": "LoginSessionCollection",
+        "query": {"cursor": "login-page-2", "limit": 1},
+        "body": {"items": [], "page": {"has_more": false}}
+      }
+    ]
+  },
+  "listCatalogItems": {
+    "operationId": "listCatalogItems",
+    "method": "GET",
+    "path": "/api/v2/catalog",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "CatalogBrowseCollection",
+        "query": {"limit": 1, "cursor": null},
+        "body": {
+          "window_cursor": "catalog-window-1",
+          "total": 2,
+          "total_exact": true,
+          "items": [
+            {
+              "content_id": "movie:future-2030",
+              "type": "future_media_kind",
+              "title": "Future Fixture",
+              "genres": [],
+              "keywords": ["contract"],
+              "status": "matched",
+              "year": 2030
+            }
+          ],
+          "page": {"has_more": true, "next_cursor": "catalog-page-2"}
+        }
+      },
+      {
+        "status": 200,
+        "schema": "CatalogBrowseCollection",
+        "query": {"limit": 1, "cursor": "catalog-page-2"},
+        "body": {
+          "window_cursor": "catalog-window-1",
+          "total": 2,
+          "total_exact": true,
+          "items": [
+            {
+              "content_id": "series:fixture",
+              "type": "series",
+              "title": "Fixture Series",
+              "genres": ["Drama"],
+              "keywords": [],
+              "status": "unmatched"
+            }
+          ],
+          "page": {"has_more": false}
+        }
+      }
+    ]
+  },
+  "getCatalogItem": {
+    "operationId": "getCatalogItem",
+    "method": "GET",
+    "path": "/api/v2/catalog/items/{id}",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "CatalogItemDetail",
+        "path_params": {"id": "movie:heat-1995"},
+        "body": {
+          "content_id": "movie:heat-1995",
+          "type": "movie",
+          "title": "Heat",
+          "genres": ["Crime"],
+          "keywords": [],
+          "status": "matched",
+          "cast": [],
+          "crew": [],
+          "versions": [],
+          "subtitles": [],
+          "runtime": 170,
+          "release_date": "1995-12-15",
+          "overview": "A contract fixture detail."
+        }
+      }
+    ]
+  },
+  "listCatalogItemVersions": {
+    "operationId": "listCatalogItemVersions",
+    "method": "GET",
+    "path": "/api/v2/catalog/items/{id}/versions",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "FileVersionCollection",
+        "path_params": {"id": "movie:heat-1995"},
+        "body": {
+          "items": [
+            {
+              "file_id": "file-heat",
+              "resolution": "1080p",
+              "codec_video": "h264",
+              "codec_audio": "aac",
+              "hdr": false,
+              "container": "mp4",
+              "file_size": 123456789,
+              "duration": 10200,
+              "bitrate": 8000,
+              "added_at": "2026-09-01T00:00:00Z",
+              "audio_tracks": [],
+              "video_tracks": [],
+              "subtitle_tracks": []
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "listSeriesSeasons": {
+    "operationId": "listSeriesSeasons",
+    "method": "GET",
+    "path": "/api/v2/catalog/series/{id}/seasons",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "SeasonCollection",
+        "path_params": {"id": "series:fixture"},
+        "body": {
+          "items": [
+            {
+              "content_id": "series:fixture-S01",
+              "season_number": 1,
+              "title": "Season 1",
+              "episode_count": 1,
+              "is_specials": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "getSeriesSeason": {
+    "operationId": "getSeriesSeason",
+    "method": "GET",
+    "path": "/api/v2/catalog/series/{id}/seasons/{num}",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "Season",
+        "path_params": {"id": "series:fixture", "num": 1},
+        "body": {
+          "content_id": "series:fixture-S01",
+          "season_number": 1,
+          "title": "Season 1",
+          "episode_count": 1,
+          "overview": "Fixture season"
+        }
+      }
+    ]
+  },
+  "listSeasonEpisodes": {
+    "operationId": "listSeasonEpisodes",
+    "method": "GET",
+    "path": "/api/v2/catalog/series/{id}/seasons/{num}/episodes",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "EpisodeCollection",
+        "path_params": {"id": "series:fixture", "num": 1},
+        "body": {
+          "items": [
+            {
+              "content_id": "episode:fixture-s01e01",
+              "season_number": 1,
+              "episode_number": 1,
+              "title": "Pilot",
+              "runtime": 45,
+              "files": []
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "listHistory": {
+    "operationId": "listHistory",
+    "method": "GET",
+    "path": "/api/v2/history",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "HistoryCollection",
+        "query": {"limit": 1},
+        "body": {
+          "items": [
+            {
+              "content_id": "movie:heat-1995",
+              "type": "movie",
+              "title": "Heat",
+              "genres": ["Crime"],
+              "keywords": [],
+              "status": "matched",
+              "watch": {
+                "media_item_id": "file-heat",
+                "watched_at": "2026-09-08T13:02:00Z",
+                "duration_seconds": 170,
+                "completed": true,
+                "source": "fixture"
+              }
+            }
+          ],
+          "page": {"has_more": true, "next_cursor": "history-page-2"}
+        }
+      },
+      {
+        "status": 200,
+        "schema": "HistoryCollection",
+        "query": {"cursor": "history-page-2", "limit": 1},
+        "body": {"items": [], "page": {"has_more": false}}
+      }
+    ]
+  },
+  "listAdminPlaybackHistory": {
+    "operationId": "listAdminPlaybackHistory",
+    "method": "GET",
+    "path": "/api/v2/admin/playback-history",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "AdminPlaybackHistoryCollection",
+        "query": {"limit": 1},
+        "body": {
+          "items": [
+            {
+              "session_id": "history-session-1",
+              "user_id": "user-1",
+              "username": "alice",
+              "profile_id": "profile-1",
+              "profile_name": "Family",
+              "media_item_id": "movie:heat-1995",
+              "media_file_id": "file-heat",
+              "media_title": "Heat",
+              "media_type": "movie",
+              "play_method": "direct",
+              "started_at": "2026-09-08T13:00:00Z",
+              "ended_at": "2026-09-08T13:02:00Z",
+              "watched_seconds": 120,
+              "duration_seconds": null,
+              "completed": false
+            }
+          ],
+          "page": {"has_more": true, "next_cursor": "admin-history-page-2"}
+        }
+      },
+      {
+        "status": 200,
+        "schema": "AdminPlaybackHistoryCollection",
+        "query": {"cursor": "admin-history-page-2", "limit": 1},
+        "body": {
+          "items": [
+            {
+              "session_id": "history-session-2",
+              "user_id": "user-2",
+              "username": "bob",
+              "profile_id": "profile-2",
+              "profile_name": "Guest",
+              "media_item_id": "episode:fixture-s01e01",
+              "media_file_id": "file-episode",
+              "media_title": "Pilot",
+              "media_type": "episode",
+              "play_method": "transcode",
+              "started_at": "2026-09-07T20:00:00Z",
+              "ended_at": "2026-09-07T20:45:00Z",
+              "watched_seconds": 2700,
+              "duration_seconds": 2700,
+              "completed": true
+            }
+          ],
+          "page": {"has_more": false}
+        }
+      }
+    ]
+  },
+  "listProfiles": {
+    "operationId": "listProfiles",
+    "method": "GET",
+    "path": "/api/v2/profiles",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "ProfileCollection",
+        "body": {
+          "avatar_upload_enabled": true,
+          "items": [
+            {
+              "id": "profile-primary",
+              "name": "Alice",
+              "avatar": "",
+              "avatar_source": "none",
+              "has_pin": false,
+              "is_child": false,
+              "is_primary": true,
+              "max_content_rating": "",
+              "quality_preference": "auto",
+              "language": "en",
+              "preferred_metadata_language": "en",
+              "subtitle_language": "en",
+              "subtitle_mode": "auto",
+              "auto_skip_intro": true,
+              "auto_skip_credits": false,
+              "auto_skip_recap": false,
+              "auto_play_next_preview": false,
+              "show_forced_subtitles": false,
+              "library_restrictions_enabled": false,
+              "allowed_library_ids": [],
+              "max_playback_quality": "",
+              "created_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-09-08T12:00:00Z"
+            },
+            {
+              "id": "profile-child",
+              "name": "Child",
+              "avatar": "preset:fox",
+              "avatar_source": "preset",
+              "has_pin": true,
+              "is_child": true,
+              "is_primary": false,
+              "max_content_rating": "PG",
+              "quality_preference": "720p",
+              "language": "en",
+              "preferred_metadata_language": "en",
+              "subtitle_language": "en",
+              "subtitle_mode": "forced_only",
+              "auto_skip_intro": false,
+              "auto_skip_credits": false,
+              "auto_skip_recap": false,
+              "auto_play_next_preview": false,
+              "show_forced_subtitles": true,
+              "library_restrictions_enabled": true,
+              "allowed_library_ids": ["library-movies"],
+              "max_playback_quality": "720p",
+              "created_at": "2026-02-01T00:00:00Z",
+              "updated_at": "2026-09-08T12:00:00Z"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "listLibraries": {
+    "operationId": "listLibraries",
+    "method": "GET",
+    "path": "/api/v2/libraries",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "LibraryCollection",
+        "body": {
+          "items": [
+            {
+              "id": "library-movies",
+              "paths": ["/media/movies"],
+              "type": "movies",
+              "name": "Movies",
+              "enabled": true,
+              "metadata_language": "en",
+              "auto_translate_metadata": false,
+              "chapter_thumbnails_enabled": false,
+              "chapter_thumbnails_supported": true,
+              "intro_detection_enabled": false,
+              "trailer_kinds": [],
+              "sort_order": 0
+            }
+          ],
+          "page": {"has_more": false}
+        }
+      }
+    ]
+  },
+  "listLibraryRoots": {
+    "operationId": "listLibraryRoots",
+    "method": "GET",
+    "path": "/api/v2/libraries/roots",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "LibraryRootCollection",
+        "body": {
+          "total": 1,
+          "items": [
+            {
+              "library_id": "library-movies",
+              "library_name": "Movies",
+              "root_path": "/media/movies",
+              "state": "active",
+              "inferred_type": "movies",
+              "type_confidence": "high",
+              "title": "Movies",
+              "year": 2026,
+              "observed_file_count": 1,
+              "first_seen_at": "2026-01-01T00:00:00Z",
+              "last_seen_at": "2026-09-08T12:00:00Z",
+              "evidence_json": {}
+            }
+          ],
+          "page": {"has_more": false}
+        }
+      }
+    ]
+  },
+  "listLibrarySections": {
+    "operationId": "listLibrarySections",
+    "method": "GET",
+    "path": "/api/v2/library/{id}/sections",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "SectionCollection",
+        "path_params": {"id": "library-movies"},
+        "body": {
+          "sections": [
+            {
+              "id": "recently_added",
+              "section_type": "recently_added",
+              "title": "Recently Added",
+              "featured": true,
+              "item_limit": 20,
+              "total_count": 1,
+              "is_custom": false,
+              "customized": false,
+              "items": []
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "getLibrarySectionItems": {
+    "operationId": "getLibrarySectionItems",
+    "method": "GET",
+    "path": "/api/v2/library/{id}/sections/{section_id}/items",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "Section",
+        "path_params": {"id": "library-movies", "section_id": "recently_added"},
+        "body": {
+          "id": "recently_added",
+          "section_type": "recently_added",
+          "title": "Recently Added",
+          "featured": true,
+          "item_limit": 20,
+          "total_count": 0,
+          "is_custom": false,
+          "customized": false,
+          "items": []
+        }
+      }
+    ]
+  },
+  "emptyCollection": {
+    "operationId": "emptyCollection",
+    "method": "GET",
+    "path": "/api/v2/catalog/items/movie:missing/versions",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "FileVersionCollection",
+        "body": {"items": []}
+      }
+    ]
+  },
+  "unknownCatalogType": {
+    "operationId": "unknownCatalogType",
+    "method": "GET",
+    "path": "/api/v2/catalog/items/future",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "CatalogItem",
+        "body": {
+          "content_id": "future:fixture",
+          "type": "future_media_kind",
+          "title": "Unknown kind",
+          "genres": [],
+          "keywords": [],
+          "status": "future_status"
+        }
+      }
+    ]
+  },
+  "nullableOptional": {
+    "operationId": "nullableOptional",
+    "method": "GET",
+    "path": "/api/v2/admin/users/user-nullable",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "AdminUser",
+        "body": {
+          "id": "user-nullable",
+          "username": "nullable",
+          "email": "",
+          "role": "user",
+          "permissions": [],
+          "enabled": true,
+          "library_ids": null,
+          "max_playback_quality": null,
+          "max_streams": null,
+          "max_transcodes": null,
+          "transcode_allowed": null,
+          "audio_transcode_allowed": null,
+          "max_profiles": 1,
+          "download_allowed": null,
+          "download_transcode_allowed": null,
+          "requests_allowed": null,
+          "access_group_id": null,
+          "effective_policy": {
+            "library_ids": [],
+            "max_playback_quality": "",
+            "max_streams": 0,
+            "max_transcodes": 0,
+            "transcode_allowed": false,
+            "audio_transcode_allowed": false,
+            "download_allowed": false,
+            "download_transcode_allowed": false,
+            "requests_allowed": false,
+            "permissions": []
+          },
+          "created_at": "2026-01-01T00:00:00Z",
+          "updated_at": "2026-01-01T00:00:00Z",
+          "last_active_at": null
+        }
+      }
+    ]
+  },
+  "problem": {
+    "operationId": "problem",
+    "method": "GET",
+    "path": "/api/v2/catalog",
+    "responses": [
+      {
+        "status": 422,
+        "schema": "Problem",
+        "body": {
+          "type": "https://siloserver.org/docs/api/v2/problems/validation_failed",
+          "title": "Validation failed",
+          "status": 422,
+          "detail": "The request did not pass validation; see errors.",
+          "instance": "urn:silo:request:fixture-0001",
+          "errors": [
+            {
+              "location": "query.limit",
+              "code": "out_of_range",
+              "detail": "limit must be between 1 and 200"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,488 @@
+/* Route-owned rules extracted from integrations.css. */
+.wizarr-refresh-button,
+.wizarr-create-card > button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid var(--barracks-border-strong);
+  border-radius: 8px;
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
+  font-weight: 950;
+  text-decoration: none;
+}
+
+.wizarr-dashboard {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.wizarr-dashboard article,
+.wizarr-create-card,
+.wizarr-invite-card {
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 84%, transparent);
+  box-shadow: 0 16px 38px color-mix(in srgb, var(--barracks-surface-inset) 22%, transparent);
+}
+
+.wizarr-dashboard article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 12px;
+  min-height: 82px;
+  align-content: center;
+  align-items: center;
+  padding: 14px;
+  background:
+    linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.18), color-mix(in srgb, var(--barracks-text-raised) 3%, transparent)),
+    color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
+}
+
+.wizarr-dashboard strong {
+  grid-column: 1 / -1;
+  color: var(--barracks-text-raised);
+  font-size: 30px;
+  font-weight: 950;
+  line-height: 0.9;
+}
+
+.wizarr-dashboard span {
+  color: var(--barracks-text-inset);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.wizarr-dashboard small {
+  color: var(--barracks-text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.wizarr-layout {
+  display: grid;
+  grid-template-columns: minmax(520px, 1.15fr) minmax(360px, 0.85fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.wizarr-create-card {
+  display: grid;
+  gap: 14px;
+  position: sticky;
+  top: 14px;
+  padding: 14px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(var(--barracks-action-rgb), 0.12), color-mix(in srgb, var(--barracks-text-raised) 2%, transparent)),
+    color-mix(in srgb, var(--barracks-surface-inset) 92%, transparent);
+}
+
+.wizarr-create-card label,
+.wizarr-form-heading {
+  display: grid;
+  gap: 8px;
+  color: var(--barracks-action);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.wizarr-form-section {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 42%, transparent);
+}
+
+.wizarr-form-heading {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.wizarr-form-heading small {
+  color: var(--barracks-action);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.wizarr-form-heading > div {
+  display: flex;
+  gap: 6px;
+}
+
+.wizarr-form-heading button {
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--barracks-border-strong);
+  border-radius: 8px;
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.wizarr-form-heading button:disabled {
+  opacity: 0.44;
+}
+
+.wizarr-create-card select,
+.wizarr-create-card input[type="number"],
+.wizarr-create-card input[type="email"],
+.wizarr-create-card input[type="text"],
+.wizarr-create-card input:not([type]) {
+  min-height: 42px;
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 8px;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-raised);
+  padding: 0 12px;
+  font-weight: 850;
+}
+
+.wizarr-create-card input::placeholder {
+  color: var(--barracks-action);
+  opacity: 1;
+}
+
+.wizarr-create-card input[type="number"] {
+  appearance: textfield;
+}
+
+.wizarr-create-card input[type="number"]::-webkit-outer-spin-button,
+.wizarr-create-card input[type="number"]::-webkit-inner-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.wizarr-create-card input.is-invalid {
+  border-color: color-mix(in srgb, var(--barracks-state-danger) 62%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--barracks-state-danger) 10%, transparent);
+}
+
+.wizarr-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  max-height: 190px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.wizarr-choice-grid button {
+  display: grid;
+  gap: 4px;
+  min-height: 62px;
+  padding: 11px;
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
+  color: var(--barracks-text-inset);
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.wizarr-choice-grid button:hover {
+  transform: translateY(-1px);
+  border-color: var(--barracks-border-strong);
+}
+
+.wizarr-choice-grid button.is-selected {
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
+}
+
+.wizarr-choice-grid button strong {
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.wizarr-choice-grid button span,
+.wizarr-empty-inline {
+  color: var(--barracks-action);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.wizarr-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.wizarr-toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.wizarr-toggle-row label {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
+  color: var(--barracks-text-inset);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.wizarr-email-box {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(var(--barracks-accent-secondary-rgb), 0.08), transparent 50%),
+    color-mix(in srgb, var(--barracks-surface-inset) 34%, transparent);
+}
+
+.wizarr-email-box label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  color: var(--barracks-action);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.wizarr-email-box label strong {
+  display: block;
+  color: var(--barracks-text-raised);
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.wizarr-email-box label small {
+  display: block;
+  margin-top: 2px;
+  color: var(--barracks-action);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.wizarr-email-box svg {
+  color: var(--barracks-accent-secondary);
+}
+
+.wizarr-email-box input[type="email"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.54;
+}
+
+.wizarr-invite-panel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 68%, transparent);
+}
+
+.wizarr-invite-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  gap: 12px;
+  align-items: center;
+}
+
+.wizarr-invite-toolbar h2 {
+  margin: 0 !important;
+  color: var(--barracks-text-raised);
+  font-size: 24px;
+  font-weight: 950;
+}
+
+.wizarr-invite-toolbar span {
+  color: var(--barracks-action);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.wizarr-search {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 8px;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
+}
+
+.wizarr-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--barracks-text-raised);
+  font-weight: 850;
+}
+
+.wizarr-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wizarr-filter-row button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
+  color: var(--barracks-text-inset);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.wizarr-filter-row button.is-active {
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+}
+
+.wizarr-invite-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.wizarr-invite-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 14px;
+  min-height: 190px;
+  padding: 14px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--barracks-surface-inset) 96%, transparent), color-mix(in srgb, var(--barracks-surface-inset) 86%, transparent)),
+    color-mix(in srgb, var(--barracks-surface-inset) 90%, transparent);
+}
+
+.wizarr-invite-card > div:first-child > span {
+  display: inline-flex;
+  min-height: 22px;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: var(--barracks-surface-raised);
+  border: 1px solid var(--barracks-state-success);
+  color: var(--barracks-state-success);
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.wizarr-invite-card.is-used > div:first-child > span,
+.wizarr-invite-card.is-expired > div:first-child > span {
+  background: var(--barracks-surface-raised);
+  border-color: var(--barracks-state-danger);
+  color: var(--barracks-state-danger);
+}
+
+.integration-notice.is-error {
+  border-color: var(--barracks-state-danger);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-state-danger);
+}
+
+.wizarr-invite-card h2 {
+  margin: 8px 0 4px !important;
+  color: var(--barracks-text-raised);
+  font-size: 24px;
+  font-weight: 950;
+}
+
+.wizarr-invite-card p,
+.wizarr-invite-meta span {
+  margin: 0;
+  color: var(--barracks-text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.wizarr-invite-card p {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wizarr-invite-meta {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 6px;
+  justify-items: start;
+  align-self: end;
+}
+
+.wizarr-invite-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.wizarr-invite-actions button,
+.wizarr-invite-actions a {
+  display: inline-flex;
+  width: 38px;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--barracks-border-strong);
+  border-radius: 8px;
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+}
+
+.wizarr-invite-actions .is-danger {
+  border-color: var(--barracks-state-danger-interactive);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-state-danger-interactive);
+}
+
+.wizarr-invite-actions a[aria-disabled="true"] {
+  pointer-events: none;
+  opacity: 0.42;
+}
+
+@media (max-width: 1100px) {
+  .wizarr-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .wizarr-invite-meta {
+    justify-items: start;
+  }
+}
+
+@media (max-width: 720px) {
+  .wizarr-dashboard,
+  .wizarr-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

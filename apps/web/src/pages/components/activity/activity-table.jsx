@@ -17,6 +17,7 @@ import IpInfoModal from "../ip-info";
 import BusyLoader from "../general/busyLoader.jsx";
 import { MRT_ShowHideColumnsButton, MRT_TablePagination, MaterialReactTable, useMaterialReactTable } from "material-react-table";
 import { Box, ThemeProvider, Typography, createTheme } from "@mui/material";
+import { grey } from "@mui/material/colors";
 
 import { Link } from "react-router-dom";
 import { Button, Modal } from "react-bootstrap";
@@ -49,14 +50,16 @@ function formatTotalWatchTime(seconds) {
 }
 
 const colors = {
-  primary: "#d78df0",
-  secondary: "#00c8ff",
-  backgroundColor: "#070a10",
-  secondaryBackgroundColor: "#0b1018",
-  tertiaryBackgroundColor: "#101620",
+  primary: "var(--barracks-action)",
+  secondary: "var(--barracks-accent-secondary)",
+  backgroundColor: "var(--barracks-canvas)",
+  tertiaryBackgroundColor: "var(--barracks-surface-interactive)",
 };
 const token = localStorage.getItem("token");
 const activityColumnVisibilityKey = "PREF_ACTIVITY_ColumnVisibility";
+const defaultColumnVisibility = {
+  RemoteEndPoint: false,
+};
 
 function getCssVariableColor(variableName, fallback) {
   if (typeof window === "undefined") {
@@ -90,11 +93,35 @@ function ActivityPoster({ itemId, title }) {
   );
 }
 
+function ActivityUserAvatar({ userId, userName }) {
+  const [imageFailed, setImageFailed] = React.useState(!userId);
+  const initial = userName?.slice(0, 1)?.toUpperCase() || "?";
+
+  if (imageFailed) {
+    return (
+      <span className="activity-user-avatar activity-user-avatar-fallback" aria-hidden="true">
+        {initial}
+      </span>
+    );
+  }
+
+  return (
+    <img
+      className="activity-user-avatar"
+      src={`/proxy/Users/Images/Primary?id=${userId}&fillWidth=72&quality=72`}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      onError={() => setImageFailed(true)}
+    />
+  );
+}
+
 function getStoredColumnVisibility() {
   try {
-    return JSON.parse(localStorage.getItem(activityColumnVisibilityKey) || "{}");
+    return { ...defaultColumnVisibility, ...JSON.parse(localStorage.getItem(activityColumnVisibilityKey) || "{}") };
   } catch {
-    return {};
+    return defaultColumnVisibility;
   }
 }
 
@@ -120,8 +147,9 @@ export default function ActivityTable(props) {
   const [themeTick, setThemeTick] = React.useState(0);
   const muiColors = useMemo(
     () => ({
-      primary: getCssVariableColor("--primary-light-color", colors.primary),
-      secondary: getCssVariableColor("--secondary-color", colors.secondary),
+      primary: getCssVariableColor("--barracks-action", colors.primary),
+      secondary: getCssVariableColor("--barracks-accent-secondary", colors.secondary),
+      surfaceRaised: getCssVariableColor("--barracks-surface-raised", grey[900]),
       tertiaryBackgroundColor: colors.tertiaryBackgroundColor,
     }),
     [themeTick]
@@ -208,47 +236,16 @@ export default function ActivityTable(props) {
 
   const columns = [
     {
-      accessorKey: "UserName",
-      header: i18next.t("USER"),
-      Cell: ({ row }) => {
-        row = row.original;
-        return (
-          <Link to={`/users/${row.UserId}`} className="activity-table-link activity-user-link">
-            {row.UserName}
-          </Link>
-        );
-      },
-    },
-    {
-      accessorKey: "RemoteEndPoint",
-      header: i18next.t("ACTIVITY_TABLE.IP_ADDRESS"),
-
-      Cell: ({ row }) => {
-        row = row.original;
-        if (
-          isRemoteSession(row.RemoteEndPoint) &&
-          (window.env?.JS_GEOLITE_ACCOUNT_ID ?? import.meta.env.JS_GEOLITE_ACCOUNT_ID) != undefined
-        ) {
-          return (
-            <Link className="activity-table-link" onClick={() => showIPDataModal(row.RemoteEndPoint)}>
-              {row.RemoteEndPoint}
-            </Link>
-          );
-        } else {
-          return <span>{row.RemoteEndPoint || "-"}</span>;
-        }
-      },
-    },
-    {
       accessorFn: (row) =>
         `${
           !row?.SeriesName
             ? row.NowPlayingItemName
             : row.SeriesName + " : S" + row.SeasonNumber + "E" + row.EpisodeNumber + " - " + row.NowPlayingItemName
-        }`,
+      }`,
       field: "NowPlayingItemName",
       header: i18next.t("TITLE"),
-      minSize: 300,
+      minSize: 360,
+      grow: 1.6,
       Cell: ({ row }) => {
         row = row.original;
         const title = !row.SeriesName
@@ -260,8 +257,25 @@ export default function ActivityTable(props) {
           <Link to={`/libraries/item/${row.EpisodeId || row.NowPlayingItemId}`} className="activity-table-link activity-title-link">
             <span className="activity-title-media">
               <ActivityPoster itemId={itemId} title={title} />
-              <span className="activity-title-copy">{title}</span>
+              <span className="activity-title-copy">
+                <strong>{title}</strong>
+                <small>{row.SeriesName ? "Episode" : row.NowPlayingItemName ? "Movie" : "Media"}</small>
+              </span>
             </span>
+          </Link>
+        );
+      },
+    },
+    {
+      accessorKey: "UserName",
+      header: i18next.t("USER"),
+      size: 190,
+      Cell: ({ row }) => {
+        row = row.original;
+        return (
+          <Link to={`/users/${row.UserId}`} className="activity-table-link activity-user-link">
+            <ActivityUserAvatar userId={row.UserId} userName={row.UserName} />
+            <span>{row.UserName || "Unknown"}</span>
           </Link>
         );
       },
@@ -269,6 +283,7 @@ export default function ActivityTable(props) {
     {
       accessorKey: "Client",
       header: i18next.t("ACTIVITY_TABLE.CLIENT"),
+      size: 160,
       Cell: ({ row }) => {
         row = row.original;
         return (
@@ -279,10 +294,18 @@ export default function ActivityTable(props) {
       },
     },
     {
+      accessorKey: "DeviceName",
+      header: i18next.t("ACTIVITY_TABLE.DEVICE"),
+      size: 180,
+      Cell: ({ cell }) => <span className="activity-device-cell">{cell.getValue() || "-"}</span>,
+    },
+    {
       accessorKey: "PlayMethod",
       header: i18next.t("TRANSCODE"),
+      size: 160,
       Cell: ({ row }) => {
         row = row.original;
+        const unavailableLabel = i18next.t("UNAVAILABLE");
         if (row.PlayMethod === "Transcode") {
           return (
             <Link onClick={() => openModal(row)} className="activity-method-pill is-transcode">
@@ -313,22 +336,23 @@ export default function ActivityTable(props) {
           );
         } else {
           return (
-            <Link onClick={() => openModal(row)} className="activity-method-pill is-empty">
-              -
+            <Link
+              onClick={() => openModal(row)}
+              className="activity-method-pill is-empty"
+              aria-label={unavailableLabel}
+              title={unavailableLabel}
+            >
+              {unavailableLabel}
             </Link>
           );
         }
       },
     },
     {
-      accessorKey: "DeviceName",
-      header: i18next.t("ACTIVITY_TABLE.DEVICE"),
-    },
-    {
       accessorFn: (row) => new Date(row.ActivityDateInserted),
       field: "ActivityDateInserted",
       header: i18next.t("DATE"),
-      size: 110,
+      size: 170,
       filterVariant: "date-range",
       Cell: ({ row }) => {
         const options = {
@@ -345,9 +369,28 @@ export default function ActivityTable(props) {
       },
     },
     {
+      accessorKey: "RemoteEndPoint",
+      header: i18next.t("ACTIVITY_TABLE.IP_ADDRESS"),
+      size: 150,
+      Cell: ({ row }) => {
+        row = row.original;
+        if (
+          isRemoteSession(row.RemoteEndPoint) &&
+          (window.env?.JS_GEOLITE_ACCOUNT_ID ?? import.meta.env.JS_GEOLITE_ACCOUNT_ID) != undefined
+        ) {
+          return (
+            <Link className="activity-table-link activity-ip-link" onClick={() => showIPDataModal(row.RemoteEndPoint)}>
+              {row.RemoteEndPoint}
+            </Link>
+          );
+        }
+        return <span className="activity-ip-cell">{row.RemoteEndPoint || "-"}</span>;
+      },
+    },
+    {
       accessorKey: "PlaybackDuration",
       header: i18next.t("ACTIVITY_TABLE.TOTAL_PLAYBACK"),
-      minSize: 200,
+      size: 160,
       // filterFn: (row, id, filterValue) => formatTotalWatchTime(row.getValue(id)).startsWith(filterValue),
       filterVariant: "range",
       Cell: ({ cell }) => <span className="activity-duration-cell">{formatTotalWatchTime(cell.getValue())}</span>,
@@ -357,6 +400,7 @@ export default function ActivityTable(props) {
       field: "TotalPlays",
       header: i18next.t("TOTAL_PLAYS"),
       filterFn: "betweenInclusive",
+      size: 110,
 
       Cell: ({ cell }) => <span className="activity-plays-cell">{cell.getValue() ?? 1}</span>,
     },
@@ -504,7 +548,7 @@ export default function ActivityTable(props) {
       return <span className="activity-table-toolbar-title">Activity view</span>;
     },
     renderEmptyRowsFallback: () => (
-      <span style={{ textAlign: "center", fontStyle: "italic", color: "grey" }} className="py-5">
+      <span style={{ textAlign: "center", fontStyle: "italic", color: "var(--barracks-text-muted-raised)" }} className="py-5">
         <Trans i18nKey="ERROR_MESSAGES.NO_ACTIVITY" />
       </span>
     ),
@@ -512,10 +556,23 @@ export default function ActivityTable(props) {
       sx: {
         backgroundColor: "transparent",
         "&:nth-of-type(odd) .MuiTableCell-body": {
-          backgroundColor: "rgba(10, 13, 18, 0.92)",
+          backgroundColor: "var(--barracks-surface-raised)",
+          borderBottom: "1px solid var(--barracks-border-raised)",
+          color: "var(--barracks-text-raised)",
         },
         "&:nth-of-type(even) .MuiTableCell-body": {
-          backgroundColor: "rgba(13, 17, 23, 0.92)",
+          backgroundColor: "var(--barracks-surface-inset)",
+          borderBottom: "1px solid var(--barracks-border-inset)",
+          color: "var(--barracks-text-inset)",
+        },
+        "& .MuiTableCell-body :is(a:not(.activity-method-pill):not(.activity-client-link), .activity-title-copy strong, .activity-title-copy small, .activity-device-cell, .activity-ip-cell, .activity-ip-link, .activity-date-cell, .activity-duration-cell, .activity-user-link, .MuiIconButton-root, .MuiSvgIcon-root)": {
+          color: "inherit !important",
+        },
+        "&:nth-of-type(odd) .MuiTableCell-body .MuiCheckbox-root, &:nth-of-type(odd) .MuiTableCell-body .MuiCheckbox-root .MuiSvgIcon-root": {
+          color: "var(--barracks-text-raised) !important",
+        },
+        "&:nth-of-type(even) .MuiTableCell-body .MuiCheckbox-root, &:nth-of-type(even) .MuiTableCell-body .MuiCheckbox-root .MuiSvgIcon-root": {
+          color: "var(--barracks-text-inset) !important",
         },
         "& .MuiTableCell-body:first-of-type": {
           borderTopLeftRadius: "0",
@@ -526,11 +583,13 @@ export default function ActivityTable(props) {
           borderBottomRightRadius: "0",
         },
         "&:hover .MuiTableCell-body": {
-          backgroundColor: "rgba(24, 30, 39, 0.96)",
+          backgroundColor: "var(--barracks-surface-interactive)",
+          borderBottomColor: "var(--barracks-border-strong)",
+          color: "var(--barracks-text-interactive)",
         },
-        "&:hover .MuiCheckbox-root": {
+        "&:hover .MuiTableCell-body .MuiCheckbox-root, &:hover .MuiTableCell-body .MuiCheckbox-root .MuiSvgIcon-root": {
           opacity: 1,
-          color: muiColors.secondary,
+          color: "var(--barracks-text-interactive) !important",
         },
       },
     },
@@ -574,8 +633,6 @@ export default function ActivityTable(props) {
     paginationDisplayMode: "pages",
     muiTableBodyCellProps: {
       sx: {
-        borderBottom: "1px solid rgba(255, 255, 255, 0.045)",
-        color: "#d9e2ee",
         fontSize: "13px",
         fontWeight: 560,
         lineHeight: 1.35,
@@ -584,9 +641,9 @@ export default function ActivityTable(props) {
     },
     muiTableHeadCellProps: {
       sx: {
-        backgroundColor: "rgba(8, 11, 16, 0.98)",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-        color: "#9ca8b8",
+        backgroundColor: "var(--barracks-surface-inset)",
+        borderBottom: "1px solid var(--barracks-border-inset)",
+        color: "var(--barracks-text-inset)",
         fontSize: "11px",
         fontWeight: 680,
         letterSpacing: "0.04em",
@@ -599,17 +656,17 @@ export default function ActivityTable(props) {
       elevation: 0,
       sx: {
         overflow: "hidden",
-        border: "1px solid rgba(255, 255, 255, 0.1)",
+        border: "1px solid var(--barracks-border-raised)",
         borderRadius: "8px",
-        background: "rgba(9, 12, 17, 0.96)",
-        boxShadow: "0 12px 30px rgba(0, 0, 0, 0.18)",
+        background: "var(--barracks-surface-raised)",
+        boxShadow: "var(--barracks-shadow)",
       },
     },
     muiTopToolbarProps: {
       sx: {
         minHeight: "48px",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-        background: "rgba(8, 11, 16, 0.98)",
+        borderBottom: "1px solid var(--barracks-border-inset)",
+        background: "var(--barracks-surface-inset)",
       },
     },
     muiTableContainerProps: {
@@ -631,7 +688,7 @@ export default function ActivityTable(props) {
     },
 
     mrtTheme: () => ({
-      baseBackgroundColor: "#070a10",
+      baseBackgroundColor: muiColors.surfaceRaised,
     }),
   });
   const theme = useMemo(
@@ -675,6 +732,7 @@ export default function ActivityTable(props) {
       <IpInfoModal show={ipModalVisible} onHide={() => setIPModalVisible(false)} ipAddress={ipAddressLookup} />
       <Modal
         show={confirmDeleteShow}
+        dialogClassName="activity-delete-modal"
         onHide={() => {
           setDeleteShow(false);
         }}
@@ -708,7 +766,7 @@ export default function ActivityTable(props) {
           </button>
         </Modal.Footer>
       </Modal>
-      <Modal show={modalState} onHide={() => setModalState(false)}>
+      <Modal show={modalState} onHide={() => setModalState(false)} dialogClassName="stream-info-modal">
         <Modal.Header>
           <Modal.Title>
             <Trans i18nKey="ACTIVITY_TABLE.MODAL.HEADER" />

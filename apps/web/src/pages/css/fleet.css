@@ -1,0 +1,255 @@
+.fleet-overview,
+.server-settings {
+  min-width: 0;
+  width: 100%;
+  color: var(--barracks-text);
+}
+
+.fleet-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.fleet-eyebrow {
+  color: var(--barracks-action-foreground);
+  font-family: monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.fleet-manage-link {
+  color: var(--barracks-action-foreground);
+  font-size: 13px;
+}
+
+.fleet-totals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.fleet-totals > div {
+  padding: 16px;
+  border: 1px solid var(--barracks-border-subtle);
+  border-radius: 4px;
+  background: var(--barracks-surface-raised);
+}
+
+.fleet-totals strong {
+  display: block;
+  color: var(--barracks-text-raised);
+  font-size: 34px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.fleet-totals span {
+  color: var(--barracks-text-muted-raised);
+  font-size: 12px;
+}
+
+.fleet-footnote {
+  color: var(--barracks-text);
+  font-size: 12px;
+}
+
+.fleet-server-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.fleet-server {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid var(--barracks-border-subtle);
+  border-top: 3px solid var(--barracks-action);
+  border-radius: 4px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+  text-align: left;
+}
+
+.fleet-server[aria-pressed="true"] {
+  outline: 2px solid var(--barracks-action);
+  outline-offset: 2px;
+}
+
+.fleet-server strong {
+  font-size: 25px;
+}
+
+.fleet-server small {
+  display: block;
+  color: var(--barracks-text-muted-raised);
+  font-size: 11px;
+}
+
+.fleet-server.unavailable,
+.fleet-server.disabled {
+  border-top-color: var(--barracks-state-unavailable);
+}
+
+.fleet-server.disabled {
+  opacity: 0.65;
+}
+
+.fleet-notice {
+  padding: 10px 12px;
+  border-left: 3px solid var(--barracks-state-warning);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+  font-size: 13px;
+}
+
+.fleet-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  font-size: 13px;
+}
+
+.fleet-filter select,
+.server-settings input {
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid var(--barracks-border-subtle);
+  border-radius: 4px;
+  background: var(--barracks-canvas);
+  color: var(--barracks-text);
+}
+
+.fleet-streams {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 496px));
+  gap: 18px;
+}
+
+.fleet-stream,
+.fleet-stream .session-card {
+  min-width: 0;
+  width: 100%;
+}
+
+.fleet-source {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 2px;
+  font-size: 12px;
+}
+
+.fleet-source span {
+  padding: 2px 6px;
+  border: 1px solid var(--barracks-state-warning);
+  border-radius: 4px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-state-warning);
+}
+
+.fleet-footnote {
+  margin-top: 14px;
+}
+
+.server-settings form {
+  display: grid;
+  max-width: 680px;
+  gap: 14px;
+  margin-block: 20px;
+  padding: 20px;
+  border: 1px solid var(--barracks-border-subtle);
+  border-radius: 4px;
+}
+
+.server-settings label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.server-settings input {
+  width: 100%;
+}
+
+.server-settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.server-settings button,
+.fleet-notice button {
+  padding: 8px 12px;
+  border: 1px solid var(--barracks-border-subtle);
+  border-radius: 4px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+}
+
+.server-settings button[type="submit"] {
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
+}
+
+.server-settings button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.server-settings-list {
+  display: grid;
+  gap: 12px;
+}
+
+.server-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 16px;
+  border: 1px solid var(--barracks-border-subtle);
+  border-radius: 4px;
+}
+
+.server-settings-row > div:first-child {
+  min-width: 0;
+}
+
+.server-settings-row small {
+  display: block;
+  color: var(--barracks-text);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .fleet-totals {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fleet-totals > div {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .fleet-totals strong {
+    font-size: 28px;
+  }
+
+  .fleet-filter {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

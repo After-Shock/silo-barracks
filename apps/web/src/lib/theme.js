@@ -1,14 +1,15 @@
-export const THEME_STORAGE_KEY = "jellyglance_custom_theme";
+export const THEME_STORAGE_KEY = "silo_barracks_theme";
+export const LEGACY_THEME_STORAGE_KEY = "jellyglance_custom_theme";
 
 export const DEFAULT_THEME = {
-  primary: "#9b6ac8",
-  secondary: "#4aa8bc",
-  background: "#0b0d12",
-  surface: "#131820",
+  primary: "#6f9bcf",
+  secondary: "#a0977f",
+  background: "#161410",
+  surface: "#221c14",
 };
 
 export const THEME_PRESETS = [
-  { name: "JellyGlance", primary: "#9b6ac8", secondary: "#4aa8bc", background: "#0b0d12", surface: "#131820" },
+  { name: "Silo Barracks", ...DEFAULT_THEME },
   { name: "Ocean", primary: "#2dd4bf", secondary: "#38bdf8", background: "#071015", surface: "#10212a" },
   { name: "Ember", primary: "#f97316", secondary: "#f43f5e", background: "#120b08", surface: "#1f1512" },
   { name: "Forest", primary: "#22c55e", secondary: "#eab308", background: "#08110d", surface: "#111d17" },
@@ -48,6 +49,16 @@ function normalizeHexColor(value, fallback) {
   return HEX_COLOR_PATTERN.test(nextValue) ? nextValue : fallback;
 }
 
+export function normalizeThemeInput(theme = {}) {
+  const source = theme && typeof theme === "object" ? theme : {};
+  return {
+    primary: normalizeHexColor(source.primary, DEFAULT_THEME.primary),
+    secondary: normalizeHexColor(source.secondary, DEFAULT_THEME.secondary),
+    background: normalizeHexColor(source.background, DEFAULT_THEME.background),
+    surface: normalizeHexColor(source.surface, DEFAULT_THEME.surface),
+  };
+}
+
 function hexToRgb(hexColor) {
   const normalized = normalizeHexColor(hexColor, "#000000").slice(1);
   return {
@@ -57,19 +68,258 @@ function hexToRgb(hexColor) {
   };
 }
 
-function darkenHex(hexColor, amount = 0.28) {
-  const { r, g, b } = hexToRgb(hexColor);
-  const channel = (value) => Math.max(0, Math.min(255, Math.round(value * (1 - amount))));
-  return `#${[channel(r), channel(g), channel(b)].map((value) => value.toString(16).padStart(2, "0")).join("")}`;
-}
-
-function mixHex(firstHexColor, secondHexColor, weight = 0.42) {
+export function mixHex(firstHexColor, secondHexColor, weight = 0.42) {
   const first = hexToRgb(firstHexColor);
   const second = hexToRgb(secondHexColor);
-  const channel = (firstValue, secondValue) => Math.max(0, Math.min(255, Math.round(firstValue * (1 - weight) + secondValue * weight)));
+  const numericWeight = Number(weight);
+  const normalizedWeight = Number.isFinite(numericWeight) ? Math.max(0, Math.min(1, numericWeight)) : 0.42;
+  const channel = (firstValue, secondValue) => Math.max(0, Math.min(255, Math.round(firstValue * (1 - normalizedWeight) + secondValue * normalizedWeight)));
   return `#${[channel(first.r, second.r), channel(first.g, second.g), channel(first.b, second.b)]
     .map((value) => value.toString(16).padStart(2, "0"))
     .join("")}`;
+}
+
+export function relativeLuminance(hexColor) {
+  const { r, g, b } = hexToRgb(hexColor);
+  const linearize = (channel) => {
+    const normalized = channel / 255;
+    return normalized <= 0.03928 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * linearize(r) + 0.7152 * linearize(g) + 0.0722 * linearize(b);
+}
+
+export function contrastRatio(foreground, background) {
+  const foregroundLuminance = relativeLuminance(foreground);
+  const backgroundLuminance = relativeLuminance(background);
+  const lighter = Math.max(foregroundLuminance, backgroundLuminance);
+  const darker = Math.min(foregroundLuminance, backgroundLuminance);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+const TEXT_LIGHT = "#f5f0e7";
+const TEXT_DARK = "#10100f";
+const PURE_TEXT_LIGHT = "#ffffff";
+const PURE_TEXT_DARK = "#000000";
+const TEXT_CONTRAST_MINIMUM = 4.5;
+
+function contrastAdjustment(candidate, endpoint, background, minimum) {
+  if (contrastRatio(endpoint, background) < minimum) {
+    return null;
+  }
+
+  let low = 0;
+  let high = 1;
+  for (let index = 0; index < 32; index += 1) {
+    const weight = (low + high) / 2;
+    if (contrastRatio(mixHex(candidate, endpoint, weight), background) >= minimum) {
+      high = weight;
+    } else {
+      low = weight;
+    }
+  }
+
+  let weight = high;
+  let color = mixHex(candidate, endpoint, weight);
+  let attempts = 0;
+  while (contrastRatio(color, background) < minimum && weight < 1 && attempts < 10001) {
+    weight = Math.min(1, weight + 0.0001);
+    color = mixHex(candidate, endpoint, weight);
+    attempts += 1;
+  }
+  return contrastRatio(color, background) >= minimum ? { color, weight } : null;
+}
+
+export function ensureContrast(foreground, background, minimum = 3) {
+  const candidate = normalizeHexColor(foreground, "#000000");
+  const backdrop = normalizeHexColor(background, "#000000");
+  const threshold = Number.isFinite(Number(minimum)) ? Math.max(1, Number(minimum)) : 3;
+
+  if (contrastRatio(candidate, backdrop) >= threshold) {
+    return candidate;
+  }
+
+  const adjustments = [TEXT_LIGHT, TEXT_DARK, PURE_TEXT_LIGHT, PURE_TEXT_DARK]
+    .map((endpoint) => contrastAdjustment(candidate, endpoint, backdrop, threshold))
+    .filter(Boolean)
+    .sort((first, second) => first.weight - second.weight);
+  if (adjustments.length > 0) {
+    return adjustments[0].color;
+  }
+
+  const endpointContrasts = [TEXT_LIGHT, TEXT_DARK, PURE_TEXT_LIGHT, PURE_TEXT_DARK]
+    .map((endpoint) => ({ endpoint, contrast: contrastRatio(endpoint, backdrop) }))
+    .sort((first, second) => second.contrast - first.contrast);
+  return endpointContrasts[0].endpoint;
+}
+
+function closestMixToward(color, background, minimum = 4.5) {
+  let closestColor = color;
+  let closestWeight = 0;
+  const steps = 4096;
+  for (let index = 0; index <= steps; index += 1) {
+    const weight = index / steps;
+    const mixedColor = mixHex(color, background, weight);
+    if (contrastRatio(mixedColor, background) >= minimum) {
+      closestColor = mixedColor;
+      closestWeight = weight;
+    }
+  }
+
+  if (closestWeight > 0 || contrastRatio(closestColor, background) >= minimum) {
+    return closestColor;
+  }
+
+  return ensureContrast(color, background, minimum);
+}
+
+function resolveActionPair(candidate, background) {
+  const endpoints = [TEXT_LIGHT, TEXT_DARK];
+  const steps = 4096;
+  const pairs = [];
+
+  for (const mixEndpoint of endpoints) {
+    for (let index = 0; index <= steps; index += 1) {
+      const weight = index / steps;
+      const action = mixHex(candidate, mixEndpoint, weight);
+      if (contrastRatio(action, background) < 3) {
+        continue;
+      }
+
+      const textCandidates = endpoints
+        .map((actionText) => ({ actionText, contrast: contrastRatio(actionText, action) }))
+        .filter(({ contrast }) => contrast >= 4.5)
+        .sort((first, second) => second.contrast - first.contrast);
+      if (textCandidates.length > 0) {
+        pairs.push({ action, actionText: textCandidates[0].actionText, weight });
+        break;
+      }
+    }
+  }
+
+  if (pairs.length > 0) {
+    return pairs.sort((first, second) => first.weight - second.weight)[0];
+  }
+
+  const action = ensureContrast(candidate, background, 3);
+  return { action, actionText: strongestWarmTextEndpoint(action), weight: 1 };
+}
+
+function strongestWarmTextEndpoint(background) {
+  return contrastRatio(TEXT_LIGHT, background) >= contrastRatio(TEXT_DARK, background) ? TEXT_LIGHT : TEXT_DARK;
+}
+
+function strongestTextEndpoint(background) {
+  const warmEndpoint = strongestWarmTextEndpoint(background);
+  if (contrastRatio(warmEndpoint, background) >= TEXT_CONTRAST_MINIMUM) {
+    return warmEndpoint;
+  }
+
+  return contrastRatio(PURE_TEXT_LIGHT, background) >= contrastRatio(PURE_TEXT_DARK, background)
+    ? PURE_TEXT_LIGHT
+    : PURE_TEXT_DARK;
+}
+
+function isDefaultThemeInput(input) {
+  return Object.keys(DEFAULT_THEME).every((key) => input[key].toLowerCase() === DEFAULT_THEME[key].toLowerCase());
+}
+
+export function resolveTheme(theme) {
+  const input = normalizeThemeInput(theme);
+  const canvas = input.background;
+  const nav = mixHex(input.surface, canvas, 0.35);
+  const surfaceRaised = input.surface;
+  const text = strongestTextEndpoint(canvas);
+  const warmCanvasText = strongestWarmTextEndpoint(canvas);
+  const textInverse = warmCanvasText === TEXT_LIGHT ? TEXT_DARK : TEXT_LIGHT;
+  const surfaceInset = mixHex(input.surface, canvas, 0.38);
+  const surfaceInteractive = mixHex(input.surface, text, 0.06);
+  const overlay = mixHex(input.surface, canvas, 0.18);
+  const textRaised = strongestTextEndpoint(surfaceRaised);
+  const textInset = strongestTextEndpoint(surfaceInset);
+  const textInteractive = strongestTextEndpoint(surfaceInteractive);
+  const textNav = strongestTextEndpoint(nav);
+  const textOverlay = strongestTextEndpoint(overlay);
+  const borderSubtle = mixHex(surfaceRaised, textRaised, 0.18);
+  const borderCanvas = ensureContrast(mixHex(canvas, text, 0.42), canvas, 3);
+  const borderRaised = ensureContrast(mixHex(surfaceRaised, textRaised, 0.42), surfaceRaised, 3);
+  const borderInset = ensureContrast(mixHex(surfaceInset, textInset, 0.42), surfaceInset, 3);
+  const borderStrong = ensureContrast(mixHex(surfaceInteractive, textInteractive, 0.42), surfaceInteractive, 3);
+  const borderNav = ensureContrast(mixHex(nav, textNav, 0.42), nav, 3);
+  const borderOverlay = ensureContrast(mixHex(overlay, textOverlay, 0.42), overlay, 3);
+  const textMuted = closestMixToward(text, canvas);
+  const textMutedRaised = closestMixToward(textRaised, surfaceRaised);
+  const focus = ensureContrast(input.primary, surfaceRaised, 3);
+  const { action, actionText } = resolveActionPair(input.primary, surfaceInteractive);
+  const actionForeground = ensureContrast(input.primary, canvas, 4.5);
+  const statusCandidates = {
+    live: "#ff6f63",
+    success: "#70b981",
+    warning: "#ffa64f",
+    danger: "#e45f55",
+    unavailable: "#a0977f",
+  };
+  const live = ensureContrast(statusCandidates.live, surfaceRaised, 3);
+  const success = ensureContrast(statusCandidates.success, surfaceRaised, 3);
+  const warning = ensureContrast(statusCandidates.warning, surfaceRaised, 3);
+  const danger = ensureContrast(statusCandidates.danger, surfaceRaised, 3);
+  const dangerInteractive = ensureContrast(statusCandidates.danger, surfaceInteractive, 3);
+  const unavailable = ensureContrast(statusCandidates.unavailable, surfaceRaised, 3);
+  const chartCandidates = [input.primary, live, warning, input.secondary, success, danger];
+  const charts = chartCandidates.map((candidate) => ensureContrast(candidate, surfaceInset, 3));
+  const rgb = (hexColor) => rgbString(hexColor);
+  const scrim = isDefaultThemeInput(input) ? "rgba(8, 7, 5, 0.72)" : `rgba(${rgb(canvas)}, 0.72)`;
+  const tokens = {
+    canvas,
+    nav,
+    surfaceRaised,
+    surfaceInset,
+    surfaceInteractive,
+    overlay,
+    borderSubtle,
+    borderCanvas,
+    borderRaised,
+    borderInset,
+    borderStrong,
+    borderNav,
+    borderOverlay,
+    text,
+    textRaised,
+    textInset,
+    textInteractive,
+    textNav,
+    textOverlay,
+    textMuted,
+    textMutedRaised,
+    textInverse,
+    focus,
+    focusLight: TEXT_LIGHT,
+    focusDark: TEXT_DARK,
+    action,
+    actionText,
+    actionForeground,
+    accentSecondary: input.secondary,
+    live,
+    success,
+    warning,
+    danger,
+    dangerInteractive,
+    unavailable,
+    chartGrid: borderSubtle,
+    chartTooltip: overlay,
+    chart1: charts[0],
+    chart2: charts[1],
+    chart3: charts[2],
+    chart4: charts[3],
+    chart5: charts[4],
+    chart6: charts[5],
+    scrim,
+    shadow: `0 12px 32px rgba(${rgb(canvas)}, 0.28)`,
+    actionRgb: rgb(action),
+    accentSecondaryRgb: rgb(input.secondary),
+    surfaceRaisedRgb: rgb(surfaceRaised),
+  };
+
+  return { input, tokens };
 }
 
 function rgbString(hexColor) {
@@ -77,62 +327,208 @@ function rgbString(hexColor) {
   return `${r}, ${g}, ${b}`;
 }
 
-export function getStoredTheme() {
+let lastAppliedTokens = null;
+
+function getGlobalStorage() {
   try {
-    const storedTheme = JSON.parse(localStorage.getItem(THEME_STORAGE_KEY) || "{}");
-    return {
-      primary: normalizeHexColor(storedTheme.primary, DEFAULT_THEME.primary),
-      secondary: normalizeHexColor(storedTheme.secondary, DEFAULT_THEME.secondary),
-      background: normalizeHexColor(storedTheme.background, DEFAULT_THEME.background),
-      surface: normalizeHexColor(storedTheme.surface, DEFAULT_THEME.surface),
-    };
+    return typeof localStorage === "undefined" ? undefined : localStorage;
   } catch {
-    return DEFAULT_THEME;
+    return undefined;
   }
 }
 
-export function saveTheme(theme) {
-  const nextTheme = {
-    primary: normalizeHexColor(theme.primary, DEFAULT_THEME.primary),
-    secondary: normalizeHexColor(theme.secondary, DEFAULT_THEME.secondary),
-    background: normalizeHexColor(theme.background, DEFAULT_THEME.background),
-    surface: normalizeHexColor(theme.surface, DEFAULT_THEME.surface),
-  };
+function getDocumentRoot() {
+  try {
+    return typeof document === "undefined" ? undefined : document.documentElement;
+  } catch {
+    return undefined;
+  }
+}
 
-  localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(nextTheme));
-  applyTheme(nextTheme);
-  window.dispatchEvent(new CustomEvent("jellyglance-theme-updated", { detail: nextTheme }));
+function getGlobalEventTarget() {
+  try {
+    return typeof window === "undefined" ? undefined : window;
+  } catch {
+    return undefined;
+  }
+}
+
+function readStoredValue(storage, key) {
+  try {
+    const value = storage?.getItem(key);
+    if (value === null || typeof value === "undefined") {
+      return { status: "absent" };
+    }
+    return { status: "present", value: JSON.parse(value) };
+  } catch {
+    return { status: "failed" };
+  }
+}
+
+function isThemeRecord(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function writeStoredValue(storage, key, value) {
+  try {
+    storage?.setItem(key, value);
+  } catch {
+    // Storage is optional and may be unavailable or full; the in-memory theme still applies.
+  }
+}
+
+function removeStoredValue(storage, key) {
+  try {
+    storage?.removeItem(key);
+  } catch {
+    // Storage removal is best effort; reset still applies in memory.
+  }
+}
+
+export function getStoredTheme({ storage = getGlobalStorage() } = {}) {
+  const stored = readStoredValue(storage, THEME_STORAGE_KEY);
+  if (stored.status === "present") {
+    return normalizeThemeInput(stored.value);
+  }
+  if (stored.status === "failed") {
+    return normalizeThemeInput();
+  }
+
+  const legacy = readStoredValue(storage, LEGACY_THEME_STORAGE_KEY);
+  if (legacy.status !== "present" || !isThemeRecord(legacy.value)) {
+    return normalizeThemeInput();
+  }
+
+  const normalizedLegacy = normalizeThemeInput(legacy.value);
+  writeStoredValue(storage, THEME_STORAGE_KEY, JSON.stringify(normalizedLegacy));
+  return normalizedLegacy;
+}
+
+const semanticPropertyMap = [
+  ["--barracks-canvas", "canvas"],
+  ["--barracks-nav", "nav"],
+  ["--barracks-surface-raised", "surfaceRaised"],
+  ["--barracks-surface-inset", "surfaceInset"],
+  ["--barracks-surface-interactive", "surfaceInteractive"],
+  ["--barracks-overlay", "overlay"],
+  ["--barracks-border-subtle", "borderSubtle"],
+  ["--barracks-border-canvas", "borderCanvas"],
+  ["--barracks-border-raised", "borderRaised"],
+  ["--barracks-border-inset", "borderInset"],
+  ["--barracks-border-strong", "borderStrong"],
+  ["--barracks-border-nav", "borderNav"],
+  ["--barracks-border-overlay", "borderOverlay"],
+  ["--barracks-text", "text"],
+  ["--barracks-text-raised", "textRaised"],
+  ["--barracks-text-inset", "textInset"],
+  ["--barracks-text-interactive", "textInteractive"],
+  ["--barracks-text-nav", "textNav"],
+  ["--barracks-text-overlay", "textOverlay"],
+  ["--barracks-text-muted", "textMuted"],
+  ["--barracks-text-muted-raised", "textMutedRaised"],
+  ["--barracks-text-inverse", "textInverse"],
+  ["--barracks-focus", "focus"],
+  ["--barracks-focus-light", "focusLight"],
+  ["--barracks-focus-dark", "focusDark"],
+  ["--barracks-action", "action"],
+  ["--barracks-action-text", "actionText"],
+  ["--barracks-action-foreground", "actionForeground"],
+  ["--barracks-accent-secondary", "accentSecondary"],
+  ["--barracks-state-live", "live"],
+  ["--barracks-state-success", "success"],
+  ["--barracks-state-warning", "warning"],
+  ["--barracks-state-danger", "danger"],
+  ["--barracks-state-danger-interactive", "dangerInteractive"],
+  ["--barracks-state-unavailable", "unavailable"],
+  ["--barracks-chart-grid", "chartGrid"],
+  ["--barracks-chart-tooltip", "chartTooltip"],
+  ["--barracks-chart-1", "chart1"],
+  ["--barracks-chart-2", "chart2"],
+  ["--barracks-chart-3", "chart3"],
+  ["--barracks-chart-4", "chart4"],
+  ["--barracks-chart-5", "chart5"],
+  ["--barracks-chart-6", "chart6"],
+  ["--barracks-scrim", "scrim"],
+  ["--barracks-shadow", "shadow"],
+  ["--barracks-action-rgb", "actionRgb"],
+  ["--barracks-accent-secondary-rgb", "accentSecondaryRgb"],
+  ["--barracks-surface-raised-rgb", "surfaceRaisedRgb"],
+];
+
+function getCssPropertyValues(tokens) {
+  const primaryLightColor = mixHex(tokens.action, tokens.focusLight, 0.42);
+  const primaryDarkColor = mixHex(tokens.action, tokens.focusDark, 0.28);
+  return {
+    ...Object.fromEntries(semanticPropertyMap.map(([property, key]) => [property, tokens[key]])),
+    "--primary-color": tokens.action,
+    "--primary-rgb": tokens.actionRgb,
+    "--primary-light-color": primaryLightColor,
+    "--primary-light-rgb": rgbString(primaryLightColor),
+    "--primary-dark-color": primaryDarkColor,
+    "--secondary-color": tokens.accentSecondary,
+    "--secondary-rgb": tokens.accentSecondaryRgb,
+    "--background-color": tokens.canvas,
+    "--secondary-background-color": tokens.surfaceRaised,
+    "--tertiary-background-color": tokens.surfaceInteractive,
+    "--surface-color": `rgba(${tokens.surfaceRaisedRgb}, 0.86)`,
+    "--surface-border-color": tokens.borderSubtle,
+    "--text-color": tokens.text,
+    "--muted-text-color": tokens.textMuted,
+    "--subtle-text-color": tokens.unavailable,
+  };
+}
+
+function writeThemeToRoot(root, tokens) {
+  if (!root?.style?.setProperty) {
+    return;
+  }
+  const values = getCssPropertyValues(tokens);
+  root.style.colorScheme = tokens.text === TEXT_DARK ? "light" : "dark";
+  for (const [property, value] of Object.entries(values)) {
+    root.style.setProperty(property, value);
+  }
+}
+
+export function applyTheme(theme, { root = getDocumentRoot(), storage = getGlobalStorage() } = {}) {
+  const sourceTheme = theme === undefined ? getStoredTheme({ storage }) : theme;
+  const { tokens } = resolveTheme(sourceTheme);
+  lastAppliedTokens = { ...tokens };
+  writeThemeToRoot(root, tokens);
+}
+
+export function getThemeTokens() {
+  return lastAppliedTokens ? { ...lastAppliedTokens } : null;
+}
+
+function dispatchThemeEvent(eventTarget, type, detail) {
+  if (!eventTarget?.dispatchEvent) {
+    return;
+  }
+  try {
+    const event = typeof CustomEvent === "function"
+      ? new CustomEvent(type, { detail })
+      : { type, detail };
+    eventTarget.dispatchEvent(event);
+  } catch {
+    // Consumers must not prevent a theme from being applied.
+  }
+}
+
+export function saveTheme(theme, { storage = getGlobalStorage(), root = getDocumentRoot(), eventTarget = getGlobalEventTarget() } = {}) {
+  const nextTheme = normalizeThemeInput(theme);
+  writeStoredValue(storage, THEME_STORAGE_KEY, JSON.stringify(nextTheme));
+  applyTheme(nextTheme, { root, storage });
+  dispatchThemeEvent(eventTarget, "jellyglance-theme-updated", nextTheme);
+  dispatchThemeEvent(eventTarget, "silo-barracks-theme-updated", getThemeTokens());
   return nextTheme;
 }
 
-export function resetTheme() {
-  localStorage.removeItem(THEME_STORAGE_KEY);
-  applyTheme(DEFAULT_THEME);
-  window.dispatchEvent(new CustomEvent("jellyglance-theme-updated", { detail: DEFAULT_THEME }));
-  return DEFAULT_THEME;
-}
-
-export function applyTheme(theme = getStoredTheme()) {
-  const root = document.documentElement;
-  const nextTheme = {
-    primary: normalizeHexColor(theme.primary, DEFAULT_THEME.primary),
-    secondary: normalizeHexColor(theme.secondary, DEFAULT_THEME.secondary),
-    background: normalizeHexColor(theme.background, DEFAULT_THEME.background),
-    surface: normalizeHexColor(theme.surface, DEFAULT_THEME.surface),
-  };
-  const { r, g, b } = hexToRgb(nextTheme.surface);
-  const primaryLightColor = mixHex(nextTheme.primary, "#ffffff");
-
-  root.style.colorScheme = "dark";
-  root.style.setProperty("--primary-color", nextTheme.primary);
-  root.style.setProperty("--primary-rgb", rgbString(nextTheme.primary));
-  root.style.setProperty("--primary-light-color", primaryLightColor);
-  root.style.setProperty("--primary-light-rgb", rgbString(primaryLightColor));
-  root.style.setProperty("--primary-dark-color", darkenHex(nextTheme.primary));
-  root.style.setProperty("--secondary-color", nextTheme.secondary);
-  root.style.setProperty("--secondary-rgb", rgbString(nextTheme.secondary));
-  root.style.setProperty("--background-color", nextTheme.background);
-  root.style.setProperty("--secondary-background-color", nextTheme.surface);
-  root.style.setProperty("--tertiary-background-color", darkenHex(nextTheme.surface, -0.18));
-  root.style.setProperty("--surface-color", `rgba(${r}, ${g}, ${b}, 0.86)`);
+export function resetTheme({ storage = getGlobalStorage(), root = getDocumentRoot(), eventTarget = getGlobalEventTarget() } = {}) {
+  const nextTheme = normalizeThemeInput(DEFAULT_THEME);
+  removeStoredValue(storage, THEME_STORAGE_KEY);
+  writeStoredValue(storage, THEME_STORAGE_KEY, JSON.stringify(nextTheme));
+  applyTheme(nextTheme, { root, storage });
+  dispatchThemeEvent(eventTarget, "jellyglance-theme-updated", nextTheme);
+  dispatchThemeEvent(eventTarget, "silo-barracks-theme-updated", getThemeTokens());
+  return nextTheme;
 }

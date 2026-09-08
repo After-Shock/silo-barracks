@@ -251,7 +251,7 @@ export default function BackupFiles() {
               <tr>
                 <td
                   colSpan="5"
-                  style={{ textAlign: "center", fontStyle: "italic", color: "grey", height: "200px" }}
+                  style={{ textAlign: "center", fontStyle: "italic", color: "var(--barracks-text-muted-raised)", height: "200px" }}
                   className="py-2"
                 >
                   <Trans i18nKey={"ERROR_MESSAGES.NO_BACKUPS"} />
@@ -267,7 +267,7 @@ export default function BackupFiles() {
                     type="file"
                     accept=".json"
                     className="upload-file"
-                    style={{ backgroundColor: "rgb(90 45 165)", borderColor: "rgb(90 45 165)" }}
+                    style={{ backgroundColor: "var(--barracks-action)", borderColor: "var(--barracks-action)" }}
                   />
                   <progress className="w-100" value={progress} max="100" />
                 </Form.Group>

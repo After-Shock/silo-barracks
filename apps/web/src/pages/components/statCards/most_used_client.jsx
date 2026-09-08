@@ -53,7 +53,7 @@ function MostUsedClient(props) {
 
 
   return (
-        <ItemStatComponent icon={  <ComputerLineIcon color="white" size={'100%'}/>} data={data} heading={<Trans i18nKey="STAT_CARDS.MOST_USED_CLIENTS" />} units={<Trans i18nKey="UNITS.PLAYS" />}/>
+        <ItemStatComponent icon={<ComputerLineIcon color="var(--barracks-text-raised)" size="100%" />} data={data} heading={<Trans i18nKey="STAT_CARDS.MOST_USED_CLIENTS" />} units={<Trans i18nKey="UNITS.PLAYS" />} />
   );
 }
 

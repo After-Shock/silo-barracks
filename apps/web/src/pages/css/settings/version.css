@@ -1,9 +1,9 @@
 @import '../variables.css';
 .version
 {
-    background-color: var(--background-color) !important;
+    background-color: var(--barracks-canvas) !important;
 
-    color: white !important;
+    color: var(--barracks-text-raised) !important;
     position: fixed !important;
     bottom: 0;
     max-width: 200px;
@@ -31,28 +31,7 @@
 
 .version-community-row a
 {
-    color: var(--primary-light-color);
+    color: var(--barracks-focus-light);
     font-size: 12px;
     font-weight: 800;
-}
-
-.nav-pills > .nav-item , .nav-pills > .nav-item > .nav-link
-{
-    color: white !important;
-}
-
-.nav-pills > .nav-item .active  
-{
-    background-color: var(--primary-color) !important;
-    color: white !important;
-}
-
-.nav-pills > .nav-item :hover
-{
-    background-color: var(--primary-color) !important;
-}
-
-.nav-pills > .nav-item  .active> .nav-link
-{
-   color: white;
 }

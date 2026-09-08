@@ -4,13 +4,12 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 390px), 1fr));
   gap: 16px;
   grid-auto-rows: auto;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018)),
-    rgba(12, 16, 23, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.075);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 16px;
   padding: 18px;
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 18px 60px var(--barracks-scrim);
 }
 
 .library-stat-card
@@ -18,15 +17,13 @@
     width: 100%;
     min-height: 184px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--barracks-border-raised);
     border-radius: 14px !important;
     display: flex;
-    color: white;
-    background:
-      linear-gradient(135deg, rgba(var(--primary-rgb), 0.78), rgba(var(--primary-light-rgb), 0.16)),
-      rgba(7, 9, 13, 0.92);
+    color: var(--barracks-text-raised);
+    background: var(--barracks-surface-raised);
     background-size: cover;
-    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
+    box-shadow: 0 12px 34px var(--barracks-scrim);
 }
 
 
@@ -43,11 +40,11 @@
   .library-header {
     display: flex;
     justify-content: space-between;
-    color: white;
+    color: var(--barracks-text-muted-raised);
     font-weight: 850;
   }
   .library-header-count {
-    color: lightgray;
+    color: var(--barracks-text-raised);
     font-weight: 300;
 
   }
@@ -65,7 +62,7 @@
     padding-top: 3px;
     font-size: 0.8em;
     padding-right: 2px;
-    color: #7d8798;
+    color: var(--barracks-text-muted-raised);
 
     text-align: right;
   }
@@ -76,7 +73,7 @@
   .library-item-count {
     width: 60%;
     text-align: right;
-    color: var(--primary-light-color);
+    color: var(--barracks-text-raised);
     font-weight: 850;
     font-size: 1.1em;
 
@@ -89,7 +86,8 @@
     align-items: center;
     min-height: 184px;
     width: 132px;
-    background-color: rgba(0, 0, 0, 0.36);
+    background-color: var(--barracks-surface-inset);
+    color: var(--barracks-text-inset);
   }
 
   .library-banner-image
@@ -114,5 +112,6 @@
     padding: 12px 16px;
     backdrop-filter: blur(8px);
     
-    background-color: rgba(0, 0, 0, 0.42);
+    background-color: var(--barracks-surface-raised);
+    color: var(--barracks-text-raised);
   }

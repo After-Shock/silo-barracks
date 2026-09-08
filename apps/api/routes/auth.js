@@ -42,6 +42,10 @@ const DEFAULT_ROLE_PERMISSIONS = {
 };
 
 function getRolePermissions(settings, role) {
+  if (role === "Owner" || role === "Disabled") {
+    return DEFAULT_ROLE_PERMISSIONS[role];
+  }
+
   return {
     ...(DEFAULT_ROLE_PERMISSIONS[role] || DEFAULT_ROLE_PERMISSIONS.Viewer),
     ...((settings.rolePermissions || {})[role] || {}),
@@ -112,7 +116,8 @@ function normalizeJellyfinUrl(url) {
 
 function queueSetupJellyfinTasks() {
   const taskManager = new TaskManager().getInstance();
-  const taskQueue = ["JellyfinSync", "PartialJellyfinSync", "JellyfinPlaybackReportingPluginSync", "RefreshDashboardStats"];
+  const taskQueue = ["JellyfinSync", "PartialJellyfinSync", "JellyfinPlaybackReportingPluginSync", "RefreshDashboardStats"]
+    .filter(task => require('../classes/provider').isSupportedTask(task));
   let index = 0;
 
   const startNextTask = () => {
@@ -151,6 +156,7 @@ function queueSetupJellyfinTasks() {
 }
 
 async function getQuickConnectConfig() {
+  if (API.isSilo) return { errorMessage: 'Use local login or OIDC for Silo Barracks.' };
   const config = await new configClass().getConfig();
 
   if (config.error || config.state < 1 || !config.JF_HOST) {
@@ -745,6 +751,7 @@ router.get("/isConfigured", async (req, res) => {
       version: packageJson.version,
       auth: config.settings?.auth || null,
       requireLogin: config.REQUIRE_LOGIN,
+      provider: require('../classes/provider').getProvider(),
     });
   } catch (error) {
     console.log(error);
@@ -753,6 +760,7 @@ router.get("/isConfigured", async (req, res) => {
 });
 
 router.get("/background-posters", async (req, res) => {
+  if (API.isSilo) return res.json({ configured: true, posters: [] });
   try {
     const config = await new configClass().getConfig();
     const requestedLimit = Number(req.query.limit) || 24;
@@ -880,6 +888,9 @@ router.post("/createuser", async (req, res) => {
 router.post("/setup-auth", async (req, res) => {
   try {
     const { mode, username, password, issuerUrl, clientId, clientSecret, redirectUri } = req.body;
+    if (API.isSilo && mode === 'quick-connect') {
+      return res.status(400).json({ errorMessage: 'Use local login or OIDC for Silo Barracks.' });
+    }
     const config = await new configClass().getConfig();
     console.log(`[SETUP-AUTH] setup-auth requested mode=${mode} state=${config.state}`);
 
@@ -973,7 +984,7 @@ router.post("/setup-auth", async (req, res) => {
   }
 });
 
-router.post("/test-jellyfin", async (req, res) => {
+router.post(["/test-jellyfin", "/test-silo"], async (req, res) => {
   try {
     const { JF_HOST, JF_API_KEY } = req.body;
 
@@ -1032,7 +1043,7 @@ router.post("/configSetup", async (req, res) => {
         if (settingsjson.length > 0) {
           const settings = settingsjson[0].settings || {};
 
-          settings.Tasks = systemInfo?.Id || null;
+          settings.ServerID = systemInfo?.Id || null;
 
           let query = 'UPDATE app_config SET settings=$1 where "ID"=1';
 

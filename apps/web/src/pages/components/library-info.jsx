@@ -64,7 +64,7 @@ function LibraryInfo() {
   }, [LibraryId, token]);
 
   if (!data) {
-    return <Loading />;
+    return <div data-theme-screen="library-detail" aria-busy="true"><Loading /></div>;
   }
 
   const tabs = [
@@ -77,7 +77,7 @@ function LibraryInfo() {
   const libraryType = data.CollectionType === "tvshows" ? "Series library" : "Movie library";
 
   return (
-    <div className="library-detail-page">
+    <div className="library-detail-page" data-theme-screen="library-detail">
       <section className="library-detail-hero">
         <div className="library-detail-icon">
           <LibraryIcon size={48} />

@@ -1,0 +1,551 @@
+/* Shared semantic theme bridge for vendor frameworks and application controls. */
+html,
+body {
+  background-color: var(--barracks-canvas);
+  color: var(--barracks-text);
+}
+
+a {
+  color: var(--barracks-action-foreground);
+}
+
+a:hover {
+  color: var(--barracks-action-foreground);
+}
+
+button,
+input,
+select,
+textarea {
+  border-color: var(--barracks-border-strong);
+  background-color: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+}
+
+::placeholder {
+  color: var(--barracks-text-interactive) !important;
+  opacity: 1;
+}
+
+html body :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--barracks-focus) !important;
+  box-shadow: 0 0 0 3px var(--barracks-focus-light), 0 0 0 4px var(--barracks-focus-dark) !important;
+}
+
+.form-control,
+.form-select {
+  --bs-body-color: var(--barracks-text-interactive);
+  --bs-body-bg: var(--barracks-surface-interactive);
+  --bs-border-color: var(--barracks-border-strong);
+  --bs-secondary-color: var(--barracks-text-interactive);
+  --bs-secondary-bg: var(--barracks-surface-inset);
+  border-color: var(--barracks-border-strong) !important;
+  background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
+}
+
+.form-control::placeholder,
+.form-select::placeholder {
+  color: var(--barracks-text-interactive) !important;
+  opacity: 1;
+}
+
+.form-control:hover:not(:disabled),
+.form-select:hover:not(:disabled),
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--barracks-border-strong) !important;
+  background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  border-color: var(--barracks-border-inset) !important;
+  background-color: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset) !important;
+}
+
+.btn {
+  --bs-btn-color: var(--barracks-text-interactive);
+  --bs-btn-bg: var(--barracks-surface-interactive);
+  --bs-btn-border-color: var(--barracks-border-strong);
+  --bs-btn-hover-color: var(--barracks-text-inset);
+  --bs-btn-hover-bg: var(--barracks-surface-inset);
+  --bs-btn-hover-border-color: var(--barracks-border-inset);
+  --bs-btn-active-color: var(--barracks-text-inset);
+  --bs-btn-active-bg: var(--barracks-surface-inset);
+  --bs-btn-active-border-color: var(--barracks-border-inset);
+  --bs-btn-disabled-color: var(--barracks-text-inset);
+  --bs-btn-disabled-bg: var(--barracks-surface-inset);
+  --bs-btn-disabled-border-color: var(--barracks-border-inset);
+  border-color: var(--bs-btn-border-color);
+  background-color: var(--bs-btn-bg);
+  color: var(--bs-btn-color);
+}
+
+.btn:not(:disabled):not(.disabled):hover {
+  border-color: var(--bs-btn-hover-border-color);
+  background-color: var(--bs-btn-hover-bg);
+  color: var(--bs-btn-hover-color);
+}
+
+.btn:not(:disabled):not(.disabled):is(:active, .active, .show) {
+  border-color: var(--bs-btn-active-border-color);
+  background-color: var(--bs-btn-active-bg);
+  color: var(--bs-btn-active-color);
+}
+
+.btn-primary {
+  --bs-btn-color: var(--barracks-action-text);
+  --bs-btn-bg: var(--barracks-action);
+  --bs-btn-border-color: var(--barracks-action);
+  --bs-btn-hover-color: var(--barracks-action-text);
+  --bs-btn-hover-bg: var(--barracks-action);
+  --bs-btn-hover-border-color: var(--barracks-action);
+  --bs-btn-active-color: var(--barracks-action-text);
+  --bs-btn-active-bg: var(--barracks-action);
+  --bs-btn-active-border-color: var(--barracks-action);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--barracks-text-interactive);
+  --bs-btn-bg: var(--barracks-surface-interactive);
+  --bs-btn-border-color: var(--barracks-border-strong);
+  --bs-btn-hover-color: var(--barracks-text-inset);
+  --bs-btn-hover-bg: var(--barracks-surface-inset);
+  --bs-btn-hover-border-color: var(--barracks-border-inset);
+  --bs-btn-active-color: var(--barracks-action-text);
+  --bs-btn-active-bg: var(--barracks-action);
+  --bs-btn-active-border-color: var(--barracks-action);
+}
+
+.btn-danger,
+.btn-outline-danger {
+  --bs-btn-color: var(--barracks-text-interactive);
+  --bs-btn-bg: var(--barracks-surface-interactive);
+  --bs-btn-border-color: var(--barracks-state-danger-interactive);
+  --bs-btn-hover-color: var(--barracks-text-interactive);
+  --bs-btn-hover-bg: var(--barracks-surface-interactive);
+  --bs-btn-hover-border-color: var(--barracks-state-danger-interactive);
+  --bs-btn-active-color: var(--barracks-text-interactive);
+  --bs-btn-active-bg: var(--barracks-surface-interactive);
+  --bs-btn-active-border-color: var(--barracks-state-danger-interactive);
+  --bs-btn-disabled-color: var(--barracks-text-inset);
+  --bs-btn-disabled-bg: var(--barracks-surface-inset);
+  --bs-btn-disabled-border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-state-danger-interactive);
+  background-color: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+  text-decoration: underline 2px var(--barracks-state-danger-interactive);
+  text-underline-offset: 0.18em;
+}
+
+:is(.btn-danger, .btn-outline-danger) :is(svg, .btn-icon) {
+  color: var(--barracks-state-danger-interactive) !important;
+}
+
+.btn:disabled,
+.btn.disabled,
+fieldset:disabled .btn {
+  --bs-btn-disabled-color: var(--barracks-text-inset);
+  --bs-btn-disabled-bg: var(--barracks-surface-inset);
+  --bs-btn-disabled-border-color: var(--barracks-border-inset);
+  border-color: var(--barracks-border-inset) !important;
+  background-color: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset) !important;
+}
+
+:is(.btn-danger, .btn-outline-danger):is(:disabled, .disabled),
+fieldset:disabled :is(.btn-danger, .btn-outline-danger) {
+  --bs-btn-disabled-color: var(--barracks-text-inset);
+  --bs-btn-disabled-bg: var(--barracks-surface-inset);
+  --bs-btn-disabled-border-color: var(--barracks-border-subtle);
+  border-color: var(--barracks-border-subtle) !important;
+  background-color: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset) !important;
+  text-decoration: none;
+}
+
+:is(.btn-danger, .btn-outline-danger):is(:disabled, .disabled) :is(svg, .btn-icon),
+fieldset:disabled :is(.btn-danger, .btn-outline-danger) :is(svg, .btn-icon) {
+  color: var(--barracks-text-inset) !important;
+}
+
+.card,
+.modal-content,
+.dropdown-menu {
+  border-color: var(--barracks-border-raised);
+  background-color: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+}
+
+.alert-success,
+.alert-danger {
+  --bs-alert-color: var(--barracks-text-raised);
+  --bs-alert-bg: var(--barracks-surface-raised);
+  background-color: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+}
+
+.alert-success {
+  --bs-alert-border-color: var(--barracks-state-success);
+  border-color: var(--barracks-state-success);
+}
+
+.alert-danger {
+  --bs-alert-border-color: var(--barracks-state-danger);
+  border-color: var(--barracks-state-danger);
+}
+
+.alert-success :is(svg, .alert-icon) {
+  color: var(--barracks-state-success) !important;
+}
+
+.alert-danger :is(svg, .alert-icon) {
+  color: var(--barracks-state-danger) !important;
+}
+
+:is(.alert-success, .alert-danger) :is(a, .alert-link),
+:is(.alert-success, .alert-danger) :is(a, .alert-link):hover {
+  color: var(--barracks-text-raised) !important;
+}
+
+:is(.alert-success, .alert-danger) :is(.text-muted, small) {
+  color: var(--barracks-text-muted-raised) !important;
+}
+
+.card :is(.text-muted, small),
+.modal-content :is(.text-muted, small),
+.dropdown-menu :is(.text-muted, small),
+.dropdown-item-text {
+  color: var(--barracks-text-muted-raised) !important;
+}
+
+:is(.card, .modal-content, .dropdown-menu) :is(a:not(.MuiButton-contained), .text-primary-custom, .text-secondary-custom),
+:is(.card, .modal-content, .dropdown-menu) :is(a:not(.MuiButton-contained), .text-primary-custom, .text-secondary-custom):hover {
+  color: var(--barracks-text-muted-raised) !important;
+}
+
+.modal-header,
+.modal-footer,
+.dropdown-divider {
+  border-color: var(--barracks-border-subtle);
+}
+
+.btn-close {
+  position: relative;
+  background-color: transparent;
+  background-image: none;
+  color: var(--barracks-text-raised);
+  opacity: 1;
+}
+
+.btn-close::before,
+.btn-close::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1rem;
+  height: 2px;
+  border-radius: 999px;
+  background-color: currentColor;
+  content: "";
+}
+
+.btn-close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.btn-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.dropdown-item {
+  color: var(--barracks-text-raised);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus,
+.dropdown-item.active,
+.dropdown-item:active {
+  background-color: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+}
+
+.table {
+  --bs-table-bg: var(--barracks-surface-raised);
+  --bs-table-color: var(--barracks-text-raised);
+  --bs-table-border-color: var(--barracks-border-raised);
+  --bs-table-striped-bg: var(--barracks-surface-inset);
+  --bs-table-striped-color: var(--barracks-text-inset);
+  --bs-table-hover-bg: var(--barracks-surface-interactive);
+  --bs-table-hover-color: var(--barracks-text-interactive);
+  border-color: var(--barracks-border-raised);
+  color: var(--barracks-text-raised);
+}
+
+.nav-tabs {
+  border-color: var(--barracks-border-canvas);
+}
+
+.nav-tabs .nav-link {
+  border-color: transparent;
+  color: var(--barracks-text);
+}
+
+.nav-tabs .nav-link:hover,
+.nav-tabs .nav-link:focus {
+  border-color: var(--barracks-border-canvas);
+  color: var(--barracks-text);
+}
+
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+  border-color: var(--barracks-border-raised) var(--barracks-border-raised) var(--barracks-surface-raised);
+  background-color: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+}
+
+.pagination {
+  --bs-pagination-bg: var(--barracks-surface-raised);
+  --bs-pagination-border-color: var(--barracks-border-raised);
+  --bs-pagination-color: var(--barracks-text-muted-raised);
+  --bs-pagination-hover-bg: var(--barracks-surface-interactive);
+  --bs-pagination-hover-border-color: var(--barracks-border-strong);
+  --bs-pagination-hover-color: var(--barracks-text-interactive);
+  --bs-pagination-focus-bg: var(--barracks-surface-interactive);
+  --bs-pagination-focus-color: var(--barracks-text-interactive);
+  --bs-pagination-active-bg: var(--barracks-action);
+  --bs-pagination-active-border-color: var(--barracks-action);
+  --bs-pagination-active-color: var(--barracks-action-text);
+  --bs-pagination-disabled-bg: var(--barracks-surface-inset);
+  --bs-pagination-disabled-border-color: var(--barracks-border-inset);
+  --bs-pagination-disabled-color: var(--barracks-text-inset);
+}
+
+.tooltip {
+  --bs-tooltip-bg: var(--barracks-overlay);
+  --bs-tooltip-color: var(--barracks-text-overlay);
+}
+
+.MuiPaper-root,
+.MuiDialog-paper,
+.MuiMenu-paper {
+  border-color: var(--barracks-border-raised) !important;
+  background-color: var(--barracks-surface-raised) !important;
+  background-image: none !important;
+  color: var(--barracks-text-raised) !important;
+}
+
+.MuiPopover-paper:not(.MuiMenu-paper) {
+  border-color: var(--barracks-border-overlay) !important;
+  background-color: var(--barracks-overlay) !important;
+  background-image: none !important;
+  color: var(--barracks-text-overlay) !important;
+}
+
+.MuiPaper-root :is(.MuiTypography-colorTextSecondary, .MuiFormHelperText-root),
+.MuiDialog-paper :is(.MuiDialogContentText-root, .MuiTypography-colorTextSecondary),
+.MuiMenu-paper .MuiListSubheader-root {
+  color: var(--barracks-text-muted-raised) !important;
+}
+
+:is(
+  .MuiPaper-root,
+  .MuiDialog-paper,
+  .MuiMenu-paper,
+  .MuiTableContainer-root,
+  .MuiTable-root,
+  .MuiTableCell-root,
+  .MuiDataGrid-root,
+  .MuiPickersLayout-root,
+  .MuiDateCalendar-root,
+  .MuiTimeClock-root,
+  .MuiDayCalendar-header,
+  .MuiPickersCalendarHeader-root
+) a:not(.MuiButton-contained),
+:is(
+  .MuiPaper-root,
+  .MuiDialog-paper,
+  .MuiMenu-paper,
+  .MuiTableContainer-root,
+  .MuiTable-root,
+  .MuiTableCell-root,
+  .MuiDataGrid-root,
+  .MuiPickersLayout-root,
+  .MuiDateCalendar-root,
+  .MuiTimeClock-root,
+  .MuiDayCalendar-header,
+  .MuiPickersCalendarHeader-root
+) :is(.MuiButton-root:not(.MuiButton-contained), .MuiIconButton-root) {
+  color: var(--barracks-text-raised) !important;
+}
+
+.MuiPopover-paper:not(.MuiMenu-paper) a:not(.MuiButton-contained),
+.MuiPopover-paper:not(.MuiMenu-paper) :is(.MuiButton-root:not(.MuiButton-contained), .MuiIconButton-root) {
+  color: var(--barracks-text-overlay) !important;
+}
+
+.MuiPopover-paper:not(.MuiMenu-paper) :is(.MuiTypography-root, .MuiFormHelperText-root, .MuiListItemText-primary, .MuiListSubheader-root) {
+  color: var(--barracks-text-overlay) !important;
+}
+
+.MuiMenuItem-root,
+.MuiListItemText-primary {
+  color: var(--barracks-text-raised) !important;
+}
+
+.MuiSvgIcon-root {
+  color: inherit !important;
+}
+
+.MuiMenuItem-root:hover,
+.MuiMenuItem-root.Mui-selected,
+.MuiMenuItem-root.Mui-selected:hover {
+  background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
+}
+
+.MuiMenuItem-root:is(:hover, .Mui-selected) .MuiListItemText-primary {
+  color: var(--barracks-text-interactive) !important;
+}
+
+.MuiInputBase-root,
+.MuiInput-root,
+.MuiFilledInput-root,
+.MuiOutlinedInput-root {
+  background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
+}
+
+.MuiInputBase-input::placeholder,
+.MuiInputLabel-root,
+.MuiFormLabel-root {
+  color: var(--barracks-text-interactive) !important;
+}
+
+.MuiOutlinedInput-notchedOutline,
+.MuiInput-root::before,
+.MuiFilledInput-root::before {
+  border-color: var(--barracks-border-strong) !important;
+}
+
+.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline,
+.MuiInput-root:hover::before,
+.MuiFilledInput-root:hover::before {
+  border-color: var(--barracks-border-strong) !important;
+}
+
+.MuiButton-root,
+.MuiIconButton-root {
+  color: var(--barracks-action-foreground) !important;
+}
+
+.MuiButton-contained {
+  background-color: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
+}
+
+.MuiButton-contained.Mui-disabled {
+  border-color: var(--barracks-border-inset) !important;
+  background-color: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset) !important;
+}
+
+.MuiButton-outlined {
+  border-color: var(--barracks-border-strong) !important;
+}
+
+.MuiTable-root,
+.MuiTableContainer-root,
+.MuiTableHead-root,
+.MuiTableBody-root,
+.MuiTableRow-root,
+.MuiTableCell-root {
+  border-color: var(--barracks-border-raised) !important;
+  background-color: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text-raised) !important;
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+  color: var(--barracks-text-muted-raised) !important;
+}
+
+.MuiTableRow-root:is(:hover, .Mui-selected) .MuiTableCell-root {
+  background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
+}
+
+.MuiTableRow-root:is(:hover, .Mui-selected) .MuiTableCell-root :is(a:not(.MuiButton-contained), .MuiButton-root:not(.MuiButton-contained):not(.Mui-disabled), .MuiIconButton-root:not(.Mui-disabled)),
+.MuiTableRow-root:is(:hover, .Mui-selected) .MuiTableCell-root > .MuiSvgIcon-root {
+  color: var(--barracks-text-interactive) !important;
+}
+
+.MuiDataGrid-root {
+  --DataGrid-containerBackground: var(--barracks-surface-raised);
+  --DataGrid-t-color-border-base: var(--barracks-border-raised);
+  border-color: var(--barracks-border-raised) !important;
+  background-color: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text-raised) !important;
+}
+
+.MuiDataGrid-columnHeaders,
+.MuiDataGrid-columnHeader,
+.MuiDataGrid-cell,
+.MuiDataGrid-footerContainer,
+.MuiDataGrid-withBorderColor {
+  border-color: var(--barracks-border-raised) !important;
+}
+
+.MuiDataGrid-columnHeaderTitle,
+.MuiDataGrid-cell,
+.MuiDataGrid-footerContainer {
+  color: var(--barracks-text-raised) !important;
+}
+
+.MuiDataGrid-row:hover,
+.MuiDataGrid-row.Mui-selected,
+.MuiDataGrid-row.Mui-selected:hover {
+  background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
+}
+
+.MuiDataGrid-row:is(:hover, .Mui-selected) .MuiDataGrid-cell {
+  background-color: var(--barracks-surface-interactive) !important;
+  color: var(--barracks-text-interactive) !important;
+}
+
+.MuiDataGrid-row:is(:hover, .Mui-selected) .MuiDataGrid-cell :is(a:not(.MuiButton-contained), .MuiButton-root:not(.MuiButton-contained):not(.Mui-disabled), .MuiIconButton-root:not(.Mui-disabled)),
+.MuiDataGrid-row:is(:hover, .Mui-selected) .MuiDataGrid-cell > .MuiSvgIcon-root {
+  color: var(--barracks-text-interactive) !important;
+}
+
+.MuiPickersPopper-root .MuiPaper-root,
+.MuiPickersLayout-root,
+.MuiDateCalendar-root,
+.MuiTimeClock-root,
+.MuiDayCalendar-header,
+.MuiPickersCalendarHeader-root {
+  background-color: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text-raised) !important;
+}
+
+.MuiPickersDay-root,
+.MuiPickersCalendarHeader-label,
+.MuiDayCalendar-weekDayLabel,
+.MuiClockNumber-root {
+  color: var(--barracks-text-raised) !important;
+}
+
+.MuiPickersDay-root:not(.Mui-disabled):hover,
+.MuiPickersDay-root.Mui-selected:not(.Mui-disabled),
+.MuiPickersDay-root.Mui-selected:not(.Mui-disabled):hover {
+  background-color: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
+}
+
+.MuiPickersDay-root.Mui-disabled {
+  background-color: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset) !important;
+}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Trans } from "react-i18next";
+import i18next from "i18next";
 import ActivityTimelineComponent from "./components/activity-timeline/activity-timeline";
 
 import { Button, FormSelect, Modal } from "react-bootstrap";
@@ -19,6 +20,10 @@ function ActivityTimeline(props) {
   );
   const [libraries, setLibraries] = useState();
   const [config, setConfig] = useState(null);
+  const [configError, setConfigError] = useState("");
+  const [userError, setUserError] = useState("");
+  const [libraryError, setLibraryError] = useState("");
+  const [timelineDataState, setTimelineDataState] = useState("loading");
   const [showLibraryFilters, setShowLibraryFilters] = useState(false);
   const [selectedLibraries, setSelectedLibraries] = useState(
     localStorage.getItem("PREF_ACTIVITY_TIMELINE_selectedLibraries") !=
@@ -29,10 +34,8 @@ function ActivityTimeline(props) {
       : []
   );
 
-  const timelineReady =
-    (users?.length > 0 || !!preselectedUser) && libraries?.length > 0;
-
   const handleLibraryFilter = (selectedOptions) => {
+    setTimelineDataState("loading");
     setSelectedLibraries(selectedOptions);
     localStorage.setItem(
       "PREF_ACTIVITY_TIMELINE_selectedLibraries",
@@ -40,6 +43,7 @@ function ActivityTimeline(props) {
     );
   };
   const handleUserSelection = (selectedUser) => {
+    setTimelineDataState("loading");
     setSelectedUser(selectedUser);
     localStorage.setItem("PREF_ACTIVITY_TIMELINE_selectedUser", selectedUser);
   };
@@ -65,7 +69,9 @@ function ActivityTimeline(props) {
       try {
         const newConfig = await Config.getConfig();
         setConfig(newConfig);
+        setConfigError("");
       } catch (error) {
+        setConfigError(i18next.t("ACTIVITY_STATES.TIMELINE_CONFIG_ERROR"));
         if (error.code === "ERR_NETWORK") {
           console.log(error);
         }
@@ -89,12 +95,14 @@ function ActivityTimeline(props) {
         })
         .then((users) => {
           setUsers(users.data);
+          setUserError("");
           if (!selectedUser && users.data[0]) {
             setSelectedUser(users.data[0].UserId);
           }
         })
         .catch((error) => {
           console.log(error);
+          setUserError(i18next.t("ACTIVITY_STATES.TIMELINE_USERS_ERROR"));
         });
     }
   }, [config, preselectedUser]);
@@ -111,6 +119,7 @@ function ActivityTimeline(props) {
         })
         .then((libraries) => {
           setLibraries(libraries.data);
+          setLibraryError("");
           if (
             selectedLibraries?.length === 0 &&
             !localStorage.getItem("PREF_ACTIVITY_TIMELINE_selectedLibraries") &&
@@ -121,12 +130,49 @@ function ActivityTimeline(props) {
         })
         .catch((error) => {
           console.log(error);
+          setLibraryError(i18next.t("ACTIVITY_STATES.TIMELINE_LIBRARIES_ERROR"));
         });
     }
   }, [config]);
 
-  return timelineReady ? (
-    <div className="watch-stats">
+  const filterError = configError || userError || libraryError;
+  const filtersResolved = Boolean(filterError) || Boolean(config && libraries !== undefined && (preselectedUser || users !== undefined));
+  const hasFilters = Boolean((preselectedUser || users?.length > 0) && libraries?.length > 0);
+  const hasSelection = Boolean(selectedUser && selectedLibraries?.length > 0);
+  const routeResolved = !hasSelection || timelineDataState !== "loading";
+
+  if (!filtersResolved) {
+    return <div aria-busy="true"><Loading /></div>;
+  }
+
+  if (filterError) {
+    return (
+      <div className="activity-timeline-screen" data-theme-screen={preselectedUser ? undefined : "timeline"}>
+        <section className="timeline-state is-error" role="alert">
+          <h1><Trans i18nKey={"TIMELINE_PAGE.TIMELINE"} /></h1>
+          <p>{filterError}</p>
+        </section>
+      </div>
+    );
+  }
+
+  if (!hasFilters) {
+    return (
+      <div className="activity-timeline-screen" data-theme-screen={preselectedUser ? undefined : "timeline"}>
+        <section className="timeline-state is-empty">
+          <h1><Trans i18nKey={"TIMELINE_PAGE.TIMELINE"} /></h1>
+          <p><Trans i18nKey="ACTIVITY_STATES.TIMELINE_FILTERS_EMPTY" /></p>
+        </section>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="activity-timeline-screen"
+      data-theme-screen={!preselectedUser && routeResolved ? "timeline" : undefined}
+      aria-busy={!routeResolved}
+    >
       <div className="Heading">
         <h1>
           <Trans i18nKey={"TIMELINE_PAGE.TIMELINE"} />
@@ -199,12 +245,12 @@ function ActivityTimeline(props) {
           <ActivityTimelineComponent
             userId={selectedUser}
             libraries={selectedLibraries}
+            onStateChange={setTimelineDataState}
           />
         )}
+        {!hasSelection ? <section className="timeline-state is-empty"><p><Trans i18nKey="ACTIVITY_STATES.TIMELINE_SELECTION_EMPTY" /></p></section> : null}
       </div>
     </div>
-  ) : (
-    <Loading />
   );
 }
 

@@ -1,0 +1,99 @@
+/* Silo's warm console palette and printed, three-colour identity. */
+html body, html body * {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+html body :is(code, pre, .session-details-title, .setup-brand-kicker) {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+
+html body :is(.home-glass-card, .setup-card, .form-box, .activity-sessions-panel, .session-card) {
+  border-radius: 4px;
+}
+
+html body :is(.home-dashboard-backdrop, .home-glass-card)::before,
+html body .home-dashboard-backdrop::after {
+  background: none;
+}
+
+html body .home-dashboard-backdrop {
+  background: none;
+}
+
+html body .navitem:not(:disabled):not(.disabled).active {
+  background: var(--barracks-action) !important;
+  border-left: 3px solid var(--barracks-action);
+  border-radius: 0 3px 3px 0;
+  box-shadow: none;
+  color: var(--barracks-action-text) !important;
+}
+
+html body :is(.navbar-brand-icon, .setup-logo-mark, .setup-jellyfin-logo, .login-logo) {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  filter: none;
+}
+
+html body .session-details-title {
+  color: var(--barracks-text-muted-raised) !important;
+  text-shadow: none;
+}
+
+html body .setup-brand-kicker {
+  color: var(--barracks-action-foreground) !important;
+  text-shadow: none;
+}
+
+html body :is(.setup-button, .profile-logout-button) {
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
+  border-color: var(--barracks-action);
+  box-shadow: none;
+}
+
+html body .setup-button:not(:disabled):not(.disabled):hover {
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
+}
+
+html body :is(.setup-button, .profile-logout-button):is(:disabled, .disabled) {
+  border-color: var(--barracks-border-inset) !important;
+  background: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset) !important;
+}
+
+html body :is(.setup-shell, .setup-stage, .setup-background, .auth-artwork-background) {
+  background: var(--barracks-canvas);
+}
+
+html body .auth-artwork-grid {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+html body .silo-wordmark {
+  color: var(--barracks-text);
+  letter-spacing: -0.04em;
+  font-weight: 800;
+}
+
+html body :is(.home-icon-bubble, .home-accent-purple .home-icon-bubble) {
+  color: var(--barracks-action);
+  background: var(--barracks-surface-interactive);
+  border-color: var(--barracks-border-strong);
+  border-radius: 4px;
+  box-shadow: none;
+}
+
+html body :is(.home-hour span, .session-popout-progress div) {
+  background: var(--barracks-action);
+  box-shadow: none;
+}
+
+html body :is(.home-hall-grid, .home-podium-card, .home-runner-row, .home-runner-empty, .session-popout-modal .modal-content) {
+  background: var(--barracks-surface-raised);
+  border-color: var(--barracks-border-raised);
+  color: var(--barracks-text-raised);
+}

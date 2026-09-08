@@ -150,11 +150,11 @@ function ItemInfo() {
   }, [config, Id]);
 
   if (!data || refresh) {
-    return <Loading />;
+    return <div data-theme-screen="item-detail" aria-busy="true"><Loading /></div>;
   }
 
   if (data && data.notfound) {
-    return <ItemNotFound message="Item not found" itemId={Id} fetchdataMethod={fetchData} />;
+    return <div data-theme-screen="item-detail"><ItemNotFound message="Item not found" itemId={Id} fetchdataMethod={fetchData} /></div>;
   }
 
   const itemId = data.EpisodeId || data.Id;
@@ -185,7 +185,7 @@ function ItemInfo() {
   const language = data.OriginalLanguage || data.PreferredMetadataLanguage || "Unknown";
 
   return (
-    <div className="item-detail-page">
+    <div className="item-detail-page" data-theme-screen="item-detail">
       <section className="item-hero" style={{ "--item-backdrop": `url(/proxy/Items/Images/Backdrop?id=${heroImageId}&fillWidth=1600&quality=92)` }}>
         <div className="item-breadcrumbs">
           {data.ParentId && (
