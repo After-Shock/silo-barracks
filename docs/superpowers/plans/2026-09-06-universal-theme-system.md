@@ -623,7 +623,7 @@ git commit -m "test(theme): verify every Barracks route"
 - Create: `scripts/run-universal-theme-verification.sh`
 - Modify: `docs/superpowers/plans/2026-09-06-universal-theme-system.md` to check completed steps and record evidence
 
-- [ ] **Step 1: Create one fail-safe verification runner**
+- [x] **Step 1: Create one fail-safe verification runner**
 
 Create `scripts/run-universal-theme-verification.sh` so the database lifecycle and every command share one shell. Use this exact structure, retaining `set -euo pipefail` and the cleanup trap:
 
@@ -639,7 +639,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-docker run --rm -d --name "$theme_db_name" -e POSTGRES_USER=barracks_test -e POSTGRES_PASSWORD=barracks_test_only -e POSTGRES_DB=barracks_test -p 127.0.0.1::5432 postgres:16-alpine
+docker run --rm -d --name "$theme_db_name" --tmpfs /var/lib/postgresql/data -e POSTGRES_USER=barracks_test -e POSTGRES_PASSWORD=barracks_test_only -e POSTGRES_DB=barracks_test -p 127.0.0.1::5432 postgres:16-alpine
 for attempt in $(seq 1 30); do
   if docker exec "$theme_db_name" pg_isready -U barracks_test -d barracks_test; then break; fi
   test "$attempt" -lt 30
@@ -665,17 +665,17 @@ docker compose ps
 
 The exact image/no-mount assertion runs before any tests. The EXIT trap owns only the unique PID-suffixed disposable container, fires on success or any earlier failure, and keeps the database alive for the entire verification sequence. Make the script executable.
 
-- [ ] **Step 2: Run the complete automated gate**
+- [x] **Step 2: Run the complete automated gate**
 
 Run: `bash scripts/run-universal-theme-verification.sh`
 
 Expected: all tests pass with zero skipped database tests; audit, lint, build, three browser suites, and diff check exit 0; Barracks and its production PostgreSQL service remain healthy; the disposable database stops and auto-removes when the script exits.
 
-- [ ] **Step 3: Inspect representative screenshots manually**
+- [x] **Step 3: Inspect representative screenshots manually**
 
 Inspect screenshots in `/tmp/silo-barracks-theme-qa`: default screenshots for every route and the Ocean/Mono/custom samples. Check visual hierarchy, no old purple/teal decorative surfaces, readable charts/tables/forms/modals, and consistent section accents. Record any discrepancy as a failing browser/static test before fixing it.
 
-- [ ] **Step 4: Confirm the disposable database is gone and live services remain healthy**
+- [x] **Step 4: Confirm the disposable database is gone and live services remain healthy**
 
 Run: `docker compose ps`
 
@@ -685,7 +685,7 @@ Run: `test -z "$(docker ps -aq --filter 'name=^silo-barracks-theme-test-db-')"`
 
 Expected: no PID-suffixed disposable theme database remains and the application remains healthy. If validation fails, inspect the exact matching container rather than stopping any unrelated service.
 
-- [ ] **Step 5: Record verification evidence and commit**
+- [x] **Step 5: Record verification evidence and commit**
 
 Check completed plan boxes and append exact test counts, audit/build/lint results, browser route counts, screenshots inspected, and service health.
 
@@ -693,6 +693,13 @@ Check completed plan boxes and append exact test counts, audit/build/lint result
 git add scripts/run-universal-theme-verification.sh docs/superpowers/plans/2026-09-06-universal-theme-system.md
 git commit -m "docs: record universal theme verification"
 ```
+
+**Recorded evidence (2026-09-08):**
+
+- `bash scripts/run-universal-theme-verification.sh` passed: `npm test` reported 127 passing, 0 failing, 0 skipped; `npm run theme:check`, web lint, Vite build, and `git diff --check` all exited 0.
+- Browser suites passed: live activity smoke completed 4/4 polls with no failures or page errors; fleet checks passed; universal matrix reported `routeStateChecks=92`, `themedTopLevelChecks=44`, `stateTests=10`, with `continuedMutations=[]`, `blockedMutations=[]`, `forbiddenActions=[]`, and `unhandledReads=[]`.
+- Screenshots were captured for every default route at desktop/mobile, all Ocean and Mono top-level routes, and default/custom/malformed home, dialog, activity/table, settings, and chart samples. Representative files manually inspected included `default-home-desktop.png`, `default-home-mobile.png`, `default-settings-general-desktop.png`, `ocean-home-desktop.png`, `ocean-statistics-desktop.png`, `mono-statistics-desktop.png`, `custom-sample-dialog.png`, and `custom-sample-chart.png`; hierarchy, warm Barracks surfaces, readable controls/charts, mobile stacking, and absence of JellyGlance purple/teal presentation were confirmed.
+- `docker compose ps` showed `silo-barracks` and `silo-barracks-db` healthy. `test -z "$(docker ps -aq --filter 'name=^silo-barracks-theme-test-db-')"` passed after the EXIT cleanup trap. The disposable database uses tmpfs so the Postgres image's declared anonymous volume cannot violate the no-named-mount assertion.
 
 ---
 
