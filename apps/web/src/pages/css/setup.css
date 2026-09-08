@@ -426,7 +426,7 @@
 
 .setup-step strong {
   display: block;
-  color: var(--barracks-text-raised);
+  color: var(--barracks-text-interactive);
   font-size: 12px;
   line-height: 1.25;
 }
@@ -434,7 +434,7 @@
 .setup-step small {
   display: block;
   margin-top: 3px;
-  color: var(--barracks-focus-light);
+  color: var(--barracks-text-interactive);
   font-size: 11px;
   line-height: 1.35;
 }
@@ -727,7 +727,7 @@
 
 .quick-connect-code-panel small {
   max-width: 300px;
-  color: var(--barracks-focus-light);
+  color: var(--barracks-text-interactive);
   font-size: 12px;
   line-height: 1.45;
 }
@@ -759,7 +759,7 @@
 }
 
 .quick-connect-status {
-  color: var(--barracks-focus-light) !important;
+  color: var(--barracks-text-interactive) !important;
   font-weight: 800;
 }
 
@@ -797,14 +797,14 @@
 }
 
 .setup-followup-option strong {
-  color: var(--barracks-text-raised);
+  color: var(--barracks-text-interactive);
   font-size: 13px;
   line-height: 1.2;
 }
 
 .setup-followup-option small {
   margin-top: 3px;
-  color: var(--barracks-focus-light);
+  color: var(--barracks-text-interactive);
   font-size: 11px;
   line-height: 1.35;
 }
