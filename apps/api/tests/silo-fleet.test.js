@@ -237,3 +237,34 @@ test('a registry failure is partial even when no prior server list exists', asyn
   assert.deepEqual(fleet.snapshot().servers, []);
   assert.equal(fleet.snapshot().partial, true);
 });
+
+test('registry failure invalidates late polls so unavailable servers cannot re-enter totals', async () => {
+  let failList = false;
+  let calls = 0;
+  const late = deferred();
+  const fleet = createFleet({
+    listServers: async () => {
+      if (failList) throw new Error('registry unavailable');
+      return [server('one')];
+    },
+    createClient: () => ({ getSessions: async () => {
+      calls += 1;
+      return calls === 1 ? [session('initial')] : late.promise;
+    } }),
+    publish: async () => {},
+  });
+
+  await fleet.refresh();
+  const polling = fleet.refresh();
+  await waitFor(() => calls === 2);
+  failList = true;
+  await fleet.refresh();
+  late.resolve([session('late')]);
+  await polling;
+
+  const snapshot = fleet.snapshot();
+  assert.equal(snapshot.partial, true);
+  assert.equal(snapshot.totalActiveStreams, 0);
+  assert.equal(snapshot.servers[0].state, 'unavailable');
+  assert.equal(snapshot.servers[0].sessions[0].Id, 'initial');
+});

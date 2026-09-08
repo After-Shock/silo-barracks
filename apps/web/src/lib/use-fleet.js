@@ -30,9 +30,13 @@ async function refresh() {
   return inFlight;
 }
 
-export default function useFleet() {
+export default function useFleet(enabled = true) {
   const [state, setState] = useState({ snapshot, error });
   useEffect(() => {
+    if (!enabled) {
+      setState({ snapshot: null, error: '' });
+      return undefined;
+    }
     const currentToken = localStorage.getItem('token');
     if (token !== currentToken) { token = currentToken; snapshot = null; error = ''; }
     listeners.add(setState);
@@ -45,6 +49,6 @@ export default function useFleet() {
       listeners.delete(setState);
       if (!listeners.size) clearInterval(timer);
     };
-  }, []);
+  }, [enabled]);
   return { ...state, refresh };
 }

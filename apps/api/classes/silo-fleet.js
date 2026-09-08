@@ -147,6 +147,9 @@ function createFleet({
     registryFailure = true;
     for (const record of records.values()) {
       if (enabled(record.server)) {
+        // A registry outage makes the current membership/configuration
+        // unverifiable. Invalidate any older response before publishing.
+        record.generation += 1;
         record.state = 'unavailable';
         record.failed = true;
       }

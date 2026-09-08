@@ -641,7 +641,7 @@ try {
     db.migrate.latest().then(() => {
       const server = http.createServer(app);
 
-      setupWebSocketServer(server, BASE_NAME);
+      setupWebSocketServer(server, BASE_NAME, { resolveTokenAccess });
       server.listen(PORT, LISTEN_IP, async () => {
         console.log(`[JellyGlance] Server listening on http://${LISTEN_IP}:${PORT}`);
         if (require('./classes/provider').getProvider() === 'silo') {

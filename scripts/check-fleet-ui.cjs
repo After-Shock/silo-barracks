@@ -66,6 +66,7 @@ async function main() {
       await page.screenshot({ path: `${process.env.BARRACKS_QA_DIR}/fleet-failure.png` });
       throw error;
     });
+    await page.locator('.nav-live-count[aria-label="2 active streams"]').waitFor();
     const gotIt = page.getByRole('button', { name: 'Got it', exact: true });
     if (await gotIt.isVisible()) await gotIt.click();
     assert.equal(await page.locator('.fleet-stream').count(), 2);

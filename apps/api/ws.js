@@ -8,6 +8,25 @@ let socketClient;
 let io; // Store the socket.io server instance
 const JWT_SECRET = process.env.JWT_SECRET;
 
+function createSocketAuthenticator({ jwtSecret = JWT_SECRET, resolveTokenAccess }) {
+  return async (socket, next) => {
+    const token = socket.handshake.auth?.token || socket.handshake.query?.token;
+    if (!token) return next(new Error('Authentication error: No token provided'));
+    try {
+      const decoded = jwt.verify(token, jwtSecret);
+      const access = await resolveTokenAccess(decoded.user);
+      if (!access.permissions?.dashboard) {
+        return next(new Error('Authentication error: Dashboard permission required'));
+      }
+      socket.user = access.user;
+      socket.permissions = access.permissions;
+      return next();
+    } catch {
+      return next(new Error('Authentication error: Invalid token'));
+    }
+  };
+}
+
 function createInternalToken() {
   if (!JWT_SECRET) {
     throw new Error("JWT Secret cannot be undefined");
@@ -25,24 +44,12 @@ function getSocketClient() {
   return socketClient;
 }
 
-const setupWebSocketServer = (server, namespacePath) => {
+const setupWebSocketServer = (server, namespacePath, { resolveTokenAccess }) => {
   io = socketIO(server, { path: namespacePath + "/socket.io" });
 
   getSocketClient().connect();
 
-  io.use((socket, next) => {
-    const token = socket.handshake.auth?.token || socket.handshake.query?.token;
-    if (!token) {
-      return next(new Error("Authentication error: No token provided"));
-    }
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET);
-      socket.user = decoded.user;
-      return next();
-    } catch (err) {
-      return next(new Error("Authentication error: Invalid token"));
-    }
-  });
+  io.use(createSocketAuthenticator({ resolveTokenAccess }));
 
   io.on("connection", (socket) => {
     // console.log("Client connected to namespace:", namespacePath);
@@ -88,4 +95,4 @@ const sendUpdate = async (tag, message) => {
   }
 };
 
-module.exports = { setupWebSocketServer, sendToAllClients, sendUpdate };
+module.exports = { createSocketAuthenticator, setupWebSocketServer, sendToAllClients, sendUpdate };

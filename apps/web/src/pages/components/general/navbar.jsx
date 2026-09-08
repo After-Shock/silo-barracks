@@ -21,6 +21,7 @@ import Config from "../../../lib/config";
 import { FONT_WEIGHT_OPTIONS, getStoredFontWeight, saveFontWeightPreference } from "../../../lib/appearance";
 import { DEFAULT_THEME, THEME_PRESETS, getStoredTheme, resetTheme, saveTheme } from "../../../lib/theme";
 import { applyNavOrder, getStoredHiddenNavLinks, getStoredNavOrder, LOCKED_NAV_LINKS } from "../../../lib/nav-order";
+import useFleet from "../../../lib/use-fleet";
 
 function getTokenPayload() {
   const token = localStorage.getItem("token");
@@ -193,6 +194,7 @@ export default function Navbar() {
   const [customTheme, setCustomTheme] = useState(() => getStoredTheme());
   const [fontWeightPreference, setFontWeightPreference] = useState(() => getStoredFontWeight());
   const [activeStreamCount, setActiveStreamCount] = useState(0);
+  const { snapshot: fleetSnapshot } = useFleet(config?.IS_SILO === true);
   const [activeDownloadCount, setActiveDownloadCount] = useState(() => Number(localStorage.getItem("jellyglance_active_download_count") || 0));
   const [activeTranscodeCount, setActiveTranscodeCount] = useState(() => Number(localStorage.getItem("jellyglance_active_transcode_count") || 0));
   const [requestBadgeCount, setRequestBadgeCount] = useState(() => Number(localStorage.getItem("jellyglance_request_badge_count") || 0));
@@ -366,14 +368,21 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleSessions = (sessionData) => {
-      if (Array.isArray(sessionData)) {
+      if (!config?.IS_SILO && Array.isArray(sessionData)) {
         setActiveStreamCount(sessionData.filter((session) => session.NowPlayingItem !== undefined).length);
       }
     };
 
     socket.on("sessions", handleSessions);
     return () => socket.off("sessions", handleSessions);
-  }, []);
+  }, [config?.IS_SILO]);
+
+  useEffect(() => {
+    if (config?.IS_SILO) {
+      setActiveStreamCount(Number.isFinite(fleetSnapshot?.totalActiveStreams)
+        ? fleetSnapshot.totalActiveStreams : 0);
+    }
+  }, [config?.IS_SILO, fleetSnapshot?.totalActiveStreams]);
 
   useEffect(() => {
     const handleDownloadCount = (event) => {
