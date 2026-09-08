@@ -7,8 +7,10 @@ import App from "./App.jsx";
 import "./pages/css/variables.css";
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./pages/css/framework-theme.css";
 import "./pages/css/width_breakpoint_css.css";
 import "./pages/css/radius_breakpoint_css.css";
+import "./pages/css/barracks.css";
 
 import i18n from "i18next";
 import Backend from "i18next-http-backend";

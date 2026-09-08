@@ -9,6 +9,7 @@ import SearchLineIcon from "remixicon-react/SearchLineIcon";
 import UserAddLineIcon from "remixicon-react/UserAddLineIcon";
 import axios from "../lib/axios_instance";
 import "./css/integrations.css";
+import "./css/wizarr.css";
 
 const emptyForm = {
   serverIds: [],
@@ -205,7 +206,7 @@ export default function WizarrPage() {
   }
 
   return (
-    <div className="integrations-page wizarr-page">
+    <div className="integrations-page wizarr-page" data-theme-screen="wizarr">
       <section className="integration-page-header">
         <div>
           <p>Invite manager</p>
@@ -219,25 +220,29 @@ export default function WizarrPage() {
       </section>
 
       {notice ? <div className="integration-notice">{notice}</div> : null}
-      {error ? <div className="integration-notice is-error">{error}</div> : null}
+      {error ? <div className="integration-notice is-error" role="alert">{error}</div> : null}
 
       {!error ? (
         <section className="wizarr-dashboard">
           <article>
             <span>Total invites</span>
             <strong>{data?.status?.invites ?? inviteStats.all}</strong>
+            <small>All links</small>
           </article>
           <article>
             <span>Active</span>
             <strong>{inviteStats.active}</strong>
+            <small>Ready to use</small>
           </article>
           <article>
             <span>Users</span>
             <strong>{data?.status?.users ?? 0}</strong>
+            <small>Wizarr accounts</small>
           </article>
           <article>
             <span>Servers</span>
             <strong>{data?.servers?.length ?? 0}</strong>
+            <small>Destinations</small>
           </article>
         </section>
       ) : null}
@@ -419,7 +424,7 @@ export default function WizarrPage() {
                   <button type="button" onClick={() => copyInvite(invite)} disabled={!invite.url} title="Copy invite link">
                     <ClipboardLineIcon size={18} />
                   </button>
-                  <a href={invite.url} target="_blank" rel="noreferrer" title="Open invite">
+                  <a href={invite.url || "#"} target="_blank" rel="noreferrer" title="Open invite" aria-disabled={!invite.url}>
                     <ExternalLinkLineIcon size={18} />
                   </a>
                   <button type="button" className="is-danger" onClick={() => deleteInvite(invite)} title="Delete invite">

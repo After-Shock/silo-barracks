@@ -22,7 +22,7 @@ function Signup() {
   const [processing, setProcessing] = useState(false);
   const [submitButtonText, setsubmitButtonText] = useState(i18next.t("CREATE_USER"));
   const [showPassword, setShowPassword] = useState(false);
-  const [authMode, setAuthMode] = useState("quick-connect");
+  const [authMode, setAuthMode] = useState("local");
   const [quickConnect, setQuickConnect] = useState(null);
   const [quickConnectStatus, setQuickConnectStatus] = useState("");
 
@@ -252,17 +252,17 @@ function Signup() {
       step={2}
       eyebrow="Admin access"
       title="Choose admin authentication"
-      description="Choose how JellyGlance should protect the dashboard. Quick Connect uses Jellyfin auth, OIDC validates your provider first, or Local creates JellyGlance credentials."
+      description="Protect Silo Barracks with a local account or your OIDC provider. The Silo administrator API key stays on the backend."
     >
         <div className="setup-auth-options" role="radiogroup" aria-label="Admin authentication method">
-          <button
+          {config?.IS_SILO === false && <button
             type="button"
             className={`setup-auth-option ${authMode === "quick-connect" ? "is-active" : ""}`}
             onClick={() => handleAuthModeChange("quick-connect")}
           >
             <strong>Jellyfin Quick Connect</strong>
             <small>No local admin details</small>
-          </button>
+          </button>}
           <button
             type="button"
             className={`setup-auth-option ${authMode === "oidc" ? "is-active" : ""}`}
@@ -277,7 +277,7 @@ function Signup() {
             onClick={() => handleAuthModeChange("local")}
           >
             <strong>Local login</strong>
-            <small>Set JellyGlance details</small>
+            <small>Set Silo Barracks details</small>
           </button>
         </div>
 
@@ -291,7 +291,7 @@ function Signup() {
                   <small>Open Jellyfin, approve Quick Connect with an administrator account, and enter this code.</small>
                 </>
               ) : (
-                <small>Approve setup through Jellyfin Quick Connect instead of creating local JellyGlance credentials.</small>
+                <small>Approve setup through Jellyfin Quick Connect instead of creating local Silo Barracks credentials.</small>
               )}
               {quickConnectStatus && <small className="quick-connect-status">{quickConnectStatus}</small>}
             </div>

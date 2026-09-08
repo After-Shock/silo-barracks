@@ -82,7 +82,7 @@ function Sessions() {
         <h1 className="my-3">
           <Trans i18nKey="HOME_PAGE.SESSIONS" />
         </h1>
-        <div style={{ color: "grey", fontSize: "0.8em", fontStyle: "italic" }}>
+        <div style={{ color: "var(--barracks-text-muted-raised)", fontSize: "0.8em", fontStyle: "italic" }}>
           <Trans i18nKey="SESSIONS.NO_SESSIONS" />
         </div>
       </div>

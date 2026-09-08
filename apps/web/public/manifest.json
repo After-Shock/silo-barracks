@@ -1,25 +1,25 @@
 {
-  "short_name": "JellyGlance",
-  "name": "JellyGlance",
+  "short_name": "Barracks",
+  "name": "Silo Barracks",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "brand/barracks-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
     },
     {
-      "src": "icon-b-192.png",
+      "src": "brand/barracks-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "icon-b-512.png",
+      "src": "brand/barracks-512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#0b1117",
-  "background_color": "#ffffff"
+  "theme_color": "#161410",
+  "background_color": "#161410"
 }

@@ -7,14 +7,14 @@ function LibraryStatComponent(props) {
   }
 
   const cardStyle = {
-    backgroundImage: `url(${props.base_url}/Items/${props.data[0].Id}/Images/Backdrop/?fillWidth=300&quality=10), linear-gradient(to right, var(--secondary-color), var(--primary-color))`,
+    backgroundImage: `url(${props.base_url}/Items/${props.data[0].Id}/Images/Backdrop/?fillWidth=300&quality=10)`,
     height: "100%",
     backgroundSize: "cover",
   };
 
   const cardBgStyle = {
     // backdropFilter: 'blur(5px)',
-    backgroundColor: "rgb(0, 0, 0, 0.6)",
+    backgroundColor: "var(--barracks-scrim)",
     height: "100%",
   };
 

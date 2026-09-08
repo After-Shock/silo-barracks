@@ -1,7 +1,7 @@
 .api-keys-page {
   display: grid;
   gap: 14px;
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
 }
 
 .api-keys-header {
@@ -13,7 +13,7 @@
 
 .api-keys-eyebrow {
   margin: 0 0 3px;
-  color: var(--primary-light-color);
+  color: var(--barracks-focus-light);
   font-size: 10px;
   font-weight: 950;
   letter-spacing: 0.16em;
@@ -22,14 +22,14 @@
 
 .api-keys-header h1 {
   margin: 0 !important;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: clamp(24px, 2.4vw, 38px);
   font-weight: 950 !important;
 }
 
 .api-keys-header p {
   margin: 5px 0 0;
-  color: #9aa7bb;
+  color: var(--barracks-focus-light);
   font-size: 13px;
   font-weight: 750;
 }
@@ -41,10 +41,10 @@
   justify-content: center;
   min-width: 78px;
   min-height: 44px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.2);
+  border: 1px solid color-mix(in srgb, var(--barracks-focus-light) 20%, transparent);
   border-radius: 13px;
-  background: rgba(var(--primary-rgb), 0.12);
-  color: var(--primary-light-color);
+  background: color-mix(in srgb, var(--barracks-action) 12%, transparent);
+  color: var(--barracks-focus-light);
   font-size: 20px;
   font-weight: 950;
 }
@@ -55,16 +55,16 @@
   gap: 12px;
   align-items: end;
   padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 8%, transparent);
   border-radius: 15px;
   background:
-    linear-gradient(145deg, rgba(var(--primary-rgb), 0.08), rgba(255, 255, 255, 0.025)),
-    rgba(8, 11, 17, 0.82);
+    linear-gradient(145deg, color-mix(in srgb, var(--barracks-action) 8%, transparent), color-mix(in srgb, var(--barracks-text-raised) 3%, transparent)),
+    color-mix(in srgb, var(--barracks-surface-inset) 82%, transparent);
 }
 
 .api-key-create label {
   margin-bottom: 6px;
-  color: #cbd5e1;
+  color: var(--barracks-text-raised);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -73,10 +73,10 @@
 
 .api-key-create .form-control {
   min-height: 38px;
-  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 11%, transparent) !important;
   border-radius: 11px !important;
-  background: rgba(5, 8, 13, 0.72) !important;
-  color: white !important;
+  background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent) !important;
+  color: var(--barracks-text-raised) !important;
 }
 
 .api-key-create .btn {
@@ -87,8 +87,8 @@
   min-height: 38px;
   border: 0 !important;
   border-radius: 11px !important;
-  background: linear-gradient(90deg, var(--primary-color), var(--primary-light-color)) !important;
-  color: #080a0f !important;
+  background: var(--barracks-action) !important;
+  color: var(--barracks-action-text) !important;
   font-weight: 950 !important;
 }
 
@@ -104,9 +104,9 @@
   align-items: center;
   min-height: 66px;
   padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 8%, transparent);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.035);
+  background: color-mix(in srgb, var(--barracks-text-raised) 4%, transparent);
 }
 
 .api-key-icon {
@@ -116,8 +116,8 @@
   width: 40px;
   height: 40px;
   border-radius: 13px;
-  background: rgba(var(--primary-rgb), 0.16);
-  color: var(--primary-light-color);
+  background: color-mix(in srgb, var(--barracks-action) 16%, transparent);
+  color: var(--barracks-focus-light);
 }
 
 .api-key-main {
@@ -126,7 +126,7 @@
 
 .api-key-main strong {
   display: block;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 14px;
   font-weight: 950;
 }
@@ -135,7 +135,7 @@
   display: block;
   margin-top: 4px;
   overflow: hidden;
-  color: #9aa7bb;
+  color: var(--barracks-focus-light);
   font-size: 12px;
   font-weight: 800;
   text-overflow: ellipsis;
@@ -163,19 +163,19 @@
   gap: 8px;
   min-height: 150px;
   padding: 24px;
-  border: 1px dashed rgba(var(--primary-light-rgb), 0.26);
+  border: 1px dashed color-mix(in srgb, var(--barracks-focus-light) 26%, transparent);
   border-radius: 15px;
-  background: rgba(255, 255, 255, 0.025);
-  color: #9aa7bb;
+  background: color-mix(in srgb, var(--barracks-text-raised) 3%, transparent);
+  color: var(--barracks-focus-light);
   text-align: center;
 }
 
 .api-keys-empty svg {
-  color: var(--primary-light-color);
+  color: var(--barracks-focus-light);
 }
 
 .api-keys-empty strong {
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-weight: 950;
 }
 

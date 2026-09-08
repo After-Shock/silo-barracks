@@ -10,7 +10,7 @@ function TerminalComponent(props){
       <div className="console-container">
         {messages && messages.map((message, index) => (
           <div key={index} className="console-message">
-            <pre style={{color: message.color || 'white'}} className="console-text">{typeof message ==='object' ? message.Message :  message}</pre>
+            <pre style={{color: message.color || 'var(--barracks-text-raised)'}} className="console-text">{typeof message ==='object' ? message.Message :  message}</pre>
           </div>
         ))}
       </div>

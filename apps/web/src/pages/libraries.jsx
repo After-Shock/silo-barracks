@@ -118,7 +118,7 @@ function Libraries() {
   }
 
   if (!data || !metadata) {
-    return <Loading />;
+    return <div data-theme-screen="libraries" aria-busy="true"><Loading /></div>;
   }
 
   const visibleLibraries = data
@@ -135,7 +135,7 @@ function Libraries() {
   const showLibraryCardNames = config?.settings?.ShowLibraryCardNames !== false;
 
   return (
-    <div className="libraries">
+    <div className="libraries" data-theme-screen="libraries">
       <div className="libraries-header">
         <div>
           <p className="libraries-eyebrow">Media stack</p>

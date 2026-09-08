@@ -163,7 +163,7 @@ export default function RepairHub() {
   ];
 
   return (
-    <div className="repair-hub">
+    <div className="repair-hub" data-theme-screen="repair-hub">
       <header className="repair-hero">
         <div>
           <span>Maintenance</span>

@@ -2,20 +2,18 @@
 
 .lib-card {
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border: 1px solid var(--barracks-border-raised) !important;
   border-radius: 16px !important;
-  background:
-    linear-gradient(145deg, rgba(var(--primary-rgb), 0.12), rgba(255, 255, 255, 0.035)),
-    rgba(9, 12, 18, 0.92) !important;
-  color: white;
-  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.3);
+  background: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text-raised);
+  box-shadow: 0 22px 58px var(--barracks-scrim);
   transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .lib-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(var(--primary-light-rgb), 0.34) !important;
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.42);
+  border-color: var(--barracks-border-raised) !important;
+  box-shadow: 0 30px 70px var(--barracks-scrim);
 }
 
 .library-card-link {
@@ -28,7 +26,8 @@
   position: relative;
   height: 210px;
   overflow: hidden;
-  background: #05070b;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .library-card-banner,
@@ -36,7 +35,8 @@
   width: 100%;
   height: 210px;
   object-fit: cover;
-  background-color: #05070b;
+  background-color: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
   transition: transform 220ms ease, opacity 220ms ease;
 }
 
@@ -48,9 +48,7 @@
 .library-card-image-overlay {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg, rgba(3, 5, 8, 0.04), rgba(3, 5, 8, 0.88)),
-    radial-gradient(circle at 20% 18%, rgba(var(--primary-rgb), 0.22), transparent 36%);
+  background: var(--barracks-scrim);
 }
 
 .library-card-hero-copy {
@@ -61,6 +59,10 @@
   display: flex;
   align-items: end;
   gap: 12px;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--barracks-overlay);
+  color: var(--barracks-text-overlay);
 }
 
 .library-type-icon {
@@ -70,16 +72,17 @@
   flex: 0 0 46px;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.34);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 14px;
-  background: rgba(7, 10, 15, 0.72);
-  box-shadow: 0 14px 36px rgba(var(--primary-rgb), 0.18);
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
+  box-shadow: 0 14px 36px var(--barracks-action);
 }
 
 .library-type-label {
   display: block;
   margin-bottom: 2px;
-  color: var(--primary-light-color);
+  color: var(--barracks-text-overlay);
   font-size: 11px;
   font-weight: 950;
   letter-spacing: 0.14em;
@@ -90,12 +93,12 @@
   display: -webkit-box;
   margin: 0;
   overflow: hidden;
-  color: #f8fafc;
+  color: var(--barracks-text-overlay);
   font-size: 24px;
   font-weight: 950;
   letter-spacing: 0;
   line-height: 1.08;
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.62);
+  text-shadow: 0 2px 18px var(--barracks-scrim);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
@@ -107,9 +110,7 @@
 }
 
 .lib-card.is-library-name-hidden .library-card-image-overlay {
-  background:
-    linear-gradient(180deg, rgba(3, 5, 8, 0.08), rgba(3, 5, 8, 0.72)),
-    radial-gradient(circle at 20% 50%, rgba(var(--primary-rgb), 0.2), transparent 34%);
+  background: var(--barracks-scrim);
 }
 
 .lib-card.is-library-name-hidden .library-card-hero-copy {
@@ -135,9 +136,8 @@
 
 .library-card-details {
   padding: 16px !important;
-  background:
-    linear-gradient(180deg, rgba(9, 12, 18, 0.72), rgba(7, 9, 13, 0.96)),
-    rgba(7, 9, 13, 0.9) !important;
+  background: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text-raised);
 }
 
 .library-card-actions {
@@ -153,10 +153,10 @@
   justify-content: center;
   min-height: 34px;
   padding: 0 12px;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.38);
+  border: 1px solid var(--barracks-action);
   border-radius: 11px;
-  background: linear-gradient(90deg, rgba(var(--primary-rgb), 0.92), rgba(var(--primary-light-rgb), 0.7));
-  color: #080b10;
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
   font-size: 12px;
   font-weight: 950;
   transition: transform 160ms ease, opacity 160ms ease, box-shadow 160ms ease;
@@ -164,7 +164,7 @@
 
 .library-scan-button:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 14px 32px rgba(var(--primary-rgb), 0.22);
+  box-shadow: 0 14px 32px var(--barracks-action);
 }
 
 .library-scan-button:disabled {
@@ -181,9 +181,10 @@
 .library-card-stat-grid > div,
 .library-card-readout > div {
   min-width: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.045);
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .library-card-stat-grid > div {
@@ -191,11 +192,22 @@
 }
 
 .library-card-stat-grid span,
-.library-card-readout span,
+.library-card-readout span {
+  display: block;
+  overflow: hidden;
+  color: var(--barracks-text-inset);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .library-card-footer span {
   display: block;
   overflow: hidden;
-  color: #9aa7bb;
+  color: var(--barracks-text-muted-raised);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -208,9 +220,10 @@
   display: block;
   overflow: hidden;
   margin-top: 4px;
-  color: #f8fafc;
-  font-size: 16px;
+  color: var(--barracks-text-inset);
+  font-size: clamp(13px, 0.9vw, 16px);
   font-weight: 950;
+  line-height: 1.15;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -236,7 +249,7 @@
 
 .library-card-readout strong {
   overflow: hidden;
-  color: #e5edf8;
+  color: var(--barracks-text-inset);
   font-size: 12px;
   font-weight: 850;
   text-align: right;
@@ -247,14 +260,14 @@
 .library-card-footer {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--barracks-border-subtle);
 }
 
 .library-card-footer strong {
   display: block;
   overflow: hidden;
   margin-top: 4px;
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
   font-size: 14px;
   font-weight: 900;
   text-overflow: ellipsis;
@@ -264,7 +277,7 @@
 .library-card-footer small {
   display: block;
   margin-top: 2px;
-  color: #c7a4df;
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 750;
 }
@@ -273,23 +286,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background:
-    radial-gradient(circle at 50% 20%, rgba(var(--primary-rgb), 0.32), transparent 36%),
-    rgba(13, 17, 25, 0.94);
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .form-switch .form-check-input {
-  border-color: var(--primary-color) !important;
+  border-color: var(--barracks-border-strong) !important;
 }
   
 .form-switch .form-check-input:checked {
-  background-color: var(--primary-color);
+  background-color: var(--barracks-action);
+  border-color: var(--barracks-action) !important;
 }
 
-.form-switch .form-check-input:focus,
-.form-switch .form-check-input:hover {
-  box-shadow: none !important;
-  border-color: var(--primary-color) !important;
+.form-switch .form-check-input:hover:not(:checked) {
+  box-shadow: none;
+  border-color: var(--barracks-border-strong) !important;
 }
 
 .library-list-row {
@@ -299,13 +311,11 @@
   gap: 14px;
   min-height: 86px;
   padding: 10px 14px 10px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid var(--barracks-border-raised);
   border-radius: 14px;
-  background:
-    linear-gradient(145deg, rgba(var(--primary-rgb), 0.09), rgba(255, 255, 255, 0.028)),
-    rgba(9, 12, 18, 0.92);
-  color: #f8fafc;
-  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.22);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+  box-shadow: 0 16px 34px var(--barracks-scrim);
 }
 
 .library-list-main {
@@ -323,7 +333,8 @@
   height: 58px;
   overflow: hidden;
   border-radius: 10px;
-  background: #05070b;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .library-list-image,
@@ -339,9 +350,10 @@
   height: 42px;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(var(--primary-light-rgb), 0.3);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 12px;
-  background: rgba(7, 10, 15, 0.72);
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .library-list-title {
@@ -352,7 +364,7 @@
 .library-list-last-played strong {
   display: block;
   overflow: hidden;
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
   font-size: 15px;
   font-weight: 950;
   text-overflow: ellipsis;
@@ -364,7 +376,7 @@
 .library-list-last-played span {
   display: block;
   overflow: hidden;
-  color: #9aa7bb;
+  color: var(--barracks-text-muted-raised);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -375,7 +387,7 @@
 
 .library-list-title span {
   margin-top: 3px;
-  color: var(--primary-light-color);
+  color: var(--barracks-text-muted-raised);
   letter-spacing: 0.14em;
 }
 
@@ -389,9 +401,14 @@
 .library-list-stats > div {
   min-width: 0;
   padding: 9px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--barracks-border-inset);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
+}
+
+.library-list-stats span {
+  color: var(--barracks-text-inset);
 }
 
 .library-list-stats strong,
@@ -399,7 +416,7 @@
   display: block;
   overflow: hidden;
   margin-top: 3px;
-  color: #e5edf8;
+  color: var(--barracks-text-inset);
   font-size: 12px;
   font-weight: 900;
   text-overflow: ellipsis;
@@ -411,7 +428,7 @@
 }
 
 .library-list-last-played small {
-  color: #c7a4df;
+  color: var(--barracks-text-muted-raised);
 }
 
 .library-list-scan-button {
@@ -463,13 +480,14 @@
 
 .selector-library-card {
   min-height: 0;
-  border-color: rgba(var(--primary-light-rgb), 0.22) !important;
-  background: rgba(9, 12, 18, 0.94) !important;
+  border-color: var(--barracks-border-inset) !important;
+  background: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset);
   box-shadow: none;
 }
 
 .selector-library-card:hover {
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 18px 42px var(--barracks-scrim);
 }
 
 .selector-library-image {
@@ -487,17 +505,14 @@
 }
 
 .selector-library-image .default_library_image-inv {
-  background:
-    radial-gradient(circle at 50% 20%, rgba(var(--primary-rgb), 0.32), transparent 36%),
-    rgba(13, 17, 25, 0.94);
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
 }
 
 .selector-library-overlay {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg, rgba(2, 5, 8, 0.08), rgba(2, 5, 8, 0.34)),
-    radial-gradient(circle at 50% 30%, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+  background: var(--barracks-scrim);
 }
 
 .selector-library-image h2 {
@@ -508,13 +523,13 @@
   display: -webkit-box;
   margin: 0;
   overflow: hidden;
-  color: #ffffff;
+  color: var(--barracks-text-overlay);
   font-size: 32px;
   font-weight: 950;
   letter-spacing: 0;
   line-height: 1;
   text-align: center;
-  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.78);
+  text-shadow: 0 3px 18px var(--barracks-scrim);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
@@ -523,9 +538,8 @@
   display: grid;
   gap: 8px;
   padding: 13px 14px 14px !important;
-  background:
-    linear-gradient(180deg, rgba(16, 19, 28, 0.98), rgba(9, 12, 18, 0.98)),
-    #090c12 !important;
+  background: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text-raised);
 }
 
 .selector-library-card .card-row {
@@ -542,7 +556,7 @@
 }
 
 .selector-library-card .card-label {
-  color: #92a0b5;
+  color: var(--barracks-text-muted-raised);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -551,7 +565,7 @@
 
 .selector-library-card .text-end {
   overflow: hidden;
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
   font-size: 13px;
   font-weight: 850;
   text-overflow: ellipsis;

@@ -242,7 +242,7 @@ export default function UserProfilePage() {
   };
 
   if (loading) {
-    return <Loading />;
+    return <div data-theme-screen="user-profile" aria-busy="true"><Loading /></div>;
   }
 
   if (matchedUser) {
@@ -268,7 +268,7 @@ export default function UserProfilePage() {
     };
 
     return (
-      <div className="user-profile-page">
+      <div className="user-profile-page" data-theme-screen="user-profile">
         <QuickConnectUserWrap user={matchedUser} rank={rank || 1} />
         <nav className="user-profile-subnav" aria-label="Profile sections">
           {PROFILE_SECTIONS.map((section) => (
@@ -377,18 +377,18 @@ export default function UserProfilePage() {
 
   if (localUser || ["local", "oidc"].includes(config?.settings?.auth?.mode)) {
     return (
-      <div className="user-profile-page">
+      <div className="user-profile-page" data-theme-screen="user-profile">
         <AccountDashboard access={access} />
       </div>
     );
   }
 
   if (userKey.length > 20) {
-    return <UserInfo />;
+    return <div data-theme-screen="user-profile"><UserInfo /></div>;
   }
 
   return (
-    <div className="user-profile-page">
+    <div className="user-profile-page" data-theme-screen="user-profile">
       <section className="user-profile-empty">
         <h1>User not found</h1>
         <p>No JellyGlance profile matched `{decodeURIComponent(userKey)}`.</p>

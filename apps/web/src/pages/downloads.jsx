@@ -6,15 +6,17 @@ import FileUploadLineIcon from "remixicon-react/FileUploadLineIcon";
 import PauseLineIcon from "remixicon-react/PauseLineIcon";
 import PlayLineIcon from "remixicon-react/PlayLineIcon";
 import TimerFlashLineIcon from "remixicon-react/TimerFlashLineIcon";
+import { useTranslation } from "react-i18next";
 import axios from "../lib/axios_instance";
 import { loadSavedIntegrations } from "../lib/integrations-storage";
 import "./css/integrations.css";
+import "./css/downloads.css";
 
 const iconUrl = (slug) => `https://cdn.jsdelivr.net/gh/selfhst/icons/svg/${slug}.svg`;
 
 function clientIcon(client) {
   if (!client.slug) return null;
-  return <img src={iconUrl(client.slug)} alt="" loading="lazy" decoding="async" />;
+  return <img src={iconUrl(client.slug)} alt="" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.style.display = "none"; }} />;
 }
 
 function normalizeName(value = "") {
@@ -33,6 +35,7 @@ function friendlyTorrentName(value, file) {
 }
 
 export default function Downloads() {
+  const { t } = useTranslation();
   const fileInputRef = useRef(null);
   const [integrations, setIntegrations] = useState(loadSavedIntegrations({ clients: [] }));
   const savedClients = integrations.clients || [];
@@ -41,6 +44,8 @@ export default function Downloads() {
   const [torrentValue, setTorrentValue] = useState("");
   const [torrentFile, setTorrentFile] = useState(null);
   const [downloads, setDownloads] = useState([]);
+  const [downloadLoading, setDownloadLoading] = useState(true);
+  const [downloadError, setDownloadError] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -54,6 +59,8 @@ export default function Downloads() {
   const activeCount = downloads.filter((download) => download.progress < 100).length;
 
   async function loadDownloadData() {
+    setDownloadLoading(true);
+    setDownloadError("");
     try {
       const [integrationResponse, downloadResponse] = await Promise.all([
         axios.get("/api/integrations", {
@@ -69,6 +76,9 @@ export default function Downloads() {
       }
     } catch (error) {
       console.log("Unable to load download sync data", error);
+      setDownloadError(t("OPERATIONAL_STATES.DOWNLOADS_ERROR"));
+    } finally {
+      setDownloadLoading(false);
     }
   }
 
@@ -147,7 +157,7 @@ export default function Downloads() {
   }
 
   return (
-    <div className="downloads-page">
+    <div className="downloads-page" data-theme-screen="downloads">
       <header className="download-page-header">
         <div>
           <p>Queue monitor</p>
@@ -195,7 +205,14 @@ export default function Downloads() {
         <article className="download-panel active-downloads-panel">
           <h2>Active Downloads</h2>
           <div className="download-list">
-            {downloads.length ? downloads.map((download) => (
+            {downloadLoading ? (
+              <div className="downloads-state" role="status">{t("OPERATIONAL_STATES.DOWNLOADS_LOADING")}</div>
+            ) : downloadError ? (
+              <div className="downloads-state is-error" role="alert">
+                <strong>{downloadError}</strong>
+                <button type="button" onClick={loadDownloadData}>{t("OPERATIONAL_STATES.RETRY")}</button>
+              </div>
+            ) : downloads.length ? downloads.map((download) => (
               <div className="download-row" key={download.id}>
                 <div className="download-row-main">
                   <div className="download-title-group">
@@ -233,7 +250,7 @@ export default function Downloads() {
                 </div>
               </div>
             )) : (
-              <div className="integration-empty-state">No active downloads. Add a client in Settings &gt; Integrations, then sync the queue.</div>
+              <div className="downloads-state">{t("OPERATIONAL_STATES.DOWNLOADS_EMPTY")}</div>
             )}
           </div>
         </article>
@@ -257,7 +274,7 @@ export default function Downloads() {
                 </div>
               );
             }) : (
-              <div className="integration-empty-state">No download clients added yet.</div>
+              <div className="downloads-state">{t("OPERATIONAL_STATES.DOWNLOADS_CLIENTS_EMPTY")}</div>
             )}
           </div>
         </article>

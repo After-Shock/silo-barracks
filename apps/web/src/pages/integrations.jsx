@@ -18,14 +18,56 @@ import JellyfinIntegrationSettings from "./components/settings/JellyfinIntegrati
 import "./css/integrations.css";
 
 const iconUrl = (slug) => `https://cdn.jsdelivr.net/gh/selfhst/icons/svg/${slug}.svg`;
+const tdarrLogoUrl = "https://home.tdarr.io/static/media/logo3-min.246d6df44c7f16ddebaf.png";
+const sickChillLogoUrl = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/sickchill.png";
+const integrationTabItems = [
+  ["media-server", "Media Server"],
+  ["automation", "Arr Apps"],
+  ["seerr", "Seerr Apps"],
+  ["downloads", "Download Clients"],
+  ["invites", "Invites / Transcodes"],
+];
+const integrationTabKeys = integrationTabItems.map(([key]) => key);
+
+function normalizeIntegrationTabSlug(value = "") {
+  const normalized = String(value || "")
+    .replace(/^#\/?/, "")
+    .trim()
+    .toLowerCase();
+  const aliases = {
+    media: "media-server",
+    mediaserver: "media-server",
+    "media-server": "media-server",
+    jellyfin: "media-server",
+    arr: "automation",
+    arrapps: "automation",
+    "arr-apps": "automation",
+    automation: "automation",
+    jellyseerr: "seerr",
+    overseerr: "seerr",
+    seerr: "seerr",
+    download: "downloads",
+    downloads: "downloads",
+    "download-clients": "downloads",
+    clients: "downloads",
+    invite: "invites",
+    invites: "invites",
+    "invites-transcodes": "invites",
+    transcodes: "invites",
+    tdarr: "invites",
+  };
+  return aliases[normalized] || (integrationTabKeys.includes(normalized) ? normalized : "");
+}
 
 const automationApps = [
-  { name: "Sonarr", slug: "sonarr", purpose: "Series automation", accent: "#35c5f4" },
-  { name: "Radarr", slug: "radarr", purpose: "Movie automation", accent: "#f4c430" },
-  { name: "Lidarr", slug: "lidarr", purpose: "Music automation", accent: "var(--secondary-color)" },
-  { name: "Bazarr", slug: "bazarr", purpose: "Subtitle automation", accent: "#84d160" },
-  { name: "Jellyseerr", slug: "jellyseerr", purpose: "Request management", accent: "#6366f1" },
-  { name: "Overseerr", slug: "overseerr", purpose: "Request management", accent: "#7dd3fc" },
+  { name: "Sonarr", slug: "sonarr", purpose: "Series automation", accent: "var(--barracks-action)" },
+  { name: "SickChill", slug: "sickchill", purpose: "Series automation", accent: "var(--barracks-state-danger)" },
+  { name: "Radarr", slug: "radarr", purpose: "Movie automation", accent: "var(--barracks-state-danger)" },
+  { name: "Lidarr", slug: "lidarr", purpose: "Music automation", accent: "var(--barracks-accent-secondary)" },
+  { name: "Prowlarr", slug: "prowlarr", purpose: "Indexer management", accent: "var(--barracks-action)" },
+  { name: "Bazarr", slug: "bazarr", purpose: "Subtitle automation", accent: "var(--barracks-state-success)" },
+  { name: "Jellyseerr", slug: "jellyseerr", purpose: "Request management", accent: "var(--barracks-action)" },
+  { name: "Overseerr", slug: "overseerr", purpose: "Request management", accent: "var(--barracks-action)" },
 ];
 
 const downloadClientOptions = [
@@ -38,7 +80,10 @@ const downloadClientOptions = [
   { name: "rTorrent", slug: null, protocol: "Torrent" },
 ];
 
-const thirdPartyOptions = [{ name: "Wizarr", slug: "wizarr", purpose: "Jellyfin invite links", accent: "#8b5cf6" }];
+const thirdPartyOptions = [
+  { name: "Tdarr", slug: "tdarr", purpose: "Active transcodes", accent: "var(--barracks-action)", secretOptional: true },
+  { name: "Wizarr", slug: "wizarr", purpose: "Jellyfin invite links", accent: "var(--barracks-action)" },
+];
 
 const initialThirdPartyApps = thirdPartyOptions.map((app, index) => ({
   ...app,
@@ -54,6 +99,21 @@ const initialAutomationApps = automationApps.map((app, index) => ({
   values: {},
 }));
 
+const defaultAgentOptions = {
+  tv: ["Sonarr", "SickChill"],
+  movies: ["Radarr"],
+  videos: ["Lidarr"],
+};
+
+const defaultAgentMeta = {
+  Sonarr: { slug: "sonarr", accent: "var(--barracks-action)", role: "Series automation" },
+  SickChill: { slug: "sickchill", accent: "var(--barracks-state-danger)", role: "Series automation" },
+  Radarr: { slug: "radarr", accent: "var(--barracks-state-danger)", role: "Movie automation" },
+  Tdarr: { slug: "tdarr", accent: "var(--barracks-action)", role: "Media processing" },
+  Lidarr: { slug: "lidarr", accent: "var(--barracks-accent-secondary)", role: "Music automation" },
+  Jellyfin: { slug: "jellyfin", accent: "var(--barracks-action)", role: "Media server" },
+};
+
 const seerrAppNames = new Set(["seerr", "jellyseerr", "overseerr"]);
 
 function isSeerrApp(app) {
@@ -61,31 +121,55 @@ function isSeerrApp(app) {
 }
 
 function normalizeAutomationApps(savedApps) {
-  if (!Array.isArray(savedApps) || !savedApps.length) {
+  const automationSavedApps = Array.isArray(savedApps)
+    ? savedApps.filter((app) => !["tdarr", "wizarr"].includes(String(app.name || app.slug || "").toLowerCase()))
+    : [];
+  if (!automationSavedApps.length) {
     return initialAutomationApps;
   }
 
-  const savedNames = new Set(savedApps.map((app) => String(app.name || "").toLowerCase()));
+  const savedNames = new Set(automationSavedApps.map((app) => String(app.name || "").toLowerCase()));
   const missingDefaults = initialAutomationApps.filter((app) => !savedNames.has(app.name.toLowerCase()));
-  return [...savedApps, ...missingDefaults];
+  return [...automationSavedApps, ...missingDefaults];
 }
 
-function normalizeThirdPartyApps(savedApps) {
-  if (!Array.isArray(savedApps) || !savedApps.length) {
+function normalizeThirdPartyApps(savedApps, legacyAutomationApps = []) {
+  const savedThirdPartyApps = [
+    ...(Array.isArray(savedApps) ? savedApps : []),
+    ...(Array.isArray(legacyAutomationApps)
+      ? legacyAutomationApps.filter((app) => ["tdarr", "wizarr"].includes(String(app.name || app.slug || "").toLowerCase()))
+      : []),
+  ];
+  if (!savedThirdPartyApps.length) {
     return initialThirdPartyApps;
   }
 
-  const savedNames = new Set(savedApps.map((app) => String(app.name || "").toLowerCase()));
+  const savedNames = new Set(savedThirdPartyApps.map((app) => String(app.name || "").toLowerCase()));
   const missingDefaults = initialThirdPartyApps.filter((app) => !savedNames.has(app.name.toLowerCase()));
-  return [...savedApps, ...missingDefaults];
+  return [...savedThirdPartyApps, ...missingDefaults];
 }
 
 function AppIcon({ app }) {
-  if (!app.slug) {
-    return <span className="integration-fallback-icon">{app.name.slice(0, 2)}</span>;
+  const [imageFailed, setImageFailed] = useState(false);
+  const normalizedName = String(app.name || "").toLowerCase();
+  const fallback = <span className="integration-fallback-icon">{app.name.slice(0, 2)}</span>;
+  if (imageFailed) return fallback;
+
+  if (normalizedName.includes("tdarr")) {
+    return <img src={tdarrLogoUrl} alt="" loading="lazy" decoding="async" onError={() => setImageFailed(true)} />;
   }
 
-  return <img src={iconUrl(app.slug)} alt="" loading="lazy" decoding="async" />;
+  const iconSlug =
+    normalizedName.includes("home assistant") || normalizedName.includes("hacs")
+      ? "home-assistant"
+      : app.slug;
+
+  if (!iconSlug) {
+    return fallback;
+  }
+
+  const source = normalizedName.includes("sickchill") ? sickChillLogoUrl : iconUrl(iconSlug);
+  return <img src={source} alt="" loading="lazy" decoding="async" onError={() => setImageFailed(true)} />;
 }
 
 function formatHealthDate(value) {
@@ -130,14 +214,15 @@ function buildHealthTimeline(entries = []) {
 function IntegrationCard({ app, type, onChange, onRemove, onSave, onTest, onCopySecret, removable = false }) {
   const usesUserPass = type === "download" && app.auth === "userpass";
   const usesPasswordOnly = type === "download" && app.auth === "password";
-  const authLabel = usesUserPass || usesPasswordOnly ? "Password" : "API key";
+  const secretOptional = Boolean(app.secretOptional) || String(app.name || app.slug || "").toLowerCase().includes("tdarr");
+  const authLabel = usesUserPass || usesPasswordOnly ? "Password" : secretOptional ? "API key (optional)" : "API key";
   const connected = Boolean(app.connected);
   const values = app.values || {};
-  const secretPlaceholder = usesPasswordOnly || usesUserPass ? `${app.name} password` : "Paste API key";
+  const secretPlaceholder = usesPasswordOnly || usesUserPass ? `${app.name} password` : secretOptional ? "Paste API key if auth is enabled" : "Paste API key";
   const [showSecret, setShowSecret] = useState(false);
 
   return (
-    <article className="integration-card" style={{ "--integration-accent": app.accent || "var(--primary-light-color)" }}>
+    <article className="integration-card" style={{ "--integration-accent": app.accent || "var(--barracks-action)" }}>
       <div className="integration-card-header">
         <span className="integration-icon">
           <AppIcon app={app} />
@@ -191,7 +276,7 @@ function IntegrationCard({ app, type, onChange, onRemove, onSave, onTest, onCopy
           </span>
         </label>
       </div>
-      {app.message ? <p className={`integration-message ${app.messageType === "error" ? "is-error" : ""}`}>{app.message}</p> : null}
+      {app.message ? <p className={`integration-message ${app.messageType === "error" ? "is-error" : ""}`} role={app.messageType === "error" ? "alert" : "status"}>{app.message}</p> : null}
       <div className="integration-actions">
         <button type="button" onClick={() => onTest(app.instanceId)}>
           Test
@@ -209,12 +294,20 @@ function IntegrationCard({ app, type, onChange, onRemove, onSave, onTest, onCopy
   );
 }
 
-export default function Integrations({ embedded = false, firstRun = false }) {
+export default function Integrations({ embedded = false, firstRun = false, activeTab: controlledActiveTab = "", onTabChange }) {
   const fileInputRef = useRef(null);
-  const [activeTab, setActiveTab] = useState("media-server");
+  const [internalActiveTab, setInternalActiveTab] = useState(normalizeIntegrationTabSlug(controlledActiveTab) || "media-server");
+  const activeTab = normalizeIntegrationTabSlug(controlledActiveTab) || internalActiveTab;
   const [arrApps, setArrApps] = useState(initialAutomationApps);
   const [clients, setClients] = useState([]);
   const [thirdParty, setThirdParty] = useState(initialThirdPartyApps);
+  const [agentDefaults, setAgentDefaults] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("jellyglance_agent_defaults") || "{}") || {};
+    } catch {
+      return {};
+    }
+  });
   const [selectedClient, setSelectedClient] = useState(downloadClientOptions[0].name);
   const [healthHistory, setHealthHistory] = useState([]);
   const [diagnostics, setDiagnostics] = useState([]);
@@ -224,8 +317,18 @@ export default function Integrations({ embedded = false, firstRun = false }) {
   const [loadedSavedIntegrations, setLoadedSavedIntegrations] = useState(!firstRun);
   const connectorCount = useMemo(() => arrApps.length + clients.length + thirdParty.length, [arrApps.length, clients.length, thirdParty.length]);
   const automationOnlyApps = useMemo(() => arrApps.filter((app) => !isSeerrApp(app)), [arrApps]);
+  const sickChillApps = useMemo(() => automationOnlyApps.filter((app) => String(app.name).toLowerCase() === "sickchill"), [automationOnlyApps]);
+  const primaryAutomationApps = useMemo(() => automationOnlyApps.filter((app) => String(app.name).toLowerCase() !== "sickchill"), [automationOnlyApps]);
   const seerrApps = useMemo(() => arrApps.filter(isSeerrApp), [arrApps]);
   const enabledIntegrations = useMemo(() => [...arrApps, ...clients, ...thirdParty].filter((item) => item.connected), [arrApps, clients, thirdParty]);
+
+  function updateAgentDefault(type, value) {
+    setAgentDefaults((current) => {
+      const next = { ...current, [type]: value };
+      localStorage.setItem("jellyglance_agent_defaults", JSON.stringify(next));
+      return next;
+    });
+  }
   const latestHealthById = useMemo(() => {
     const lookup = new Map();
     healthHistory.forEach((entry) => {
@@ -235,6 +338,19 @@ export default function Integrations({ embedded = false, firstRun = false }) {
     });
     return lookup;
   }, [healthHistory]);
+
+  useEffect(() => {
+    const normalized = normalizeIntegrationTabSlug(controlledActiveTab);
+    if (normalized) {
+      setInternalActiveTab(normalized);
+    }
+  }, [controlledActiveTab]);
+
+  function selectIntegrationTab(tabKey) {
+    const normalized = normalizeIntegrationTabSlug(tabKey) || "media-server";
+    setInternalActiveTab(normalized);
+    onTabChange?.(normalized);
+  }
 
   useEffect(() => {
     async function loadIntegrations() {
@@ -271,14 +387,14 @@ export default function Integrations({ embedded = false, firstRun = false }) {
         if (Array.isArray(saved.clients)) {
           setClients(saved.clients);
         }
-        setThirdParty(normalizeThirdPartyApps(saved.thirdParty));
+        setThirdParty(normalizeThirdPartyApps(saved.thirdParty, saved.arrApps));
       } catch {
         const saved = loadSavedIntegrations();
         setArrApps(normalizeAutomationApps(saved.arrApps));
         if (Array.isArray(saved.clients)) {
           setClients(saved.clients);
         }
-        setThirdParty(normalizeThirdPartyApps(saved.thirdParty));
+        setThirdParty(normalizeThirdPartyApps(saved.thirdParty, saved.arrApps));
       }
     }
     loadIntegrations();
@@ -342,7 +458,7 @@ export default function Integrations({ embedded = false, firstRun = false }) {
       const imported = parsed.integrations || parsed;
       const nextArrApps = normalizeAutomationApps(imported.arrApps);
       const nextClients = Array.isArray(imported.clients) ? imported.clients : [];
-      const nextThirdParty = normalizeThirdPartyApps(imported.thirdParty);
+      const nextThirdParty = normalizeThirdPartyApps(imported.thirdParty, imported.arrApps);
       setArrApps(nextArrApps);
       setClients(nextClients);
       setThirdParty(nextThirdParty);
@@ -442,7 +558,8 @@ export default function Integrations({ embedded = false, firstRun = false }) {
     const needsUsername = listName === "clients" && selectedIntegration.auth === "userpass";
     const missingUrl = !values.url?.trim();
     const missingUsername = needsUsername && !values.username?.trim();
-    const missingSecret = !values.secret?.trim();
+    const secretOptional = listName === "thirdParty" && (selectedIntegration.secretOptional || String(selectedIntegration.name || selectedIntegration.slug || "").toLowerCase().includes("tdarr"));
+    const missingSecret = !secretOptional && !values.secret?.trim();
     const invalidUrl = values.url?.trim() && !/^https?:\/\//i.test(values.url.trim());
     const validationError = invalidUrl ? "URL must start with http:// or https://" : "Fill in all required fields before testing";
 
@@ -539,7 +656,7 @@ export default function Integrations({ embedded = false, firstRun = false }) {
   }
 
   return (
-    <div className={`integrations-page${embedded ? " is-embedded" : ""}`}>
+    <div className={`integrations-page${embedded ? " is-embedded" : ""}`} data-theme-screen="integrations">
       <section className="integrations-hero">
         <div>
           <p>Media control</p>
@@ -554,20 +671,59 @@ export default function Integrations({ embedded = false, firstRun = false }) {
       </section>
 
       <nav className="integration-subtabs" aria-label="Integration categories">
-        {[
-          ["media-server", "Media Server"],
-          ["automation", "Arr Apps"],
-          ["seerr", "Seerr Apps"],
-          ["downloads", "Download Clients"],
-          ["invites", "Invites"],
-        ].map(([key, label]) => (
-          <button type="button" className={activeTab === key ? "is-active" : ""} onClick={() => setActiveTab(key)} key={key}>
+        {integrationTabItems.map(([key, label]) => (
+          <button type="button" className={activeTab === key ? "is-active" : ""} onClick={() => selectIntegrationTab(key)} key={key}>
             {label}
           </button>
         ))}
       </nav>
 
       {activeTab === "media-server" ? <JellyfinIntegrationSettings compact firstRun={firstRun} /> : null}
+
+      {activeTab === "media-server" ? (
+        <section className="integration-agent-panel">
+          <div className="integration-subsection-title">
+            <strong>Default media agents</strong>
+            <span>Choose the preferred service for TV, movies, and audio workflows.</span>
+          </div>
+          <div className="integration-agent-grid">
+            {Object.entries(defaultAgentOptions).map(([type, options]) => {
+              const typeLabel = type === "tv" ? "TV shows" : type === "movies" ? "Movies" : "Audio";
+              const selected = agentDefaults[type] || options[0];
+              return (
+                <div key={type} className="integration-agent-category">
+                  <span className="integration-agent-type-label">{typeLabel}</span>
+                  <div className="integration-agent-choices">
+                    {options.map((option) => {
+                      const meta = defaultAgentMeta[option] || {};
+                      const isSelected = selected === option;
+                      return (
+                        <button
+                          type="button"
+                          key={option}
+                          className={`integration-agent-choice${isSelected ? " is-selected" : ""}`}
+                          style={{ "--agent-accent": meta.accent || "var(--barracks-action)" }}
+                          onClick={() => updateAgentDefault(type, option)}
+                          aria-pressed={isSelected}
+                        >
+                          <span className="integration-agent-choice-icon">
+                            <AppIcon app={{ name: option, ...meta }} />
+                          </span>
+                          <span className="integration-agent-choice-copy">
+                            <strong>{option}</strong>
+                            <small>{meta.role || ""}</small>
+                          </span>
+                          {isSelected ? <span className="integration-agent-check">✓</span> : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
 
       {notice ? <div className="integration-notice">{notice}</div> : null}
 
@@ -576,7 +732,7 @@ export default function Integrations({ embedded = false, firstRun = false }) {
           <div className="integration-section-title">
             <div>
               <h2>Arr Apps</h2>
-              <span>Sonarr, Radarr, Lidarr, and Bazarr</span>
+              <span>Sonarr, Radarr, Lidarr, Prowlarr, and Bazarr</span>
             </div>
             <Settings3LineIcon />
           </div>
@@ -604,7 +760,7 @@ export default function Integrations({ embedded = false, firstRun = false }) {
             </label>
           </div>
           <div className="integration-grid">
-            {automationOnlyApps.map((app) => (
+            {primaryAutomationApps.map((app) => (
               <IntegrationCard
                 key={app.instanceId}
                 app={app}
@@ -616,6 +772,37 @@ export default function Integrations({ embedded = false, firstRun = false }) {
                 onCopySecret={copySecret}
               />
             ))}
+          </div>
+          {sickChillApps.length ? (
+            <div className="integration-subsection">
+              <div className="integration-subsection-title">
+                <strong>TV alternative</strong>
+                <span>SickChill can be used instead of Sonarr for series automation.</span>
+              </div>
+              <div className="integration-grid integration-grid-single-row">
+                {sickChillApps.map((app) => (
+                  <IntegrationCard
+                    key={app.instanceId}
+                    app={app}
+                    type="automation"
+                    onChange={(instanceId, field, value) => updateIntegration("arrApps", setArrApps, instanceId, field, value)}
+                    onRemove={(instanceId) => removeIntegration("arrApps", setArrApps, instanceId)}
+                    onSave={(instanceId) => saveIntegration("arrApps", setArrApps, instanceId)}
+                    onTest={(instanceId) => testIntegration("arrApps", setArrApps, instanceId)}
+                    onCopySecret={copySecret}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
+          <div className="integration-link-panel">
+            <div>
+              <strong>Automation health</strong>
+              <span>Review Bazarr subtitles and Prowlarr indexer status from one JellyGlance view.</span>
+            </div>
+            <div className="integration-link-actions">
+              <Link to="/automation-health">Open Automation Health</Link>
+            </div>
           </div>
         </section>
       ) : null}
@@ -731,8 +918,8 @@ export default function Integrations({ embedded = false, firstRun = false }) {
         <section className="integration-section">
           <div className="integration-section-title">
             <div>
-              <h2>Invite Managers</h2>
-              <span>Wizarr user invites for Jellyfin and other media servers</span>
+              <h2>Third-party Apps</h2>
+              <span>Wizarr invites and Tdarr active transcode monitoring</span>
             </div>
             <UserAddLineIcon />
           </div>
@@ -775,10 +962,13 @@ export default function Integrations({ embedded = false, firstRun = false }) {
           </div>
           <div className="integration-link-panel">
             <div>
-              <strong>Manage invite links</strong>
-              <span>Create, copy, and revoke Wizarr invitations from JellyGlance once the connection tests successfully.</span>
+              <strong>Open connected tools</strong>
+              <span>Manage Wizarr invitations or monitor Tdarr active, queued, and finished transcodes from JellyGlance.</span>
             </div>
-            <Link to="/wizarr">Open Wizarr links</Link>
+            <div className="integration-link-actions">
+              <Link to="/wizarr">Open Wizarr links</Link>
+              <Link to="/active-transcodes">Open Active Transcodes</Link>
+            </div>
           </div>
         </section>
       ) : null}

@@ -1,42 +1,48 @@
 services:
-  jellyglance-db:
+  silo-barracks-db:
     image: postgres:16-alpine
-    container_name: jellyglance-db
     restart: unless-stopped
     shm_size: "1gb"
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: jellyglance
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: silo_barracks
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - barracks-postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready --dbname=jellyglance --username=postgres"]
+      test: ["CMD-SHELL", "pg_isready --dbname=silo_barracks --username=postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  jellyglance:
-    image: ghcr.io/nerdy-technician/jellyglance:latest
-    container_name: jellyglance
+  silo-barracks:
+    build: .
+    image: silo-barracks:local
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_IP: jellyglance-db
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_IP: silo-barracks-db
       POSTGRES_PORT: 5432
-      POSTGRES_DB: jellyglance
-      JWT_SECRET: "replace-me-with-a-long-random-secret"
-      TZ: Europe/London
+      POSTGRES_DB: silo_barracks
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      MEDIA_SERVER_PROVIDER: silo
+      SILO_URL: ${SILO_URL:-}
+      SILO_API_KEY: ${SILO_API_KEY:-}
+      SILO_POLL_INTERVAL_MS: ${SILO_POLL_INTERVAL_MS:-5000}
+      TZ: America/New_York
       CONFIG_DIR: /app/config
       BACKUP_DIR: /app/backups
     volumes:
-      - ./config:/app/config
-      - ./backups:/app/backups
+      - barracks-config:/app/config
+      - barracks-backups:/app/backups
     ports:
       - "3000:3000"
     depends_on:
-      jellyglance-db:
+      silo-barracks-db:
         condition: service_healthy
 
-
+volumes:
+  barracks-postgres:
+  barracks-config:
+  barracks-backups:

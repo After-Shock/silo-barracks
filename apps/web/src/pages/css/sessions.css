@@ -7,9 +7,13 @@
 }
 
 .session-details {
-  margin: 0px !important;
-  padding: 10px 10px 0 10px !important;
-  color: #e5edf8;
+  margin: 5px !important;
+  padding: 8px !important;
+  border: 1px solid var(--barracks-border-subtle);
+  border-radius: 8px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+  box-shadow: 0 8px 24px var(--barracks-scrim);
   font-size: 11px;
   line-height: 1.28;
   min-width: 0;
@@ -39,20 +43,18 @@
 }
 
 .session-details-title {
-  color: #d6a3f1 !important;
+  color: var(--barracks-text-muted-raised) !important;
   min-width: 0;
   padding: 0 8px 0 0 !important;
   font-size: 9px;
   font-weight: 900;
   letter-spacing: 0.1em;
-  text-shadow: 0 0 14px rgba(var(--primary-rgb), 0.2);
 }
 
 .session-details-title + .session-details-value {
-  color: #f8fafc;
+  color: var(--barracks-text-raised);
   font-size: 11px;
   font-weight: 750;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.62);
 }
 
 .session-details .ellipse {
@@ -82,6 +84,10 @@
   white-space: nowrap !important;
 }
 
+.session-details-value > a {
+  color: var(--barracks-text-raised) !important;
+}
+
 .card-device-image-overlay {
   position: absolute;
   top: 12px;
@@ -100,22 +106,20 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border: 1px solid var(--barracks-border-subtle) !important;
   border-radius: 16px !important;
-  background:
-    linear-gradient(145deg, rgba(var(--primary-rgb), 0.12), rgba(255, 255, 255, 0.035)),
-    rgba(11, 14, 20, 0.9) !important;
-  color: white;
+  background-color: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text-raised);
   width: min(496px, 100%);
   max-width: none;
   max-height: none;
-  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.32);
+  box-shadow: 0 20px 54px var(--barracks-scrim);
   transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
   cursor: pointer;
 }
 
 .session-card:focus-visible {
-  outline: 2px solid rgba(var(--primary-light-rgb), 0.82);
+  outline: 2px solid var(--barracks-action);
   outline-offset: 4px;
 }
 
@@ -135,26 +139,26 @@
 
 .session-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(var(--primary-rgb), 0.32) !important;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.42);
+  border-color: var(--barracks-action) !important;
+  box-shadow: 0 24px 64px var(--barracks-scrim);
 }
 
 .progress-bar {
   height: 7px;
-  background-color: rgba(255, 255, 255, 0.12) !important;
+  background-color: var(--barracks-surface-interactive) !important;
   border-radius: 999px;
   margin: 10px 12px 0;
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px var(--barracks-border-subtle);
 }
 
 .progress-custom {
   height: 100%;
   min-width: 3px;
-  background: var(--primary-color);
+  background: var(--barracks-action);
   transition: width 0.2s ease-in-out;
   border-radius: 999px;
-  box-shadow: 0 0 16px rgba(var(--primary-rgb), 0.42);
+  box-shadow: 0 0 16px var(--barracks-action);
 }
 
 .card-banner {
@@ -172,10 +176,8 @@
   grid-row: 1 / 3;
 
   grid-column: 2 / 3;
-  backdrop-filter: blur(10px);
-  background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.64), rgba(8, 10, 15, 0.42)),
-    rgba(0, 0, 0, 0.26);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   border-radius: 0 16px 0 0;
 }
 
@@ -201,7 +203,7 @@
   width: 30px;
   height: 30px;
   margin-left: 5px;
-  border: 2px solid rgba(255, 255, 255, 0.18);
+  border: 2px solid var(--barracks-border-subtle);
   object-fit: cover;
 }
 
@@ -217,11 +219,11 @@
 
 .card-username a {
   text-decoration: none;
-  color: white;
+  color: var(--barracks-text-raised);
 }
 
 .card-username:hover a {
-  color: rgb(0, 164, 219);
+  color: var(--barracks-text-raised);
 }
 
 .card-device {
@@ -241,8 +243,8 @@
 .card-device-image {
   width: 30px;
   height: 30px;
-  fill: var(--platform-icon-color, var(--primary-color));
-  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--platform-icon-color, var(--primary-color)) 52%, transparent));
+  fill: var(--platform-icon-color, var(--barracks-action));
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--platform-icon-color, var(--barracks-action)) 52%, transparent));
 }
 
 .card-client {
@@ -280,11 +282,11 @@
 
 .card-text > a {
   text-decoration: none !important;
-  color: white !important;
+  color: var(--barracks-text-raised) !important;
 }
 
 .card-text a:hover {
-  color: var(--secondary-color) !important;
+  color: var(--barracks-text-raised) !important;
 }
 
 .ellipse {
@@ -311,19 +313,20 @@
   min-height: 58px;
   padding: 8px 12px 10px !important;
   background:
-    linear-gradient(180deg, rgba(7, 9, 13, 0.82), rgba(7, 9, 13, 0.96)),
-    rgba(7, 9, 13, 0.9);
+    linear-gradient(180deg, var(--barracks-overlay), var(--barracks-overlay)),
+    var(--barracks-overlay);
+  color: var(--barracks-text-overlay);
 }
 
 .session-timecode {
   margin: 4px 0 0 !important;
-  color: #f8fafc;
+  color: var(--barracks-text-overlay);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0;
   line-height: 1.15;
   min-width: 0;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.72);
+  text-shadow: 0 2px 14px var(--barracks-scrim);
 }
 
 .session-timecode-value {
@@ -353,8 +356,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: rgba(var(--primary-rgb), 0.18);
-  color: #f8fafc;
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
 .session-play-state svg {
@@ -378,7 +381,7 @@
   display: block;
   max-width: 100%;
   overflow: hidden;
-  color: #f8fafc !important;
+  color: var(--barracks-text-overlay) !important;
   font-size: 14px;
   font-weight: 900;
   line-height: 1.25;
@@ -390,7 +393,7 @@
   display: block;
   max-width: 100%;
   overflow: hidden;
-  color: #c7a4df;
+  color: var(--barracks-text-overlay);
   font-size: 12px;
   font-weight: 800;
   line-height: 1.35;
@@ -418,11 +421,16 @@
   min-width: 0;
   max-width: 82px;
   overflow: hidden;
-  color: #cbd5e1 !important;
+  color: var(--barracks-text-overlay) !important;
   font-size: 12px;
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.session-card .session-card-meta :is(a, .session-user-name, small),
+.session-card .session-card-meta :is(a, .session-user-name):is(:hover, :focus-visible) {
+  color: var(--barracks-text-overlay) !important;
 }
 
 .session-popout-modal {
@@ -431,13 +439,11 @@
 
 .session-popout-modal .modal-content {
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 18px;
-  background:
-    linear-gradient(145deg, rgba(var(--primary-rgb), 0.18), rgba(12, 15, 22, 0.98)),
-    #080b10;
-  color: #f8fafc;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.56);
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+  box-shadow: 0 30px 90px var(--barracks-scrim);
 }
 
 .session-popout-modal .modal-body {
@@ -455,10 +461,10 @@
   height: 34px;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 999px;
-  background: rgba(7, 9, 13, 0.72);
-  color: #fff;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   font-size: 24px;
   line-height: 1;
 }
@@ -479,12 +485,18 @@
   aspect-ratio: 2 / 3;
   object-fit: cover;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.46);
+  border: 1px solid var(--barracks-border-subtle);
+  box-shadow: 0 22px 52px var(--barracks-scrim);
 }
 
 .session-popout-copy {
   min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--barracks-border-subtle);
+  border-radius: 12px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+  box-shadow: 0 16px 38px var(--barracks-scrim);
 }
 
 .session-popout-status {
@@ -499,28 +511,32 @@
   min-height: 28px;
   align-items: center;
   padding: 0 10px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
   font-size: 11px;
   font-weight: 900;
 }
 
 .session-popout-status .is-playing {
-  border-color: rgba(45, 212, 191, 0.36);
-  color: #9ff8e8;
+  border-color: var(--barracks-state-live);
+  color: var(--barracks-state-live);
 }
 
-.session-popout-status .is-paused,
+.session-popout-status .is-paused {
+  border-color: var(--barracks-state-warning);
+  color: var(--barracks-state-warning);
+}
+
 .session-popout-status .is-transcoding {
-  border-color: rgba(var(--primary-light-rgb), 0.42);
-  color: var(--primary-light-color);
+  border-color: var(--barracks-action);
+  color: var(--barracks-text-raised);
 }
 
 .session-popout-copy h2 {
   margin: 0;
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-size: 32px;
   font-weight: 950;
   line-height: 1.05;
@@ -528,7 +544,7 @@
 
 .session-popout-copy p {
   margin: 8px 0 22px;
-  color: #cbd5e1;
+  color: var(--barracks-text-muted-raised);
   font-size: 14px;
   font-weight: 750;
 }
@@ -537,16 +553,16 @@
   height: 10px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.13);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  background: var(--barracks-surface-interactive);
+  box-shadow: inset 0 0 0 1px var(--barracks-border-subtle);
 }
 
 .session-popout-progress div {
   height: 100%;
   min-width: 4px;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--primary-color), var(--primary-light-color));
-  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.52);
+  background: var(--barracks-action);
+  box-shadow: 0 0 20px var(--barracks-action);
 }
 
 .session-popout-time {
@@ -555,13 +571,13 @@
   gap: 8px 14px;
   justify-content: space-between;
   margin-top: 10px;
-  color: #cbd5e1;
+  color: var(--barracks-text-muted-raised);
   font-size: 12px;
   font-weight: 800;
 }
 
 .session-popout-time strong {
-  color: #fff;
+  color: var(--barracks-text-raised);
   font-variant-numeric: tabular-nums;
 }
 
@@ -570,15 +586,16 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   padding: 18px;
-  background: rgba(7, 9, 13, 0.92);
+  background: var(--barracks-surface-raised);
 }
 
 .session-popout-detail {
   min-width: 0;
   padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--barracks-border-subtle);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.055);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
 }
 
 .session-popout-detail.is-wide {
@@ -588,7 +605,7 @@
 .session-popout-detail span {
   display: block;
   margin-bottom: 5px;
-  color: #d6a3f1;
+  color: var(--barracks-text-interactive);
   font-size: 10px;
   font-weight: 950;
   text-transform: uppercase;
@@ -597,7 +614,7 @@
 .session-popout-detail strong {
   display: block;
   overflow: hidden;
-  color: #f8fafc;
+  color: var(--barracks-text-interactive);
   font-size: 13px;
   font-weight: 850;
   line-height: 1.35;
@@ -646,7 +663,8 @@
   }
 
   .session-details {
-    padding: 8px 0 0 9px !important;
+    margin: 3px !important;
+    padding: 5px !important;
     font-size: 10px;
   }
 
@@ -772,4 +790,14 @@
   .session-card-user-image {
     display: none !important;
   }
+}
+.session-connection-status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid var(--barracks-state-warning);
+  border-radius: 0.75rem;
+  background: var(--barracks-surface-raised);
 }

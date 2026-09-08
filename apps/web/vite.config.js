@@ -19,11 +19,16 @@ export default defineConfig(({ mode }) => {
       },
     },
 
+    resolve: {
+      dedupe: ["react", "react-dom"],
+    },
+
     server: {
       port: 3001,
       proxy: {
         "/api":      { target: "http://127.0.0.1:3000", changeOrigin: true },
         "/proxy":    { target: "http://127.0.0.1:3000", changeOrigin: true },
+        "/fleet":    { target: "http://127.0.0.1:3000", changeOrigin: true },
         "/stats":    { target: "http://127.0.0.1:3000", changeOrigin: true },
         "/sync":     { target: "http://127.0.0.1:3000", changeOrigin: true },
         "/auth":     { target: "http://127.0.0.1:3000", changeOrigin: true },

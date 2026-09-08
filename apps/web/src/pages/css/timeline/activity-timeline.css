@@ -1,56 +1,221 @@
 @import "../variables.css";
 
-.Heading {
+.activity-timeline-screen {
+  display: grid;
+  width: 100%;
+  max-width: 1600px;
+  min-width: 0;
+  gap: 24px;
+  padding: 18px clamp(14px, 1.6vw, 24px) 32px;
+  color: var(--barracks-text);
+}
+
+.activity-timeline-screen > .Heading {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  @media (max-width: 576px) {
-    h1 {
-      width: 100%;
-      padding-bottom: 1rem;
-    }
-    * {
-      flex-grow: 1;
-    }
-  }
+  gap: 16px;
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: 12px;
+  padding: 18px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+  box-shadow: var(--barracks-shadow);
 }
-.activity-card {
+
+.activity-timeline-screen > .Heading h1 {
+  margin: 0;
+  color: var(--barracks-text-raised);
+}
+
+.activity-timeline-screen .user-selection,
+.activity-timeline-screen .library-selection {
+  min-width: 0;
+}
+
+.activity-timeline-screen .bg-primary-1 {
+  border: 1px solid var(--barracks-border-inset);
+  background: var(--barracks-surface-inset) !important;
+  color: var(--barracks-text-inset);
+}
+
+.activity-timeline-screen :is(.form-select, .btn) {
+  min-height: 42px;
+}
+
+.activity-timeline-screen .MuiTimeline-root {
+  min-width: 0;
+  margin: 0;
+  padding: 12px 0;
+}
+
+.activity-timeline-screen .MuiTimelineItem-root {
+  min-height: 20rem;
+  color: var(--barracks-text);
+}
+
+.activity-timeline-screen .MuiTimelineConnector-root {
+  width: 3px;
+  background: var(--barracks-border-canvas);
+}
+
+.activity-timeline-screen .MuiTimelineContent-root {
+  align-self: center;
+  min-width: 0;
+}
+
+.activity-timeline-screen .activity-card {
   display: flex;
   width: 10rem;
-  * {
-    flex-grow: 1;
-    border-radius: var(--bs-border-radius-lg) !important;
-  }
-  .activity-card-img {
-    object-fit: cover;
-    background-color: black;
-    background-repeat: no-repeat;
-    background-size: cover;
-    transition: all 0.2s ease-in-out;
-  }
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: var(--bs-border-radius-lg);
+  background: var(--barracks-surface-raised);
+  box-shadow: var(--barracks-shadow);
 }
 
-.MuiTimelineItem-root {
-  height: 20rem;
-  @media (max-width: 576px) {
-    height: 25rem;
-    ::before {
-      padding: 0;
-      flex: 0;
-    }
-    .MuiTimelineSeparator-root {
-      flex: 1;
-    }
-    .MuiTimelineOppositeContent-root {
-      display: none;
-    }
-    .activity-description {
-      max-width: 50%;
-      padding: 0.5rem 0;
-      text-align: center;
-    }
-  }
+.activity-timeline-screen .activity-card > * {
+  flex-grow: 1;
+  min-width: 0;
+  border-radius: inherit !important;
 }
 
-.MuiTimelineContent-root {
-  align-self: center;
+.activity-timeline-screen .activity-card a {
+  display: block;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
+}
+
+.activity-timeline-screen .activity-card-img,
+.activity-timeline-screen .default_library_image {
+  display: block;
+  width: 100%;
+  height: 15rem;
+  object-fit: cover;
+  background-color: var(--barracks-surface-inset);
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: var(--barracks-text-inset);
+  transition: transform 0.2s ease-in-out;
+}
+
+.activity-timeline-screen .activity-card a:hover .activity-card-img {
+  transform: scale(1.025);
+}
+
+.activity-timeline-screen .activity-description {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: 10px;
+  padding: 14px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+  box-shadow: var(--barracks-shadow);
+}
+
+.activity-timeline-screen .activity-description .MuiTypography-root {
+  color: var(--barracks-text-muted-raised);
+  overflow-wrap: anywhere;
+}
+
+.activity-timeline-screen .activity-description .MuiTypography-h6 {
+  color: var(--barracks-text-raised);
+  font-weight: 760;
+}
+
+.activity-timeline-screen :is(.timeline-state, .timeline-notice) {
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: 10px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+}
+
+.activity-timeline-screen .timeline-state {
+  display: grid;
+  min-height: 12rem;
+  place-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+}
+
+.activity-timeline-screen .timeline-state :is(h1, p),
+.activity-timeline-screen .timeline-notice {
+  margin: 0;
+}
+
+.activity-timeline-screen :is(.timeline-state, .timeline-notice).is-error {
+  border-color: var(--barracks-state-danger);
+  color: var(--barracks-state-danger);
+}
+
+.activity-timeline-screen .timeline-notice {
+  padding: 10px 12px;
+}
+
+.activity-timeline-screen .timeline-loading {
+  min-height: 12rem;
+}
+
+.activity-timeline-screen .timeline-results {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+
+@media (max-width: 576px) {
+  .activity-timeline-screen {
+    gap: 16px;
+  }
+
+  .activity-timeline-screen > .Heading {
+    align-items: stretch;
+    padding: 14px;
+  }
+
+  .activity-timeline-screen > .Heading h1 {
+    width: 100%;
+  }
+
+  .activity-timeline-screen > .Heading > *,
+  .activity-timeline-screen .user-selection,
+  .activity-timeline-screen .library-selection,
+  .activity-timeline-screen .user-selection > div,
+  .activity-timeline-screen .library-selection .btn {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+
+  .activity-timeline-screen .MuiTimelineItem-root {
+    min-height: 25rem;
+  }
+
+  .activity-timeline-screen .MuiTimelineItem-root::before {
+    flex: 0;
+    padding: 0;
+  }
+
+  .activity-timeline-screen .MuiTimelineSeparator-root {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .activity-timeline-screen .MuiTimelineOppositeContent-root {
+    display: none;
+  }
+
+  .activity-timeline-screen .activity-card {
+    width: min(10rem, 100%);
+  }
+
+  .activity-timeline-screen .activity-description {
+    width: min(16rem, 100%);
+    max-width: 100%;
+    padding: 10px;
+    text-align: center;
+  }
 }

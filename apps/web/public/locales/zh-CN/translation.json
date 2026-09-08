@@ -352,5 +352,35 @@
   "X_ROWS_SELECTED": "已选中 {ROWS} 行",
   "TRANSCODE_REASONS": "转码原因",
   "SUBTITLES": "字幕",
+  "UNAVAILABLE": "不可用",
+  "ACTIVITY_STATES": {
+    "CONFIG_ERROR": "无法加载活动配置。",
+    "HISTORY_ERROR": "无法加载活动历史记录。",
+    "FILTERS_PARTIAL": "部分活动筛选器不可用。",
+    "TIMELINE_CONFIG_ERROR": "无法加载时间线配置。",
+    "TIMELINE_USERS_ERROR": "无法加载时间线用户。",
+    "TIMELINE_LIBRARIES_ERROR": "无法加载时间线媒体库。",
+    "TIMELINE_ACTIVITY_ERROR": "无法加载时间线活动。",
+    "TIMELINE_EMPTY": "没有可用于此时间线的活动。",
+    "TIMELINE_FILTERS_EMPTY": "没有可用于时间线的用户或媒体库。",
+    "TIMELINE_SELECTION_EMPTY": "请选择一个用户和至少一个媒体库以查看时间线。"
+  },
+  "OPERATIONAL_STATES": {
+    "CALENDAR_LOADING": "正在加载日历…",
+    "CALENDAR_ERROR": "无法加载日历数据。",
+    "CALENDAR_EMPTY": "暂无发布数据。",
+    "CALENDAR_EMPTY_HINT": "请在设置 → 集成中添加并测试 Sonarr、Radarr 或 Lidarr，然后运行立即同步。",
+    "CALENDAR_FILTER_EMPTY": "此日历时间段没有找到 {{source}} 发布内容。",
+    "DOWNLOADS_LOADING": "正在加载下载活动…",
+    "DOWNLOADS_ERROR": "无法加载下载活动。",
+    "DOWNLOADS_EMPTY": "没有活动下载。请在设置 → 集成中添加客户端，然后同步队列。",
+    "DOWNLOADS_CLIENTS_EMPTY": "尚未添加下载客户端。",
+    "REQUESTS_LOADING": "正在加载请求…",
+    "REQUESTS_ERROR": "无法加载请求。",
+    "REQUESTS_EMPTY": "未找到请求。",
+    "REQUESTS_EMPTY_FILTER_HINT": "请尝试其他搜索、排序或状态筛选。",
+    "REQUESTS_EMPTY_SETUP_HINT": "请在设置 → 集成 → Seerr 应用中启用并测试 Jellyseerr 或 Overseerr。",
+    "RETRY": "重试"
+  },
   "GENRES": "类型"
 }

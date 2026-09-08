@@ -1,6 +1,6 @@
 {
   "name": "@jellyglance/web",
-  "version": "1.2.2",
+  "version": "1.2.3-beta.3",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,9 +12,10 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^9.3.1",
+    "@mui/icons-material": "7.3.11",
     "@mui/lab": "^7.0.0-beta.17",
-    "@mui/material": "^9.3.1",
+    "@mui/material": "7.3.11",
+    "@mui/system": "7.3.11",
     "@mui/x-data-grid": "^9.11.0",
     "@mui/x-date-pickers": "^9.11.0",
     "axios": "^1.19.0",
