@@ -164,6 +164,14 @@ export const HOME_WIDGET_SIZE_LABELS = {
   large: "Full width",
 };
 
+export const HOME_THEME_OPTIONS = [
+  { value: "default", label: "Default" },
+  { value: "darker", label: "Darker" },
+  { value: "neon", label: "Signal" },
+  { value: "highContrast", label: "High contrast" },
+  { value: "wall", label: "Wall display" },
+];
+
 export function normalizeHomeOrder(order) {
   const knownSections = new Set(DEFAULT_HOME_ORDER);
   const savedOrder = Array.isArray(order) ? order.filter((sectionId) => knownSections.has(sectionId)) : [];

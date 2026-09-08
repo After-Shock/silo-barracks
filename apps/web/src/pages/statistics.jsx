@@ -282,7 +282,7 @@ function Statistics() {
       : "Watch-time trends split by library, weekday, and hour.";
 
   return (
-    <div className="watch-stats">
+    <div className="watch-stats" data-theme-screen="statistics">
       <div className="stats-page-header">
         <div className="stats-title-block">
           <div className="stats-title-icon">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts";
 
@@ -7,10 +7,14 @@ import ErrorBoundary from "../general/ErrorBoundary.jsx";
 import "../../css/genres.css";
 import { Trans } from "react-i18next";
 import i18next from "i18next";
+import { getChartTheme, subscribeThemeTokens } from "../../../lib/theme-chart";
 
 function GenreStatCard(props) {
   const [maxRange, setMaxRange] = useState(100);
   const [data, setData] = useState(props.data);
+  const [chartTheme, setChartTheme] = useState(() => getChartTheme());
+
+  useEffect(() => subscribeThemeTokens(typeof window === "undefined" ? undefined : window, (tokens) => setChartTheme(getChartTheme(tokens))), []);
 
   useEffect(() => {
     const maxDuration = props.data.reduce((max, item) => {
@@ -82,14 +86,14 @@ function GenreStatCard(props) {
       <ErrorBoundary>
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
-            <PolarGrid gridType="circle" />
-            <PolarAngleAxis dataKey="genre" />
-            <PolarRadiusAxis domain={[0, maxRange]} tick={false} axisLine={false} />
+            <PolarGrid gridType="circle" stroke={chartTheme.grid} />
+            <PolarAngleAxis dataKey="genre" stroke="var(--barracks-text-muted-raised)" />
+            <PolarRadiusAxis domain={[0, maxRange]} tick={false} axisLine={false} stroke={chartTheme.grid} />
             <Radar
               name="Duration"
               dataKey={props.dataKey}
-              stroke={`var(--tertiary-background-color)`}
-              fill={`var(--secondary-color)`}
+              stroke={chartTheme.series[0]}
+              fill={chartTheme.series[1]}
               fillOpacity={0.6}
             />
             <Tooltip content={<CustomTooltip />} />

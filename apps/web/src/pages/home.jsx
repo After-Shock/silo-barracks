@@ -40,6 +40,7 @@ import {
   DEFAULT_HOME_SETTINGS,
   HOME_PRESETS,
   HOME_SECTION_DEFINITIONS,
+  HOME_THEME_OPTIONS,
   HOME_WIDGET_SIZE_LABELS,
   getHomeSettingsStorageKey,
   loadHomeSettings,
@@ -865,11 +866,9 @@ export default function Home({ kioskMode = false }) {
             <label>
               <span>Theme</span>
               <select value={homeSettings.theme} onChange={(event) => updateHomeSettings({ theme: event.target.value, preset: "custom" })}>
-                <option value="default">Default</option>
-                <option value="darker">Darker</option>
-                <option value="neon">Neon</option>
-                <option value="highContrast">High contrast</option>
-                <option value="wall">Wall display</option>
+                {HOME_THEME_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
               </select>
             </label>
             <button type="button" className={homeSettings.autoRotate ? "is-enabled" : ""} onClick={() => updateHomeSettings((current) => ({ ...current, autoRotate: !current.autoRotate, preset: "custom" }))}>

@@ -18,14 +18,14 @@ function ItemStatComponent(props) {
   const backgroundImage = `/proxy/Items/Images/Backdrop?id=${props.data[0].Id}&fillWidth=300&quality=10`;
 
   const cardStyle = {
-    backgroundImage: `url(${backgroundImage}), linear-gradient(to right, var(--secondary-color), var(--primary-color))`,
+    backgroundImage: `url(${backgroundImage}), linear-gradient(to right, var(--barracks-accent-secondary), var(--barracks-action))`,
     height: "100%",
     backgroundSize: "cover",
   };
 
   const cardBgStyle = {
     backdropFilter: props.base_url ? "blur(5px)" : "blur(0px)",
-    backgroundColor: "rgb(0, 0, 0, 0.6)",
+    backgroundColor: "var(--barracks-scrim)",
     height: "100%",
   };
 

@@ -8,6 +8,7 @@ import {
   DEFAULT_HOME_ORDER,
   HOME_PRESETS,
   HOME_SECTION_DEFINITIONS,
+  HOME_THEME_OPTIONS,
   HOME_WIDGET_SIZE_LABELS,
   loadHomeSettings,
   normalizeHomeOrder,
@@ -42,7 +43,7 @@ export default function KioskSettings() {
     const preset = HOME_PRESETS.kiosk;
     updateSettings({
       ...preset,
-      title: "JellyGlance Kiosk",
+      title: "Silo Barracks Kiosk",
       autoRotate: false,
       theme: "default",
       pinned: "",
@@ -141,7 +142,7 @@ export default function KioskSettings() {
         <div className="kiosk-settings-grid">
           <label>
             <span>Title</span>
-            <input value={settings.title} placeholder="JellyGlance Kiosk" onChange={(event) => updateSettings({ title: event.target.value, preset: "custom" })} />
+            <input value={settings.title} placeholder="Silo Barracks Kiosk" onChange={(event) => updateSettings({ title: event.target.value, preset: "custom" })} />
           </label>
           <label>
             <span>Preset</span>
@@ -175,11 +176,9 @@ export default function KioskSettings() {
           <label>
             <span>Theme</span>
             <select value={settings.theme} onChange={(event) => updateSettings({ theme: event.target.value, preset: "custom" })}>
-              <option value="default">Default</option>
-              <option value="darker">Darker</option>
-              <option value="neon">Neon</option>
-              <option value="highContrast">High contrast</option>
-              <option value="wall">Wall display</option>
+              {HOME_THEME_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
             </select>
           </label>
           <label className="kiosk-settings-toggle">
