@@ -1,7 +1,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const { createFleetRouter } = require('../routes/fleet');
+const { createAuthenticate } = require('../middleware/authenticate');
 
 async function appFor(t, registry) {
   const app = express();
@@ -37,4 +39,32 @@ test('settings-only permission can manage connections but cannot view activity',
   const headers = { 'x-test-admin': 'yes', 'x-test-dashboard': 'no' };
   assert.equal((await fetch(base, { headers })).status, 403);
   assert.equal((await fetch(base + '/servers', { headers })).status, 200);
+});
+
+test('real authentication lets settings-only JWTs manage servers without dashboard access', async t => {
+  const secret = 'fleet-route-test-secret';
+  const app = express();
+  app.use(express.json());
+  app.use('/fleet', createAuthenticate({
+    jwt,
+    jwtSecret: secret,
+    allowedPermissions: ['dashboard', 'settings'],
+    resolveTokenAccess: async () => ({
+      user: { role: 'Custom' },
+      permissions: { dashboard: false, settings: true },
+    }),
+    findApiKeys: async () => [],
+    ownerPermissions: { dashboard: true, settings: true },
+  }), createFleetRouter({
+    registry: { listPublic: async () => [] },
+    fleet: { snapshot: () => ({ totalActiveStreams: 3 }), invalidate() {}, refresh: async () => {} },
+  }));
+  const server = app.listen(0, '127.0.0.1');
+  await new Promise(resolve => server.once('listening', resolve));
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const base = `http://127.0.0.1:${server.address().port}/fleet`;
+  const headers = { Authorization: `Bearer ${jwt.sign({ user: 'settings-only' }, secret)}` };
+
+  assert.equal((await fetch(`${base}/servers`, { headers })).status, 200);
+  assert.equal((await fetch(base, { headers })).status, 403);
 });

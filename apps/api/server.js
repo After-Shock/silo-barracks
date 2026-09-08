@@ -12,6 +12,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
 const sanitizeFilename = require("./utils/sanitizer");
 const { getBackupDir } = require("./utils/storage-paths");
+const { createAuthenticate } = require('./middleware/authenticate');
 
 // db
 const dbInstance = require("./db");
@@ -350,6 +351,19 @@ app.use((req, res, next) => {
 });
 
 // initiate routes
+const authenticationOptions = {
+  jwt,
+  jwtSecret: JWT_SECRET,
+  resolveTokenAccess,
+  findApiKeys: async () => dbInstance.query('SELECT api_keys FROM app_config where "ID"=1')
+    .then(result => result.rows[0].api_keys),
+  ownerPermissions: DEFAULT_ROLE_PERMISSIONS.Owner,
+};
+const authenticate = createAuthenticate(authenticationOptions);
+const authenticateFleet = createAuthenticate({
+  ...authenticationOptions,
+  allowedPermissions: ['dashboard', 'settings'],
+});
 app.use(`/auth`, authRateLimitUnlessPublicStatus, authRouter, () => {
   /*  #swagger.tags = ['Auth'] */
 }); // mount the API router at /auth
@@ -357,7 +371,7 @@ app.use("/proxy", authenticate, authorizeApiRoute, proxyRouter, () => {
   /*  #swagger.tags = ['Proxy']*/
 }); // mount the API router at /proxy
 let fleetRouter;
-app.use('/fleet', authenticate, (req, res, next) => {
+app.use('/fleet', authenticateFleet, (req, res, next) => {
   if (require('./classes/provider').getProvider() !== 'silo') {
     return res.status(404).json({ error: 'Multiple-server monitoring requires Silo.' });
   }
@@ -460,58 +474,6 @@ writeEnvVariables().then(() => {
     res.sendFile(path.join(root, "index.html"));
   });
 });
-
-// JWT middleware
-async function authenticate(req, res, next) {
-  const token = req.headers.authorization;
-  const apiKey = req.headers["x-api-token"];
-
-  if (!token && !apiKey) {
-    return res.status(401).json({
-      message: "Authentication failed. No token or API key provided.",
-    });
-  }
-
-  if (token) {
-    const extracted_token = token.split(" ")[1];
-    if (!extracted_token || extracted_token === "null") {
-      return res.sendStatus(403);
-    }
-
-    try {
-      const decoded = jwt.verify(extracted_token, JWT_SECRET);
-      const access = await resolveTokenAccess(decoded.user);
-      if (!access.permissions.dashboard) {
-        return res.status(403).json({ message: "This account is disabled in JellyGlance" });
-      }
-
-      req.user = access.user;
-      req.permissions = access.permissions;
-      next();
-    } catch (error) {
-      console.log("Invalid token");
-      return res.status(401).json({ message: "Invalid token" });
-    }
-  } else {
-    if (apiKey) {
-      const keysjson = await dbInstance.query('SELECT api_keys FROM app_config where "ID"=1').then((res) => res.rows[0].api_keys);
-
-      if (!keysjson || Object.keys(keysjson).length === 0) {
-        return res.status(404).json({ message: "No API keys configured" });
-      }
-      const keys = keysjson || [];
-
-      const keyExists = keys.some((obj) => obj.key === apiKey);
-
-      if (keyExists) {
-        req.permissions = DEFAULT_ROLE_PERMISSIONS.Owner;
-        next();
-      } else {
-        return res.status(403).json({ message: "Invalid API key" });
-      }
-    }
-  }
-}
 
 function getTokenPermissions(user) {
   if (user === "internal") {
