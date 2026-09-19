@@ -263,10 +263,19 @@ against the production Barracks container:
   labeling, Previous/Next controls, primary account/profile and item/back routes,
   and no Jellyfin SQL totals on the Silo item page. At 390 × 844 there was no
   horizontal document overflow and keyboard Tab reached a button.
+- Failure-mode checks rejected an invalid Barracks token with 401, a Viewer control
+  attempt with 403, an unsupported action with 400, and an invalid Silo key with
+  the upstream `invalid_token` 401 Problem Details response. A temporary invalid-key
+  fleet member made the snapshot explicitly partial/unavailable while the primary
+  stayed connected. Headless Chrome displayed that unavailable server without a
+  fatal alert or horizontal overflow; removal restored a healthy fleet and left no
+  temporary registry row.
+- A real invalid history cursor returned 400. Barracks now translates its
+  `invalid_cursor` category into an actionable restart-from-first-page message on
+  primary, item/account and fleet history routes.
 
-Multi-server rapid switching, real cursor expiry, account/profile-authority
-revocation and denied/rate-limited credentials still require dedicated expendable
-accounts or players.
-Overlapping IDs, cursor loops/expiry errors, failed refreshes, empty results,
-filter/page-size resets and malformed preferences remain covered by automated
-contract and state tests.
+Rapid switching between two healthy physical servers with overlapping IDs,
+account/profile-authority revocation, an actual upstream 429, and primary-key
+revocation still require dedicated expendable infrastructure. Cursor loops/expiry,
+failed refreshes, empty results, filter/page-size resets and malformed preferences
+also remain covered by automated contract and state tests.

@@ -59,8 +59,14 @@ retained attempts. Headless desktop and mobile Chrome checks covered Activity,
 history paging, account/profile and item navigation, keyboard focus, and horizontal
 overflow.
 
-Before broad rollout, test denied credentials, revoked keys, rate limiting,
-unsupported player capabilities, prolonged mixed-server observation, and
-intentional partial-fleet outages. Capability
+Invalid Barracks authentication, insufficient Barracks role, unsupported actions,
+an invalid Silo key, and a temporary partial-fleet outage were also exercised. The
+primary remained available, the unavailable member was visible in the browser,
+and cleanup restored the healthy fleet. A real invalid cursor now produces an
+actionable restart-first-page response instead of a generic upstream 400.
+
+Before broad rollout, test primary-key/profile revocation, an actual upstream 429,
+unsupported capabilities from a real limited player, prolonged operation with two
+healthy physical Silo servers, and intentional network-loss recovery. Capability
 visibility must not be treated as mutation authority; Silo's response to each
 command remains authoritative.

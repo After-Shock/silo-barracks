@@ -4,6 +4,9 @@ const { addAuditEntry } = require('../classes/admin-history');
 
 function createFleetRouter({ registry, fleet }) {
   const router = express.Router();
+  const historyFailure = error => error?.category === 'invalid_cursor'
+    ? { status: 400, message: 'Silo playback history cursor expired or is invalid; restart from the first page' }
+    : { status: error?.status || 503, message: error?.message || 'Unable to load Silo playback history.' };
   const recordAuditSafely = async (req, action, details) => {
     try { await addAuditEntry(req, action, details); }
     catch (error) { console.error(`[Silo Barracks] Audit logging failed for ${action}:`, error.message); }
@@ -24,7 +27,8 @@ function createFleetRouter({ registry, fleet }) {
         next_cursor: history.nextCursor, server_id: history.serverId, server_name: history.serverName,
         source: 'Silo retention', retention_managed_by: 'Silo' });
     } catch (error) {
-      res.status(error.status || 503).json({ error: error.message || 'Unable to load Silo playback history.' });
+      const failure = historyFailure(error);
+      res.status(failure.status).json({ error: failure.message });
     }
   });
   router.get('/history/:serverId/users', async (req, res) => {

@@ -35,6 +35,12 @@ const dayjs = require("dayjs");
 
 const router = express.Router();
 
+function siloHistoryError(error) {
+  return error?.category === "invalid_cursor"
+    ? { status: 400, message: "Silo playback history cursor expired or is invalid; restart from the first page" }
+    : { status: error?.status || 503, message: error?.message || "Unable to load Silo playback history" };
+}
+
 async function recordAuditSafely(req, action, details) {
   try {
     await addAuditEntry(req, action, details);
@@ -5663,7 +5669,8 @@ router.get("/getHistory", async (req, res) => {
         results: history.results.map(row => ({ ...row, FleetServerId: "primary" })), has_more: history.hasMore,
         next_cursor: history.nextCursor, source: "Silo retention", retention_managed_by: "Silo" });
     } catch (error) {
-      return res.status(error.status || 503).json({ error: error.message || "Unable to load Silo playback history" });
+      const failure = siloHistoryError(error);
+      return res.status(failure.status).json({ error: failure.message });
     }
   }
 
@@ -6094,6 +6101,10 @@ router.post("/getItemHistory", async (req, res) => {
 
     res.send(response);
   } catch (error) {
+    if (API.isSilo) {
+      const failure = siloHistoryError(error);
+      return res.status(failure.status).json({ error: failure.message });
+    }
     console.log(error);
     res.status(503);
     res.send(error);
@@ -6247,6 +6258,10 @@ router.post("/deletePlaybackActivity", async (req, res) => {
     await db.query(`DELETE from jf_playback_activity where "Id" = ANY($1)`, [ids], true);
     res.send(`${ids.length} Records Deleted`);
   } catch (error) {
+    if (API.isSilo) {
+      const failure = siloHistoryError(error);
+      return res.status(failure.status).json({ error: failure.message });
+    }
     console.log(error);
     res.status(503);
     res.send(error);
