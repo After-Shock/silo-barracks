@@ -46,18 +46,21 @@ healthy and exposed v2 discovery and the contract above. Local contract validati
 adapter/fleet tests, branding and theme audits, zero-warning frontend lint, and the
 production build pass against this revision.
 
-On September 19, 2026 an attached production Silo session was discovered with live
-position/transcode diagnostics. Capability-checked pause and resume each returned
-202 and their state transitions were observed. Restarting Barracks preserved the
-player and rediscovered the same session after a clean reconnect. Normal player
-shutdown removed it from live state and finalized the same session in Silo history;
-live-only diagnostics were not copied into the retained attempt. Headless desktop
-and mobile Chrome checks covered Activity, history paging, account/profile and item
-navigation, keyboard focus, and horizontal overflow.
+On September 19, 2026 attached production Silo sessions were discovered with live
+position/transcode diagnostics. Capability-checked pause/resume, message and stop
+returned 202; state transitions and finalization were observed. Terminate returned
+200 with playback authority revoked, durable stopped state, client notification
+and dispatched delivery. It does not revoke the account login, and the administrator
+web player correctly remained authenticated. A repeated stale Barracks command was
+rejected with 409. Restarting Barracks preserved a player and rediscovered the same
+session after a clean reconnect. Normal shutdown and destructive commands finalized
+the matching sessions in Silo history; live-only diagnostics were not copied into
+retained attempts. Headless desktop and mobile Chrome checks covered Activity,
+history paging, account/profile and item navigation, keyboard focus, and horizontal
+overflow.
 
-Before broad rollout, test `stop`, `message`, and authority-revoking `terminate`
-against explicitly expendable sessions, plus denied credentials, revoked keys,
-duplicate requests, rate limiting, unsupported player capabilities, prolonged
-mixed-server observation, and intentional partial-fleet outages. Capability
+Before broad rollout, test denied credentials, revoked keys, rate limiting,
+unsupported player capabilities, prolonged mixed-server observation, and
+intentional partial-fleet outages. Capability
 visibility must not be treated as mutation authority; Silo's response to each
 command remains authoritative.

@@ -64,9 +64,9 @@ Silo's rich live Activity and its separate finalized Playback History.
    backend/settings contract.
 6. **Interaction/playback acceptance — baseline complete:** the attached Silo was
    verified with a real stream, pause/resume, Barracks reconnect, finalization, and
-   desktop/mobile headless Chrome. The remaining destructive, denied-authority and
-   multi-server outage cases are listed in `activity-parity-review.md` and
-   `silo-v2-status.md`.
+   desktop/mobile headless Chrome, message, stop, durable terminate, and stale-
+   target rejection. Remaining denied-authority, rate-limit and multi-server outage
+   cases are listed in `activity-parity-review.md` and `silo-v2-status.md`.
 
 ## Validation
 
@@ -75,4 +75,4 @@ responses, cursor loops, bounded sampling and upstream failures. An HTTP fixture
 checks the adapter uses admin history without catalog/profile access. Full test suite, production frontend build, zero-warning frontend lint, branding
 audit, theme-color audit and contract validation pass locally. Baseline live Silo
 playback and browser interaction verification passed on September 19, 2026; the
-remaining destructive and failure-mode cases are explicitly documented.
+remaining credential, rate-limit and fleet failure-mode cases are explicitly documented.
