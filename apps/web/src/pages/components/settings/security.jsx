@@ -242,7 +242,7 @@ export default function SecuritySettings() {
                   name="issuerUrl"
                   value={oidcValues.issuerUrl || ""}
                   onChange={handleOidcChange}
-                  placeholder="https://auth.example.com/application/o/jellyglance/"
+                  placeholder="https://auth.example.com/application/o/barracks/"
                   required={authMode === "oidc"}
                 />
               </Col>

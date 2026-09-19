@@ -49,12 +49,12 @@ function getCachedConfig() {
   }
 }
 
-const REQUEST_NAV_AVAILABLE_KEY = "jellyglance_request_nav_available";
-const DOWNLOAD_NAV_AVAILABLE_KEY = "jellyglance_download_nav_available";
-const WIZARR_NAV_AVAILABLE_KEY = "jellyglance_wizarr_nav_available";
-const TDARR_NAV_AVAILABLE_KEY = "jellyglance_tdarr_nav_available";
-const AUTOMATION_HEALTH_NAV_AVAILABLE_KEY = "jellyglance_automation_health_nav_available";
-const NAV_COLLAPSED_KEY = "jellyglance_nav_collapsed";
+const REQUEST_NAV_AVAILABLE_KEY = "silo_barracks_request_nav_available";
+const DOWNLOAD_NAV_AVAILABLE_KEY = "silo_barracks_download_nav_available";
+const WIZARR_NAV_AVAILABLE_KEY = "silo_barracks_wizarr_nav_available";
+const TDARR_NAV_AVAILABLE_KEY = "silo_barracks_tdarr_nav_available";
+const AUTOMATION_HEALTH_NAV_AVAILABLE_KEY = "silo_barracks_automation_health_nav_available";
+const NAV_COLLAPSED_KEY = "silo_barracks_nav_collapsed";
 const INTEGRATIONS_CACHE_TTL_MS = 10000;
 
 let integrationsCache = null;
@@ -190,14 +190,14 @@ function isNavItemActive(item, location) {
 export default function Navbar() {
   const [showAccount, setShowAccount] = useState(false);
   const [config, setConfig] = useState(() => getCachedConfig());
-  const [customAvatar, setCustomAvatar] = useState(() => localStorage.getItem("jellyglance_account_avatar") || "");
+  const [customAvatar, setCustomAvatar] = useState(() => localStorage.getItem("silo_barracks_account_avatar") || "");
   const [customTheme, setCustomTheme] = useState(() => getStoredTheme());
   const [fontWeightPreference, setFontWeightPreference] = useState(() => getStoredFontWeight());
   const [activeStreamCount, setActiveStreamCount] = useState(0);
   const { snapshot: fleetSnapshot } = useFleet(config?.IS_SILO === true);
-  const [activeDownloadCount, setActiveDownloadCount] = useState(() => Number(localStorage.getItem("jellyglance_active_download_count") || 0));
-  const [activeTranscodeCount, setActiveTranscodeCount] = useState(() => Number(localStorage.getItem("jellyglance_active_transcode_count") || 0));
-  const [requestBadgeCount, setRequestBadgeCount] = useState(() => Number(localStorage.getItem("jellyglance_request_badge_count") || 0));
+  const [activeDownloadCount, setActiveDownloadCount] = useState(() => Number(localStorage.getItem("silo_barracks_active_download_count") || 0));
+  const [activeTranscodeCount, setActiveTranscodeCount] = useState(() => Number(localStorage.getItem("silo_barracks_active_transcode_count") || 0));
+  const [requestBadgeCount, setRequestBadgeCount] = useState(() => Number(localStorage.getItem("silo_barracks_request_badge_count") || 0));
   const [showRequestsNav, setShowRequestsNav] = useState(() => getCachedRequestNavAvailable());
   const [showDownloadsNav, setShowDownloadsNav] = useState(() => getCachedDownloadNavAvailable());
   const [showWizarrNav, setShowWizarrNav] = useState(() => getCachedWizarrNavAvailable());
@@ -251,7 +251,7 @@ export default function Navbar() {
   );
 
   const handleLogout = () => {
-    localStorage.setItem("jellyglance_logged_out", "true");
+    localStorage.setItem("silo_barracks_logged_out", "true");
     localStorage.removeItem("token");
     localStorage.removeItem("config");
     deleteLibraryTabKeys();
@@ -276,8 +276,8 @@ export default function Navbar() {
       setIsNavCollapsed(Boolean(event.detail));
     }
 
-    window.addEventListener("jellyglance-nav-collapsed-updated", handleNavCollapsedUpdate);
-    return () => window.removeEventListener("jellyglance-nav-collapsed-updated", handleNavCollapsedUpdate);
+    window.addEventListener("silo-barracks-nav-collapsed-updated", handleNavCollapsedUpdate);
+    return () => window.removeEventListener("silo-barracks-nav-collapsed-updated", handleNavCollapsedUpdate);
   }, []);
 
   useEffect(() => {
@@ -316,10 +316,10 @@ export default function Navbar() {
     };
 
     const startupTimer = window.setTimeout(refreshAutomationHealthAvailability, 500);
-    window.addEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+    window.addEventListener("silo-barracks-integrations-updated", handleIntegrationsUpdated);
     return () => {
       isMounted = false;
-      window.removeEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+      window.removeEventListener("silo-barracks-integrations-updated", handleIntegrationsUpdated);
       window.clearTimeout(startupTimer);
     };
   }, []);
@@ -340,12 +340,12 @@ export default function Navbar() {
     };
 
     refreshConfig();
-    window.addEventListener("jellyglance-config-updated", refreshConfig);
+    window.addEventListener("silo-barracks-config-updated", refreshConfig);
     window.addEventListener("storage", refreshConfig);
 
     return () => {
       isMounted = false;
-      window.removeEventListener("jellyglance-config-updated", refreshConfig);
+      window.removeEventListener("silo-barracks-config-updated", refreshConfig);
       window.removeEventListener("storage", refreshConfig);
     };
   }, []);
@@ -354,13 +354,13 @@ export default function Navbar() {
     const refreshNavOrder = () => setNavOrder(getStoredNavOrder(navData));
     const refreshNavVisibility = () => setHiddenNavLinks(getStoredHiddenNavLinks(navData));
 
-    window.addEventListener("jellyglance-nav-order-updated", refreshNavOrder);
-    window.addEventListener("jellyglance-nav-visibility-updated", refreshNavVisibility);
+    window.addEventListener("silo-barracks-nav-order-updated", refreshNavOrder);
+    window.addEventListener("silo-barracks-nav-visibility-updated", refreshNavVisibility);
     window.addEventListener("storage", refreshNavOrder);
     window.addEventListener("storage", refreshNavVisibility);
     return () => {
-      window.removeEventListener("jellyglance-nav-order-updated", refreshNavOrder);
-      window.removeEventListener("jellyglance-nav-visibility-updated", refreshNavVisibility);
+      window.removeEventListener("silo-barracks-nav-order-updated", refreshNavOrder);
+      window.removeEventListener("silo-barracks-nav-visibility-updated", refreshNavVisibility);
       window.removeEventListener("storage", refreshNavOrder);
       window.removeEventListener("storage", refreshNavVisibility);
     };
@@ -386,7 +386,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleDownloadCount = (event) => {
-      const nextCount = Number(event.detail ?? localStorage.getItem("jellyglance_active_download_count") ?? 0);
+      const nextCount = Number(event.detail ?? localStorage.getItem("silo_barracks_active_download_count") ?? 0);
       setActiveDownloadCount(Number.isFinite(nextCount) ? nextCount : 0);
     };
 
@@ -422,12 +422,12 @@ export default function Navbar() {
     };
 
     const startupTimer = window.setTimeout(refreshDownloadAvailability, 500);
-    window.addEventListener("jellyglance-download-count", handleDownloadCount);
-    window.addEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+    window.addEventListener("silo-barracks-download-count", handleDownloadCount);
+    window.addEventListener("silo-barracks-integrations-updated", handleIntegrationsUpdated);
     window.addEventListener("storage", handleDownloadCount);
     return () => {
-      window.removeEventListener("jellyglance-download-count", handleDownloadCount);
-      window.removeEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+      window.removeEventListener("silo-barracks-download-count", handleDownloadCount);
+      window.removeEventListener("silo-barracks-integrations-updated", handleIntegrationsUpdated);
       window.removeEventListener("storage", handleDownloadCount);
       window.clearTimeout(startupTimer);
     };
@@ -469,10 +469,10 @@ export default function Navbar() {
     };
 
     const startupTimer = window.setTimeout(refreshWizarrAvailability, 500);
-    window.addEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+    window.addEventListener("silo-barracks-integrations-updated", handleIntegrationsUpdated);
     return () => {
       isMounted = false;
-      window.removeEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+      window.removeEventListener("silo-barracks-integrations-updated", handleIntegrationsUpdated);
       window.clearTimeout(startupTimer);
     };
   }, []);
@@ -525,14 +525,14 @@ export default function Navbar() {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         const nextCount = Number(response.data?.stats?.active || response.data?.active?.length || 0);
-        localStorage.setItem("jellyglance_active_transcode_count", String(nextCount));
+        localStorage.setItem("silo_barracks_active_transcode_count", String(nextCount));
         setSafeTranscodeCount(nextCount);
       } catch {
-        setSafeTranscodeCount(localStorage.getItem("jellyglance_active_transcode_count"));
+        setSafeTranscodeCount(localStorage.getItem("silo_barracks_active_transcode_count"));
       }
     };
 
-    const handleTranscodeCount = (event) => setSafeTranscodeCount(event.detail ?? localStorage.getItem("jellyglance_active_transcode_count"));
+    const handleTranscodeCount = (event) => setSafeTranscodeCount(event.detail ?? localStorage.getItem("silo_barracks_active_transcode_count"));
     const handleIntegrationsUpdated = (event) => {
       const hasTdarr = event.detail ? setTranscodeAvailability(event.detail) : getCachedTdarrNavAvailable();
       if (!event.detail) {
@@ -550,16 +550,16 @@ export default function Navbar() {
       });
     }, 650);
     const intervalId = setInterval(refreshTranscodeCount, 60000);
-    window.addEventListener("jellyglance-transcode-count", handleTranscodeCount);
-    window.addEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+    window.addEventListener("silo-barracks-transcode-count", handleTranscodeCount);
+    window.addEventListener("silo-barracks-integrations-updated", handleIntegrationsUpdated);
     window.addEventListener("storage", handleTranscodeCount);
 
     return () => {
       isMounted = false;
       clearInterval(intervalId);
       window.clearTimeout(startupTimer);
-      window.removeEventListener("jellyglance-transcode-count", handleTranscodeCount);
-      window.removeEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+      window.removeEventListener("silo-barracks-transcode-count", handleTranscodeCount);
+      window.removeEventListener("silo-barracks-integrations-updated", handleIntegrationsUpdated);
       window.removeEventListener("storage", handleTranscodeCount);
     };
   }, []);
@@ -616,16 +616,16 @@ export default function Navbar() {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         const nextCount = Number(response.data?.stats?.badgeCount || 0);
-        localStorage.setItem("jellyglance_request_badge_count", String(nextCount));
+        localStorage.setItem("silo_barracks_request_badge_count", String(nextCount));
         setRequestAvailability(response.data?.sources);
         setSafeCount(nextCount);
       } catch {
         refreshRequestAvailability();
-        setSafeCount(localStorage.getItem("jellyglance_request_badge_count"));
+        setSafeCount(localStorage.getItem("silo_barracks_request_badge_count"));
       }
     };
 
-    const handleRequestCount = (event) => setSafeCount(event.detail ?? localStorage.getItem("jellyglance_request_badge_count"));
+    const handleRequestCount = (event) => setSafeCount(event.detail ?? localStorage.getItem("silo_barracks_request_badge_count"));
     const handleIntegrationsUpdated = (event) => {
       if (event.detail) {
         const nextAvailable = getRequestAvailabilityFromIntegrations(event.detail);
@@ -650,16 +650,16 @@ export default function Navbar() {
       refreshRequestCount();
     }, 650);
     const intervalId = setInterval(refreshRequestCount, 60000);
-    window.addEventListener("jellyglance-request-count", handleRequestCount);
-    window.addEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+    window.addEventListener("silo-barracks-request-count", handleRequestCount);
+    window.addEventListener("silo-barracks-integrations-updated", handleIntegrationsUpdated);
     window.addEventListener("storage", handleRequestCount);
 
     return () => {
       isMounted = false;
       clearInterval(intervalId);
       window.clearTimeout(startupTimer);
-      window.removeEventListener("jellyglance-request-count", handleRequestCount);
-      window.removeEventListener("jellyglance-integrations-updated", handleIntegrationsUpdated);
+      window.removeEventListener("silo-barracks-request-count", handleRequestCount);
+      window.removeEventListener("silo-barracks-integrations-updated", handleIntegrationsUpdated);
       window.removeEventListener("storage", handleRequestCount);
     };
   }, []);
@@ -693,7 +693,7 @@ export default function Navbar() {
     const reader = new FileReader();
     reader.onload = () => {
       const nextAvatar = reader.result;
-      localStorage.setItem("jellyglance_account_avatar", nextAvatar);
+      localStorage.setItem("silo_barracks_account_avatar", nextAvatar);
       setCustomAvatar(nextAvatar);
     };
     reader.readAsDataURL(file);

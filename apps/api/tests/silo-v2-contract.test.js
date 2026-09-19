@@ -48,10 +48,10 @@ test('v2 contract subset is pinned to the upstream revision and self-consistent'
   const schemaArtifact = fs.readFileSync(path.join(fixtureRoot, manifest.schema_artifact.path));
   const schemaDocument = JSON.parse(schemaArtifact);
 
-  assert.equal(manifest.source.revision, '26661d76f451ed790cf74221538b1048a8d193d6');
+  assert.equal(manifest.source.revision, '8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf');
   assert.equal(manifest.source.path, 'contracts/api/v2/openapi.json');
   assert.match(manifest.source.url, new RegExp(manifest.source.revision));
-  assert.equal(manifest.source.sha256, 'e0cabb6c0a2535e05aab38cdc5823fa73dbf808ebff17332d7d372947abe5310');
+  assert.equal(manifest.source.sha256, '774f49bd02d1b9465b2591013242eeb2aa41042c5303108ffc3ab39fd27c64eb');
   assert.equal(manifest.source.digest, `sha256:${manifest.source.sha256}`);
   assert.equal(manifest.schema_artifact.sha256, sha256(schemaArtifact));
   assert.equal(manifest.schema_artifact.digest, `sha256:${manifest.schema_artifact.sha256}`);
@@ -97,6 +97,13 @@ test('v2 synthetic fixtures cover pagination, empty collections, unknown enum va
   assert.equal(responses.health.responses[0].body.status, 'ok');
   assert.equal(responses.listAdminPlaybackHistory.path, '/api/v2/admin/playback-history');
   assert.equal(responses.listHistory.path, '/api/v2/history');
+  const contract = readJSON('openapi.json');
+  assert.equal(contract.paths['/api/v2/admin/stats'].get.operationId, 'getAdminDashboardStats');
+  assert.equal(contract.paths['/api/v2/admin/stats/playback-activity'].get.operationId, 'getAdminDashboardPlaybackActivity');
+  assert.equal(contract.paths['/api/v2/admin/stats/top-activity'].get.operationId, 'getAdminDashboardTopActivity');
+  for (const schema of ['AdminDashboardStats', 'AdminDashboardPlaybackActivity', 'AdminDashboardTopActivity']) {
+    assert.ok(contract.components.schemas[schema], `native dashboard contract missing ${schema}`);
+  }
   assert.ok(manifest.notes.some(note => note.includes('listAdminPlaybackSessions') && note.includes('above 100')));
 
   // The API-key profile selector must have one unambiguous primary profile.

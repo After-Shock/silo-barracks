@@ -70,10 +70,10 @@ function getCssVariableColor(variableName, fallback) {
   return value || fallback;
 }
 
-function ActivityPoster({ itemId, title }) {
+function ActivityPoster({ itemId, title, disabled = false }) {
   const [imageFailed, setImageFailed] = React.useState(false);
 
-  if (!itemId || imageFailed) {
+  if (!itemId || imageFailed || disabled) {
     return (
       <span className="activity-poster-fallback" aria-hidden="true">
         {title?.slice(0, 1)?.toUpperCase() || "?"}
@@ -126,7 +126,8 @@ function getStoredColumnVisibility() {
 }
 
 export default function ActivityTable(props) {
-  const twelve_hr = JSON.parse(localStorage.getItem("12hr"));
+  let twelve_hr = false;
+  try { twelve_hr = JSON.parse(localStorage.getItem("12hr") || "false"); } catch { twelve_hr = false; }
   const localization = localStorage.getItem("i18nextLng");
   const [data, setData] = React.useState(props.data ?? []);
   const pages = props.pageCount || 1;
@@ -140,7 +141,9 @@ export default function ActivityTable(props) {
   const [sorting, setSorting] = React.useState([{ id: "Date", desc: true }]);
 
   const [columnFilters, setColumnFilters] = React.useState([]);
-  const [columnVisibility, setColumnVisibility] = React.useState(getStoredColumnVisibility);
+  const [columnVisibility, setColumnVisibility] = React.useState(() => props.siloHistory
+    ? { ...getStoredColumnVisibility(), Client: false, DeviceName: false, RemoteEndPoint: false, TotalPlays: false }
+    : getStoredColumnVisibility());
 
   const [modalState, setModalState] = React.useState(false);
   const [modalData, setModalData] = React.useState();
@@ -157,8 +160,8 @@ export default function ActivityTable(props) {
 
   useEffect(() => {
     const handleThemeUpdate = () => setThemeTick((current) => current + 1);
-    window.addEventListener("jellyglance-theme-updated", handleThemeUpdate);
-    return () => window.removeEventListener("jellyglance-theme-updated", handleThemeUpdate);
+    window.addEventListener("silo-barracks-theme-updated", handleThemeUpdate);
+    return () => window.removeEventListener("silo-barracks-theme-updated", handleThemeUpdate);
   }, []);
 
   const handlePageChange = (updater) => {
@@ -253,17 +256,16 @@ export default function ActivityTable(props) {
           : row.SeriesName + " : S" + row.SeasonNumber + "E" + row.EpisodeNumber + " - " + row.NowPlayingItemName;
         const itemId = row.NowPlayingItemId || row.EpisodeId;
 
-        return (
-          <Link to={`/libraries/item/${row.EpisodeId || row.NowPlayingItemId}`} className="activity-table-link activity-title-link">
-            <span className="activity-title-media">
-              <ActivityPoster itemId={itemId} title={title} />
-              <span className="activity-title-copy">
-                <strong>{title}</strong>
-                <small>{row.SeriesName ? "Episode" : row.NowPlayingItemName ? "Movie" : "Media"}</small>
-              </span>
-            </span>
-          </Link>
-        );
+        const secondaryServer = props.siloHistory && props.serverId !== "primary";
+        const mediaType = row.SiloMediaType || (row.SeriesName ? "Episode" : row.NowPlayingItemName ? "Movie" : "Media");
+        const content = <span className="activity-title-media">
+          <ActivityPoster itemId={itemId} title={title} disabled={secondaryServer} />
+          <span className="activity-title-copy"><strong>{title || "Unknown item"}</strong><small>{mediaType}</small></span>
+        </span>;
+        if (!itemId) return <span className="activity-table-link activity-title-link">{content}</span>;
+        return secondaryServer
+          ? <Link to={`/fleet/${encodeURIComponent(props.serverId)}/items/${encodeURIComponent(itemId)}`} className="activity-table-link activity-title-link">{content}</Link>
+          : <Link to={`/libraries/item/${row.EpisodeId || row.NowPlayingItemId}`} className="activity-table-link activity-title-link">{content}</Link>;
       },
     },
     {
@@ -272,12 +274,17 @@ export default function ActivityTable(props) {
       size: 190,
       Cell: ({ row }) => {
         row = row.original;
-        return (
-          <Link to={`/users/${row.UserId}`} className="activity-table-link activity-user-link">
-            <ActivityUserAvatar userId={row.UserId} userName={row.UserName} />
-            <span>{row.UserName || "Unknown"}</span>
-          </Link>
-        );
+        const content = <><ActivityUserAvatar userId={props.siloHistory ? null : row.UserId} userName={row.UserName} />
+          <span>{row.UserName || "Unknown"}{row.ProfileName ? <small className="activity-profile-name">{row.ProfileName}</small> : null}</span></>;
+        if (props.siloHistory && row.UserId) {
+          const path = props.serverId !== "primary"
+            ? `/fleet/${encodeURIComponent(props.serverId)}/users/${encodeURIComponent(row.UserId)}`
+            : `/silo/users/${encodeURIComponent(row.UserId)}`;
+          return <Link to={path} className="activity-table-link activity-user-link">{content}</Link>;
+        }
+        return !row.UserId
+          ? <span className="activity-table-link activity-user-link">{content}</span>
+          : <Link to={`/users/${row.UserId}`} className="activity-table-link activity-user-link">{content}</Link>;
       },
     },
     {
@@ -286,11 +293,7 @@ export default function ActivityTable(props) {
       size: 160,
       Cell: ({ row }) => {
         row = row.original;
-        return (
-          <Link onClick={() => openModal(row)} className="activity-table-link activity-client-link">
-            {row.Client}
-          </Link>
-        );
+        return row.Client ? <Link onClick={() => openModal(row)} className="activity-table-link activity-client-link">{row.Client}</Link> : <span>—</span>;
       },
     },
     {
@@ -393,8 +396,15 @@ export default function ActivityTable(props) {
       size: 160,
       // filterFn: (row, id, filterValue) => formatTotalWatchTime(row.getValue(id)).startsWith(filterValue),
       filterVariant: "range",
-      Cell: ({ cell }) => <span className="activity-duration-cell">{formatTotalWatchTime(cell.getValue())}</span>,
+      Cell: ({ cell }) => <span className="activity-duration-cell">{formatTotalWatchTime(Math.round(Number(cell.getValue()) || 0)) || `0 ${i18next.t("UNITS.SECONDS").toLowerCase()}`}</span>,
     },
+    ...(props.siloHistory ? [{
+      accessorKey: "Completed",
+      header: "Status",
+      size: 120,
+      enableColumnFilter: false,
+      Cell: ({ cell }) => <span className={`activity-completion ${cell.getValue() ? "is-complete" : "is-incomplete"}`}>{cell.getValue() ? "Completed" : "Stopped early"}</span>,
+    }] : []),
     {
       accessorFn: (row) => Number(row.TotalPlays ?? 1),
       field: "TotalPlays",
@@ -404,7 +414,7 @@ export default function ActivityTable(props) {
 
       Cell: ({ cell }) => <span className="activity-plays-cell">{cell.getValue() ?? 1}</span>,
     },
-  ];
+  ].filter((column) => !props.siloHistory || !["Client", "DeviceName", "RemoteEndPoint", "TotalPlays"].includes(column.accessorKey || column.field));
 
   const fieldMap = columns.map((column) => {
     return { accessorKey: column.accessorKey ?? column.field, header: column.header };
@@ -483,14 +493,15 @@ export default function ActivityTable(props) {
     enableExpandAll: false,
     enableExpanding: true,
     enableDensityToggle: false,
-    enableFilters: true,
-    manualFiltering: true,
+    enableFilters: !props.siloHistory,
+    enableSorting: !props.siloHistory,
+    manualFiltering: !props.siloHistory,
     onSortingChange: handleSortingChange,
     onColumnFiltersChange: handleFilteringChange,
     onColumnVisibilityChange: handleColumnVisibilityChange,
     enableTopToolbar: true,
-    manualPagination: true,
-    manualSorting: true,
+    manualPagination: !props.cursorMode,
+    manualSorting: !props.siloHistory,
     autoResetPageIndex: false,
     initialState: {
       expanded: false,
@@ -513,7 +524,7 @@ export default function ActivityTable(props) {
     enableFullScreenToggle: false,
     enableGlobalFilter: false,
     enableBottomToolbar: false,
-    enableRowSelection: (row) => row.original.Id,
+    enableRowSelection: (row) => !props.readOnly && row.original.Id,
     enableMultiRowSelection: true,
     enableBatchRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -525,7 +536,7 @@ export default function ActivityTable(props) {
       </Box>
     ),
     renderTopToolbarCustomActions: () => {
-      if (Object.keys(rowSelection).length > 0) {
+      if (!props.readOnly && Object.keys(rowSelection).length > 0) {
         return (
           <Box sx={{ display: "flex", gap: "1rem", p: "0px" }}>
             <span>
@@ -607,11 +618,7 @@ export default function ActivityTable(props) {
     state: { rowSelection, pagination, sorting, columnFilters, columnVisibility },
     filterFromLeafRows: true,
     getSubRows: (row) => {
-      if (Array.isArray(row.results) && row.results.length == 1) {
-        row.results.pop();
-      }
-
-      return row.results;
+      return Array.isArray(row.results) && row.results.length > 1 ? row.results : undefined;
     },
     onPaginationChange: handlePageChange,
     getRowId: (row) => row.Id,
@@ -786,7 +793,7 @@ export default function ActivityTable(props) {
       </Modal>
       <ThemeProvider theme={theme}>
         <MaterialReactTable table={table} />
-        <Box
+        {!props.cursorMode && <Box
           sx={{
             display: "flex",
             justifyContent: "end",
@@ -794,7 +801,7 @@ export default function ActivityTable(props) {
           }}
         >
           <MRT_TablePagination table={table} />
-        </Box>
+        </Box>}
       </ThemeProvider>
     </LocalizationProvider>
   );

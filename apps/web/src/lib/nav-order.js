@@ -1,5 +1,5 @@
-export const NAV_ORDER_STORAGE_KEY = "jellyglance_nav_order";
-export const NAV_HIDDEN_STORAGE_KEY = "jellyglance_nav_hidden";
+export const NAV_ORDER_STORAGE_KEY = "silo_barracks_nav_order";
+export const NAV_HIDDEN_STORAGE_KEY = "silo_barracks_nav_hidden";
 export const LOCKED_NAV_LINKS = new Set(["", "settings", "about"]);
 
 export function getDefaultReorderableNavLinks(navItems = []) {
@@ -22,13 +22,13 @@ export function saveNavOrder(order = [], navItems = []) {
   const defaultOrder = getDefaultReorderableNavLinks(navItems);
   const nextOrder = [...order.filter((link) => defaultOrder.includes(link)), ...defaultOrder.filter((link) => !order.includes(link))];
   localStorage.setItem(NAV_ORDER_STORAGE_KEY, JSON.stringify(nextOrder));
-  window.dispatchEvent(new CustomEvent("jellyglance-nav-order-updated", { detail: nextOrder }));
+  window.dispatchEvent(new CustomEvent("silo-barracks-nav-order-updated", { detail: nextOrder }));
   return nextOrder;
 }
 
 export function resetNavOrder() {
   localStorage.removeItem(NAV_ORDER_STORAGE_KEY);
-  window.dispatchEvent(new CustomEvent("jellyglance-nav-order-updated"));
+  window.dispatchEvent(new CustomEvent("silo-barracks-nav-order-updated"));
 }
 
 export function getStoredHiddenNavLinks(navItems = []) {
@@ -46,13 +46,13 @@ export function saveHiddenNavLinks(hiddenLinks = [], navItems = []) {
   const hideableLinks = new Set(navItems.filter((item) => !LOCKED_NAV_LINKS.has(item.link)).map((item) => item.link));
   const nextHiddenLinks = [...new Set(hiddenLinks.filter((link) => hideableLinks.has(link)))];
   localStorage.setItem(NAV_HIDDEN_STORAGE_KEY, JSON.stringify(nextHiddenLinks));
-  window.dispatchEvent(new CustomEvent("jellyglance-nav-visibility-updated", { detail: nextHiddenLinks }));
+  window.dispatchEvent(new CustomEvent("silo-barracks-nav-visibility-updated", { detail: nextHiddenLinks }));
   return nextHiddenLinks;
 }
 
 export function resetHiddenNavLinks() {
   localStorage.removeItem(NAV_HIDDEN_STORAGE_KEY);
-  window.dispatchEvent(new CustomEvent("jellyglance-nav-visibility-updated", { detail: [] }));
+  window.dispatchEvent(new CustomEvent("silo-barracks-nav-visibility-updated", { detail: [] }));
 }
 
 export function applyNavOrder(navItems = [], order = getStoredNavOrder(navItems)) {

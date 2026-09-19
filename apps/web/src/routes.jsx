@@ -22,6 +22,9 @@ const ActiveTranscodes = lazy(() => import("./pages/active-transcodes"));
 const AutomationHealth = lazy(() => import("./pages/automation-health"));
 const ServerManagement = lazy(() => import("./pages/server-management"));
 const Wizarr = lazy(() => import("./pages/wizarr"));
+const FleetHistoryDetail = lazy(() => import("./pages/fleet-history-detail"));
+const SiloAccountDetail = lazy(() => import("./pages/silo-account-detail"));
+const FleetLibraries = lazy(() => import("./pages/fleet-libraries"));
 
 const routes = [
   { path: "/", element: <Home />, exact: true },
@@ -30,9 +33,14 @@ const routes = [
   { path: "/settings/*", element: <Settings />, exact: true },
   { path: "/users", element: <Users />, exact: true },
   { path: "/users/:UserId", element: <UserProfilePage />, exact: true },
+  { path: "/silo/users/:userId", element: <SiloAccountDetail />, exact: true },
   { path: "/libraries", element: <Libraries />, exact: true },
   { path: "/libraries/:LibraryId", element: <LibraryInfo />, exact: true },
   { path: "/libraries/item/:Id", element: <ItemInfo />, exact: true },
+  { path: "/fleet/:serverId/items/:itemId", element: <FleetHistoryDetail type="item" />, exact: true },
+  { path: "/fleet/:serverId/users/:userId", element: <FleetHistoryDetail type="user" />, exact: true },
+  { path: "/fleet/:serverId/libraries", element: <FleetLibraries />, exact: true },
+  { path: "/fleet/:serverId/libraries/:libraryId", element: <FleetLibraries />, exact: true },
   { path: "/recently-added", element: <RecentlyAddedPage />, exact: true },
   { path: "/integrations", element: <Integrations />, exact: true },
   { path: "/calendar", element: <Calendar />, exact: true },

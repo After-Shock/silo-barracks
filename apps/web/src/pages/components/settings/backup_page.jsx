@@ -123,8 +123,8 @@ function BackupPage() {
       const response = await axios.get(`/backup/restore/${encodeURIComponent(filename)}`, { headers: getHeaders() });
       localStorage.removeItem("config");
       localStorage.removeItem("PREF_ACTIVITY_libraryFilters");
-      window.dispatchEvent(new Event("jellyglance-config-updated"));
-      window.dispatchEvent(new CustomEvent("jellyglance-backup-restored", { detail: response.data }));
+      window.dispatchEvent(new Event("silo-barracks-config-updated"));
+      window.dispatchEvent(new CustomEvent("silo-barracks-backup-restored", { detail: response.data }));
       setMessage({ type: "success", text: response.data?.message || "Restore completed successfully." });
       await fetchData();
     } catch (error) {
@@ -187,7 +187,7 @@ function BackupPage() {
         <div>
           <span>Recovery Center</span>
           <h1>Backups</h1>
-          <p>Create portable JSON backups, choose what data is included, and restore uploaded JellyGlance or legacy Jellystat files.</p>
+          <p>Create portable JSON backups, choose what data is included, and restore uploaded Barracks or legacy Jellystat files.</p>
         </div>
         <div className="backup-hero-actions">
           <Button type="button" variant="primary" onClick={createBackup} disabled={Boolean(busyAction)}>
@@ -301,7 +301,7 @@ function BackupPage() {
             <div className="backup-empty-state">
               <ArchiveDrawerFillIcon size={30} />
               <strong>No backups yet</strong>
-              <span>Create a backup or upload an existing JellyGlance or Jellystat JSON backup.</span>
+              <span>Create a backup or upload an existing Barracks or Jellystat JSON backup.</span>
             </div>
           ) : null}
         </div>

@@ -261,7 +261,7 @@ function indexStaticAssets(dir, baseDir = dir) {
 
 function getRequestPathname(req) {
   try {
-    return decodeURIComponent(new URL(req.originalUrl || req.url, "http://jellyglance.local").pathname);
+    return decodeURIComponent(new URL(req.originalUrl || req.url, "http://barracks.local").pathname);
   } catch {
     return req.path || req.url.split("?")[0];
   }
@@ -367,6 +367,10 @@ const authenticateFleet = createAuthenticate({
 app.use(`/auth`, authRateLimitUnlessPublicStatus, authRouter, () => {
   /*  #swagger.tags = ['Auth'] */
 }); // mount the API router at /auth
+app.use("/proxy", (req, res, next) => {
+  if (/^\/(Items|Users)\/Images\/(Primary|Backdrop)\/?$/i.test(req.path)) return proxyRouter(req, res, next);
+  return next();
+});
 app.use("/proxy", authenticate, authorizeApiRoute, proxyRouter, () => {
   /*  #swagger.tags = ['Proxy']*/
 }); // mount the API router at /proxy
@@ -580,7 +584,7 @@ function authorizeApiRoute(req, res, next) {
     return;
   }
 
-  if (pathName.startsWith("/server-management")) {
+  if (pathName.startsWith("/server-management") || pathName.startsWith("/session-controls")) {
     if (!req.permissions?.settings || !["Owner", "Admin"].includes(req.user?.role)) {
       return res.status(403).json({ message: "Admin role required" });
     }
@@ -633,9 +637,9 @@ function authorizeApiRoute(req, res, next) {
 try {
   createdb.createDatabase().then((result) => {
     if (result) {
-      console.log("[JellyGlance] Database created");
+      console.log("[Barracks] Database created");
     } else {
-      console.log("[JellyGlance] Database exists. Skipping creation");
+      console.log("[Barracks] Database exists. Skipping creation");
     }
 
     db.migrate.latest().then(() => {
@@ -643,9 +647,10 @@ try {
 
       setupWebSocketServer(server, BASE_NAME, { resolveTokenAccess });
       server.listen(PORT, LISTEN_IP, async () => {
-        console.log(`[JellyGlance] Server listening on http://${LISTEN_IP}:${PORT}`);
+        console.log(`[Barracks] Server listening on http://${LISTEN_IP}:${PORT}`);
         if (require('./classes/provider').getProvider() === 'silo') {
-          require('./tasks/SiloActivityMonitor').startSiloActivityMonitor();
+          // Silo owns playback history retention. Fleet polling serves live state
+          // without duplicating Silo history into Barracks PostgreSQL.
           require('./classes/fleet-service').startFleet();
         } else {
           ActivityMonitor.ActivityMonitor(1000);
@@ -657,5 +662,5 @@ try {
     });
   });
 } catch (error) {
-  console.log("[JellyGlance] An error has occured on startup: " + error);
+  console.log("[Barracks] An error has occured on startup: " + error);
 }

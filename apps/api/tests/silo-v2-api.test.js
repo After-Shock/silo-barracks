@@ -24,6 +24,130 @@ async function fixture(t, handler, options = {}) {
   return { base, calls, api: new SiloAPI({ getConfig: async () => ({ state: 2, SILO_URL: base, SILO_API_KEY: 'fixture' }), timeoutMs: 1000, ...options }) };
 }
 
+test('home dashboard uses native stats, playback and leaderboard endpoints', async t => {
+  const f = await fixture(t, (url, send) => {
+    const path = url.pathname.replace('/proxy/api/v2/', '');
+    if (path === 'admin/stats') return send({ total_items: 12, total_movies: 2, total_shows: 1, total_files: 15, total_storage_bytes: 99 });
+    if (path === 'admin/stats/playback-activity') return send({ hours: 168, from: '2026-09-11T00:00:00Z', to: '2026-09-18T00:00:00Z',
+      profiles_active_24h: 2, reliability: { sessions_started: 8, finalized_sessions: 7, completed_sessions: 6,
+        completion_rate: 0.75, unique_profiles: 3 }, buckets: [{ hour: '2026-09-17T20:00:00Z', direct: 2, remux: 1, transcode: 1 }] });
+    if (path === 'admin/stats/top-activity') return send({ days: 7, titles: [{ media_item_id: 'm', title: 'Film', media_type: 'movie', plays: 4, total_seconds: 300 }],
+      profiles: [{ user_id: '1', username: 'Account', profile_id: 'p', profile_name: 'Viewer', plays: 5, total_seconds: 400 }] });
+    return send({}, 403);
+  });
+  const dashboard = await f.api.getHomeDashboard();
+  assert.equal(dashboard.source, 'silo-native');
+  assert.equal(dashboard.totals.totalPlaybacks, 8);
+  assert.equal(dashboard.totals.completedPlaybacks, 6);
+  assert.equal(dashboard.catalog.movies, 2);
+  assert.equal(dashboard.peakHours[20].count, 4);
+  assert.equal(dashboard.weekPulse.topItem.name, 'Film');
+  assert.equal(dashboard.hallOfFame[0].userName, 'Viewer');
+  assert.ok(!f.calls.some(url => /playback-history|profiles|catalog/.test(url.pathname)));
+});
+
+test('history uses one opaque cursor request and preserves Silo-native attempt fields', async t => {
+  const f = await fixture(t, (url, send) => {
+    if (!url.pathname.endsWith('/admin/playback-history')) return send({}, 404);
+    assert.equal(url.searchParams.get('cursor'), 'opaque cursor/+');
+    assert.equal(url.searchParams.get('user_id'), '7');
+    assert.equal(url.searchParams.get('profile_id'), 'profile-a');
+    assert.equal(url.searchParams.get('completed'), 'false');
+    send({ items: [{ session_id: 'attempt', user_id: '7', username: 'Viewer', profile_id: 'profile-a',
+      profile_name: 'Kids', media_item_id: 'episode', media_file_id: 'file', media_title: 'Pilot',
+      media_type: 'episode', play_method: 'remux', started_at: '2026-09-18T10:00:00Z',
+      ended_at: '2026-09-18T10:20:00Z', watched_seconds: 1200, duration_seconds: 1800, completed: false }],
+      page: { has_more: true, next_cursor: 'next' } });
+  });
+  const history = await f.api.getPlaybackHistoryPage({ page: 9, limit: 25, cursor: 'opaque cursor/+',
+    userId: '7', profileId: 'profile-a', completed: false });
+  assert.equal(f.calls.filter(url => url.pathname.endsWith('/admin/playback-history')).length, 1);
+  assert.equal(history.currentPage, 9);
+  assert.equal(history.nextCursor, 'next');
+  assert.equal(history.results[0].SiloMediaType, 'episode');
+  assert.equal(history.results[0].ProfileName, 'Kids');
+  assert.equal(history.results[0].PlayMethod, 'DirectStream');
+  assert.equal(history.results[0].Completed, false);
+  assert.equal(history.results[0].results, undefined);
+});
+
+test('history rejects repeated or terminal cursors', async t => {
+  let terminal = false;
+  const f = await fixture(t, (url, send) => {
+    if (!url.pathname.endsWith('/admin/playback-history')) return send({}, 404);
+    send({ items: [{ session_id: 'attempt' }], page: terminal
+      ? { has_more: false, next_cursor: 'invalid' }
+      : { has_more: true, next_cursor: url.searchParams.get('cursor') } });
+  });
+  await assert.rejects(f.api.getPlaybackHistoryPage({ cursor: 'same' }), /cursor/i);
+  terminal = true;
+  await assert.rejects(f.api.getPlaybackHistoryPage(), /terminal|cursor/i);
+});
+
+test('item library attribution comes from paginated admin file ownership', async t => {
+  const f = await fixture(t, (url, send) => {
+    if (!url.pathname.endsWith('/admin/items/episode%2Fone/files')) return send({}, 404);
+    if (!url.searchParams.has('cursor')) return send({ items: [{ id: 'f1', library_id: 'lib-a' }],
+      page: { has_more: true, next_cursor: 'files-next' } });
+    assert.equal(url.searchParams.get('cursor'), 'files-next');
+    return send({ items: [{ id: 'f2', library_id: 'lib-b' }], page: { has_more: false } });
+  });
+  const ids = await f.api._itemLibraryIds('episode/one', Date.now() + 1000);
+  assert.deepEqual([...ids].sort(), ['lib-a', 'lib-b']);
+  assert.equal(f.calls.filter(url => url.pathname.includes('/admin/items/')).length, 2);
+  await f.api._itemLibraryIds('episode/one', Date.now() + 1000);
+  assert.equal(f.calls.filter(url => url.pathname.includes('/admin/items/')).length, 2, 'membership should be cached');
+});
+
+test('library history uses exact catalog membership and resumable filtered cursors', async () => {
+  const api = new SiloAPI({ timeoutMs: 1000, maxPages: 5 });
+  api._configured = async () => {};
+  api._wire = async () => { api.connectionInfo = { apiMajor: 2 }; };
+  api.connectionInfo = { apiMajor: 2 };
+  api.getLibraries = async () => [{ Id: 'library', CollectionType: 'tvshows' }];
+  const membershipChecks = [];
+  api._itemLibraryIds = async itemId => {
+    membershipChecks.push(itemId);
+    return new Set(itemId === 'episode' ? ['library'] : ['other-library']);
+  };
+  let historyCalls = 0;
+  api.getPlaybackHistoryPage = async ({ cursor }) => {
+    historyCalls += 1;
+    if (!cursor) return { results: [
+      { Id: 'one', NowPlayingItemId: 'episode' }, { Id: 'other', NowPlayingItemId: 'elsewhere' },
+      { Id: 'two', NowPlayingItemId: 'episode' }, { Id: 'three', NowPlayingItemId: 'episode' },
+    ], hasMore: true, nextCursor: 'upstream' };
+    assert.equal(cursor, 'upstream');
+    return { results: [{ Id: 'four', NowPlayingItemId: 'episode' }], hasMore: false, nextCursor: null };
+  };
+  const first = await api.getLibraryPlaybackHistoryPage({ libraryId: 'library', limit: 2 });
+  assert.deepEqual(first.results.map(row => row.Id), ['one', 'two']);
+  assert.deepEqual(membershipChecks.sort(), ['elsewhere', 'episode']);
+  assert.ok(first.nextCursor);
+  assert.equal(historyCalls, 1);
+  const second = await api.getLibraryPlaybackHistoryPage({ libraryId: 'library', limit: 2, cursor: first.nextCursor });
+  assert.deepEqual(second.results.map(row => row.Id), ['three', 'four']);
+  assert.equal(second.hasMore, false);
+  assert.equal(historyCalls, 2);
+  const replay = await api.getLibraryPlaybackHistoryPage({ libraryId: 'library', limit: 2, cursor: first.nextCursor });
+  assert.deepEqual(replay.results.map(row => row.Id), ['three', 'four'], 'back navigation cursors must remain replayable');
+});
+
+test('native dashboard insights use the v2 aggregate endpoints', async t => {
+  const seen = new Set();
+  const f = await fixture(t, (url, send) => {
+    const path = url.pathname.replace('/proxy/api/v2/', ''); seen.add(path);
+    if (path === 'admin/stats') return send({ total_items: 5 });
+    if (path === 'admin/stats/playback-activity') return send({ buckets: [], reliability: {}, hours: 24 });
+    if (path === 'admin/stats/top-activity') return send({ titles: [], profiles: [], days: 7 });
+    return send({}, 404);
+  });
+  const result = await f.api.getAdminDashboardInsights({ hours: 24, days: 7, refresh: true });
+  assert.equal(result.stats.total_items, 5);
+  assert.deepEqual([...seen].sort(), ['admin/stats', 'admin/stats/playback-activity', 'admin/stats/top-activity']);
+  assert.ok(f.calls.filter(url => url.pathname.includes('/admin/stats')).every(url => url.searchParams.get('refresh') === 'true'));
+});
+
 test('auto v2 counts every session page and rejects an incomplete snapshot', async t => {
   let fail = false;
   const f = await fixture(t, (url, send) => {
@@ -74,6 +198,9 @@ test('v2 retains all provider read shapes and translates catalog offsets and des
   assert.ok(f.calls.some(url => url.searchParams.get('seek') === '20' && url.searchParams.get('cursor') === 'window'));
   assert.equal((await f.api.getRecentlyAdded({ limit: 1 }))[0].MediaSources[0].RunTimeTicks, 54000000000);
   assert.ok(f.calls.some(url => url.searchParams.get('sort') === '-added_at'));
+  await f.api._catalogPage({ libraryId: 'lib', mediaType: 'episode', search: 'pilot', sort: 'title', desc: true, limit: 1 });
+  assert.ok(f.calls.some(url => url.pathname.endsWith('/catalog') && url.searchParams.get('type') === 'episode'
+    && url.searchParams.get('q') === 'pilot' && url.searchParams.get('sort') === '-title'));
   assert.equal((await f.api.getEpisodes({ SeriesId: 'series', SeasonId: 'season' }))[0].Name, 'Pilot');
   assert.equal((await f.api.getItemsByID({ ids: ['movie'] }))[0].Id, 'movie');
   assert.equal((await f.api.validateSettings(f.base, 'fixture')).isValid, true);

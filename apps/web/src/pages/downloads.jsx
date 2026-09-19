@@ -94,8 +94,8 @@ export default function Downloads() {
   }
 
   useEffect(() => {
-    localStorage.setItem("jellyglance_active_download_count", String(activeCount));
-    window.dispatchEvent(new CustomEvent("jellyglance-download-count", { detail: activeCount }));
+    localStorage.setItem("silo_barracks_active_download_count", String(activeCount));
+    window.dispatchEvent(new CustomEvent("silo-barracks-download-count", { detail: activeCount }));
   }, [activeCount]);
 
   useEffect(() => {

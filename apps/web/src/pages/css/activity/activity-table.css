@@ -390,6 +390,20 @@
   color: var(--barracks-text-inset) !important;
 }
 
+.activity-profile-name {
+  display: block;
+  color: inherit;
+  opacity: 0.7;
+  font-size: 11px;
+}
+
+.activity-completion {
+  font-weight: 680;
+}
+
+.activity-completion.is-complete { color: var(--barracks-state-success); }
+.activity-completion.is-incomplete { color: var(--barracks-state-warning); }
+
 .activity-delete-modal .modal-header {
   color: var(--barracks-text-overlay);
   border-bottom: none !important;

@@ -1,4 +1,4 @@
-export const INTEGRATIONS_STORAGE_KEY = "JELLYGLANCE_INTEGRATIONS";
+export const INTEGRATIONS_STORAGE_KEY = "SILO_BARRACKS_INTEGRATIONS";
 
 export function loadSavedIntegrations(fallback = {}) {
   const saved = localStorage.getItem(INTEGRATIONS_STORAGE_KEY);

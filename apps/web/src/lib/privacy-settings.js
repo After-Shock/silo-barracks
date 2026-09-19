@@ -1,5 +1,5 @@
-export const ACTIVE_SESSION_IP_PRIVACY_KEY = "jellyglance_active_session_ip_privacy";
-export const ACTIVE_SESSION_IP_PRIVACY_EVENT = "jellyglance-active-session-ip-privacy-updated";
+export const ACTIVE_SESSION_IP_PRIVACY_KEY = "silo_barracks_active_session_ip_privacy";
+export const ACTIVE_SESSION_IP_PRIVACY_EVENT = "silo-barracks-active-session-ip-privacy-updated";
 
 export const ACTIVE_SESSION_IP_PRIVACY_OPTIONS = [
   {

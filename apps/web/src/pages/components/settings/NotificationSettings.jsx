@@ -73,7 +73,7 @@ export default function NotificationSettings() {
         <div>
           <span>In-app alerts</span>
           <h2>Notifications</h2>
-          <p>Control when JellyGlance shows toast messages while background tasks, syncs, backups, and repairs run.</p>
+          <p>Control when Barracks shows toast messages while background tasks, syncs, backups, and repairs run.</p>
         </div>
       </header>
 

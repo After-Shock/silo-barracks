@@ -146,7 +146,7 @@ export default function SettingsAbout() {
         const releases = response.data?.releases || [];
         setReleaseData({
           releases,
-          releases_url: response.data?.releases_url || "https://github.com/Nerdy-Technician/JellyGlance/releases",
+          releases_url: response.data?.releases_url || "https://github.com/After-Shock/silo-barracks/releases",
           channel: response.data?.channel || "stable",
         });
         setSelectedReleaseId(String(releases[0]?.id || ""));
@@ -399,7 +399,7 @@ export default function SettingsAbout() {
                   Updates
                 </dt>
                 <dd>
-                  <a href={data.releases_url || "https://github.com/Nerdy-Technician/JellyGlance/releases"} target="_blank" rel="noreferrer">
+                  <a href={data.releases_url || "https://github.com/After-Shock/silo-barracks/releases"} target="_blank" rel="noreferrer">
                     {updateMessage}
                   </a>
                 </dd>

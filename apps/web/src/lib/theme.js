@@ -1,5 +1,5 @@
 export const THEME_STORAGE_KEY = "silo_barracks_theme";
-export const LEGACY_THEME_STORAGE_KEY = "jellyglance_custom_theme";
+export const LEGACY_THEME_STORAGE_KEY = "silo_barracks_custom_theme";
 
 export const DEFAULT_THEME = {
   primary: "#6f9bcf",
@@ -518,7 +518,6 @@ export function saveTheme(theme, { storage = getGlobalStorage(), root = getDocum
   const nextTheme = normalizeThemeInput(theme);
   writeStoredValue(storage, THEME_STORAGE_KEY, JSON.stringify(nextTheme));
   applyTheme(nextTheme, { root, storage });
-  dispatchThemeEvent(eventTarget, "jellyglance-theme-updated", nextTheme);
   dispatchThemeEvent(eventTarget, "silo-barracks-theme-updated", getThemeTokens());
   return nextTheme;
 }
@@ -528,7 +527,6 @@ export function resetTheme({ storage = getGlobalStorage(), root = getDocumentRoo
   removeStoredValue(storage, THEME_STORAGE_KEY);
   writeStoredValue(storage, THEME_STORAGE_KEY, JSON.stringify(nextTheme));
   applyTheme(nextTheme, { root, storage });
-  dispatchThemeEvent(eventTarget, "jellyglance-theme-updated", nextTheme);
   dispatchThemeEvent(eventTarget, "silo-barracks-theme-updated", getThemeTokens());
   return nextTheme;
 }

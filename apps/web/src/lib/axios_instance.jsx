@@ -24,7 +24,7 @@ axios.interceptors.response.use(
     if (error?.response?.status === 401 && localStorage.getItem("token")) {
       localStorage.removeItem("token");
       localStorage.removeItem("config");
-      window.dispatchEvent(new Event("jellyglance-auth-expired"));
+      window.dispatchEvent(new Event("silo-barracks-auth-expired"));
     }
 
     return Promise.reject(error);

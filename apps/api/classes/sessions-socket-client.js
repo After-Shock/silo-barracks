@@ -13,7 +13,7 @@ function initializeClient(websocketUrl, apiKey) {
   const options = {
     headers: {
       "Authorization": 'MediaBrowser Token="' + apiKey + '"',
-      "User-Agent": "JellyGlance/1.0.0"
+      "User-Agent": "Barracks/1.0.0"
     }
   };
   

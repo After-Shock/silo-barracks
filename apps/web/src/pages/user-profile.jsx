@@ -391,7 +391,7 @@ export default function UserProfilePage() {
     <div className="user-profile-page" data-theme-screen="user-profile">
       <section className="user-profile-empty">
         <h1>User not found</h1>
-        <p>No JellyGlance profile matched `{decodeURIComponent(userKey)}`.</p>
+        <p>No Barracks profile matched `{decodeURIComponent(userKey)}`.</p>
         <Link to="/users">Back to users</Link>
       </section>
     </div>

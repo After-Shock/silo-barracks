@@ -114,7 +114,7 @@ export default function TautulliImport() {
 
   async function importBackup() {
     if (!uploadedBackup?.uploadId) return;
-    const confirmed = window.confirm("Import this Tautulli watch history? Existing JellyGlance rows will be left alone and matching rows will be skipped.");
+    const confirmed = window.confirm("Import this Tautulli watch history? Existing Barracks rows will be left alone and matching rows will be skipped.");
     if (!confirmed) return;
 
     try {
@@ -128,7 +128,7 @@ export default function TautulliImport() {
       setResult(response.data);
       setPreview(response.data);
       setUploadedBackup(null);
-      window.dispatchEvent(new CustomEvent("jellyglance-history-imported", { detail: response.data }));
+      window.dispatchEvent(new CustomEvent("silo-barracks-history-imported", { detail: response.data }));
       setMessage({
         type: "success",
         text: `Imported ${response.data.insertedRows} new Tautulli plays. Matched ${response.data.matchedJellyfinRows} rows to Jellyfin media and repaired ${response.data.repairedRows} existing imported rows.`,
@@ -174,7 +174,7 @@ export default function TautulliImport() {
       setSelectedTarget(null);
       setMediaResults([]);
       setMediaSearch("");
-      window.dispatchEvent(new CustomEvent("jellyglance-history-imported", { detail: response.data }));
+      window.dispatchEvent(new CustomEvent("silo-barracks-history-imported", { detail: response.data }));
       await loadUnmatched();
       await loadUnmatchedUsers();
     } catch (error) {
@@ -197,7 +197,7 @@ export default function TautulliImport() {
         { headers: { ...authHeader(), "Content-Type": "application/json" } }
       );
       setMessage({ type: "success", text: `Linked ${response.data.updatedRows} imported plays to ${target.Name}.` });
-      window.dispatchEvent(new CustomEvent("jellyglance-history-imported", { detail: response.data }));
+      window.dispatchEvent(new CustomEvent("silo-barracks-history-imported", { detail: response.data }));
       await loadUnmatchedUsers();
     } catch (error) {
       setMessage({ type: "danger", text: getErrorMessage(error, "Unable to link Tautulli user.") });
@@ -219,7 +219,7 @@ export default function TautulliImport() {
         <div>
           <span>Legacy history</span>
           <h2>Tautulli Import</h2>
-          <p>Upload an old Tautulli backup and append its Plex watch history into JellyGlance without overwriting current playback data.</p>
+          <p>Upload an old Tautulli backup and append its Plex watch history into Barracks without overwriting current playback data.</p>
         </div>
       </header>
 
@@ -271,7 +271,7 @@ export default function TautulliImport() {
           <article>
             <span>Already imported</span>
             <strong>{preview.alreadyImportedRows ?? result?.skippedRows ?? 0}</strong>
-            <small>Rows with Tautulli IDs currently in JellyGlance.</small>
+            <small>Rows with Tautulli IDs currently in Barracks.</small>
           </article>
           {result ? (
             <article>

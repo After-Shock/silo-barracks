@@ -330,11 +330,22 @@
 }
 
 .session-timecode-value {
-  display: inline-block;
+  display: block;
   max-width: 100%;
   overflow: hidden;
   font-variant-numeric: tabular-nums;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.session-timecode-eta {
+  display: block;
+  margin-top: 2px;
+  color: var(--barracks-text-muted-overlay);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -791,6 +802,58 @@
     display: none !important;
   }
 }
+.session-controls {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid var(--barracks-border);
+  border-radius: 14px;
+  background: var(--barracks-surface-inset);
+}
+
+.session-controls-heading,
+.session-control-buttons,
+.session-control-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.session-controls-heading {
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.session-controls-heading div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.session-controls-heading span,
+.session-controls-heading small,
+.session-control-notice {
+  color: var(--barracks-text-muted);
+  font-size: 0.82rem;
+}
+
+.session-control-buttons {
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.session-control-message input {
+  min-width: 0;
+}
+
+.session-control-notice.is-error { color: var(--barracks-state-danger); }
+.session-control-notice.is-success { color: var(--barracks-state-success); }
+
+@media (max-width: 520px) {
+  .session-controls-heading,
+  .session-control-message { align-items: stretch; flex-direction: column; }
+  .session-controls-heading small { align-self: flex-start; }
+}
+
 .session-connection-status {
   display: flex;
   flex-direction: column;
@@ -800,4 +863,227 @@
   border: 1px solid var(--barracks-state-warning);
   border-radius: 0.75rem;
   background: var(--barracks-surface-raised);
+}
+
+/* Jellyglance-style active session cards, rebranded for Silo Barracks. */
+.sessions-container,
+.fleet-streams {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.session-card {
+  width: 100%;
+  min-height: 252px;
+  border: 1px solid color-mix(in srgb, var(--barracks-border-subtle) 82%, var(--barracks-border-strong)) !important;
+  border-radius: 14px !important;
+  background: var(--barracks-surface-raised) !important;
+  color: var(--barracks-text-raised);
+  box-shadow: none;
+}
+
+.session-card:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--barracks-action) 54%, var(--barracks-border-subtle)) !important;
+  box-shadow: 0 18px 44px var(--barracks-shadow);
+}
+
+.session-card-main {
+  height: 176px;
+  min-height: 176px;
+  background: var(--barracks-surface-raised) !important;
+}
+
+.session-card-main.rounded-top {
+  border-radius: 14px 14px 0 0 !important;
+}
+
+.session-card-banner-image {
+  flex: 0 0 120px !important;
+  width: 120px !important;
+  max-width: 120px !important;
+}
+
+.session-card-item-image,
+.stat-card-image-audio {
+  width: 120px !important;
+  height: 176px !important;
+  object-fit: cover;
+  border-radius: 14px 0 0 0 !important;
+}
+
+.session-card-body {
+  padding: 10px 54px 6px 14px !important;
+}
+
+.session-details {
+  height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--barracks-text-raised);
+}
+
+.session-details-list {
+  max-height: 154px;
+  gap: 2px;
+}
+
+.session-details-row {
+  grid-template-columns: 78px minmax(0, 1fr);
+  column-gap: 10px;
+  width: 100%;
+  margin-bottom: 2px !important;
+}
+
+.session-details-title {
+  color: color-mix(in srgb, var(--barracks-action) 62%, var(--barracks-text-raised)) !important;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+}
+
+.session-details-title + .session-details-value {
+  color: var(--barracks-text-raised);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.session-timecode {
+  margin: 0 !important;
+  color: var(--barracks-text-raised);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.session-timecode-eta {
+  display: none;
+}
+
+.card-device-image-overlay {
+  top: 28px;
+  right: 30px;
+  width: 34px;
+  height: 34px;
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--platform-icon-color, var(--barracks-action)) 72%, transparent));
+}
+
+.card-device-image {
+  width: 31px;
+  height: 31px;
+}
+
+.progress-bar {
+  height: 7px;
+  margin: 10px 12px 0;
+  border-radius: 999px;
+  background: var(--barracks-surface-inset) !important;
+  box-shadow: none;
+}
+
+.progress-custom {
+  background: var(--barracks-action);
+  box-shadow: none;
+}
+
+.session-card-meta {
+  min-height: 58px;
+  padding: 8px 14px 12px !important;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+}
+
+.session-play-state {
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+  background: color-mix(in srgb, var(--barracks-action) 28%, var(--barracks-surface-inset));
+  color: var(--barracks-text-raised);
+}
+
+.session-title a {
+  color: var(--barracks-text-raised) !important;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.session-subtitle {
+  color: color-mix(in srgb, var(--barracks-action) 52%, var(--barracks-text-raised));
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.session-card-user {
+  flex: 0 1 150px !important;
+  max-width: 150px;
+}
+
+.session-user-name {
+  max-width: 104px;
+  color: var(--barracks-text-muted-raised) !important;
+  text-decoration: underline;
+  font-weight: 900;
+}
+
+.session-card-user-image {
+  width: 31px;
+  height: 31px;
+  border: 2px solid var(--barracks-text-raised);
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
+}
+
+@media (max-width: 560px) {
+  .sessions-container,
+  .fleet-streams {
+    grid-template-columns: 1fr;
+  }
+
+  .session-card {
+    min-height: 238px;
+  }
+
+  .session-card-main {
+    height: 166px;
+    min-height: 166px;
+  }
+
+  .session-card-banner-image,
+  .session-card-item-image,
+  .stat-card-image-audio {
+    width: 108px !important;
+    max-width: 108px !important;
+  }
+
+  .session-card-item-image,
+  .stat-card-image-audio {
+    height: 166px !important;
+  }
+
+  .session-card-body {
+    padding: 9px 44px 5px 12px !important;
+  }
+
+  .session-details-row {
+    grid-template-columns: 70px minmax(0, 1fr);
+    column-gap: 8px;
+  }
+
+  .card-device-image-overlay {
+    top: 24px;
+    right: 18px;
+  }
+
+  .session-card-user {
+    flex-basis: 96px !important;
+    max-width: 96px;
+  }
+
+  .session-user-name {
+    max-width: 58px;
+  }
 }

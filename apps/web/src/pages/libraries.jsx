@@ -20,46 +20,27 @@ const LIBRARY_VIEW_MODE_KEY = "PREF_LIBRARIES_VIEW_MODE";
 
 function Libraries() {
   const [data, setData] = useState();
-  const [metadata, setMetaData] = useState();
   const [config, setConfig] = useState(null);
+  const [overviewPending, setOverviewPending] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   const [scanningLibraryId, setScanningLibraryId] = useState(null);
   const [scanMessage, setScanMessage] = useState(null);
   const [viewMode, setViewMode] = useState(() => localStorage.getItem(LIBRARY_VIEW_MODE_KEY) || "grid");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchLibraries = useCallback(() => {
-    if (config) {
-      const url = `/stats/getLibraryCardStats`;
-      axios
-        .get(url, {
-          headers: {
-            Authorization: `Bearer ${config.token}`,
-            "Content-Type": "application/json",
-          },
-        })
-        .then((data) => {
-          setData(data.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-
-      const metadataurl = `/stats/getLibraryMetadata`;
-
-      axios
-        .get(metadataurl, {
-          headers: {
-            Authorization: `Bearer ${config.token}`,
-            "Content-Type": "application/json",
-          },
-        })
-        .then((data) => {
-          setMetaData(data.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+  const fetchLibraries = useCallback(async () => {
+    if (!config) return;
+    try {
+      const response = await axios.get("/stats/getLibrariesOverview", {
+        headers: {
+          Authorization: `Bearer ${config.token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      setData(Array.isArray(response.data?.libraries) ? response.data.libraries : []);
+      setOverviewPending(Boolean(response.data?.pending));
+    } catch (error) {
+      console.log(error);
     }
   }, [config]);
 
@@ -107,9 +88,9 @@ function Libraries() {
     }
 
     fetchLibraries();
-    const intervalId = setInterval(fetchLibraries, 60000 * 60);
+    const intervalId = setInterval(fetchLibraries, overviewPending ? 10000 : 60000 * 60);
     return () => clearInterval(intervalId);
-  }, [config, fetchLibraries]);
+  }, [config, fetchLibraries, overviewPending]);
 
   function updateViewMode(nextViewMode) {
     const normalizedViewMode = nextViewMode === "list" ? "list" : "grid";
@@ -117,7 +98,7 @@ function Libraries() {
     localStorage.setItem(LIBRARY_VIEW_MODE_KEY, normalizedViewMode);
   }
 
-  if (!data || !metadata) {
+  if (!data) {
     return <div data-theme-screen="libraries" aria-busy="true"><Loading /></div>;
   }
 
@@ -200,7 +181,7 @@ function Libraries() {
           <ErrorBoundary key={item.Id}>
             <LibraryCard
               data={item}
-              metadata={metadata.find((data) => data.Id === item.Id)}
+              metadata={item.metadata}
               base_url={config.settings?.EXTERNAL_URL ?? config.hostUrl}
               onScan={() => scanLibrary(item)}
               scanning={scanningLibraryId === item.Id}

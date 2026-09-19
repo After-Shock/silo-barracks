@@ -2,17 +2,17 @@
   "version": 1,
   "source": {
     "repository": "Silo-Server/silo-server",
-    "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
+    "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
     "path": "contracts/api/v2/openapi.json",
-    "sha256": "e0cabb6c0a2535e05aab38cdc5823fa73dbf808ebff17332d7d372947abe5310",
-    "digest": "sha256:e0cabb6c0a2535e05aab38cdc5823fa73dbf808ebff17332d7d372947abe5310",
-    "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json",
-    "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json"
+    "sha256": "774f49bd02d1b9465b2591013242eeb2aa41042c5303108ffc3ab39fd27c64eb",
+    "digest": "sha256:774f49bd02d1b9465b2591013242eeb2aa41042c5303108ffc3ab39fd27c64eb",
+    "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json",
+    "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json"
   },
   "schema_artifact": {
     "path": "openapi.json",
-    "sha256": "385c70a1a21746977dd09316e0f8ff819f2de560dbb02c1bbe61c15537946963",
-    "digest": "sha256:385c70a1a21746977dd09316e0f8ff819f2de560dbb02c1bbe61c15537946963"
+    "sha256": "12148b54ffc862b86833b0b89c650aeb7c18704333c80feb9f410c0f93d79282",
+    "digest": "sha256:12148b54ffc862b86833b0b89c650aeb7c18704333c80feb9f410c0f93d79282"
   },
   "notes": [
     "The upstream listAdminPlaybackSessions schema permits limit 200, but its current LoadPage implementation rejects values above 100; keep transport probes at 100 until the upstream behavior is reconciled."
@@ -23,9 +23,9 @@
       "path": "/api/v2/admin/sessions",
       "response_schema": "CollectionAdminPlaybackSession",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1sessions/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1sessions/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1sessions/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1sessions/get"
       }
     },
     "getAdminPlaybackSessionCapabilities": {
@@ -33,9 +33,9 @@
       "path": "/api/v2/admin/sessions/capabilities",
       "response_schema": "AdminPlaybackSessionCapabilitiesOutputBody",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1sessions~1capabilities/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1sessions~1capabilities/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1sessions~1capabilities/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1sessions~1capabilities/get"
       }
     },
     "listAdminUsers": {
@@ -43,9 +43,9 @@
       "path": "/api/v2/admin/users",
       "response_schema": "AdminUserCollection",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1users/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1users/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1users/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1users/get"
       }
     },
     "listSessions": {
@@ -53,9 +53,9 @@
       "path": "/api/v2/auth/sessions",
       "response_schema": "LoginSessionCollection",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1auth~1sessions/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1auth~1sessions/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1auth~1sessions/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1auth~1sessions/get"
       }
     },
     "listCatalogItems": {
@@ -63,9 +63,9 @@
       "path": "/api/v2/catalog",
       "response_schema": "CatalogBrowseCollection",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog/get"
       }
     },
     "getCatalogItem": {
@@ -73,9 +73,9 @@
       "path": "/api/v2/catalog/items/{id}",
       "response_schema": "CatalogItemDetail",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1items~1{id}/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1items~1{id}/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1items~1{id}/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1items~1{id}/get"
       }
     },
     "listCatalogItemVersions": {
@@ -83,9 +83,9 @@
       "path": "/api/v2/catalog/items/{id}/versions",
       "response_schema": "FileVersionCollection",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1items~1{id}~1versions/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1items~1{id}~1versions/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1items~1{id}~1versions/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1items~1{id}~1versions/get"
       }
     },
     "listSeriesSeasons": {
@@ -93,9 +93,9 @@
       "path": "/api/v2/catalog/series/{id}/seasons",
       "response_schema": "SeasonCollection",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1series~1{id}~1seasons/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1series~1{id}~1seasons/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1series~1{id}~1seasons/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1series~1{id}~1seasons/get"
       }
     },
     "getSeriesSeason": {
@@ -103,9 +103,9 @@
       "path": "/api/v2/catalog/series/{id}/seasons/{num}",
       "response_schema": "Season",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1series~1{id}~1seasons~1{num}/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1series~1{id}~1seasons~1{num}/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1series~1{id}~1seasons~1{num}/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1series~1{id}~1seasons~1{num}/get"
       }
     },
     "listSeasonEpisodes": {
@@ -113,9 +113,9 @@
       "path": "/api/v2/catalog/series/{id}/seasons/{num}/episodes",
       "response_schema": "EpisodeCollection",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1series~1{id}~1seasons~1{num}~1episodes/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1series~1{id}~1seasons~1{num}~1episodes/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1series~1{id}~1seasons~1{num}~1episodes/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1catalog~1series~1{id}~1seasons~1{num}~1episodes/get"
       }
     },
     "listHistory": {
@@ -123,9 +123,9 @@
       "path": "/api/v2/history",
       "response_schema": "HistoryCollection",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1history/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1history/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1history/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1history/get"
       }
     },
     "listLibraries": {
@@ -133,9 +133,9 @@
       "path": "/api/v2/libraries",
       "response_schema": "LibraryCollection",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1libraries/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1libraries/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1libraries/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1libraries/get"
       }
     },
     "listLibraryRoots": {
@@ -143,9 +143,9 @@
       "path": "/api/v2/libraries/roots",
       "response_schema": "LibraryRootCollection",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1libraries~1roots/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1libraries~1roots/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1libraries~1roots/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1libraries~1roots/get"
       }
     },
     "listLibrarySections": {
@@ -153,9 +153,9 @@
       "path": "/api/v2/library/{id}/sections",
       "response_schema": "SectionCollection",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1library~1{id}~1sections/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1library~1{id}~1sections/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1library~1{id}~1sections/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1library~1{id}~1sections/get"
       }
     },
     "getLibrarySectionItems": {
@@ -163,9 +163,9 @@
       "path": "/api/v2/library/{id}/sections/{section_id}/items",
       "response_schema": "Section",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1library~1{id}~1sections~1{section_id}~1items/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1library~1{id}~1sections~1{section_id}~1items/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1library~1{id}~1sections~1{section_id}~1items/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1library~1{id}~1sections~1{section_id}~1items/get"
       }
     },
     "getSystemInfo": {
@@ -173,9 +173,9 @@
       "path": "/api/v2/system/info",
       "response_schema": "SystemInfo",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1system~1info/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1system~1info/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1system~1info/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1system~1info/get"
       }
     },
     "listAdminPlaybackHistory": {
@@ -183,9 +183,9 @@
       "path": "/api/v2/admin/playback-history",
       "response_schema": "AdminPlaybackHistoryCollection",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1playback-history/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1playback-history/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1playback-history/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1playback-history/get"
       }
     },
     "listProfiles": {
@@ -193,480 +193,704 @@
       "path": "/api/v2/profiles",
       "response_schema": "ProfileCollection",
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1profiles/get",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/paths/~1api~1v2~1profiles/get"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1profiles/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1profiles/get"
+      }
+    },
+    "getAdminPlaybackCommandCapabilities": {
+      "method": "GET",
+      "path": "/api/v2/admin/sessions/command-capabilities",
+      "response_schema": "AdminPlaybackCommandCapabilitiesOutputBody",
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "pauseAdminPlaybackSession": {
+      "method": "POST",
+      "path": "/api/v2/admin/sessions/{session_id}/pause",
+      "response_schema": "AdminPlaybackCommandReceipt",
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "resumeAdminPlaybackSession": {
+      "method": "POST",
+      "path": "/api/v2/admin/sessions/{session_id}/resume",
+      "response_schema": "AdminPlaybackCommandReceipt",
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "stopAdminPlaybackSession": {
+      "method": "POST",
+      "path": "/api/v2/admin/sessions/{session_id}/stop",
+      "response_schema": "AdminPlaybackCommandReceipt",
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "terminateAdminPlaybackSession": {
+      "method": "POST",
+      "path": "/api/v2/admin/sessions/{session_id}/terminate",
+      "response_schema": "AdminPlaybackTerminateReceipt",
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "messageAdminPlaybackSession": {
+      "method": "POST",
+      "path": "/api/v2/admin/sessions/{session_id}/message",
+      "response_schema": "AdminPlaybackCommandReceipt",
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "getAdminDashboardStats": {
+      "method": "GET",
+      "path": "/api/v2/admin/stats",
+      "response_schema": "AdminDashboardStats",
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1stats/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1stats/get"
+      }
+    },
+    "getAdminDashboardPlaybackActivity": {
+      "method": "GET",
+      "path": "/api/v2/admin/stats/playback-activity",
+      "response_schema": "AdminDashboardPlaybackActivity",
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1stats~1playback-activity/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1stats~1playback-activity/get"
+      }
+    },
+    "getAdminDashboardTopActivity": {
+      "method": "GET",
+      "path": "/api/v2/admin/stats/top-activity",
+      "response_schema": "AdminDashboardTopActivity",
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1stats~1top-activity/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1stats~1top-activity/get"
+      }
+    },
+    "listAdminItemFiles": {
+      "method": "GET",
+      "path": "/api/v2/admin/items/{id}/files",
+      "response_schema": "CollectionAdminItemFile",
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1items~1{id}~1files/get",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/paths/~1api~1v2~1admin~1items~1{id}~1files/get"
       }
     }
   },
   "schemas": {
     "AdminPlaybackSession": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackSession",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackSession"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackSession",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackSession"
       }
     },
     "AdminPlaybackSessionCapabilitiesOutputBody": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackSessionCapabilitiesOutputBody",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackSessionCapabilitiesOutputBody"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackSessionCapabilitiesOutputBody",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackSessionCapabilitiesOutputBody"
       }
     },
     "AdminUser": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AdminUser",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AdminUser"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminUser",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminUser"
       }
     },
     "AdminUserCollection": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AdminUserCollection",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AdminUserCollection"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminUserCollection",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminUserCollection"
       }
     },
     "AudioTrack": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudioTrack",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudioTrack"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudioTrack",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudioTrack"
       }
     },
     "AudiobookDetailExtension": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudiobookDetailExtension",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudiobookDetailExtension"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudiobookDetailExtension",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudiobookDetailExtension"
       }
     },
     "AudiobookNarration": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudiobookNarration",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudiobookNarration"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudiobookNarration",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudiobookNarration"
       }
     },
     "AudiobookPerson": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudiobookPerson",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudiobookPerson"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudiobookPerson",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudiobookPerson"
       }
     },
     "AudiobookRelatedContent": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudiobookRelatedContent",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudiobookRelatedContent"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudiobookRelatedContent",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudiobookRelatedContent"
       }
     },
     "AudiobookRelatedItem": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudiobookRelatedItem",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudiobookRelatedItem"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudiobookRelatedItem",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudiobookRelatedItem"
       }
     },
     "AudiobookSeriesGroup": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudiobookSeriesGroup",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AudiobookSeriesGroup"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudiobookSeriesGroup",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AudiobookSeriesGroup"
       }
     },
     "CastCredit": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CastCredit",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CastCredit"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CastCredit",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CastCredit"
       }
     },
     "CatalogBrowseCollection": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogBrowseCollection",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogBrowseCollection"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogBrowseCollection",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogBrowseCollection"
       }
     },
     "CatalogEffectiveSort": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogEffectiveSort",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogEffectiveSort"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogEffectiveSort",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogEffectiveSort"
       }
     },
     "CatalogItem": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogItem",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogItem"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogItem",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogItem"
       }
     },
     "CatalogItemDetail": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogItemDetail",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogItemDetail"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogItemDetail",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogItemDetail"
       }
     },
     "CatalogItemOverlay": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogItemOverlay",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogItemOverlay"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogItemOverlay",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogItemOverlay"
       }
     },
     "CatalogItemSortMetrics": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogItemSortMetrics",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogItemSortMetrics"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogItemSortMetrics",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogItemSortMetrics"
       }
     },
     "CatalogItemUpcomingEvent": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogItemUpcomingEvent",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogItemUpcomingEvent"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogItemUpcomingEvent",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogItemUpcomingEvent"
       }
     },
     "CatalogItemUserState": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogItemUserState",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogItemUserState"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogItemUserState",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogItemUserState"
       }
     },
     "CatalogSearchDiagnostics": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogSearchDiagnostics",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogSearchDiagnostics"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogSearchDiagnostics",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogSearchDiagnostics"
       }
     },
     "CatalogWorkFormat": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogWorkFormat",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CatalogWorkFormat"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogWorkFormat",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CatalogWorkFormat"
       }
     },
     "CollectionAdminPlaybackSession": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CollectionAdminPlaybackSession",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CollectionAdminPlaybackSession"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CollectionAdminPlaybackSession",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CollectionAdminPlaybackSession"
       }
     },
     "CrewCredit": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CrewCredit",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/CrewCredit"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CrewCredit",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CrewCredit"
       }
     },
     "EbookDetailExtension": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/EbookDetailExtension",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/EbookDetailExtension"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/EbookDetailExtension",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/EbookDetailExtension"
       }
     },
     "EffectivePolicy": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/EffectivePolicy",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/EffectivePolicy"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/EffectivePolicy",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/EffectivePolicy"
       }
     },
     "Episode": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Episode",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Episode"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Episode",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Episode"
       }
     },
     "EpisodeCollection": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/EpisodeCollection",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/EpisodeCollection"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/EpisodeCollection",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/EpisodeCollection"
       }
     },
     "EpisodeFile": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/EpisodeFile",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/EpisodeFile"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/EpisodeFile",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/EpisodeFile"
       }
     },
     "FileVersion": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/FileVersion",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/FileVersion"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/FileVersion",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/FileVersion"
       }
     },
     "FileVersionCollection": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/FileVersionCollection",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/FileVersionCollection"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/FileVersionCollection",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/FileVersionCollection"
       }
     },
     "HistoryCard": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/HistoryCard",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/HistoryCard"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/HistoryCard",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/HistoryCard"
       }
     },
     "HistoryCollection": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/HistoryCollection",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/HistoryCollection"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/HistoryCollection",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/HistoryCollection"
       }
     },
     "HistoryWatch": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/HistoryWatch",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/HistoryWatch"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/HistoryWatch",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/HistoryWatch"
       }
     },
     "ItemExtraInfo": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/ItemExtraInfo",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/ItemExtraInfo"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/ItemExtraInfo",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/ItemExtraInfo"
       }
     },
     "ItemVideoInfo": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/ItemVideoInfo",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/ItemVideoInfo"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/ItemVideoInfo",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/ItemVideoInfo"
       }
     },
     "Library": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Library",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Library"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Library",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Library"
       }
     },
     "LibraryCollection": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/LibraryCollection",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/LibraryCollection"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/LibraryCollection",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/LibraryCollection"
       }
     },
     "LibraryRoot": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/LibraryRoot",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/LibraryRoot"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/LibraryRoot",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/LibraryRoot"
       }
     },
     "LibraryRootCollection": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/LibraryRootCollection",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/LibraryRootCollection"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/LibraryRootCollection",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/LibraryRootCollection"
       }
     },
     "LoginSession": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/LoginSession",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/LoginSession"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/LoginSession",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/LoginSession"
       }
     },
     "LoginSessionCollection": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/LoginSessionCollection",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/LoginSessionCollection"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/LoginSessionCollection",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/LoginSessionCollection"
       }
     },
     "MangaChapter": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/MangaChapter",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/MangaChapter"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/MangaChapter",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/MangaChapter"
       }
     },
     "MangaDetailExtension": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/MangaDetailExtension",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/MangaDetailExtension"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/MangaDetailExtension",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/MangaDetailExtension"
       }
     },
     "Marker": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Marker",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Marker"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Marker",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Marker"
       }
     },
     "PageInfo": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/PageInfo",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/PageInfo"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/PageInfo",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/PageInfo"
       }
     },
     "PlaybackVariant": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/PlaybackVariant",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/PlaybackVariant"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/PlaybackVariant",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/PlaybackVariant"
       }
     },
     "PlaybackVariantPart": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/PlaybackVariantPart",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/PlaybackVariantPart"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/PlaybackVariantPart",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/PlaybackVariantPart"
       }
     },
     "Problem": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Problem",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Problem"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Problem",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Problem"
       }
     },
     "ProblemError": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/ProblemError",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/ProblemError"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/ProblemError",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/ProblemError"
       }
     },
     "RootOverride": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/RootOverride",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/RootOverride"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/RootOverride",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/RootOverride"
       }
     },
     "Season": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Season",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Season"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Season",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Season"
       }
     },
     "SeasonCollection": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/SeasonCollection",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/SeasonCollection"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/SeasonCollection",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/SeasonCollection"
       }
     },
     "Section": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Section",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Section"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Section",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Section"
       }
     },
     "SectionCollection": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/SectionCollection",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/SectionCollection"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/SectionCollection",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/SectionCollection"
       }
     },
     "SubtitleInfo": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/SubtitleInfo",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/SubtitleInfo"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/SubtitleInfo",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/SubtitleInfo"
       }
     },
     "SystemInfo": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/SystemInfo",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/SystemInfo"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/SystemInfo",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/SystemInfo"
       }
     },
     "SystemInfoLinks": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/SystemInfoLinks",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/SystemInfoLinks"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/SystemInfoLinks",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/SystemInfoLinks"
       }
     },
     "VersionChapter": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/VersionChapter",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/VersionChapter"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/VersionChapter",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/VersionChapter"
       }
     },
     "VersionSubtitleTrack": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/VersionSubtitleTrack",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/VersionSubtitleTrack"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/VersionSubtitleTrack",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/VersionSubtitleTrack"
       }
     },
     "VideoTrack": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/VideoTrack",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/VideoTrack"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/VideoTrack",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/VideoTrack"
       }
     },
     "WatchRollup": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/WatchRollup",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/WatchRollup"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/WatchRollup",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/WatchRollup"
       }
     },
     "WatchSubtitleSignature": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/WatchSubtitleSignature",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/WatchSubtitleSignature"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/WatchSubtitleSignature",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/WatchSubtitleSignature"
       }
     },
     "AdminPlaybackHistoryCollection": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackHistoryCollection",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackHistoryCollection"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackHistoryCollection",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackHistoryCollection"
       }
     },
     "AdminPlaybackHistoryEntry": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackHistoryEntry",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackHistoryEntry"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackHistoryEntry",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackHistoryEntry"
       }
     },
     "ProfileCollection": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/ProfileCollection",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/ProfileCollection"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/ProfileCollection",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/ProfileCollection"
       }
     },
     "Profile": {
       "source": {
-        "revision": "26661d76f451ed790cf74221538b1048a8d193d6",
-        "url": "https://github.com/Silo-Server/silo-server/blob/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Profile",
-        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/26661d76f451ed790cf74221538b1048a8d193d6/contracts/api/v2/openapi.json#/components/schemas/Profile"
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Profile",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/Profile"
+      }
+    },
+    "AdminAccountCreateBody": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "AdminAccountCreatedBody": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "AdminPlaybackCommandCapabilitiesOutputBody": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "AdminPlaybackCommandIdentity": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "AdminPlaybackCommandReceipt": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "AdminPlaybackSessionMessageInputBody": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "AdminPlaybackTerminateInputBody": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "AdminPlaybackTerminateReceipt": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "LibraryCreate": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "ProfileCreate": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#L1"
+      }
+    },
+    "AdminDashboardPlaybackActivity": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminDashboardPlaybackActivity",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminDashboardPlaybackActivity"
+      }
+    },
+    "AdminDashboardPlaybackBucket": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminDashboardPlaybackBucket",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminDashboardPlaybackBucket"
+      }
+    },
+    "AdminDashboardStats": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminDashboardStats",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminDashboardStats"
+      }
+    },
+    "AdminDashboardTopActivity": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminDashboardTopActivity",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminDashboardTopActivity"
+      }
+    },
+    "AdminDashboardTopProfile": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminDashboardTopProfile",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminDashboardTopProfile"
+      }
+    },
+    "AdminDashboardWatchProviderStats": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminDashboardWatchProviderStats",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminDashboardWatchProviderStats"
+      }
+    },
+    "AdminPlaybackReliability": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackReliability",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminPlaybackReliability"
+      }
+    },
+    "AdminTopTitle": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminTopTitle",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminTopTitle"
+      }
+    },
+    "AdminItemFile": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminItemFile",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/AdminItemFile"
+      }
+    },
+    "CollectionAdminItemFile": {
+      "source": {
+        "revision": "8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf",
+        "url": "https://github.com/Silo-Server/silo-server/blob/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CollectionAdminItemFile",
+        "raw_url": "https://raw.githubusercontent.com/Silo-Server/silo-server/8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf/contracts/api/v2/openapi.json#/components/schemas/CollectionAdminItemFile"
       }
     }
   }

@@ -303,7 +303,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
   const [thirdParty, setThirdParty] = useState(initialThirdPartyApps);
   const [agentDefaults, setAgentDefaults] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("jellyglance_agent_defaults") || "{}") || {};
+      return JSON.parse(localStorage.getItem("silo_barracks_agent_defaults") || "{}") || {};
     } catch {
       return {};
     }
@@ -325,7 +325,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
   function updateAgentDefault(type, value) {
     setAgentDefaults((current) => {
       const next = { ...current, [type]: value };
-      localStorage.setItem("jellyglance_agent_defaults", JSON.stringify(next));
+      localStorage.setItem("silo_barracks_agent_defaults", JSON.stringify(next));
       return next;
     });
   }
@@ -417,12 +417,12 @@ export default function Integrations({ embedded = false, firstRun = false, activ
   function persist(nextArrApps = arrApps, nextClients = clients, nextThirdParty = thirdParty) {
     const payload = { arrApps: nextArrApps, clients: nextClients, thirdParty: nextThirdParty };
     saveSavedIntegrations(payload);
-    window.dispatchEvent(new CustomEvent("jellyglance-integrations-updated", { detail: payload }));
+    window.dispatchEvent(new CustomEvent("barracks-integrations-updated", { detail: payload }));
     axios
       .post("/api/integrations", payload, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
-      .then(() => window.dispatchEvent(new CustomEvent("jellyglance-integrations-updated", { detail: payload })))
+      .then(() => window.dispatchEvent(new CustomEvent("barracks-integrations-updated", { detail: payload })))
       .catch((error) => console.log("Unable to save integrations", error));
   }
 
@@ -440,7 +440,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `jellyglance-integrations-${new Date().toISOString().slice(0, 10)}.json`;
+    link.download = `barracks-integrations-${new Date().toISOString().slice(0, 10)}.json`;
     document.body.appendChild(link);
     link.click();
     URL.revokeObjectURL(link.href);
@@ -465,7 +465,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
       persist(nextArrApps, nextClients, nextThirdParty);
       setNotice(`${file.name} imported.`);
     } catch (error) {
-      setNotice("Import failed. Choose a JellyGlance integrations JSON file.");
+      setNotice("Import failed. Choose a Barracks integrations JSON file.");
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
@@ -798,7 +798,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
           <div className="integration-link-panel">
             <div>
               <strong>Automation health</strong>
-              <span>Review Bazarr subtitles and Prowlarr indexer status from one JellyGlance view.</span>
+              <span>Review Bazarr subtitles and Prowlarr indexer status from one Barracks view.</span>
             </div>
             <div className="integration-link-actions">
               <Link to="/automation-health">Open Automation Health</Link>
@@ -963,7 +963,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
           <div className="integration-link-panel">
             <div>
               <strong>Open connected tools</strong>
-              <span>Manage Wizarr invitations or monitor Tdarr active, queued, and finished transcodes from JellyGlance.</span>
+              <span>Manage Wizarr invitations or monitor Tdarr active, queued, and finished transcodes from Barracks.</span>
             </div>
             <div className="integration-link-actions">
               <Link to="/wizarr">Open Wizarr links</Link>

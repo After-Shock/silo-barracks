@@ -100,13 +100,13 @@ function verifyOidcState(state) {
   });
 }
 
-function getJellyfinAuthHeaders(deviceId = "jellyglance-web") {
-  const authHeader = `MediaBrowser Client="JellyGlance", Device="JellyGlance Web", DeviceId="${deviceId}", Version="${packageJson.version}"`;
+function getJellyfinAuthHeaders(deviceId = "silo-barracks-web") {
+  const authHeader = `MediaBrowser Client="Barracks", Device="Barracks Web", DeviceId="${deviceId}", Version="${packageJson.version}"`;
 
   return {
     Authorization: authHeader,
     "X-Emby-Authorization": authHeader,
-    "User-Agent": `JellyGlance/${packageJson.version}`,
+    "User-Agent": `Barracks/${packageJson.version}`,
   };
 }
 
@@ -287,7 +287,7 @@ function renderOidcCallbackPage({ token, errorMessage, appPath = "" }) {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>JellyGlance OIDC</title>
+    <title>Barracks OIDC</title>
   </head>
   <body>
     <script>
@@ -295,10 +295,10 @@ function renderOidcCallbackPage({ token, errorMessage, appPath = "" }) {
       const errorMessage = ${safeError};
       if (token) {
         localStorage.setItem("token", token);
-        localStorage.removeItem("jellyglance_logged_out");
+        localStorage.removeItem("silo_barracks_logged_out");
         window.location.replace(${safeSuccessPath});
       } else {
-        sessionStorage.setItem("jellyglance_oidc_error", errorMessage || "OIDC login failed");
+        sessionStorage.setItem("silo_barracks_oidc_error", errorMessage || "OIDC login failed");
         window.location.replace(${safeErrorPath});
       }
     </script>
@@ -508,7 +508,7 @@ router.post("/jellyfin-quick-connect/complete", async (req, res) => {
     const permissions = getRolePermissions(settings, assignedRole);
 
     if (assignedRole === "Disabled" || !permissions.dashboard) {
-      res.status(403).json({ errorMessage: "This Jellyfin account is disabled in JellyGlance" });
+      res.status(403).json({ errorMessage: "This Jellyfin account is disabled in Barracks" });
       return;
     }
 
@@ -716,7 +716,7 @@ router.get("/oidc/callback", async (req, res) => {
     const assignedRole = settings.userRoles?.[jellyfinUser.id] || (jellyfinUser.isAdministrator ? "Admin" : "Viewer");
     const permissions = getRolePermissions(settings, assignedRole);
     if (assignedRole === "Disabled" || !permissions.dashboard) {
-      res.status(403).send(renderOidcCallbackPage({ errorMessage: "This OIDC account is disabled in JellyGlance", appPath }));
+      res.status(403).send(renderOidcCallbackPage({ errorMessage: "This OIDC account is disabled in Barracks", appPath }));
       return;
     }
 
@@ -774,7 +774,7 @@ router.get("/background-posters", async (req, res) => {
 
     const headers = {
       Authorization: 'MediaBrowser Token="' + config.JF_API_KEY + '"',
-      "User-Agent": "JellyGlance/" + packageJson.version,
+      "User-Agent": "Barracks/" + packageJson.version,
     };
     const itemTypes = ["Movie", "Series", "BoxSet"];
     const perTypeLimit = Math.ceil(limit / itemTypes.length) + 10;
@@ -924,7 +924,7 @@ router.post("/setup-auth", async (req, res) => {
 
       settings.auth = {
         mode: "local",
-        label: "Local JellyGlance login",
+        label: "Local Barracks login",
       };
       settings.firstRunExtrasPending = true;
       settings.localUsers = [

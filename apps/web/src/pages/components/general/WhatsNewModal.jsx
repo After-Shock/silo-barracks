@@ -10,7 +10,7 @@ import axios from "../../../lib/axios_instance";
 import { APP_VERSION_STORAGE_KEY, OPEN_WHATS_NEW_EVENT } from "../../../lib/events";
 import releaseNotes from "../../../whats-new.json";
 
-const SEEN_VERSION_KEY = "jellyglance_whats_new_seen_version";
+const SEEN_VERSION_KEY = "silo_barracks_whats_new_seen_version";
 
 const iconMap = {
   magic: MagicLineIcon,
@@ -26,7 +26,7 @@ function getNotes(version) {
     {
       icon: MagicLineIcon,
       title: "Silo Barracks activity monitoring",
-      body: "Native Silo sessions now power live activity and observed playback history. Built on the JellyGlance dashboard.",
+      body: "Native Silo sessions now power live activity and observed playback history. Built on the Barracks dashboard.",
     },
   ];
 }

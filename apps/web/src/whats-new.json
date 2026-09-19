@@ -40,7 +40,7 @@
     {
       "icon": "speed",
       "title": "Statistics Rebuilt",
-      "body": "Statistics has clearer summary panels, redesigned watch stats, profile pictures, client icons, and media links through to JellyGlance media pages where possible."
+      "body": "Statistics has clearer summary panels, redesigned watch stats, profile pictures, client icons, and media links through to Barracks media pages where possible."
     },
     {
       "icon": "magic",
@@ -52,7 +52,7 @@
     {
       "icon": "magic",
       "title": "Invite People Faster",
-      "body": "Create, copy, open, and remove Wizarr invite links without leaving JellyGlance. You can choose servers, libraries, access options, custom invite codes, and a wizard bundle ID when needed."
+      "body": "Create, copy, open, and remove Wizarr invite links without leaving Barracks. You can choose servers, libraries, access options, custom invite codes, and a wizard bundle ID when needed."
     },
     {
       "icon": "upload",
@@ -87,7 +87,7 @@
     {
       "icon": "palette",
       "title": "Font Weight Preferences",
-      "body": "The profile modal now lets you choose Default, Comfortable, or Light text weight, making JellyGlance easier to tune if the interface feels too bold."
+      "body": "The profile modal now lets you choose Default, Comfortable, or Light text weight, making Barracks easier to tune if the interface feels too bold."
     },
     {
       "icon": "speed",
@@ -97,7 +97,7 @@
     {
       "icon": "mail",
       "title": "Email Wizarr Invites",
-      "body": "Wizarr invites can now be emailed directly from JellyGlance using the built-in SMTP settings from Newsletter."
+      "body": "Wizarr invites can now be emailed directly from Barracks using the built-in SMTP settings from Newsletter."
     }
   ],
   "1.2.1": [
@@ -200,7 +200,7 @@
     {
       "icon": "magic",
       "title": "Mobile app navigation",
-      "body": "The mobile bottom dock has been replaced with a full-screen app launcher opened from the JellyGlance header."
+      "body": "The mobile bottom dock has been replaced with a full-screen app launcher opened from the Barracks header."
     },
     {
       "icon": "upload",
@@ -244,7 +244,7 @@
     {
       "icon": "palette",
       "title": "Custom profile theming",
-      "body": "New theme controls and presets let JellyGlance feel more personal across the dashboard."
+      "body": "New theme controls and presets let Barracks feel more personal across the dashboard."
     },
     {
       "icon": "speed",
@@ -254,7 +254,7 @@
     {
       "icon": "magic",
       "title": "What's new popup",
-      "body": "JellyGlance now shows update notes once per version, with a manual button in the profile menu whenever you want to revisit them."
+      "body": "Barracks now shows update notes once per version, with a manual button in the profile menu whenever you want to revisit them."
     },
     {
       "icon": "speed",
@@ -274,7 +274,7 @@
     {
       "icon": "mail",
       "title": "Newsletter generator",
-      "body": "Configure SMTP, preview a JellyGlance digest, send test emails, and manually email recently added media, top watched items, active viewers, and repair status."
+      "body": "Configure SMTP, preview a Barracks digest, send test emails, and manually email recently added media, top watched items, active viewers, and repair status."
     }
   ]
 }

@@ -2,6 +2,8 @@
 const express = require("express");
 const db = require("../db");
 const dbHelper = require("../classes/db-helper");
+const configClass = require("../classes/config");
+const API = require("../classes/api-loader");
 
 const dayjs = require("dayjs");
 
@@ -70,6 +72,41 @@ const filterFields = [
 ];
 
 //endpoints
+
+async function isSiloProvider() {
+  const config = await new configClass().getConfig();
+  return config?.IS_SILO === true;
+}
+
+async function getSiloLibraryRows() {
+  const libraries = await API.getLibraries();
+  const statsRows = await db.query(
+    `select *, now() - js_library_stats_overview."ActivityDateInserted" AS "LastActivity" from js_library_stats_overview`
+  ).then(result => result.rows).catch(() => []);
+  const statsById = new Map(statsRows.map(row => [String(row.Id), row]));
+  return Promise.all(libraries.map(async library => {
+    const stats = statsById.get(String(library.Id)) || {};
+    const summary = typeof API.getLibraryCatalogSummary === 'function'
+      ? await API.getLibraryCatalogSummary({ id: library.Id }).catch(() => null)
+      : null;
+    const siloPosterUrl = library.SiloPosterUrl || (typeof API.getLibraryPosterUrl === 'function'
+      ? await API.getLibraryPosterUrl({ id: library.Id, waitIfMissing: false }).catch(() => '')
+      : '');
+    const count = Number(summary?.total ?? stats.Library_Count ?? 0);
+    return {
+      ...stats,
+      ...library,
+      SiloPosterUrl: siloPosterUrl || library.SiloPosterUrl,
+      archived: false,
+      Library_Count: count,
+      Episode_Count: stats.Episode_Count ?? (library.CollectionType === 'tvshows' ? count : 0),
+      Season_Count: stats.Season_Count ?? 0,
+      Plays: stats.Plays ?? 0,
+      total_play_time: stats.total_play_time ?? 0,
+      total_playback_duration: stats.total_playback_duration ?? 0,
+    };
+  }));
+}
 
 router.get("/repair-hub", async (req, res) => {
   try {
@@ -201,6 +238,9 @@ router.get("/getHomeDashboard", async (req, res) => {
   try {
     const settingsResult = await db.query('SELECT settings FROM app_config where "ID"=1').catch(() => ({ rows: [] }));
     const excludedUsers = Array.isArray(settingsResult.rows?.[0]?.settings?.ExcludedUsers) ? settingsResult.rows[0].settings.ExcludedUsers : [];
+    if (await isSiloProvider()) {
+      return res.send(await API.getHomeDashboard({ excludedUsers }));
+    }
     const [
       playbackTotals,
       peakHours,
@@ -503,6 +543,36 @@ router.get("/getHomeDashboard", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(503).send(error);
+  }
+});
+
+router.get("/getNativeOverview", async (req, res) => {
+  try {
+    if (!(await isSiloProvider())) return res.send({ native: false });
+    const requestedDays = Math.max(1, Number(req.query.days) || 7);
+    const days = Math.min(30, requestedDays);
+    const hours = Math.min(744, days * 24);
+    const insights = await API.getAdminDashboardInsights({ days, hours, limit: 25, refresh: req.query.refresh === "true" });
+    const methods = { DirectPlay: 0, DirectStream: 0, Transcode: 0 };
+    for (const bucket of insights.playback.buckets) {
+      methods.DirectPlay += Number(bucket.direct || 0);
+      methods.DirectStream += Number(bucket.remux || 0);
+      methods.Transcode += Number(bucket.transcode || 0);
+    }
+    const titles = insights.top.titles.map(item => ({ Id: String(item.media_item_id || ""), Name: item.title || "Unknown item",
+      MediaType: item.media_type || "", Plays: Number(item.plays || 0), TotalDuration: Number(item.total_seconds || 0) }));
+    return res.send({ native: true, source: "Silo API v2", requestedDays, days: Number(insights.top.days || days),
+      hours: Number(insights.playback.hours || hours),
+      movies: titles.filter(item => String(item.MediaType).toLowerCase() === "movie"),
+      series: titles.filter(item => String(item.MediaType).toLowerCase() !== "movie"),
+      users: insights.top.profiles.map(item => ({ UserId: String(item.user_id || ""), ProfileId: String(item.profile_id || ""),
+        Name: item.profile_name || item.username || "Unknown profile", AccountName: item.username || "",
+        Plays: Number(item.plays || 0), TotalDuration: Number(item.total_seconds || 0) })),
+      methods: Object.entries(methods).map(([Name, Plays]) => ({ Name, Plays })),
+      libraries: [], clients: [], reliability: insights.playback.reliability, stats: insights.stats,
+      coverageLimited: requestedDays > days });
+  } catch (error) {
+    return res.status(error.status || 503).send({ error: error.message || "Unable to load Silo statistics" });
   }
 });
 
@@ -978,8 +1048,30 @@ router.post("/getGlobalLibraryStats", async (req, res) => {
   }
 });
 
+router.get("/getLibrariesOverview", async (req, res) => {
+  try {
+    if (await isSiloProvider()) {
+      const [libraries, metadata] = await Promise.all([getSiloLibraryRows(), API.getLibraryStorageMetadata()]);
+      const metadataById = new Map(metadata.map(row => [String(row.Id), row]));
+      const rows = libraries.map(library => ({ ...library, metadata: metadataById.get(String(library.Id)) || {
+        Id: library.Id, Size: null, files: null, measurement_available: false, measurement_pending: true,
+      } }));
+      return res.send({ libraries: rows, pending: rows.some(row => row.metadata?.measurement_pending || !row.SiloPosterUrl) });
+    }
+    const [statsResult, metadataResult] = await Promise.all([
+      db.query(`select *, now() - js_library_stats_overview."ActivityDateInserted" AS "LastActivity" from js_library_stats_overview`),
+      db.query("select * from js_library_metadata"),
+    ]);
+    const metadataById = new Map(metadataResult.rows.map(row => [String(row.Id), row]));
+    return res.send({ libraries: statsResult.rows.map(library => ({ ...library, metadata: metadataById.get(String(library.Id)) })), pending: false });
+  } catch (error) {
+    res.status(503).send(error);
+  }
+});
+
 router.get("/getLibraryCardStats", async (req, res) => {
   try {
+    if (await isSiloProvider()) return res.send(await getSiloLibraryRows());
     const { rows } = await db.query(
       `select *, now() - js_library_stats_overview."ActivityDateInserted" AS "LastActivity" from js_library_stats_overview`
     );
@@ -1012,6 +1104,12 @@ router.post("/getLibraryCardStats", async (req, res) => {
 
 router.get("/getLibraryMetadata", async (req, res) => {
   try {
+    if (await isSiloProvider()) {
+      if (typeof API.getLibraryStorageMetadata === 'function') return res.send(await API.getLibraryStorageMetadata());
+      const libraries = await API.getLibraries();
+      return res.send(libraries.map(library => ({ Id: library.Id, Size: library.Size ?? null, files: library.files ?? null,
+        measurement_available: library.Size !== undefined || library.files !== undefined })));
+    }
     const { rows } = await db.query("select * from js_library_metadata");
     res.send(rows);
   } catch (error) {
@@ -1024,7 +1122,7 @@ router.post("/getLibraryItemsWithStats", async (req, res) => {
   const { size = 999999999, page = 1, search, sort = "Date", desc = true } = req.query;
   const { libraryid } = req.body;
   if (libraryid === undefined) {
-    res.status(400).send({ error: "Invalid Library Id" });
+    return res.status(400).send({ error: "Invalid Library Id" });
   }
 
   const sortMap = [
@@ -1038,6 +1136,27 @@ router.post("/getLibraryItemsWithStats", async (req, res) => {
   const sortField = sortMap.find((item) => item.field === sort)?.column || "DateCreated";
   const values = [];
   try {
+    if (await isSiloProvider() && typeof API.getLibraryItemsPage === 'function') {
+      const pageSize = Math.max(1, Math.min(200, Number.parseInt(String(size), 10) || 50));
+      const pageNumber = Math.max(1, Number.parseInt(String(page), 10) || 1);
+      const fetchSize = pageSize + 1;
+      const nativeSort = sort === 'Title' ? 'title' : sort === 'Date' ? 'added_at' : null;
+      if (!nativeSort) return res.status(400).send({ error: `Sort ${sort} is unavailable for Silo library items` });
+      const items = await API.getLibraryItemsPage({
+        id: libraryid,
+        startIndex: (pageNumber - 1) * pageSize,
+        limit: fetchSize,
+        search: String(search || '').trim() || undefined,
+        sort: nativeSort,
+        desc: String(desc) === 'true',
+      });
+      const hasMore = items.length > pageSize;
+      const results = items.slice(0, pageSize).map(item => ({ ...item, times_played: null, total_play_time: null }));
+      const response = { current_page: pageNumber, pages: hasMore ? pageNumber + 1 : pageNumber, size: pageSize, sort, desc, results };
+      if (search && search.length > 0) response.search = search;
+      return res.send(response);
+    }
+
     const query = {
       select: ["*"],
       table: "js_library_items_with_playcount_playtime",

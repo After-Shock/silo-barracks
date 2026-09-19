@@ -1,5 +1,5 @@
 {
-  "JELLYSTAT": "JellyGlance",
+  "JELLYSTAT": "Barracks",
   "MENU_TABS": {
     "HOME": "Accueil",
     "LIBRARIES": "Médiathèques",
@@ -260,14 +260,14 @@
     "PartialJellyfinSync": "Synchronisation du contenu récemment ajoutés",
     "JellyfinSync": "Synchronisation complète avec Jellyfin",
     "Jellyfin_Playback_Reporting_Plugin_Sync": "Import Playback Reporting Plugin Data",
-    "Backup": "Sauvegarde de JellyGlance"
+    "Backup": "Sauvegarde de Barracks"
   },
   "ABOUT_PAGE": {
-    "ABOUT_JELLYSTAT": "À propos de JellyGlance",
+    "ABOUT_JELLYSTAT": "À propos de Barracks",
     "VERSION": "Version",
     "UPDATE_AVAILABLE": "Mise à jour disponible",
     "GITHUB": "Github",
-    "Backup": "Sauvegarde de JellyGlance"
+    "Backup": "Sauvegarde de Barracks"
   },
   "TIMELINE_PAGE": {
     "TIMELINE": "Fil chronologique",

@@ -1,1 +1,1 @@
-export const FIRST_RUN_EXTRAS_KEY = "jellyglance-show-first-run-extras";
+export const FIRST_RUN_EXTRAS_KEY = "silo-barracks-show-first-run-extras";

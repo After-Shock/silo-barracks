@@ -62,13 +62,13 @@ const eventCards = [
   {
     id: "task_started",
     title: "Task started",
-    text: "When a JellyGlance job begins.",
+    text: "When a Barracks job begins.",
     Icon: TaskLineIcon,
   },
   {
     id: "task_completed",
     title: "Task completed",
-    text: "When a JellyGlance job completes.",
+    text: "When a Barracks job completes.",
     Icon: CheckboxCircleLineIcon,
   },
   {
@@ -491,7 +491,7 @@ export default function WebhooksSettings() {
               <InformationLineIcon size={20} />
             </Tooltip>
           </h1>
-          <p>Add one or many webhook destinations, then tick exactly which JellyGlance events should trigger each one.</p>
+          <p>Add one or many webhook destinations, then tick exactly which Barracks events should trigger each one.</p>
         </div>
         <div className="webhooks-hero-stats">
           <strong>{groupedWebhooks.length}</strong>
@@ -610,7 +610,7 @@ export default function WebhooksSettings() {
                 <TaskLineIcon size={19} />
                 <strong>Optional task filter</strong>
               </div>
-              <p>Leave as all tasks, or choose specific JellyGlance jobs for task started/completed/failed events.</p>
+              <p>Leave as all tasks, or choose specific Barracks jobs for task started/completed/failed events.</p>
               <div className="webhook-task-check-grid">
                 <button
                   type="button"
@@ -704,7 +704,7 @@ export default function WebhooksSettings() {
             <div className="webhook-empty-state">
               <LinksLineIcon size={28} />
               <strong>No webhooks yet</strong>
-              <span>Add a destination above, tick the events, and JellyGlance will notify it automatically.</span>
+              <span>Add a destination above, tick the events, and Barracks will notify it automatically.</span>
             </div>
           ) : null}
         </div>

@@ -35,7 +35,8 @@ function MoreItems(props) {
           }
   
           const itemData = await axios.post(url, {
-            Id: props.data.EpisodeId||props.data.Id
+            Id: props.data.EpisodeId||props.data.Id,
+            SeriesId: props.data.SeriesId
           },{
             headers: {
               Authorization: `Bearer ${config.token}`,

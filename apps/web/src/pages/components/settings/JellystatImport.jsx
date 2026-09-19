@@ -99,7 +99,7 @@ export default function JellystatImport() {
 
   async function importBackup() {
     if (!uploadedBackup?.uploadId) return;
-    const confirmed = window.confirm("Import this Jellystat watch history? Existing JellyGlance rows will be left alone and matching rows will be skipped.");
+    const confirmed = window.confirm("Import this Jellystat watch history? Existing Barracks rows will be left alone and matching rows will be skipped.");
     if (!confirmed) return;
 
     try {
@@ -113,7 +113,7 @@ export default function JellystatImport() {
       setResult(response.data);
       setPreview(response.data);
       setUploadedBackup(null);
-      window.dispatchEvent(new CustomEvent("jellyglance-history-imported", { detail: response.data }));
+      window.dispatchEvent(new CustomEvent("silo-barracks-history-imported", { detail: response.data }));
       setMessage({ type: "success", text: `Imported ${response.data.insertedRows} new Jellystat plays. ${response.data.skippedRows} rows were skipped safely.` });
       await loadUnmatchedUsers();
     } catch (error) {
@@ -136,7 +136,7 @@ export default function JellystatImport() {
         { headers: { ...authHeader(), "Content-Type": "application/json" } }
       );
       setMessage({ type: "success", text: `Linked ${response.data.updatedRows} imported plays to ${target.Name}.` });
-      window.dispatchEvent(new CustomEvent("jellyglance-history-imported", { detail: response.data }));
+      window.dispatchEvent(new CustomEvent("silo-barracks-history-imported", { detail: response.data }));
       await loadUnmatchedUsers();
     } catch (error) {
       setMessage({ type: "danger", text: getErrorMessage(error, "Unable to link Jellystat user.") });
@@ -151,7 +151,7 @@ export default function JellystatImport() {
         <div>
           <span>Legacy history</span>
           <h2>Jellystat Import</h2>
-          <p>Upload a Jellystat JSON backup and append its watch history into JellyGlance before the first sync runs.</p>
+          <p>Upload a Jellystat JSON backup and append its watch history into Barracks before the first sync runs.</p>
         </div>
       </header>
 
@@ -199,7 +199,7 @@ export default function JellystatImport() {
           <article>
             <span>Already imported</span>
             <strong>{preview.alreadyImportedRows ?? result?.skippedRows ?? 0}</strong>
-            <small>Rows with Jellystat IDs currently in JellyGlance.</small>
+            <small>Rows with Jellystat IDs currently in Barracks.</small>
           </article>
           {result ? (
             <article>

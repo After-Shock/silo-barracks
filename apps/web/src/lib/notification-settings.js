@@ -1,4 +1,4 @@
-export const NOTIFICATION_SETTINGS_KEY = "JellyGlanceNotificationSettings";
+export const NOTIFICATION_SETTINGS_KEY = "BarracksNotificationSettings";
 
 export const defaultNotificationSettings = {
   mode: "all",
@@ -35,6 +35,6 @@ export function getStoredNotificationSettings() {
 export function storeNotificationSettings(settings) {
   const normalized = normalizeNotificationSettings(settings);
   localStorage.setItem(NOTIFICATION_SETTINGS_KEY, JSON.stringify(normalized));
-  window.dispatchEvent(new CustomEvent("jellyglance-notification-settings-updated", { detail: normalized }));
+  window.dispatchEvent(new CustomEvent("silo-barracks-notification-settings-updated", { detail: normalized }));
   return normalized;
 }

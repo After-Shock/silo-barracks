@@ -40,8 +40,10 @@ module.exports = function createV2(rawRequest, { maxPages = 100 } = {}) {
   async function catalogPage(path, options) {
     const legacy = new URLSearchParams(path.split('?')[1]);
     const offset = Number(legacy.get('offset') || 0);
-    const query = new URLSearchParams({ limit: legacy.get('limit') || '100' });
-    if (legacy.has('library_id')) query.set('library_id', legacy.get('library_id'));
+    const query = new URLSearchParams(legacy);
+    query.delete('offset');
+    query.delete('order');
+    query.set('limit', legacy.get('limit') || '100');
     if (legacy.get('sort') === 'added_at') query.set('sort', '-added_at');
     const scope = query.toString();
     const deadline = Date.now() + (options?.timeoutMs || 8000);

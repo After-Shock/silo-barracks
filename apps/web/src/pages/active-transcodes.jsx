@@ -12,7 +12,7 @@ const tabs = [
   { key: "queued", label: "Queued", Icon: ListCheck2Icon },
   { key: "history", label: "History", Icon: HistoryLineIcon },
 ];
-const TRANSCODES_CACHE_KEY = "jellyglance_tdarr_transcodes_cache_v2";
+const TRANSCODES_CACHE_KEY = "silo_barracks_tdarr_transcodes_cache_v2";
 const TRANSCODES_CACHE_MAX_AGE_MS = 2 * 60 * 1000;
 const emptyBundle = { active: [], queued: [], history: [], stats: {} };
 
@@ -159,8 +159,8 @@ export default function ActiveTranscodes() {
       if (error) setError("");
       const nextActiveCount = Number(nextBundle.stats?.active || nextBundle.active?.length || 0);
       const nextQueueCount = Number(nextBundle.stats?.queue ?? nextBundle.stats?.queued ?? nextBundle.queued?.length ?? 0);
-      localStorage.setItem("jellyglance_active_transcode_count", String(nextActiveCount));
-      window.dispatchEvent(new CustomEvent("jellyglance-transcode-count", { detail: nextActiveCount }));
+      localStorage.setItem("silo_barracks_active_transcode_count", String(nextActiveCount));
+      window.dispatchEvent(new CustomEvent("silo-barracks-transcode-count", { detail: nextActiveCount }));
       return { active: nextActiveCount, queued: nextQueueCount };
     } catch (requestError) {
       // Only show the error banner when no cached/live data exists

@@ -11,7 +11,11 @@ async function siloImage(req, res) {
   if (typeof id !== 'string' || !id) return res.status(400).send('Image ID is required');
   try {
     const imageType = req.path.includes('Backdrop') ? 'Backdrop' : 'Primary';
-    const imageUrl = req.path.startsWith('/Users/') ? null : await API.getImageUrl(id, imageType);
+    const imageUrl = req.path.startsWith('/Users/')
+      ? await API.getUserImageUrl(id)
+      : req.query.library === 'true' && typeof API.getLibraryPosterUrl === 'function'
+        ? await API.getLibraryPosterUrl({ id, waitIfMissing: true })
+        : await API.getImageUrl(id, imageType);
     if (imageUrl) {
       const url = new URL(imageUrl);
       if (['http:', 'https:'].includes(url.protocol) && !url.username && !url.password) {
@@ -278,7 +282,7 @@ router.get("/Plugins/Images/", async (req, res) => {
         responseType: "arraybuffer",
         headers: {
           ...(imageUrl ? {} : { Authorization: `MediaBrowser Token="${config.JF_API_KEY}"` }),
-          "User-Agent": "JellyGlance/1.0.6",
+          "User-Agent": "Barracks/1.0.6",
         },
       });
 

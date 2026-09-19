@@ -693,7 +693,7 @@ export default function Users() {
                     </div>
                   </div>
                   <div className="users-profile-name">
-                    {user.Source === "Jellyfin" ? <Link to={`/users/${user.UserId}`}>{user.UserName}</Link> : <strong>{user.UserName}</strong>}
+                    {user.Source === "Jellyfin" ? <Link to={config.IS_SILO ? `/silo/users/${encodeURIComponent(user.UserId)}` : `/users/${user.UserId}`}>{user.UserName}</Link> : <strong>{user.UserName}</strong>}
                     <span>{user.SourceLabel}</span>
                   </div>
                   <div className="users-profile-badges">
@@ -701,24 +701,12 @@ export default function Users() {
                     <Badge className={`users-source-badge ${sourceClass(user.Source)}`}>{user.Source === "Jellyfin" ? (config.IS_SILO ? "Silo" : "Media server") : user.Source}</Badge>
                     {user.Source === "Jellyfin" && !user.Tracked ? <Badge className="users-source-badge source-hidden">Hidden</Badge> : null}
                   </div>
-                  <div className="users-profile-metrics">
-                    <span>
-                      <small>Watch time</small>
-                      <strong>{formatWatchTime(user.TotalWatchTime)}</strong>
-                    </span>
-                    <span>
-                      <small>Last watched</small>
-                      <strong>{user.LastWatched || "Never"}</strong>
-                    </span>
-                    <span>
-                      <small>Client</small>
-                      <strong>{user.LastClient || "N/A"}</strong>
-                    </span>
-                    <span>
-                      <small>{user.IsRunning ? "Watching now" : "Last seen"}</small>
-                      <strong>{user.IsRunning ? "Running" : formatLastSeen(user.LastSeen)}</strong>
-                    </span>
-                  </div>
+                  {!(config.IS_SILO && user.Source === "Jellyfin") ? <div className="users-profile-metrics">
+                    <span><small>Watch time</small><strong>{formatWatchTime(user.TotalWatchTime)}</strong></span>
+                    <span><small>Last watched</small><strong>{user.LastWatched || "Never"}</strong></span>
+                    <span><small>Client</small><strong>{user.LastClient || "N/A"}</strong></span>
+                    <span><small>{user.IsRunning ? "Watching now" : "Last seen"}</small><strong>{user.IsRunning ? "Running" : formatLastSeen(user.LastSeen)}</strong></span>
+                  </div> : <p className="users-native-history-note">Playback metrics are available in the Silo account detail.</p>}
                   <div className="users-profile-role">
                     {renderRoleControl(user)}
                   </div>
@@ -732,29 +720,17 @@ export default function Users() {
                   <div className="users-row-person">
                     {userImage(user, 54)}
                     <div>
-                      {user.Source === "Jellyfin" ? <Link to={`/users/${user.UserId}`}>{user.UserName}</Link> : <strong>{user.UserName}</strong>}
+                      {user.Source === "Jellyfin" ? <Link to={config.IS_SILO ? `/silo/users/${encodeURIComponent(user.UserId)}` : `/users/${user.UserId}`}>{user.UserName}</Link> : <strong>{user.UserName}</strong>}
                       <span>{user.SourceLabel}</span>
                     </div>
                   </div>
 
-                  <div className="users-row-metrics">
-                    <div className="users-row-meta">
-                      <span>Last watched</span>
-                      <strong>{user.LastWatched || "Never"}</strong>
-                    </div>
-                    <div className="users-row-meta">
-                      <span>Client</span>
-                      <strong>{user.LastClient || "N/A"}</strong>
-                    </div>
-                    <div className="users-row-meta">
-                      <span>Watch time</span>
-                      <strong>{formatWatchTime(user.TotalWatchTime)}</strong>
-                    </div>
-                    <div className="users-row-meta">
-                      <span>{user.IsRunning ? "Watching now" : "Last seen"}</span>
-                      <strong>{user.IsRunning ? "Running" : formatLastSeen(user.LastSeen)}</strong>
-                    </div>
-                  </div>
+                  {!(config.IS_SILO && user.Source === "Jellyfin") ? <div className="users-row-metrics">
+                    <div className="users-row-meta"><span>Last watched</span><strong>{user.LastWatched || "Never"}</strong></div>
+                    <div className="users-row-meta"><span>Client</span><strong>{user.LastClient || "N/A"}</strong></div>
+                    <div className="users-row-meta"><span>Watch time</span><strong>{formatWatchTime(user.TotalWatchTime)}</strong></div>
+                    <div className="users-row-meta"><span>{user.IsRunning ? "Watching now" : "Last seen"}</span><strong>{user.IsRunning ? "Running" : formatLastSeen(user.LastSeen)}</strong></div>
+                  </div> : <span className="users-native-history-note">Open account for Silo playback history</span>}
 
                   <div className="users-row-badges">
                     <Badge className={`users-role-badge ${roleClass(user.Role)}`}>{user.Role}</Badge>
@@ -831,7 +807,7 @@ export default function Users() {
           </div>
 
           {selectedRoleLocked ? (
-            <p className="users-permission-note">{previewRole === "Owner" ? "Owner always keeps full access." : "Disabled users cannot access JellyGlance."}</p>
+            <p className="users-permission-note">{previewRole === "Owner" ? "Owner always keeps full access." : "Disabled users cannot access Barracks."}</p>
           ) : (
             <p className="users-permission-note">Changes save immediately and apply the next time that user calls a protected route.</p>
           )}

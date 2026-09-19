@@ -11,7 +11,7 @@ function secretKey() {
 function defaultNewsletterSettings() {
   return {
     enabled: false,
-    senderName: "JellyGlance",
+    senderName: "Barracks",
     senderEmail: "",
     recipients: [],
     frequency: "manual",
@@ -102,7 +102,7 @@ async function sendConfiguredMail({ to, subject, text, html, attachments = [] })
 
   const transporter = createTransport(newsletter);
   const result = await transporter.sendMail({
-    from: `"${newsletter.senderName || "JellyGlance"}" <${newsletter.senderEmail}>`,
+    from: `"${newsletter.senderName || "Barracks"}" <${newsletter.senderEmail}>`,
     to: targets,
     subject,
     text,

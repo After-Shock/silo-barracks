@@ -1,81 +1,54 @@
 # Silo API v2 implementation status
 
-## Scope
+## Deployed contract
 
-First delivery: compatibility and live diagnostics (approved plan, Chunk 1).
-Branch: `feat/silo-api-v2`; upstream contract pin:
-`26661d76f451ed790cf74221538b1048a8d193d6`.
+Barracks is pinned to Silo revision
+`8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf` (`server_version: 8eeb9f3e`).
+The deployed `/api/v2/openapi.json` contains 575 paths and has contract digest
+`774f49bd02d1b9465b2591013242eeb2aa41042c5303108ffc3ab39fd27c64eb`.
+The selected contract fixture includes the read APIs consumed by Barracks plus the
+administrator playback capability and mutation endpoints.
 
-Implemented: per-connection negotiation, retained health identity, bounded transport
-and safe Problem Details categories, complete session/user cursor traversal, catalog
-window/seek translation, existing provider read shapes, optional capability-gated
-session diagnostics, unattributed stream cards and API status in server settings.
-Unknown fields remain unknown, not invented zero measurements. Mixed v1/v2 fleets
-retain independent credentials, stale-state handling and confirmed totals.
+## Implemented behavior
 
-The session loader at this pin rejects limits above 100 even though generated
-OpenAPI advertises 200; Barracks uses 100 and tests 201 sessions over three pages.
-Catalog requests require `X-Profile-Id`. Barracks reads `/api/v2/profiles` and uses
-only the credential owner's unique primary profile, with bounded per-connection
-caching. Missing/ambiguous profiles or upstream profile/PIN denials are not bypassed;
-ordinary administrative activity reads do not require profile discovery.
+- Per-connection v1/v2 negotiation, retained server identity, bounded requests,
+  safe Problem Details mapping, and independent mixed-version fleet failures.
+- Complete cursor traversal for sessions and users. Barracks deliberately requests
+  at most 100 sessions because the deployed runtime rejects larger limits even
+  where older generated contracts advertised 200.
+- Profile-scoped v2 catalog, library, item, season, episode, artwork, and recently
+  added reads. Barracks uses only the API-key owner's unique primary profile and
+  does not bypass missing, ambiguous, PIN-locked, or denied profiles.
+- Live session diagnostics with unknown and unavailable values preserved rather
+  than converted to zero.
+- Silo playback history is read directly from `/api/v2/admin/playback-history` and
+  shown as retention-managed, read-only activity. Silo sessions are not copied into
+  Barracks' durable Jellyfin history tables.
+- Administrator pause, resume, stop, terminate, and message controls. Barracks
+  requires an Owner/Admin with settings permission, checks upstream command
+  capabilities, verifies that the targeted session is still current, scopes every
+  mutation to one server/session, uses UUID command IDs and monotonic per-session
+  sequences, confirms disruptive actions in the UI, and records best-effort audit
+  events. A failed audit write never changes the result of an upstream command.
+- Primary-server and fleet live-session views use the same cards and controls;
+  stale and partial fleet states remain explicit.
 
-Contract fixtures are synthetic, with pinned schema provenance and strict Ajv2020
-validation. Runtime adapters validate consumed envelope/identity fields; they do not
-require every optional OpenAPI field or reject future diagnostic strings.
+Catalog requests that need profile context send `X-Profile-Id`. Administrative
+session and history reads remain independent of catalog profile discovery.
+API-key connections continue to use REST polling because event tickets require a
+live login-session token; Barracks does not store administrator passwords or invent
+session credentials.
 
-## Release gates
+## Verification and remaining live checks
 
-- The configured live Silo returned discovery 404 and healthy retained v1 health
-  on September 8, 2026. No production Silo upgrade, upstream mutation, or Barracks
-  deployment has been performed for this change.
-- The pinned source was also built and exercised through Silo's official disposable
-  playback harness and real v2 router on September 8, 2026. Barracks negotiated v2,
-  retained the health identity, resolved the API-key owner's primary profile, and
-  read admin users, libraries, catalog items, and a synthetic active-session
-  projection. The mapped card retained title, DirectPlay state, client build, and
-  target audio channels. Silo's own playback smoke passed login, capability,
-  start/replay, media bytes, progress, installation fencing, stop, and stop replay.
-  This is a real-router integration test, but not the approved one-day deployed-server
-  observation; complete that observation and an intentional interruption before
-  expanding rollout.
-- The harness's newer initial-playback flow did not appear in the
-  `playback_sessions_sync` projection consumed by `/api/v2/admin/sessions` during
-  this test. The monitoring read was therefore checked with a disposable synthetic
-  projection row. Recheck that projection on the actual Silo build used for rollout.
-- The source-built canary reported `server_version: "unavailable"` because it had
-  no release build number; Barracks correctly selected v2 from `api_major` and the
-  validated contract digest rather than version text.
-- API negotiation is cached until a connection URL/key change or process restart.
-  Restart Barracks after upgrading an upstream server's API version.
-- History backfill, fleet history storage, analytics and playback controls are
-  subsequent chunks, not features of this compatibility delivery. Existing history,
-  catalog and user views remain primary-only.
-- Keep API-key connections on REST polling. Event tickets at this pin require an
-  expiring token backed by a live login session, not an API key. No administrator
-  password storage or synthesized event-session credentials were introduced.
+On September 12, 2026 the `ghcr.io/silo-server/silo-server:apiv2` deployment was
+healthy and exposed v2 discovery and the contract above. Local contract validation,
+adapter/fleet tests, branding audit, zero-warning frontend lint, and production build
+pass against this revision.
 
-## Verification
-
-September 8, 2026 local verification:
-
-- 156 automated tests passed with disposable PostgreSQL; zero failures or skips.
-- Theme source audit, zero-warning frontend lint, production frontend build and
-  `git diff --check` passed.
-- Browser matrix: 92 desktop/mobile route-state checks, 44 Ocean/Mono themed-route
-  checks and 10 state checks passed; no browser errors or unexpected mutations.
-- Fleet browser fixtures passed aggregation, stale/partial totals, recovery,
-  permission-safe management, API-version text and desktop/mobile diagnostics.
-  Release-note onboarding is suppressed in this fleet-specific fixture to avoid
-  an unrelated asynchronous modal stealing keyboard focus.
-- Read-only live smoke: four successful activity polls, no activity error notice;
-  existing application and database containers remain healthy.
-- Spec review approved after resolving pagination bounds, missing identity,
-  nullability and Problem Details handling findings.
-- Final quality review approved after verifying the enforced 100-row session
-  limit and profile-scoped catalog transport. Targeted recheck: 21 tests passed.
-
-Browser checks target an isolated frontend preview with fixture-only management writes;
-authenticated live checks are read-only. PostgreSQL tests use a disposable container,
-never the live schema. The approved plan remains the rollout checklist; unchecked
-release and later-chunk steps must not be interpreted as completed.
+Before broad rollout, exercise pause/resume/seek/end/disconnect/reconnect and every
+administrator command against expendable live playback sessions, including denied
+credentials, revoked keys, duplicate requests, rate limiting, and unsupported player
+capabilities. Also complete prolonged mixed-server observation and intentional
+partial-fleet outage testing. Capability visibility must not be treated as mutation
+authority; Silo's response to each command remains authoritative.

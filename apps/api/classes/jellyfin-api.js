@@ -11,7 +11,7 @@ class JellyfinAPI {
     this.#checkReadyStatus();
     this.sessionErrorCounter = 0;
     this.version = "1.0.0";
-    this.userAgent = "JellyGlance/" + this.version;
+    this.userAgent = "Silo-Barracks/" + this.version;
   }
   //Helper classes
   #checkReadyStatus() {
@@ -517,6 +517,34 @@ class JellyfinAPI {
       this.#errorHandler(error);
       return [];
     }
+  }
+
+  async getSessionCommandCapabilities() {
+    return { available: true, allowed: true, actions: ["pause", "resume", "stop", "message"],
+      state: "available", sequencedCommands: false, terminateRevokesAuthority: false };
+  }
+
+  async controlSession(sessionId, action, { reason = "", message = "", title = "" } = {}) {
+    if (!this.configReady) {
+      const success = await this.#fetchConfig();
+      if (!success) throw new Error("Jellyfin is not configured");
+    }
+    const id = String(sessionId || "").trim();
+    const command = String(action || "").toLowerCase();
+    if (!id || id.length > 128 || /[\x00-\x1f\x7f]/.test(id)) throw new Error("Invalid Jellyfin session ID");
+    const headers = { Authorization: 'MediaBrowser Token="' + this.config.JF_API_KEY + '"', "User-Agent": this.userAgent };
+    if (command === "message") {
+      const text = String(message || "").trim().slice(0, 2048);
+      if (!text) throw new Error("A playback message is required");
+      await axios.post(`${this.config.JF_HOST}/Sessions/${encodeURIComponent(id)}/Message`, {
+        Header: String(title || "Barracks administrator").trim().slice(0, 256), Text: text, TimeoutMs: 5000,
+      }, { headers });
+    } else {
+      const jellyfinCommand = ({ pause: "Pause", resume: "Unpause", stop: "Stop" })[command];
+      if (!jellyfinCommand) throw new Error("Unsupported Jellyfin playback command");
+      await axios.post(`${this.config.JF_HOST}/Sessions/${encodeURIComponent(id)}/Playing/${jellyfinCommand}`, null, { headers });
+    }
+    return { action: command, status: 204, receipt: null, reason: String(reason || "").trim().slice(0, 1024) };
   }
 
   async getInstalledPlugins() {

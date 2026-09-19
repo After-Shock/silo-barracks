@@ -1,0 +1,65 @@
+.fleet-history-detail {
+  display: grid;
+  gap: 18px;
+  padding: 22px clamp(16px, 2vw, 30px) 42px;
+  color: var(--barracks-text);
+}
+
+.fleet-detail-back { width: fit-content; color: var(--barracks-action); }
+
+.fleet-detail-hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: 8px;
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text-raised);
+}
+
+.fleet-detail-hero img,
+.fleet-detail-avatar {
+  width: 96px;
+  height: 132px;
+  flex: 0 0 auto;
+  border-radius: 7px;
+  object-fit: cover;
+  background: var(--barracks-surface-inset);
+}
+
+.fleet-detail-avatar {
+  display: grid;
+  width: 92px;
+  height: 92px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 2rem;
+  font-weight: 760;
+}
+
+.fleet-detail-hero h1 { margin: 4px 0; }
+.fleet-detail-hero p { max-width: 76ch; color: var(--barracks-text-muted-raised); }
+.fleet-detail-hero span,
+.fleet-detail-hero small { color: var(--barracks-text-muted-raised); }
+
+.fleet-profile-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.fleet-profile-list span {
+  padding: 4px 9px;
+  border: 1px solid var(--barracks-border-inset);
+  border-radius: 999px;
+  background: var(--barracks-surface-inset);
+  color: var(--barracks-text-inset);
+  font-size: 12px;
+}
+
+@media (max-width: 620px) {
+  .fleet-detail-hero { align-items: flex-start; }
+  .fleet-detail-hero img { width: 72px; height: 104px; }
+}

@@ -5,17 +5,17 @@ const outputFile = "./swagger.json";
 const endpointsFiles = ["./server.js"];
 const config = {
   info: {
-    title: "JellyGlance API Documentation",
+    title: "Barracks API Documentation",
     description: "",
   },
   tags: [
     {
       name: "API",
-      description: "JellyGlance API Endpoints",
+      description: "Barracks API Endpoints",
     },
     {
       name: "Auth",
-      description: "JellyGlance Auth Endpoints",
+      description: "Barracks Auth Endpoints",
     },
     {
       name: "Proxy",
@@ -23,19 +23,19 @@ const config = {
     },
     {
       name: "Stats",
-      description: "JellyGlance Statisitc Endpoints",
+      description: "Barracks Statisitc Endpoints",
     },
     {
       name: "Sync",
-      description: "JellyGlance Sync Endpoints",
+      description: "Barracks Sync Endpoints",
     },
     {
       name: "Backup",
-      description: "JellyGlance Backup/Restore Endpoints",
+      description: "Barracks Backup/Restore Endpoints",
     },
     {
       name: "Logs",
-      description: "JellyGlance Log Endpoints",
+      description: "Barracks Log Endpoints",
     },
   ],
   host: "",

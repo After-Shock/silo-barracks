@@ -1,10 +1,10 @@
-export const FONT_WEIGHT_STORAGE_KEY = "jellyglance_font_weight";
+export const FONT_WEIGHT_STORAGE_KEY = "silo_barracks_font_weight";
 
 export const FONT_WEIGHT_OPTIONS = [
   {
     id: "default",
     label: "Default",
-    description: "Keep JellyGlance's current bold display style.",
+    description: "Keep Barracks's current bold display style.",
   },
   {
     id: "comfortable",
@@ -32,6 +32,6 @@ export function applyFontWeightPreference(preference = getStoredFontWeight()) {
 export function saveFontWeightPreference(preference) {
   const nextPreference = applyFontWeightPreference(preference);
   localStorage.setItem(FONT_WEIGHT_STORAGE_KEY, nextPreference);
-  window.dispatchEvent(new CustomEvent("jellyglance-font-weight-updated", { detail: nextPreference }));
+  window.dispatchEvent(new CustomEvent("silo-barracks-font-weight-updated", { detail: nextPreference }));
   return nextPreference;
 }

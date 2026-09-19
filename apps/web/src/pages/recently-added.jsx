@@ -12,7 +12,7 @@ import "./css/home.css";
 import "./css/recently-added-page.css";
 
 const mediaTypes = ["Series", "Movie", "Audio", "Episode"];
-const shelfCacheKey = "jellyglance_recently_added_shelves_v2_posters";
+const shelfCacheKey = "silo_barracks_recently_added_shelves_v2_posters";
 const typeFilterKey = "PREF_RECENTLY_ADDED_TypeFilter";
 const libraryFilterKey = "PREF_RECENTLY_ADDED_LibraryFilter";
 const itemOrderKey = "PREF_RECENTLY_ADDED_ItemOrder";

@@ -211,7 +211,7 @@ export default function WizarrPage() {
         <div>
           <p>Invite manager</p>
           <h1>Wizarr Links</h1>
-          <span>Create and manage Jellyfin invite links without leaving JellyGlance.</span>
+          <span>Create and manage Jellyfin invite links without leaving Barracks.</span>
         </div>
         <button type="button" className="wizarr-refresh-button" onClick={loadWizarr} disabled={loading}>
           <RefreshLineIcon size={18} />

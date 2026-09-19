@@ -103,7 +103,7 @@ function Login() {
   async function finishQuickConnect(secret) {
     try {
       setProcessing(true);
-      setQuickConnectStatus("Approved. Opening JellyGlance...");
+      setQuickConnectStatus("Approved. Opening Barracks...");
       const response = await axios.post(
         "/auth/jellyfin-quick-connect/complete",
         { secret },
@@ -115,7 +115,7 @@ function Login() {
       );
 
       localStorage.setItem("token", response.data.token);
-      localStorage.removeItem("jellyglance_logged_out");
+      localStorage.removeItem("silo_barracks_logged_out");
       await Config.setConfig();
       window.location.reload();
     } catch (error) {
@@ -167,7 +167,7 @@ function Login() {
       )
       .then(async (response) => {
         localStorage.setItem("token", response.data.token);
-        localStorage.removeItem("jellyglance_logged_out");
+        localStorage.removeItem("silo_barracks_logged_out");
         setProcessing(false);
         if (JS_USERNAME || response.data.token) {
           await Config.setConfig();
@@ -211,11 +211,11 @@ function Login() {
       try {
         const response = await axios.get("/auth/isConfigured");
         setSetupInfo(response.data);
-        const oidcError = sessionStorage.getItem("jellyglance_oidc_error");
+        const oidcError = sessionStorage.getItem("silo_barracks_oidc_error");
         if (oidcError) {
           setsubmitButtonText(oidcError);
           setOidcStatus(oidcError);
-          sessionStorage.removeItem("jellyglance_oidc_error");
+          sessionStorage.removeItem("silo_barracks_oidc_error");
         }
         setConfig({});
       } catch (error) {

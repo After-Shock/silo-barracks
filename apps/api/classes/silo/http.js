@@ -80,9 +80,17 @@ async function boundedText(response, maxBytes) {
   } finally { reader.releaseLock(); }
 }
 
-async function requestJSON({ path, base, key, timeoutMs = 8000, apiMajor = 1, profileId, fetchImpl, httpClient, userAgent }) {
+async function requestJSON({ path, base, key, timeoutMs = 8000, apiMajor = 1, profileId, fetchImpl, httpClient, userAgent,
+  method = 'GET', body }) {
   const url = `${normalizeBase(base, apiMajor)}/${String(path).replace(/^\/+/, '')}`;
+  const requestMethod = String(method || 'GET').toUpperCase();
+  if (!['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(requestMethod)) throw new SiloRequestError('Invalid Silo request method', 400);
   const requestHeaders = { Authorization: `Bearer ${key}`, Accept: 'application/json', 'User-Agent': userAgent };
+  let requestBody;
+  if (body !== undefined) {
+    requestHeaders['Content-Type'] = 'application/json';
+    try { requestBody = JSON.stringify(body); } catch { throw new SiloRequestError('Invalid Silo request body', 400); }
+  }
   if (profileId !== undefined) {
     if (apiMajor !== 2 || typeof profileId !== 'string' || !profileId || profileId.length > 256 || /[\x00-\x20\x7f]/.test(profileId)) {
       throw new SiloRequestError('Invalid Silo profile identity');
@@ -96,7 +104,7 @@ async function requestJSON({ path, base, key, timeoutMs = 8000, apiMajor = 1, pr
     let headers;
     let body;
     if (httpClient) {
-      const config = { method: 'GET', url, headers: requestHeaders,
+      const config = { method: requestMethod, url, headers: requestHeaders, data: body,
         signal: controller.signal, maxRedirects: 0, timeout: timeoutMs, maxContentLength: MAX_RESPONSE_BYTES, validateStatus: () => true };
       let response;
       if (typeof httpClient === 'function') response = await httpClient(config);
@@ -108,7 +116,7 @@ async function requestJSON({ path, base, key, timeoutMs = 8000, apiMajor = 1, pr
       body = response.data;
     } else {
       if (typeof fetchImpl !== 'function') throw new SiloRequestError('Silo HTTP client unavailable');
-      const response = await fetchImpl(url, { method: 'GET', redirect: 'manual', signal: controller.signal,
+      const response = await fetchImpl(url, { method: requestMethod, body: requestBody, redirect: 'manual', signal: controller.signal,
         headers: requestHeaders });
       status = response.status;
       headers = response.headers;

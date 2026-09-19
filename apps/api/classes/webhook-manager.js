@@ -215,7 +215,7 @@ class WebhookManager {
                 const compiledPayload = this.compileTemplate(templatePayload, data);
 
                 if (!compiledPayload.message) {
-                    compiledPayload.message = data.message || message || 'JellyGlance webhook test';
+                    compiledPayload.message = data.message || message || 'Barracks webhook test';
                 }
 
                 response = await axios({
@@ -304,22 +304,22 @@ class WebhookManager {
         }
 
         if (data.event?.startsWith('download_')) {
-            return data.integrationEvent || 'JellyGlance download update';
+            return data.integrationEvent || 'Barracks download update';
         }
 
         if (data.taskName) {
-            return `JellyGlance task ${data.status || 'updated'}`;
+            return `Barracks task ${data.status || 'updated'}`;
         }
 
         if (data.count) {
-            return 'JellyGlance media sync';
+            return 'Barracks media sync';
         }
 
         if (data.integrationEvent) {
-            return `JellyGlance ${data.integrationEvent}`;
+            return `Barracks ${data.integrationEvent}`;
         }
 
-        return 'JellyGlance notification';
+        return 'Barracks notification';
     }
 
     getDefaultMessage(data = {}) {

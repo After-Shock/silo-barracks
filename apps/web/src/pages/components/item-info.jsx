@@ -168,15 +168,18 @@ function ItemInfo() {
   const tmdbId = getProviderId(providerIds, ["Tmdb", "TMDb", "TheMovieDb"]);
   const tvdbId = getProviderId(seriesProviderIds, ["Tvdb", "TVDB", "TheTVDB"]);
   const rottenId = getProviderId(providerIds, ["RottenTomatoes", "Rotten Tomatoes"]);
+  const mediaServerName = config?.IS_SILO ? "Silo" : config?.IS_JELLYFIN === false ? "Emby" : "Jellyfin";
   const jellyfinUrl =
     data.JellyfinUrl ||
-    ((config?.settings?.EXTERNAL_URL ?? config?.hostUrl) && `${config.settings?.EXTERNAL_URL ?? config.hostUrl}/web/index.html#!/details?id=${itemId}`);
+    ((config?.settings?.EXTERNAL_URL ?? config?.hostUrl) && (config?.IS_SILO
+      ? `${config.settings?.EXTERNAL_URL ?? config.hostUrl}/watch/${encodeURIComponent(itemId)}`
+      : `${config.settings?.EXTERNAL_URL ?? config.hostUrl}/web/index.html#!/details?id=${encodeURIComponent(itemId)}`));
   const rottenLink = rottenId
     ? `https://www.rottentomatoes.com/m/${rottenId}`
     : `https://www.rottentomatoes.com/search?search=${encodeURIComponent(`${data.Name || title} ${data.ProductionYear || ""}`.trim())}`;
   const arrLinks = data.ArrLinks || [];
   const actionLinks = [
-    jellyfinUrl && { label: "Open in Jellyfin", url: jellyfinUrl, primary: true },
+    jellyfinUrl && { label: `Open in ${mediaServerName}`, url: jellyfinUrl, primary: true },
     ...arrLinks.map((link) => ({ label: link.matched ? `Open in ${link.name}` : `Find in ${link.name}`, url: link.url })),
   ].filter(Boolean);
   const studio = Array.isArray(data.Studios) ? data.Studios[0]?.Name || data.Studios[0] : null;
@@ -243,7 +246,7 @@ function ItemInfo() {
                   {data.ProductionYear ? <span>{data.ProductionYear}</span> : null}
                   <span>{ticksToTimeString(data.RunTimeTicks)}</span>
                   {jellyfinUrl ? (
-                    <a href={jellyfinUrl} target="_blank" rel="noreferrer" title="Open in Jellyfin">
+                    <a href={jellyfinUrl} target="_blank" rel="noreferrer" title={`Open in ${mediaServerName}`}>
                       <ExternalLinkFillIcon size={22} />
                     </a>
                   ) : null}
@@ -373,7 +376,8 @@ function ItemInfo() {
 
       <Tabs defaultActiveKey="tabOverview" activeKey={activeTab} variant="pills" className="hide-tab-titles">
         <Tab eventKey="tabOverview" title="Overview" className="bg-transparent">
-          <GlobalStats id={Id} param={"itemid"} endpoint={"getGlobalItemStats"} title={<Trans i18nKey="GLOBAL_STATS.ITEM_STATS" />} />
+          {!config?.IS_SILO ? <GlobalStats id={Id} param={"itemid"} endpoint={"getGlobalItemStats"} title={<Trans i18nKey="GLOBAL_STATS.ITEM_STATS" />} />
+            : <p className="activity-notice">Playback totals are retention-managed by Silo. Open Activity for the complete cursor-paged attempts for this exact catalog item.</p>}
           {["Series", "Season"].includes(data && data.Type) ? <MoreItems data={data} /> : <></>}
         </Tab>
         <Tab eventKey="tabActivity" title="Activity" className="bg-transparent">

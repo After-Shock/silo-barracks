@@ -11,7 +11,7 @@ import "../../css/settings/settings.css";
 
 const emptySettings = {
   enabled: false,
-  senderName: "JellyGlance",
+  senderName: "Barracks",
   senderEmail: "",
   recipients: [],
   frequency: "manual",
@@ -64,7 +64,7 @@ function normalizePreviewPayload(payload) {
     ...(typeof data === "object" ? data : {}),
     html,
     generatedAt: data?.generatedAt || new Date().toISOString(),
-    subject: data?.subject || "JellyGlance newsletter preview",
+    subject: data?.subject || "Barracks newsletter preview",
   };
 }
 
@@ -198,7 +198,7 @@ export default function NewsletterSettings() {
     if (!previewHtml) return;
     const previewWindow = window.open("", "_blank");
     if (!previewWindow) {
-      setMessage({ type: "warning", text: "Browser blocked the preview tab. Allow popups for JellyGlance and try again." });
+      setMessage({ type: "warning", text: "Browser blocked the preview tab. Allow popups for Barracks and try again." });
       return;
     }
     previewWindow.opener = null;
@@ -221,7 +221,7 @@ export default function NewsletterSettings() {
         <div>
           <span>Digest email</span>
           <h2>Newsletter Generator</h2>
-          <p>Generate a JellyGlance digest with recently added media, weekly watch stats, active viewers, and repair status.</p>
+          <p>Generate a Barracks digest with recently added media, weekly watch stats, active viewers, and repair status.</p>
         </div>
         <Button type="button" variant="outline-primary" onClick={generatePreview} disabled={Boolean(busyAction)}>
           {busyAction === "preview" ? <Spinner size="sm" animation="border" /> : <RefreshLineIcon size={17} />}
@@ -286,7 +286,7 @@ export default function NewsletterSettings() {
                   </Form.Group>
                   <Form.Group>
                     <Form.Label>Sender email</Form.Label>
-                    <Form.Control type="email" value={settings.senderEmail} onChange={(event) => updateField("senderEmail", event.target.value)} placeholder="jellyglance@example.com" />
+                    <Form.Control type="email" value={settings.senderEmail} onChange={(event) => updateField("senderEmail", event.target.value)} placeholder="barracks@example.com" />
                   </Form.Group>
                   <Form.Group>
                     <Form.Label>Frequency</Form.Label>

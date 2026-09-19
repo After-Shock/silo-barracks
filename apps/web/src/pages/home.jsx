@@ -49,9 +49,10 @@ import {
 } from "../lib/home-settings";
 
 const numberFormat = new Intl.NumberFormat();
-const HOME_DASHBOARD_CACHE_KEY = "jellyglance_home_dashboard_cache";
-const HOME_OPERATIONS_CACHE_KEY = "jellyglance_home_operations_cache";
+const HOME_DASHBOARD_CACHE_KEY = "silo_barracks_home_dashboard_cache";
+const HOME_OPERATIONS_CACHE_KEY = "silo_barracks_home_operations_cache";
 const HOME_CACHE_MAX_AGE_MS = 5 * 60 * 1000;
+const DASHBOARD_SECTIONS = ["overview", "hall", "library", "catalog", "milestones", "week", "trends", "issues", "watchParty", "seasonGaps", "automation"];
 
 function loadHomeCache(key) {
   try {
@@ -411,7 +412,7 @@ export default function Home({ kioskMode = false }) {
   const [busyAction, setBusyAction] = useState("");
   const [draggedSection, setDraggedSection] = useState("");
   const [detailModal, setDetailModal] = useState(null);
-  const [, setError] = useState("");
+  const [error, setError] = useState("");
 
   async function loadDashboardData() {
     try {
@@ -479,6 +480,8 @@ export default function Home({ kioskMode = false }) {
     };
   }, [kioskMode]);
 
+  const isSiloDashboard = String(dashboard?.source || "").startsWith("silo");
+  const isNativeSiloDashboard = dashboard?.source === "silo-native";
   const peakHours = dashboard?.peakHours || [];
   const maxPeak = useMemo(() => Math.max(...peakHours.map((hour) => Number(hour.count || 0)), 1), [peakHours]);
   const hallOfFame = dashboard?.hallOfFame || [];
@@ -518,7 +521,7 @@ export default function Home({ kioskMode = false }) {
       ? { key: `requests:${requestUrgency}`, label: `${formatNumber(requestUrgency)} request${requestUrgency === 1 ? "" : "s"} need attention`, type: "requests" }
       : null,
     failingChecks.length ? { key: `health:${failingChecks.map((check) => check.key).join(",")}`, label: `${failingChecks.length} health check${failingChecks.length === 1 ? "" : "s"} failing`, type: "health" } : null,
-    backupAgeDays >= Number(homeSettings.alertRules.backupDays || 7) ? { key: `backup:${backupDate || "missing"}`, label: "Backup is stale or missing", type: "backup" } : null,
+    operations.health && backupAgeDays >= Number(homeSettings.alertRules.backupDays || 7) ? { key: `backup:${backupDate || "missing"}`, label: "Backup is stale or missing", type: "backup" } : null,
     Number(libraryIssues.missingPosters || 0) >= Number(homeSettings.alertRules.missingPosterThreshold || 1)
       ? { key: `posters:${libraryIssues.missingPosters}`, label: `${formatNumber(libraryIssues.missingPosters)} missing posters`, type: "posters" }
       : null,
@@ -638,7 +641,8 @@ export default function Home({ kioskMode = false }) {
   const sectionLabels = HOME_SECTION_DEFINITIONS.reduce((labels, section) => ({ ...labels, [section.id]: section.label }), {});
   const orderedSectionIds = useMemo(() => {
     const hidden = new Set(homeSettings.hidden);
-    let ordered = normalizeHomeOrder(homeSettings.order).filter((sectionId) => !hidden.has(sectionId));
+    const unavailable = new Set(error && !dashboard ? DASHBOARD_SECTIONS : dashboard?.unavailableSections || []);
+    let ordered = normalizeHomeOrder(homeSettings.order).filter((sectionId) => !hidden.has(sectionId) && !unavailable.has(sectionId));
 
     if (homeSettings.pinned && ordered.includes(homeSettings.pinned)) {
       ordered = [homeSettings.pinned, ...ordered.filter((sectionId) => sectionId !== homeSettings.pinned)];
@@ -652,7 +656,7 @@ export default function Home({ kioskMode = false }) {
     }
 
     return ordered;
-  }, [homeSettings.hidden, homeSettings.order, homeSettings.pinned, requestUrgency]);
+  }, [homeSettings.hidden, homeSettings.order, homeSettings.pinned, requestUrgency, dashboard, error]);
   useEffect(() => {
     if (!kioskMode) return undefined;
     const refreshSessions = () => {
@@ -816,6 +820,24 @@ export default function Home({ kioskMode = false }) {
         </div>
       </div>
 
+      {error ? (
+        <div className="home-glass-card home-data-notice" role="alert">
+          <span>{error} {dashboard ? "Showing the last loaded data." : "Check the primary server connection and API permissions."}</span>
+          <button type="button" onClick={loadDashboardData}>Retry</button>
+        </div>
+      ) : null}
+      {isSiloDashboard ? (
+        <div className="home-glass-card home-data-notice" role="status">
+          <span>
+            {isNativeSiloDashboard
+              ? `Native Silo activity covers the last ${formatNumber(dashboard.history?.hours || 168)} hours; leaderboards cover ${formatNumber(dashboard.history?.days || 7)} days.`
+              : dashboard.history?.truncated ? `Showing a limited sample of ${formatNumber(dashboard.history.sampledRows)} retained history records, not all-time totals.` : "Playback statistics use Silo’s retained history, not all-time totals."}
+            {" "}Peak hours are in UTC. Widgets without a native data source are omitted.
+          </span>
+          <Link to="/activity">View activity</Link>
+        </div>
+      ) : null}
+
       {isOrderingHome ? (
         <div className="home-order-panel home-glass-card">
           <div className="home-order-panel-heading">
@@ -911,7 +933,7 @@ export default function Home({ kioskMode = false }) {
                 <span>{index + 1}</span>
                 <strong className={isHidden ? "is-hidden-section" : ""}>
                   {sectionLabels[sectionId]}
-                  <small>{isHidden ? "Hidden" : HOME_WIDGET_SIZE_LABELS[homeSettings.sizes?.[sectionId] || "medium"]}</small>
+                  <small>{dashboard?.unavailableSections?.includes(sectionId) ? "Not yet available for Silo" : isHidden ? "Hidden" : HOME_WIDGET_SIZE_LABELS[homeSettings.sizes?.[sectionId] || "medium"]}</small>
                 </strong>
                 <div>
                   <select title="Widget size" value={homeSettings.sizes?.[sectionId] || "medium"} onChange={(event) => updateWidgetSize(sectionId, event.target.value)}>
@@ -944,21 +966,23 @@ export default function Home({ kioskMode = false }) {
       {shouldRenderSection("overview") ? <section className={getHomeSectionClass("overview", "home-hero-grid")} aria-label="Silo Barracks overview" style={getHomeSectionStyle("overview")}>
         <MetricCard
           icon={PlayCircleLineIcon}
-          label="Total playbacks"
+          label={isNativeSiloDashboard ? "Playback starts (7d)" : isSiloDashboard ? "Retained playbacks" : "Total playbacks"}
           value={dashboard ? formatNumber(dashboard?.totals?.totalPlaybacks) : undefined}
-          detail={dashboard ? `${formatDuration(dashboard?.totals?.totalWatchSeconds)} watched` : ""}
+          detail={dashboard ? (isNativeSiloDashboard
+            ? `${formatNumber(dashboard?.totals?.finalizedPlaybacks)} finalized · ${(Number(dashboard?.totals?.completionRate || 0) * 100).toFixed(0)}% completed`
+            : `${formatDuration(dashboard?.totals?.totalWatchSeconds)} watched`) : ""}
         />
         <MetricCard
           icon={GroupLineIcon}
           label="Unique viewers"
           value={dashboard ? formatNumber(dashboard?.totals?.uniqueViewers) : undefined}
-          detail={dashboard ? "people with synced activity" : ""}
+          detail={dashboard ? (isNativeSiloDashboard ? "profiles active in the selected window" : isSiloDashboard ? "viewers in retained history" : "people with synced activity") : ""}
           accent="purple"
         />
         <article className="home-glass-card home-peak-card">
           <div className="home-card-label">
             <TimeLineIcon size={17} />
-            <span>Peak viewing hours</span>
+            <span>Peak viewing hours{isSiloDashboard ? " (UTC)" : ""}</span>
           </div>
           <div className="home-hour-bars" aria-label="Playback count by hour">
             {peakHours.map((hour) => (
@@ -1021,7 +1045,7 @@ export default function Home({ kioskMode = false }) {
                 </article>
               ))
             ) : (
-              <article className="home-runner-empty">More playback history will appear here as Silo Barracks observes playback.</article>
+              <article className="home-runner-empty">{isNativeSiloDashboard ? "No additional profiles in Silo’s leaderboard window." : isSiloDashboard ? "No additional viewers in the retained history." : "More playback history will appear here as Silo Barracks observes playback."}</article>
             )}
           </div>
         </div>
@@ -1064,7 +1088,7 @@ export default function Home({ kioskMode = false }) {
           icon={Tv2LineIcon}
           label="TV shows catalog"
           value={dashboard ? formatNumber(dashboard?.catalog?.shows) : undefined}
-          detail={dashboard ? `${formatNumber(dashboard?.catalog?.episodes)} episodes` : ""}
+          detail={dashboard ? (isNativeSiloDashboard ? `${formatNumber(dashboard?.catalog?.showFiles)} show files` : `${formatNumber(dashboard?.catalog?.episodes)} episodes`) : ""}
         />
         <CatalogCard
           icon={Music2LineIcon}
@@ -1127,8 +1151,8 @@ export default function Home({ kioskMode = false }) {
           </article>
           <article>
             <span>Quiet users</span>
-            <strong className={!dashboard ? "home-value-skeleton" : ""}>{dashboard ? formatNumber(quietUsers.length) : ""}</strong>
-            {dashboard ? <small>{quietUsers.length ? quietUsers.map((user) => user.userName).join(", ") : "Everyone has checked in recently."}</small> : <small className="home-detail-skeleton" />}
+            <strong className={!dashboard ? "home-value-skeleton" : ""}>{isSiloDashboard ? "Unavailable" : dashboard ? formatNumber(quietUsers.length) : ""}</strong>
+            {dashboard ? <small>{isSiloDashboard ? "Silo’s bounded activity response does not classify inactive accounts." : quietUsers.length ? quietUsers.map((user) => user.userName).join(", ") : "Everyone has checked in recently."}</small> : <small className="home-detail-skeleton" />}
           </article>
         </div>
       </section> : null}

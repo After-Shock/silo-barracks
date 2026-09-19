@@ -21,6 +21,7 @@ function LibraryItems(props) {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
   const [sortOrder, setSortOrder] = useState(localStorage.getItem("PREF_sortOrder") ?? "Title");
   const [currentPage, setCurrentPage] = useState(1);
+  const effectiveSortOrder = config?.IS_SILO && !["Title", "Date"].includes(sortOrder) ? "Title" : sortOrder;
   const [sortAsc, setSortAsc] = useState(
     localStorage.getItem("PREF_sortAsc") != undefined ? localStorage.getItem("PREF_sortAsc") == "true" : true
   );
@@ -67,7 +68,7 @@ function LibraryItems(props) {
     // setData(undefined);
     fetchData(1, true);
     // eslint-disable-next-line
-  }, [config, props.LibraryId, sortOrder, sortAsc, debouncedSearchQuery]);
+  }, [config, props.LibraryId, effectiveSortOrder, sortAsc, debouncedSearchQuery]);
 
   // Fetch data function
   const fetchData = async (page, reset = false) => {
@@ -82,7 +83,7 @@ function LibraryItems(props) {
             size: 50,
             page: page,
             search: debouncedSearchQuery,
-            sort: sortOrder,
+            sort: effectiveSortOrder,
             desc: !sortAsc,
           },
           headers: {
@@ -164,7 +165,7 @@ function LibraryItems(props) {
   if (filteredData) {
     filteredData = filteredData.filter((item) => {
       let match = false;
-      if (showArchived == archive.all || item.archived == (showArchived == "true")) {
+      if (config?.IS_SILO || showArchived == archive.all || item.archived == (showArchived == "true")) {
         match = true;
       }
       return match;
@@ -183,7 +184,7 @@ function LibraryItems(props) {
         </h1>
 
         <div className="d-flex flex-column flex-md-row">
-          <div className="d-flex flex-row w-md-75">
+          {!config.IS_SILO && <div className="d-flex flex-row w-md-75">
             <FormSelect
               value={showArchived}
               onChange={(e) => setArchivedFilter(e.target.value)}
@@ -199,12 +200,12 @@ function LibraryItems(props) {
                 <Trans i18nKey="NOT_ARCHIVED" />
               </option>
             </FormSelect>
-          </div>
+          </div>}
           <div className="d-flex flex-row w-100  mt-2 mt-md-0">
             <FormSelect
               onChange={(e) => sortOrderLogic(e.target.value)}
               className="ms-md-3 my-md-3 w-100 rounded-0 rounded-start"
-              value={sortOrder}
+              value={effectiveSortOrder}
             >
               <option value="Title">
                 <Trans i18nKey="TITLE" />
@@ -212,15 +213,11 @@ function LibraryItems(props) {
               <option value="Date">
                 <Trans i18nKey="SETTINGS_PAGE.DATE_ADDED" />
               </option>
-              <option value="Views">
-                <Trans i18nKey="VIEWS" />
-              </option>
-              <option value="WatchTime">
-                <Trans i18nKey="WATCH_TIME" />
-              </option>
-              <option value="Size">
-                <Trans i18nKey="SETTINGS_PAGE.SIZE" />
-              </option>
+              {!config.IS_SILO ? <>
+                <option value="Views"><Trans i18nKey="VIEWS" /></option>
+                <option value="WatchTime"><Trans i18nKey="WATCH_TIME" /></option>
+                <option value="Size"><Trans i18nKey="SETTINGS_PAGE.SIZE" /></option>
+              </> : null}
             </FormSelect>
 
             <Button className="my-md-3 rounded-0 rounded-end" onClick={() => setSortDirection(!sortAsc)}>

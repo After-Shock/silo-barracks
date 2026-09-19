@@ -55,6 +55,28 @@
   backdrop-filter: blur(14px);
 }
 
+.home-data-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.home-data-notice span {
+  flex: 1 1 280px;
+}
+
+.home-data-notice button {
+  background: var(--barracks-surface-raised);
+  color: var(--barracks-text);
+  border: 1px solid var(--barracks-border-subtle);
+  border-radius: 6px;
+  padding: 6px 12px;
+}
+
 .home-glass-card::before {
   content: "";
   position: absolute;

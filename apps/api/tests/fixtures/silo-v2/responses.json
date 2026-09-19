@@ -23,9 +23,9 @@
         "status": 200,
         "schema": "SystemInfo",
         "body": {
-          "server_version": "fixture-2.0.0",
+          "server_version": "8eeb9f3e",
           "api_major": 2,
-          "contract_digest": "e0cabb6c0a2535e05aab38cdc5823fa73dbf808ebff17332d7d372947abe5310",
+          "contract_digest": "774f49bd02d1b9465b2591013242eeb2aa41042c5303108ffc3ab39fd27c64eb",
           "links": {
             "openapi": "https://siloserver.org/contracts/api/v2/openapi.json",
             "capabilities": "https://siloserver.org/api/v2/capabilities"
@@ -46,15 +46,28 @@
           "available": true,
           "node_observations": true,
           "effective_play_method": true,
-          "effective_play_method_values": ["direct", "remux", "transcode"],
+          "effective_play_method_values": [
+            "direct",
+            "remux",
+            "transcode"
+          ],
           "is_jellyfin_client": true,
           "transcode_hw_accel": true,
           "tone_map_mode": true,
-          "tone_map_mode_values": ["none", "hdr10", "dolby_vision"],
+          "tone_map_mode_values": [
+            "none",
+            "hdr10",
+            "dolby_vision"
+          ],
           "client_build": true,
           "client_channel": true,
           "target_audio_channels": true,
-          "node_routing": true
+          "node_routing": true,
+          "user_filter": true,
+          "summary": true,
+          "revision": "8eeb9f3e",
+          "state": "available",
+          "allowed": true
         }
       }
     ]
@@ -67,7 +80,9 @@
       {
         "status": 200,
         "schema": "CollectionAdminPlaybackSession",
-        "query": {"limit": 1},
+        "query": {
+          "limit": 1
+        },
         "body": {
           "items": [
             {
@@ -98,14 +113,25 @@
               "client_version": "fixture-client"
             }
           ],
-          "page": {"has_more": true, "next_cursor": "sessions-page-2"}
+          "page": {
+            "has_more": true,
+            "next_cursor": "sessions-page-2"
+          }
         }
       },
       {
         "status": 200,
         "schema": "CollectionAdminPlaybackSession",
-        "query": {"cursor": "sessions-page-2", "limit": 1},
-        "body": {"items": [], "page": {"has_more": false}}
+        "query": {
+          "cursor": "sessions-page-2",
+          "limit": 1
+        },
+        "body": {
+          "items": [],
+          "page": {
+            "has_more": false
+          }
+        }
       }
     ]
   },
@@ -117,7 +143,9 @@
       {
         "status": 200,
         "schema": "AdminUserCollection",
-        "query": {"limit": 1},
+        "query": {
+          "limit": 1
+        },
         "body": {
           "items": [
             {
@@ -125,9 +153,13 @@
               "username": "alice",
               "email": "alice@example.test",
               "role": "admin",
-              "permissions": ["admin"],
+              "permissions": [
+                "admin"
+              ],
               "enabled": true,
-              "library_ids": ["library-movies"],
+              "library_ids": [
+                "library-movies"
+              ],
               "max_playback_quality": null,
               "max_streams": null,
               "max_transcodes": null,
@@ -148,21 +180,34 @@
                 "download_allowed": false,
                 "download_transcode_allowed": false,
                 "requests_allowed": true,
-                "permissions": ["admin"]
+                "permissions": [
+                  "admin"
+                ]
               },
               "created_at": "2026-01-01T00:00:00Z",
               "updated_at": "2026-09-08T12:00:00Z",
               "last_active_at": null
             }
           ],
-          "page": {"has_more": true, "next_cursor": "users-page-2"}
+          "page": {
+            "has_more": true,
+            "next_cursor": "users-page-2"
+          }
         }
       },
       {
         "status": 200,
         "schema": "AdminUserCollection",
-        "query": {"cursor": "users-page-2", "limit": 1},
-        "body": {"items": [], "page": {"has_more": false}}
+        "query": {
+          "cursor": "users-page-2",
+          "limit": 1
+        },
+        "body": {
+          "items": [],
+          "page": {
+            "has_more": false
+          }
+        }
       }
     ]
   },
@@ -174,7 +219,9 @@
       {
         "status": 200,
         "schema": "LoginSessionCollection",
-        "query": {"limit": 1},
+        "query": {
+          "limit": 1
+        },
         "body": {
           "items": [
             {
@@ -185,14 +232,25 @@
               "expires_at": "2026-09-09T12:00:00Z"
             }
           ],
-          "page": {"has_more": true, "next_cursor": "login-page-2"}
+          "page": {
+            "has_more": true,
+            "next_cursor": "login-page-2"
+          }
         }
       },
       {
         "status": 200,
         "schema": "LoginSessionCollection",
-        "query": {"cursor": "login-page-2", "limit": 1},
-        "body": {"items": [], "page": {"has_more": false}}
+        "query": {
+          "cursor": "login-page-2",
+          "limit": 1
+        },
+        "body": {
+          "items": [],
+          "page": {
+            "has_more": false
+          }
+        }
       }
     ]
   },
@@ -204,7 +262,10 @@
       {
         "status": 200,
         "schema": "CatalogBrowseCollection",
-        "query": {"limit": 1, "cursor": null},
+        "query": {
+          "limit": 1,
+          "cursor": null
+        },
         "body": {
           "window_cursor": "catalog-window-1",
           "total": 2,
@@ -215,18 +276,26 @@
               "type": "future_media_kind",
               "title": "Future Fixture",
               "genres": [],
-              "keywords": ["contract"],
+              "keywords": [
+                "contract"
+              ],
               "status": "matched",
               "year": 2030
             }
           ],
-          "page": {"has_more": true, "next_cursor": "catalog-page-2"}
+          "page": {
+            "has_more": true,
+            "next_cursor": "catalog-page-2"
+          }
         }
       },
       {
         "status": 200,
         "schema": "CatalogBrowseCollection",
-        "query": {"limit": 1, "cursor": "catalog-page-2"},
+        "query": {
+          "limit": 1,
+          "cursor": "catalog-page-2"
+        },
         "body": {
           "window_cursor": "catalog-window-1",
           "total": 2,
@@ -236,12 +305,16 @@
               "content_id": "series:fixture",
               "type": "series",
               "title": "Fixture Series",
-              "genres": ["Drama"],
+              "genres": [
+                "Drama"
+              ],
               "keywords": [],
               "status": "unmatched"
             }
           ],
-          "page": {"has_more": false}
+          "page": {
+            "has_more": false
+          }
         }
       }
     ]
@@ -254,12 +327,16 @@
       {
         "status": 200,
         "schema": "CatalogItemDetail",
-        "path_params": {"id": "movie:heat-1995"},
+        "path_params": {
+          "id": "movie:heat-1995"
+        },
         "body": {
           "content_id": "movie:heat-1995",
           "type": "movie",
           "title": "Heat",
-          "genres": ["Crime"],
+          "genres": [
+            "Crime"
+          ],
           "keywords": [],
           "status": "matched",
           "cast": [],
@@ -281,7 +358,9 @@
       {
         "status": 200,
         "schema": "FileVersionCollection",
-        "path_params": {"id": "movie:heat-1995"},
+        "path_params": {
+          "id": "movie:heat-1995"
+        },
         "body": {
           "items": [
             {
@@ -312,7 +391,9 @@
       {
         "status": 200,
         "schema": "SeasonCollection",
-        "path_params": {"id": "series:fixture"},
+        "path_params": {
+          "id": "series:fixture"
+        },
         "body": {
           "items": [
             {
@@ -335,7 +416,10 @@
       {
         "status": 200,
         "schema": "Season",
-        "path_params": {"id": "series:fixture", "num": 1},
+        "path_params": {
+          "id": "series:fixture",
+          "num": 1
+        },
         "body": {
           "content_id": "series:fixture-S01",
           "season_number": 1,
@@ -354,7 +438,10 @@
       {
         "status": 200,
         "schema": "EpisodeCollection",
-        "path_params": {"id": "series:fixture", "num": 1},
+        "path_params": {
+          "id": "series:fixture",
+          "num": 1
+        },
         "body": {
           "items": [
             {
@@ -378,14 +465,18 @@
       {
         "status": 200,
         "schema": "HistoryCollection",
-        "query": {"limit": 1},
+        "query": {
+          "limit": 1
+        },
         "body": {
           "items": [
             {
               "content_id": "movie:heat-1995",
               "type": "movie",
               "title": "Heat",
-              "genres": ["Crime"],
+              "genres": [
+                "Crime"
+              ],
               "keywords": [],
               "status": "matched",
               "watch": {
@@ -397,14 +488,25 @@
               }
             }
           ],
-          "page": {"has_more": true, "next_cursor": "history-page-2"}
+          "page": {
+            "has_more": true,
+            "next_cursor": "history-page-2"
+          }
         }
       },
       {
         "status": 200,
         "schema": "HistoryCollection",
-        "query": {"cursor": "history-page-2", "limit": 1},
-        "body": {"items": [], "page": {"has_more": false}}
+        "query": {
+          "cursor": "history-page-2",
+          "limit": 1
+        },
+        "body": {
+          "items": [],
+          "page": {
+            "has_more": false
+          }
+        }
       }
     ]
   },
@@ -416,7 +518,9 @@
       {
         "status": 200,
         "schema": "AdminPlaybackHistoryCollection",
-        "query": {"limit": 1},
+        "query": {
+          "limit": 1
+        },
         "body": {
           "items": [
             {
@@ -437,13 +541,19 @@
               "completed": false
             }
           ],
-          "page": {"has_more": true, "next_cursor": "admin-history-page-2"}
+          "page": {
+            "has_more": true,
+            "next_cursor": "admin-history-page-2"
+          }
         }
       },
       {
         "status": 200,
         "schema": "AdminPlaybackHistoryCollection",
-        "query": {"cursor": "admin-history-page-2", "limit": 1},
+        "query": {
+          "cursor": "admin-history-page-2",
+          "limit": 1
+        },
         "body": {
           "items": [
             {
@@ -464,7 +574,9 @@
               "completed": true
             }
           ],
-          "page": {"has_more": false}
+          "page": {
+            "has_more": false
+          }
         }
       }
     ]
@@ -525,7 +637,9 @@
               "auto_play_next_preview": false,
               "show_forced_subtitles": true,
               "library_restrictions_enabled": true,
-              "allowed_library_ids": ["library-movies"],
+              "allowed_library_ids": [
+                "library-movies"
+              ],
               "max_playback_quality": "720p",
               "created_at": "2026-02-01T00:00:00Z",
               "updated_at": "2026-09-08T12:00:00Z"
@@ -547,7 +661,9 @@
           "items": [
             {
               "id": "library-movies",
-              "paths": ["/media/movies"],
+              "paths": [
+                "/media/movies"
+              ],
               "type": "movies",
               "name": "Movies",
               "enabled": true,
@@ -560,7 +676,9 @@
               "sort_order": 0
             }
           ],
-          "page": {"has_more": false}
+          "page": {
+            "has_more": false
+          }
         }
       }
     ]
@@ -591,7 +709,9 @@
               "evidence_json": {}
             }
           ],
-          "page": {"has_more": false}
+          "page": {
+            "has_more": false
+          }
         }
       }
     ]
@@ -604,7 +724,9 @@
       {
         "status": 200,
         "schema": "SectionCollection",
-        "path_params": {"id": "library-movies"},
+        "path_params": {
+          "id": "library-movies"
+        },
         "body": {
           "sections": [
             {
@@ -631,7 +753,10 @@
       {
         "status": 200,
         "schema": "Section",
-        "path_params": {"id": "library-movies", "section_id": "recently_added"},
+        "path_params": {
+          "id": "library-movies",
+          "section_id": "recently_added"
+        },
         "body": {
           "id": "recently_added",
           "section_type": "recently_added",
@@ -654,7 +779,9 @@
       {
         "status": 200,
         "schema": "FileVersionCollection",
-        "body": {"items": []}
+        "body": {
+          "items": []
+        }
       }
     ]
   },
@@ -743,6 +870,121 @@
               "detail": "limit must be between 1 and 200"
             }
           ]
+        }
+      }
+    ]
+  },
+  "getAdminDashboardStats": {
+    "operationId": "getAdminDashboardStats",
+    "method": "GET",
+    "path": "/api/v2/admin/stats",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "AdminDashboardStats",
+        "body": {
+          "total_items": 12,
+          "total_files": 15,
+          "total_users": 2,
+          "total_movies": 3,
+          "total_movie_files": 4,
+          "total_shows": 2,
+          "total_show_files": 8,
+          "active_streams": 1,
+          "total_storage_bytes": 1024,
+          "watch_providers": []
+        }
+      }
+    ]
+  },
+  "getAdminDashboardPlaybackActivity": {
+    "operationId": "getAdminDashboardPlaybackActivity",
+    "method": "GET",
+    "path": "/api/v2/admin/stats/playback-activity",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "AdminDashboardPlaybackActivity",
+        "body": {
+          "hours": 168,
+          "bucket_seconds": 3600,
+          "from": "2026-09-11T00:00:00.000Z",
+          "to": "2026-09-18T00:00:00.000Z",
+          "buckets": [
+            {
+              "hour": "2026-09-17T20:00:00.000Z",
+              "direct": 2,
+              "remux": 1,
+              "transcode": 1
+            }
+          ],
+          "reliability": {
+            "sessions_started": 4,
+            "transcode_starts": 1,
+            "finalized_sessions": 4,
+            "completed_sessions": 3,
+            "completion_rate": 0.75,
+            "unique_profiles": 2
+          },
+          "profiles_active_24h": 1
+        }
+      }
+    ]
+  },
+  "getAdminDashboardTopActivity": {
+    "operationId": "getAdminDashboardTopActivity",
+    "method": "GET",
+    "path": "/api/v2/admin/stats/top-activity",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "AdminDashboardTopActivity",
+        "body": {
+          "days": 7,
+          "limit": 10,
+          "titles": [
+            {
+              "media_item_id": "movie-1",
+              "title": "Film",
+              "media_type": "movie",
+              "plays": 3,
+              "total_seconds": 3600
+            }
+          ],
+          "profiles": [
+            {
+              "user_id": "user-1",
+              "username": "Account",
+              "profile_id": "profile-1",
+              "profile_name": "Viewer",
+              "plays": 3,
+              "total_seconds": 3600
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "listAdminItemFiles": {
+    "operationId": "listAdminItemFiles",
+    "method": "GET",
+    "path": "/api/v2/admin/items/{id}/files",
+    "responses": [
+      {
+        "status": 200,
+        "schema": "CollectionAdminItemFile",
+        "body": {
+          "items": [
+            {
+              "id": "file-1",
+              "library_id": "library-1",
+              "file_path": "/media/show/episode.mkv",
+              "observed_root_path": "/media"
+            }
+          ],
+          "page": {
+            "has_more": false
+          }
         }
       }
     ]

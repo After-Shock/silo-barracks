@@ -761,7 +761,7 @@ test("applyTheme chooses a matching color scheme for dark and light canvases", (
   assert.equal(lightRoot.style.colorScheme, "light");
 });
 
-test("saveTheme applies before emitting normalized and resolved theme events", () => {
+test("saveTheme applies before emitting the resolved Barracks theme event", () => {
   const log = [];
   const root = createRoot(log);
   const eventTarget = createEventTarget(log);
@@ -771,7 +771,6 @@ test("saveTheme applies before emitting normalized and resolved theme events", (
 
   assert.deepEqual(saveTheme(theme, { storage, root, eventTarget }), normalized);
   assert.deepEqual(log.filter(([type]) => type === "event"), [
-    ["event", "jellyglance-theme-updated", normalized],
     ["event", "silo-barracks-theme-updated", resolveTheme(normalized).tokens],
   ]);
   assert.ok(log.findIndex(([type, name]) => type === "set" && name === "--barracks-canvas") < log.findIndex(([type, name]) => type === "event" && name === "silo-barracks-theme-updated"));
@@ -785,10 +784,8 @@ test("resetTheme returns defaults and emits each exact event once after applicat
 
   assert.deepEqual(resetTheme({ storage, root, eventTarget }), DEFAULT_THEME);
   assert.deepEqual(log.filter(([type]) => type === "event"), [
-    ["event", "jellyglance-theme-updated", DEFAULT_THEME],
     ["event", "silo-barracks-theme-updated", resolveTheme(DEFAULT_THEME).tokens],
   ]);
-  assert.equal(log.filter(([type, name]) => type === "event" && name === "jellyglance-theme-updated").length, 1);
   assert.equal(log.filter(([type, name]) => type === "event" && name === "silo-barracks-theme-updated").length, 1);
 });
 
@@ -823,9 +820,7 @@ test("failed storage writes and removals do not prevent applying themes in memor
   assert.doesNotThrow(() => resetTheme({ storage: failingStorage, root: saveRoot, eventTarget: saveEvents }));
   assert.equal(saveRoot.style.values.get("--barracks-canvas"), DEFAULT_THEME.background);
   assert.deepEqual(saveEvents.log.map(([, type]) => type), [
-    "jellyglance-theme-updated",
     "silo-barracks-theme-updated",
-    "jellyglance-theme-updated",
     "silo-barracks-theme-updated",
   ]);
 });

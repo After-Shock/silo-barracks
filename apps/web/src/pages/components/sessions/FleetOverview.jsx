@@ -7,7 +7,7 @@ import SessionCard from './session-card';
 import ErrorBoundary from '../general/ErrorBoundary';
 import '../../css/fleet.css';
 
-export default function FleetOverview({ surface = 'home' }) {
+export default function FleetOverview({ surface = 'home', canControl = false }) {
   const { snapshot, error, refresh } = useFleet();
   const [selected, setSelected] = useState('all');
   const [privacy, setPrivacy] = useState(getActiveSessionIpPrivacy);
@@ -56,9 +56,10 @@ export default function FleetOverview({ surface = 'home' }) {
     <div className="fleet-streams">
       {streams.map(({ server, session }) => <div key={`${server.id}:${session.Id}`} className="fleet-stream">
         <div className="fleet-source"><strong>{server.name}</strong>{(session.stale || server.state !== 'connected' || error) && <span>Stale · last known activity</span>}</div>
-        <ErrorBoundary><SessionCard data={{ session: { ...session, FleetServerId: server.id } }} hideIpAddress={shouldHideActiveSessionIp(surface, privacy)} /></ErrorBoundary>
+        <ErrorBoundary><SessionCard data={{ session: { ...session, FleetServerId: server.id } }}
+          hideIpAddress={shouldHideActiveSessionIp(surface, privacy)} canControl={canControl && server.state === 'connected' && !session.stale} /></ErrorBoundary>
       </div>)}
     </div>
-    {servers.length > 1 && <p className="fleet-footnote">Live activity includes all enabled servers. Saved history and library statistics currently belong to the primary server.</p>}
+    {servers.length > 1 && <p className="fleet-footnote">Live activity includes all enabled servers. Playback History can be scoped to one connected server; library statistics remain primary-server scoped.</p>}
   </section>;
 }

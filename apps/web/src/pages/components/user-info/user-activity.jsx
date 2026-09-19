@@ -9,8 +9,9 @@ import "../../css/users/user-activity.css";
 import i18next from "i18next";
 import LibraryFilterModal from "../library/library-filter-modal";
 import Config from "../../../lib/config.jsx";
+import SiloScopedActivity from "../activity/silo-scoped-activity";
 
-function UserActivity(props) {
+function LegacyUserActivity({ initialConfig, ...props }) {
   const [data, setData] = useState();
   const token = localStorage.getItem("token");
   const [itemCount, setItemCount] = useState(parseInt(localStorage.getItem("PREF_ACTIVITY_ItemCount") ?? "10"));
@@ -20,7 +21,7 @@ function UserActivity(props) {
   const [libraryFilters, setLibraryFilters] = useState([]);
   const [libraries, setLibraries] = useState([]);
   const [showLibraryFilters, setShowLibraryFilters] = useState(false);
-  const [config, setConfig] = useState();
+  const [config, setConfig] = useState(initialConfig);
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState({ column: "ActivityDateInserted", desc: true });
   const [filterParams, setFilterParams] = useState([]);
@@ -294,10 +295,28 @@ function UserActivity(props) {
           onFilterChange={onFilterChange}
           pageCount={data.pages}
           isBusy={isBusy}
+          readOnly={Boolean(config?.IS_SILO)}
+          siloHistory={Boolean(config?.IS_SILO)}
+          serverId="primary"
+          cursorMode={Boolean(config?.IS_SILO)}
         />
       </div>
     </div>
   );
 }
 
-export default UserActivity;
+export default function UserActivity(props) {
+  const [config, setConfig] = useState(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    let active = true;
+    Config.getConfig().then((next) => { if (active) setConfig(next); })
+      .catch((requestError) => { if (active) setError(requestError.message || "Activity configuration unavailable."); });
+    return () => { active = false; };
+  }, []);
+  if (error) return <p className="activity-notice is-error" role="alert">{error}</p>;
+  if (!config) return null;
+  return config.IS_SILO
+    ? <SiloScopedActivity endpoint="/api/getUserHistory" body={{ userid: props.UserId }} scopeLabel="Account" config={config} />
+    : <LegacyUserActivity {...props} initialConfig={config} />;
+}

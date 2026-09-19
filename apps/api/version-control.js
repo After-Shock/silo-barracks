@@ -43,7 +43,7 @@ function releaseMatchesChannel(release, channel) {
 async function fetchLatestReleaseVersion(currentVersion, channel = releaseChannel(currentVersion)) {
   const headers = {
     Accept: "application/vnd.github+json",
-    "User-Agent": `JellyGlance/${currentVersion}`,
+    "User-Agent": `Barracks/${currentVersion}`,
     ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
   };
 
@@ -71,7 +71,7 @@ async function fetchLatestReleaseVersion(currentVersion, channel = releaseChanne
     const response = await axios.get(RELEASES_ATOM_URL, {
       headers: {
         Accept: "application/atom+xml",
-        "User-Agent": `JellyGlance/${currentVersion}`,
+        "User-Agent": `Barracks/${currentVersion}`,
       },
       timeout: 10000,
     });
@@ -195,7 +195,7 @@ function bundledNotesToRelease(version, notes) {
   return {
     id: `bundled-${normalizedVersion}`,
     version: normalizedVersion,
-    name: `JellyGlance v${normalizedVersion}`,
+    name: `Barracks v${normalizedVersion}`,
     date: null,
     prerelease: isPrereleaseVersion(normalizedVersion),
     draft: false,
@@ -301,12 +301,12 @@ function getFallbackReleaseNotes(currentVersion, channel) {
       {
         id: `fallback-${version}`,
         version,
-        name: `JellyGlance v${version}`,
+        name: `Barracks v${version}`,
         date: null,
         prerelease: channel === "beta",
         draft: false,
         url: `${RELEASES_URL}/tag/v${version}`,
-        body: `Release notes are temporarily unavailable because GitHub could not be reached. View JellyGlance v${version} on GitHub for the full notes.`,
+        body: `Release notes are temporarily unavailable because GitHub could not be reached. View Barracks v${version} on GitHub for the full notes.`,
       },
     ],
   };
@@ -324,7 +324,7 @@ async function fetchReleaseNotes() {
     const response = await axios.get(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases`, {
       headers: {
         Accept: "application/vnd.github+json",
-        "User-Agent": `JellyGlance/${currentVersion}`,
+        "User-Agent": `Barracks/${currentVersion}`,
         ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
       },
       params: {
@@ -372,7 +372,7 @@ async function fetchGithubContributors() {
     const response = await axios.get(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contributors`, {
       headers: {
         Accept: "application/vnd.github+json",
-        "User-Agent": `JellyGlance/${currentVersion}`,
+        "User-Agent": `Barracks/${currentVersion}`,
         ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
       },
       params: {

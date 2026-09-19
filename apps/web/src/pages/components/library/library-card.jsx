@@ -1,4 +1,4 @@
-import {useState} from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "../../css/library/library-card.css";
 
@@ -32,9 +32,23 @@ function LibraryCard(props) {
     props.data.CollectionType === "tvshows" ? SeriesIcon : props.data.CollectionType === "movies" ? MovieIcon : props.data.CollectionType === "music" ? MusicIcon : MixedIcon;
   const primaryItemCount = props.data.CollectionType === "tvshows" ? props.data.Episode_Count : props.data.Library_Count;
   const primaryItemLabel = props.data.CollectionType === "tvshows" ? i18next.t("EPISODES") : props.data.CollectionType === "music" ? i18next.t("SONGS") : i18next.t("FILES");
+  const libraryImageSrc = getLibraryImageSrc(props.data);
+
+  useEffect(() => {
+    setImageLoaded(true);
+  }, [libraryImageSrc]);
+
+  function getLibraryImageSrc(library) {
+    // Keep Silo's signed artwork URL behind Barracks so an expired signature can be
+    // refreshed server-side without leaving the card stuck on its placeholder.
+    return baseUrl + "/proxy/Items/Images/Primary?library=true&id=" + encodeURIComponent(library.Id);
+  }
 
   function formatFileSize(sizeInBytes) {
-    const sizeInKB = sizeInBytes / 1024; // 1 KB = 1024 bytes
+    if (sizeInBytes === null || sizeInBytes === undefined || !Number.isFinite(Number(sizeInBytes))) {
+      return i18next.t("ERROR_MESSAGES.N/A");
+    }
+    const sizeInKB = Number(sizeInBytes) / 1024; // 1 KB = 1024 bytes
     if (sizeInKB < 1024) {
       return `${sizeInKB.toFixed(2)} KB`;
     } else {
@@ -155,7 +169,7 @@ function LibraryCard(props) {
             {imageLoaded ? (
               <img
                 className="library-list-image"
-                src={baseUrl + "/proxy/Items/Images/Primary?id=" + props.data.Id + "&fillWidth=320&quality=55"}
+                src={libraryImageSrc.includes("/proxy/") ? `${libraryImageSrc}&fillWidth=320&quality=55` : libraryImageSrc}
                 alt=""
                 loading="lazy"
                 decoding="async"
@@ -183,7 +197,7 @@ function LibraryCard(props) {
           </div>
           <div>
             <span><Trans i18nKey="LIBRARY_CARD.LIBRARY_SIZE" /></span>
-            <strong>{formatFileSize(props.metadata && props.metadata.Size ? props.metadata.Size : 0)}</strong>
+            <strong>{formatFileSize(props.metadata?.Size)}</strong>
           </div>
           <div>
             <span><Trans i18nKey="LIBRARY_CARD.TOTAL_TIME" /></span>
@@ -217,7 +231,7 @@ function LibraryCard(props) {
             <Card.Img
               variant="top"
               className="library-card-banner library-card-banner-hover"
-              src={baseUrl + "/proxy/Items/Images/Primary?id=" + props.data.Id + "&fillWidth=560&quality=55"}
+              src={libraryImageSrc.includes("/proxy/") ? `${libraryImageSrc}&fillWidth=560&quality=55` : libraryImageSrc}
               loading="lazy"
               decoding="async"
               onError={() => setImageLoaded(false)}
@@ -255,7 +269,7 @@ function LibraryCard(props) {
           </div>
           <div>
             <span><Trans i18nKey="LIBRARY_CARD.LIBRARY_SIZE" /></span>
-            <strong>{formatFileSize(props.metadata && props.metadata.Size ? props.metadata.Size : 0)}</strong>
+            <strong>{formatFileSize(props.metadata?.Size)}</strong>
           </div>
         </div>
 
@@ -270,7 +284,9 @@ function LibraryCard(props) {
           </div>
           <div>
             <span><Trans i18nKey="LIBRARY_CARD.TOTAL_FILES" /></span>
-            <strong>{(props.metadata && props.metadata.files ? props.metadata.files : 0).toLocaleString()}</strong>
+            <strong>{props.metadata?.files === null || props.metadata?.files === undefined
+              ? i18next.t("ERROR_MESSAGES.N/A")
+              : Number(props.metadata.files).toLocaleString()}</strong>
           </div>
           {props.data.CollectionType === "tvshows" ? (
             <div>

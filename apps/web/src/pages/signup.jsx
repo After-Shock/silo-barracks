@@ -113,7 +113,7 @@ function Signup() {
 
       localStorage.setItem("token", response.data.token);
       localStorage.removeItem("config");
-      window.dispatchEvent(new Event("jellyglance-config-updated"));
+      window.dispatchEvent(new Event("silo-barracks-config-updated"));
       await finishSetupNavigation();
     } catch (error) {
       const errorMessage = error.response?.data?.errorMessage || `Error : ${error.response?.status || "Unknown"}`;

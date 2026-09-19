@@ -126,12 +126,23 @@ function userToJellyfin(row, serverId) {
   };
 }
 
+function firstFiniteNumber(...values) {
+  for (const value of values) {
+    const number = Number(value);
+    if (Number.isFinite(number)) return number;
+  }
+  return undefined;
+}
+
 function libraryToJellyfin(row, serverId) {
   const collectionType = String(row.type || '').toLowerCase() === 'series' ? 'tvshows' : (row.type || 'mixed');
+  const size = firstFiniteNumber(row.size, row.Size, row.total_size, row.total_size_bytes, row.storage_bytes, row.bytes, row.file_size);
+  const files = firstFiniteNumber(row.files, row.file_count, row.total_files, row.total_file_count, row.observed_file_count);
   return {
     Id: String(row.id), Name: row.name || '', ServerId: serverId || '', IsFolder: true,
     Type: 'CollectionFolder', CollectionType: collectionType, LocationType: 'FileSystem',
-    ImageTags: {}, BackdropImageTags: [], SiloPosterUrl: row.poster_url || undefined,
+    ImageTags: {}, BackdropImageTags: [], SiloPosterUrl: row.poster_url || row.image_url || row.artwork_url || row.backdrop_url || undefined,
+    ...(size !== undefined ? { Size: size } : {}), ...(files !== undefined ? { files } : {}),
   };
 }
 

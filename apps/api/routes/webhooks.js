@@ -270,8 +270,8 @@ router.post('/:id/test', async (req, res) => {
         // Discord behaviour
         if (webhook.webhook_type === 'gotify') {
             testData = {
-                title: "JellyGlance test notification",
-                message: "Gotify is connected to JellyGlance.",
+                title: "Barracks test notification",
+                message: "Gotify is connected to Barracks.",
                 priority: 5
             };
 
@@ -282,7 +282,7 @@ router.post('/:id/test', async (req, res) => {
 
             // Discord specific format
             testData = {
-                content: "Test de webhook depuis JellyGlance",
+                content: "Test de webhook depuis Barracks",
                 embeds: [{
                     title: "Discord test notification",
                     description: "This is a test notification of jellystat discord webhook",
@@ -386,7 +386,7 @@ router.post('/:id/test', async (req, res) => {
                         source: "Wizarr",
                         code: "TEST99",
                         url: "https://wizarr.example.com/j/TEST99",
-                        message: "Invite TEST99 created from JellyGlance.",
+                        message: "Invite TEST99 created from Barracks.",
                     };
                     success = await webhookManager.triggerEventWebhooks(eventType, eventData, [webhook.id]);
                     break;
@@ -396,7 +396,7 @@ router.post('/:id/test', async (req, res) => {
                         integrationEvent: "invite deleted",
                         source: "Wizarr",
                         id: "test-invite-id",
-                        message: "Invite test-invite-id deleted from JellyGlance.",
+                        message: "Invite test-invite-id deleted from Barracks.",
                     };
                     success = await webhookManager.triggerEventWebhooks(eventType, eventData, [webhook.id]);
                     break;

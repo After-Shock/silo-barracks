@@ -213,6 +213,12 @@
   font-weight: 720;
 }
 
+.stream-info-history-note {
+  margin: 12px 14px 4px;
+  color: var(--barracks-text-muted-raised);
+  font-size: 12px;
+}
+
 .ellipse {
   display: -webkit-box;
   -webkit-box-orient: vertical;

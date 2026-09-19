@@ -18,6 +18,7 @@ import PlayStatsByDay from "./components/statistics/play-stats-by-day";
 import PlayStatsByHour from "./components/statistics/play-stats-by-hour";
 import HomeStatisticCards from "./components/HomeStatisticCards";
 import { Trans } from "react-i18next";
+import Config from "../lib/config";
 
 function getStatValue(item = {}) {
   return Number(item.Plays ?? item.Count ?? item.unique_viewers ?? 0);
@@ -78,6 +79,7 @@ function StatsOverview({ days }) {
     methods: [],
   });
   const [status, setStatus] = useState("loading");
+  const [nativeMeta, setNativeMeta] = useState(null);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -91,6 +93,17 @@ function StatsOverview({ days }) {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         };
+        const native = await axios.get("/stats/getNativeOverview", { headers, params: { days } });
+        if (native.data?.native) {
+          if (!ignore) {
+            setOverview({ movies: native.data.movies || [], series: native.data.series || [],
+              libraries: native.data.libraries || [], users: native.data.users || [],
+              clients: native.data.clients || [], methods: native.data.methods || [] });
+            setNativeMeta(native.data);
+            setStatus("loaded");
+          }
+          return;
+        }
         const requests = [
           axios.post("/stats/getMostViewedByType", { days, type: "Movie" }, { headers }),
           axios.post("/stats/getMostViewedByType", { days, type: "Series" }, { headers }),
@@ -103,14 +116,9 @@ function StatsOverview({ days }) {
         const [movies, series, libraries, users, clients, methods] = await Promise.all(requests);
 
         if (!ignore) {
-          setOverview({
-            movies: movies.data || [],
-            series: series.data || [],
-            libraries: libraries.data || [],
-            users: users.data || [],
-            clients: clients.data || [],
-            methods: methods.data || [],
-          });
+          setNativeMeta(null);
+          setOverview({ movies: movies.data || [], series: series.data || [], libraries: libraries.data || [],
+            users: users.data || [], clients: clients.data || [], methods: methods.data || [] });
           setStatus("loaded");
         }
       } catch (error) {
@@ -140,25 +148,25 @@ function StatsOverview({ days }) {
       .reduce((sum, item) => sum + getStatValue(item), 0);
 
     return {
-      totalPlays: totalMovies + totalSeries,
+      totalPlays: nativeMeta ? Number(nativeMeta.reliability?.sessions_started || 0) : totalMovies + totalSeries,
       topLibrary: overview.libraries[0],
       topUser: overview.users[0],
       topClient: overview.clients[0],
       directPercent: totalMethods ? Math.round((directPlays / totalMethods) * 100) : 0,
       transcodePercent: totalMethods ? Math.round((transcodes / totalMethods) * 100) : 0,
     };
-  }, [overview]);
+  }, [nativeMeta, overview]);
 
   const methodTotal = overview.methods.reduce((sum, item) => sum + getStatValue(item), 0);
   const topCards = [
-    { label: "Top library", value: metrics.topLibrary?.Name || "No data", detail: `${formatNumber(getStatValue(metrics.topLibrary))} plays`, icon: <BarChartFillIcon /> },
+    { label: "Top library", value: metrics.topLibrary?.Name || (nativeMeta ? "Not provided" : "No data"), detail: nativeMeta ? "Not part of this Silo aggregate" : `${formatNumber(getStatValue(metrics.topLibrary))} plays`, icon: <BarChartFillIcon /> },
     {
-      label: "Most active user",
+      label: nativeMeta ? "Most active profile" : "Most active user",
       value: metrics.topUser?.Name || "No data",
       detail: `${formatNumber(getStatValue(metrics.topUser))} plays`,
       icon: metrics.topUser?.UserId ? <img src={`/proxy/Users/Images/Primary?id=${metrics.topUser.UserId}&fillWidth=80&quality=80`} alt="" /> : <UserStarLineIcon />,
     },
-    { label: "Top client", value: metrics.topClient?.Client || metrics.topClient?.Name || "No data", detail: `${formatNumber(getStatValue(metrics.topClient))} plays`, icon: <ComputerLineIcon /> },
+    { label: "Top client", value: metrics.topClient?.Client || metrics.topClient?.Name || (nativeMeta ? "Live only" : "No data"), detail: nativeMeta ? "See Activity > Live sessions" : `${formatNumber(getStatValue(metrics.topClient))} plays`, icon: <ComputerLineIcon /> },
   ];
 
   return (
@@ -182,10 +190,15 @@ function StatsOverview({ days }) {
         <article>
           <TimeLineIcon />
           <span>Window</span>
-          <strong>{days} days</strong>
+          <strong>{nativeMeta?.days || days} days</strong>
         </article>
       </div>
 
+      {nativeMeta ? <div className="stats-overview-note">
+        Native Silo analytics · {nativeMeta.days} day leaderboard · {nativeMeta.hours} hour playback-method window
+        {nativeMeta.coverageLimited ? ` (requested ${nativeMeta.requestedDays} days; Silo’s endpoint supports up to 30)` : ""}.
+        Profiles are ranked separately from login accounts; unavailable historical client and library rankings are not fabricated.
+      </div> : null}
       {status === "error" ? <div className="stats-overview-error">Unable to load overview statistics.</div> : null}
 
       <div className="stats-overview-grid">
@@ -234,7 +247,7 @@ function StatsOverview({ days }) {
         </div>
       </div>
 
-      <HomeStatisticCards days={days} variant="media-rankings" />
+      {!nativeMeta ? <HomeStatisticCards days={days} variant="media-rankings" /> : null}
     </section>
   );
 }
@@ -247,6 +260,8 @@ function Statistics() {
       : localStorage.getItem("PREF_STATISTICS_STAT_DAYS") ?? 20
   );
   const [input, setInput] = useState(localStorage.getItem("PREF_STATISTICS_STAT_DAYS_INPUT") ?? 20);
+  const [isSilo, setIsSilo] = useState(false);
+  useEffect(() => { let active = true; Config.getConfig().then((value) => { if (active) setIsSilo(Boolean(value?.IS_SILO)); }).catch(() => {}); return () => { active = false; }; }, []);
 
   const handleOnChange = (event) => {
     setInput(event.target.value);
@@ -298,7 +313,7 @@ function Statistics() {
         </div>
 
         <div className="stats-controls">
-          <div className="stats-tab-nav">
+          {!isSilo && <div className="stats-tab-nav">
             <Tabs defaultActiveKey={activeTab} activeKey={activeTab} onSelect={setTab} variant="pills">
               <Tab eventKey="tabOverview" className="bg-transparent" title="Overview" />
 
@@ -306,7 +321,7 @@ function Statistics() {
 
               <Tab eventKey="tabDuration" className="bg-transparent" title={<Trans i18nKey="STAT_PAGE.DURATION_VIEW" />} />
             </Tabs>
-          </div>
+          </div>}
           <div className="stats-range-panel">
             <div className="stats-range-label">
               <CalendarLineIcon size={17} />
@@ -340,9 +355,9 @@ function Statistics() {
       </div>
 
       <main className="stats-workbench">
-        {activeTab === "tabOverview" && <StatsOverview days={days} />}
+        {(isSilo || activeTab === "tabOverview") && <StatsOverview days={days} />}
 
-        {(activeTab === "tabCount" || activeTab === "tabDuration") && (
+        {!isSilo && (activeTab === "tabCount" || activeTab === "tabDuration") && (
           <div className="statistics-dashboard">
             <div className="stats-chart-intro">
               <div>

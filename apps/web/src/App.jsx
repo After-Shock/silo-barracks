@@ -64,7 +64,7 @@ function isLibrarySyncProgress(message) {
 }
 
 function taskToastId(task) {
-  return `jellyglance-task-toast:${task}`;
+  return `silo-barracks-task-toast:${task}`;
 }
 
 const recentTaskNotifications = new Map();
@@ -191,9 +191,9 @@ function App() {
       setNotificationSettings(normalizeNotificationSettings(event.detail));
     }
 
-    window.addEventListener("jellyglance-notification-settings-updated", handleNotificationSettings);
+    window.addEventListener("silo-barracks-notification-settings-updated", handleNotificationSettings);
     return () => {
-      window.removeEventListener("jellyglance-notification-settings-updated", handleNotificationSettings);
+      window.removeEventListener("silo-barracks-notification-settings-updated", handleNotificationSettings);
     };
   }, []);
 
@@ -274,8 +274,8 @@ function App() {
       setConfig(null);
     };
 
-    window.addEventListener("jellyglance-auth-expired", handleAuthExpired);
-    return () => window.removeEventListener("jellyglance-auth-expired", handleAuthExpired);
+    window.addEventListener("silo-barracks-auth-expired", handleAuthExpired);
+    return () => window.removeEventListener("silo-barracks-auth-expired", handleAuthExpired);
   }, []);
 
   if (loading) {
@@ -320,10 +320,10 @@ function App() {
           limit={5}
           pauseOnFocusLoss={false}
           hideProgressBar={false}
-          className="jellyglance-toast-container"
-          toastClassName="jellyglance-toast"
-          bodyClassName="jellyglance-toast-body"
-          progressClassName="jellyglance-toast-progress"
+          className="barracks-toast-container"
+          toastClassName="barracks-toast"
+          bodyClassName="barracks-toast-body"
+          progressClassName="barracks-toast-progress"
         />
         <WhatsNewModal enabled={!kioskMode} />
       </div>

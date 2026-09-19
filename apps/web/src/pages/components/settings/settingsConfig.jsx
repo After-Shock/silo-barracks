@@ -351,7 +351,7 @@ export default function SettingsConfig() {
                 <Trans i18nKey={"SETTINGS_PAGE.EXTERNAL_URL"} />
               </Form.Label>
               <Col sm="10">
-                <Form.Control id="ExternalUrl" name="ExternalUrl" value={externalUrl} onChange={handleFormChangeExternal} placeholder="https://jellyglance.example.com" />
+                <Form.Control id="ExternalUrl" name="ExternalUrl" value={externalUrl} onChange={handleFormChangeExternal} placeholder="https://barracks.example.com" />
               </Col>
             </Form.Group>
           </div>

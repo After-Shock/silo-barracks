@@ -35,6 +35,14 @@ const dayjs = require("dayjs");
 
 const router = express.Router();
 
+async function recordAuditSafely(req, action, details) {
+  try {
+    await addAuditEntry(req, action, details);
+  } catch (error) {
+    console.error(`[Silo Barracks] Audit logging failed for ${action}:`, error.message);
+  }
+}
+
 router.use((req, res, next) => {
   if (!require('../classes/provider').isSupportedTask(req.query.task || req.body?.task)) {
     return res.status(501).json({ error: 'Jellyfin Playback Reporting import is not supported by Silo.' });
@@ -1202,7 +1210,7 @@ function buildWizarrInviteEmail(invite, integration) {
     "",
     inviteUrl ? `Open invite: ${inviteUrl}` : `Invite code: ${code}`,
     "",
-    "This invite was sent from JellyGlance.",
+    "This invite was sent from Barracks.",
   ].join("\n");
   const html = `
     <!doctype html>
@@ -1215,7 +1223,7 @@ function buildWizarrInviteEmail(invite, integration) {
                 <tr>
                   <td style="border-radius:20px;overflow:hidden;background:#101722;border:1px solid #26364a;">
                     <div style="background:linear-gradient(135deg,#111827 0%,#132436 52%,#351b44 100%);padding:28px;">
-                      <div style="color:#9ee8ff;font-size:12px;font-weight:900;text-transform:uppercase;">JellyGlance Invite</div>
+                      <div style="color:#9ee8ff;font-size:12px;font-weight:900;text-transform:uppercase;">Barracks Invite</div>
                       <h1 style="margin:8px 0 10px;color:#ffffff;font-size:32px;line-height:1.05;">Your server invite is ready</h1>
                       <p style="margin:0;color:#c7d4e6;font-size:14px;line-height:1.5;">Use the link below to accept your ${escapeWizarrHtml(sourceName)} invitation.</p>
                     </div>
@@ -1230,7 +1238,7 @@ function buildWizarrInviteEmail(invite, integration) {
                   </td>
                 </tr>
                 <tr>
-                  <td align="center" style="padding:16px;color:#72839a;font-size:12px;">Sent by JellyGlance</td>
+                  <td align="center" style="padding:16px;color:#72839a;font-size:12px;">Sent by Barracks</td>
                 </tr>
               </table>
             </td>
@@ -2816,7 +2824,7 @@ async function fetchJellyfinUserItems(userId, params = {}) {
     timeout: 12000,
     headers: {
       Authorization: `MediaBrowser Token="${config.JF_API_KEY}"`,
-      "User-Agent": "JellyGlance/1.0.6",
+      "User-Agent": "Barracks/1.0.6",
     },
     params: {
       Recursive: true,
@@ -2842,7 +2850,7 @@ async function jellyfinRequest(path, options = {}) {
     url: `${cleanIntegrationUrl(config.JF_HOST)}${path}`,
     headers: {
       Authorization: `MediaBrowser Token="${config.JF_API_KEY}"`,
-      "User-Agent": "JellyGlance/1.0.6",
+      "User-Agent": "Barracks/1.0.6",
       ...(options.headers || {}),
     },
     params: options.params,
@@ -3417,6 +3425,7 @@ async function getArrLinks(item, liveItem, seriesLiveItem) {
 function buildJellyfinItemUrl(config, itemId) {
   const host = cleanIntegrationUrl(config?.settings?.EXTERNAL_URL || config?.JF_HOST || "");
   if (!host || !itemId) return null;
+  if (config.IS_SILO) return `${host}/watch/${encodeURIComponent(itemId)}`;
   const serverId = config?.settings?.ServerID ? `&serverId=${encodeURIComponent(config.settings.ServerID)}` : "";
   return `${host}/web/index.html#!/${config.IS_JELLYFIN ? "details" : "item"}?id=${encodeURIComponent(itemId)}${serverId}`;
 }
@@ -3792,6 +3801,37 @@ router.post("/users/:userId/media/:itemId/actions", async (req, res) => {
   }
 });
 
+router.get("/session-controls/capabilities", async (req, res) => {
+  try {
+    if (typeof API.getSessionCommandCapabilities !== "function") {
+      return res.json({ available: false, allowed: false, actions: [], state: "unsupported" });
+    }
+    res.json(await API.getSessionCommandCapabilities());
+  } catch (error) {
+    res.status(error.status || error.response?.status || 503).json({ error: error.message || "Playback controls are unavailable." });
+  }
+});
+
+router.post("/session-controls/:sessionId/:action", async (req, res) => {
+  const action = String(req.params.action || "").toLowerCase();
+  if (!["pause", "resume", "stop", "terminate", "message"].includes(action)) {
+    return res.status(400).json({ error: "Unsupported playback command." });
+  }
+  try {
+    const sessions = await API.getSessions();
+    if (!sessions.some((session) => String(session?.Id || "") === String(req.params.sessionId))) {
+      return res.status(409).json({ error: "Playback session is no longer active." });
+    }
+    const result = await API.controlSession(req.params.sessionId, action, req.body || {});
+    await recordAuditSafely(req, "playback.command", { serverId: "primary", sessionId: req.params.sessionId, action, status: result.status });
+    res.status(result.status === 202 ? 202 : 200).json(result);
+  } catch (error) {
+    await recordAuditSafely(req, "playback.command.failed", { serverId: "primary", sessionId: req.params.sessionId,
+      action, status: error.status || error.response?.status || 503 });
+    res.status(error.status || error.response?.status || 503).json({ error: error.message || "Playback command failed." });
+  }
+});
+
 router.get("/getconfig", async (req, res) => {
   try {
     const config = await new configClass().getConfig();
@@ -3880,39 +3920,51 @@ router.get("/getLibraries", async (req, res) => {
   }
 });
 
+function mapRecentlyAddedItem(item, parentId = null) {
+  return {
+    Name: item.Name,
+    SeriesName: item.SeriesName,
+    Id: item.Id,
+    SeriesId: item.SeriesId || null,
+    SeasonId: item.SeasonId || null,
+    EpisodeId: item.Type === "Episode" ? item.Id : null,
+    SeasonNumber: item.ParentIndexNumber ?? null,
+    EpisodeNumber: item.IndexNumber ?? null,
+    PrimaryImageHash:
+      item.ImageTags &&
+      item.ImageTags.Primary &&
+      item.ImageBlurHashes &&
+      item.ImageBlurHashes.Primary &&
+      item.ImageBlurHashes.Primary[item.ImageTags["Primary"]]
+        ? item.ImageBlurHashes.Primary[item.ImageTags["Primary"]]
+        : null,
+    DateCreated: item.DateCreated ?? null,
+    Type: item.Type,
+    ParentId: item.ParentId || parentId,
+  };
+}
+
 router.get("/getRecentlyAdded", async (req, res) => {
   try {
     const { libraryid, limit = 50, GroupResults = true } = req.query;
 
     const config = await new configClass().getConfig();
     const excluded_libraries = config.settings.ExcludedLibraries || [];
+    const numericLimit = Math.min(Math.max(Number(limit) || 50, 1), 100);
 
-    let recentlyAddedFromJellyfin = await API.getRecentlyAdded({ libraryid: libraryid });
+    if (config?.IS_SILO) {
+      const recentlyAdded = (await API.getRecentlyAdded({ libraryid, limit: numericLimit }))
+        .map(item => mapRecentlyAddedItem(item, libraryid || item.ParentId))
+        .filter(item => item.Type !== "Series" && !excluded_libraries.includes(String(item.ParentId || "")));
+      recentlyAdded.sort(
+        (a, b) => dayjs(b.DateCreated, "YYYY-MM-DD HH:mm:ss.SSSZ") - dayjs(a.DateCreated, "YYYY-MM-DD HH:mm:ss.SSSZ"),
+      );
+      return res.send(GroupResults == true || GroupResults === "true" ? groupRecentlyAdded(recentlyAdded) : recentlyAdded);
+    }
 
-    let recentlyAddedFromJellyfinMapped = recentlyAddedFromJellyfin.map((item) => {
-      return {
-        Name: item.Name,
-        SeriesName: item.SeriesName,
-        Id: item.Id,
-        SeriesId: item.SeriesId || null,
-        SeasonId: item.SeasonId || null,
-        EpisodeId: item.Type === "Episode" ? item.Id : null,
+    let recentlyAddedFromJellyfin = await API.getRecentlyAdded({ libraryid: libraryid, limit: numericLimit });
 
-        SeasonNumber: item.ParentIndexNumber ?? null,
-        EpisodeNumber: item.IndexNumber ?? null,
-        PrimaryImageHash:
-          item.ImageTags &&
-          item.ImageTags.Primary &&
-          item.ImageBlurHashes &&
-          item.ImageBlurHashes.Primary &&
-          item.ImageBlurHashes.Primary[item.ImageTags["Primary"]]
-            ? item.ImageBlurHashes.Primary[item.ImageTags["Primary"]]
-            : null,
-
-        DateCreated: item.DateCreated ?? null,
-        Type: item.Type,
-      };
-    });
+    let recentlyAddedFromJellyfinMapped = recentlyAddedFromJellyfin.map((item) => mapRecentlyAddedItem(item, libraryid));
 
     if (libraryid !== undefined) {
       const { rows: items } = await db.query(
@@ -4043,6 +4095,22 @@ router.get("/getRecentlyAddedShelves", async (req, res) => {
     const limit = Math.min(Math.max(Number(req.query.limit) || 24, 1), 60);
     const config = await new configClass().getConfig();
     const excludedLibraries = config.settings.ExcludedLibraries || [];
+
+    if (config?.IS_SILO) {
+      const libraries = (await API.getLibraries())
+        .filter(library => !excludedLibraries.includes(String(library.Id)))
+        .sort((a, b) => a.Name.localeCompare(b.Name));
+      const shelves = await Promise.all(libraries.map(async library => {
+        const items = (await API.getRecentlyAdded({ libraryid: library.Id, limit }).catch(() => []))
+          .map(item => mapRecentlyAddedItem(item, library.Id))
+          .filter(item => item.Type !== "Series")
+          .sort((a, b) => dayjs(b.DateCreated, "YYYY-MM-DD HH:mm:ss.SSSZ") - dayjs(a.DateCreated, "YYYY-MM-DD HH:mm:ss.SSSZ"))
+          .slice(0, limit);
+        return { id: library.Id, name: library.Name, type: library.CollectionType, count: items.length, items };
+      }));
+      res.set("Cache-Control", "private, max-age=30");
+      return res.send(shelves);
+    }
 
     const { rows } = await db.query(
       `
@@ -4334,7 +4402,7 @@ router.post("/setAuthMode", async (req, res) => {
 
       settings.auth = {
         mode: "local",
-        label: "Local JellyGlance login",
+        label: "Local Barracks login",
       };
 
       query = 'UPDATE app_config SET "APP_USER"=$1, "REQUIRE_LOGIN"=$2, settings=$3 where "ID"=1';
@@ -5088,7 +5156,7 @@ router.post("/setActivityMonitorSettings", async (req, res) => {
   }
 });
 
-//JellyGlance app functions
+//Barracks app functions
 router.get("/CheckForUpdates", async (req, res) => {
   try {
     let result = await checkForUpdates();
@@ -5140,6 +5208,8 @@ router.post("/getUserDetails", async (req, res) => {
 
 router.get("/getLibraries", async (req, res) => {
   try {
+    const config = await new configClass().getConfig();
+    if (config?.IS_SILO) return res.send((await API.getLibraries()).map(library => ({ ...library, archived: false })));
     const { rows } = await db.query(`SELECT * FROM jf_libraries`);
     res.send(rows);
   } catch (error) {
@@ -5155,6 +5225,19 @@ router.post("/getLibrary", async (req, res) => {
       res.status(400);
       res.send("No Library Id provided");
       return;
+    }
+
+    const config = await new configClass().getConfig();
+    if (config?.IS_SILO) {
+      const library = (await API.getLibraries()).find(item => String(item.Id) === String(libraryid));
+      if (!library) return res.status(404).send("Library not found");
+      const [summary, metadata] = await Promise.all([
+        API.getLibraryCatalogSummary({ id: libraryid }).catch(() => null),
+        API.getLibraryStorageMetadata().then(rows => rows.find(row => String(row.Id) === String(libraryid))).catch(() => null),
+      ]);
+      return res.send({ ...library, archived: false, Library_Count: summary?.total ?? null,
+        Library_Count_Exact: summary?.totalExact ?? false, Size: metadata?.Size ?? library.Size ?? null,
+        files: metadata?.files ?? library.files ?? null, measurement_pending: Boolean(metadata?.measurement_pending) });
     }
 
     const { rows } = await db.query(`select * from jf_libraries where "Id"=$1`, [libraryid]);
@@ -5176,6 +5259,11 @@ router.post("/getLibraryItems", async (req, res) => {
       return;
     }
 
+    const config = await new configClass().getConfig();
+    if (config?.IS_SILO && typeof API.getLibraryItemsPage === 'function') {
+      return res.send(await API.getLibraryItemsPage({ id: libraryid, startIndex: 0, limit: 200 }));
+    }
+
     const { rows } = await db.query(`SELECT * FROM jf_library_items where "ParentId"=$1`, [libraryid]);
     res.send(rows);
   } catch (error) {
@@ -5193,6 +5281,9 @@ router.post("/getSeasons", async (req, res) => {
       return;
     }
 
+    const config = await new configClass().getConfig();
+    if (config?.IS_SILO) return res.send(await API.getSeasons(Id));
+
     const { rows } = await db.query(
       `SELECT s.*, i."PrimaryImageHash", (select count(e.*) "Episodes" from jf_library_episodes e  where e."SeasonId"=s."Id") ,(select sum(ii."Size") "Size" from jf_library_episodes e join jf_item_info ii on ii."Id"=e."EpisodeId" where e."SeasonId"=s."Id") FROM jf_library_seasons s left join jf_library_items i on i."Id"=s."SeriesId" where "SeriesId"=$1`,
       [Id],
@@ -5205,13 +5296,16 @@ router.post("/getSeasons", async (req, res) => {
 
 router.post("/getEpisodes", async (req, res) => {
   try {
-    const { Id } = req.body;
+    const { Id, SeriesId } = req.body;
 
     if (Id === undefined) {
       res.status(400);
       res.send("No Episode Id provided");
       return;
     }
+
+    const config = await new configClass().getConfig();
+    if (config?.IS_SILO && SeriesId) return res.send(await API.getEpisodes({ SeriesId, SeasonId: Id }));
 
     const { rows } = await db.query(
       `SELECT e.*, i."PrimaryImageHash", ii."Size" FROM jf_library_episodes e left join jf_library_items i on i."Id"=e."SeriesId" join jf_item_info ii on ii."Id"=e."EpisodeId" where "SeasonId"=$1`,
@@ -5230,6 +5324,18 @@ router.post("/getItemDetails", async (req, res) => {
       res.status(400);
       res.send("No ID provided");
       return;
+    }
+    const config = await new configClass().getConfig();
+    if (config?.IS_SILO) {
+      const liveItems = await API.getItemsByID({ ids: [Id] }).catch(() => []);
+      if (liveItems.length > 0) {
+        const item = liveItems[0];
+        const activityField = item.Type === 'Episode' ? '"EpisodeId"' : item.Type === 'Season' ? '"SeasonId"' : '"NowPlayingItemId"';
+        const last = await db.querySingle(`SELECT MAX("ActivityDateInserted") "LastActivityDate" FROM public.jf_playback_activity WHERE ${activityField}=$1`, [Id]).catch(() => ({}));
+        const plays = await db.querySingle(`SELECT Count("ActivityDateInserted") "times_played", SUM("PlaybackDuration") "total_play_time" FROM public.jf_playback_activity WHERE ${activityField}=$1`, [Id]).catch(() => ({}));
+        return res.send(await enrichItemDetails([{ ...item, LastActivityDate: last.LastActivityDate ?? null,
+          times_played: plays.times_played ?? null, total_play_time: plays.total_play_time ?? null }]));
+      }
     }
     // let query = `SELECT im."Name" "FileName",im.*,i.* FROM jf_library_items i left join jf_item_info im on i."Id" = im."Id" where i."Id"=$1`;
     let query = `SELECT im."Name" "FileName",im."Id",im."Path",im."Name",im."Bitrate",im."MediaStreams",im."Type",  COALESCE(im."Size" ,(SELECT SUM(im."Size") FROM jf_library_seasons s JOIN jf_library_episodes e on s."Id"=e."SeasonId" JOIN jf_item_info im ON im."Id" = e."EpisodeId" WHERE s."SeriesId" = i."Id")) "Size",i.*, (select "Name" from jf_libraries l where l."Id"=i."ParentId") "LibraryName" FROM jf_library_items i left join jf_item_info im on i."Id" = im."Id" where i."Id"=$1`;
@@ -5469,8 +5575,31 @@ router.post("/setExcludedBackupTable", async (req, res) => {
 });
 
 //DB Queries - History
+router.get("/getHistory/users", async (req, res) => {
+  if (!API.isSilo) return res.status(404).json({ error: "Silo activity users are unavailable" });
+  try { return res.json({ users: await API.getPlaybackHistoryUsers(), serverId: "primary" }); }
+  catch (error) { return res.status(error.status || 503).json({ error: error.message || "Unable to load Silo users" }); }
+});
+
+router.get("/getHistory/users/:userId/profiles", async (req, res) => {
+  if (!API.isSilo) return res.status(404).json({ error: "Silo activity profiles are unavailable" });
+  try { return res.json({ profiles: await API.getPlaybackHistoryProfiles(req.params.userId), serverId: "primary" }); }
+  catch (error) { return res.status(error.status || 503).json({ error: error.message || "Unable to load Silo profiles" }); }
+});
+
+router.get("/getHistory/users/:userId", async (req, res) => {
+  if (!API.isSilo) return res.status(404).json({ error: "Silo activity account is unavailable" });
+  try {
+    const [user, profiles] = await Promise.all([
+      API.getUserById(req.params.userId), API.getPlaybackHistoryProfiles(req.params.userId),
+    ]);
+    return user ? res.json({ user, profiles, serverId: "primary", serverName: "Primary server" })
+      : res.status(404).json({ error: "Silo account was not found" });
+  } catch (error) { return res.status(error.status || 503).json({ error: error.message || "Unable to load Silo account" }); }
+});
+
 router.get("/getHistory", async (req, res) => {
-  const { size = 50, page = 1, search, sort = "ActivityDateInserted", desc = true, filters } = req.query;
+  const { size = 50, page = 1, cursor, search, sort = "ActivityDateInserted", desc = true, filters } = req.query;
 
   let filtersArray = [];
   if (filters) {
@@ -5517,6 +5646,24 @@ router.get("/getHistory", async (req, res) => {
           },
         ],
       });
+    }
+  }
+
+  if (API.isSilo) {
+    try {
+      const userFilter = filtersArray.find((filter) => filter.field === "UserId" && filter.value)?.value;
+      const completedFilter = filtersArray.find((filter) => filter.field === "Completed" && filter.value !== undefined)?.value;
+      const profileFilter = filtersArray.find((filter) => filter.field === "ProfileId" && filter.value)?.value;
+      const mediaItemFilter = filtersArray.find((filter) => filter.field === "NowPlayingItemId" && filter.value)?.value;
+      const history = await API.getPlaybackHistoryPage({ size, limit: size, page, cursor, userId: userFilter,
+        profileId: profileFilter, mediaItemId: mediaItemFilter,
+        completed: completedFilter === undefined ? undefined : [true, "true", 1, "1"].includes(completedFilter) });
+      return res.send({ current_page: history.currentPage, size: Number(size),
+        sort: "ActivityDateInserted", desc: true,
+        results: history.results.map(row => ({ ...row, FleetServerId: "primary" })), has_more: history.hasMore,
+        next_cursor: history.nextCursor, source: "Silo retention", retention_managed_by: "Silo" });
+    } catch (error) {
+      return res.status(error.status || 503).json({ error: error.message || "Unable to load Silo playback history" });
     }
   }
 
@@ -5641,7 +5788,7 @@ router.get("/getHistory", async (req, res) => {
 
 router.post("/getLibraryHistory", async (req, res) => {
   try {
-    const { size = 50, page = 1, search, sort = "ActivityDateInserted", desc = true, filters } = req.query;
+    const { size = 50, page = 1, cursor, search, sort = "ActivityDateInserted", desc = true, filters } = req.query;
 
     let filtersArray = [];
     if (filters) {
@@ -5696,6 +5843,13 @@ router.post("/getLibraryHistory", async (req, res) => {
       res.status(400);
       res.send("No Library ID provided");
       return;
+    }
+
+    if (API.isSilo) {
+      const history = await API.getLibraryPlaybackHistoryPage({ libraryId: libraryid, limit: size, cursor });
+      return res.send({ current_page: Number(page) || 1, size: Number(size), sort: "ActivityDateInserted", desc: true,
+        results: history.results.map(row => ({ ...row, FleetServerId: "primary" })), has_more: history.hasMore,
+        next_cursor: history.nextCursor, source: "Silo retention", coverage: history.coverage });
     }
 
     const sortField = groupedSortMap.find((item) => item.field === sort)?.column || "a.ActivityDateInserted";
@@ -5810,13 +5964,20 @@ router.post("/getLibraryHistory", async (req, res) => {
 
 router.post("/getItemHistory", async (req, res) => {
   try {
-    const { size = 50, page = 1, search, sort = "ActivityDateInserted", desc = true, filters } = req.query;
+    const { size = 50, page = 1, cursor, search, sort = "ActivityDateInserted", desc = true, filters } = req.query;
     const { itemid } = req.body;
 
     if (itemid === undefined) {
       res.status(400);
       res.send("No Item ID provided");
       return;
+    }
+
+    if (API.isSilo) {
+      const history = await API.getPlaybackHistoryPage({ limit: size, page, cursor, mediaItemId: itemid });
+      return res.send({ current_page: Number(page) || 1, size: Number(size), sort: "ActivityDateInserted", desc: true,
+        results: history.results.map(row => ({ ...row, FleetServerId: "primary" })), has_more: history.hasMore,
+        next_cursor: history.nextCursor, source: "Silo retention" });
     }
 
     let filtersArray = [];
@@ -5941,7 +6102,7 @@ router.post("/getItemHistory", async (req, res) => {
 
 router.post("/getUserHistory", async (req, res) => {
   try {
-    const { size = 50, page = 1, search, sort = "ActivityDateInserted", desc = true, filters } = req.query;
+    const { size = 50, page = 1, cursor, search, sort = "ActivityDateInserted", desc = true, filters } = req.query;
 
     let filtersArray = [];
     if (filters) {
@@ -5997,6 +6158,13 @@ router.post("/getUserHistory", async (req, res) => {
       res.status(400);
       res.send("No User ID provided");
       return;
+    }
+
+    if (API.isSilo) {
+      const history = await API.getPlaybackHistoryPage({ limit: size, page, cursor, userId: userid });
+      return res.send({ current_page: Number(page) || 1, size: Number(size), sort: "ActivityDateInserted", desc: true,
+        results: history.results.map(row => ({ ...row, FleetServerId: "primary" })), has_more: history.hasMore,
+        next_cursor: history.nextCursor, source: "Silo retention" });
     }
 
     const sortField = unGroupedSortMap.find((item) => item.field === sort)?.column || "a.ActivityDateInserted";
@@ -6342,7 +6510,7 @@ router.post("/wizarr/invitations", async (req, res) => {
       serverIds,
       libraryIds,
       emailRecipient: sendInviteEmail ? emailRecipient : "",
-      message: `Invite ${normalizedInvite.code || normalizedInvite.id || "link"} created from JellyGlance.`,
+      message: `Invite ${normalizedInvite.code || normalizedInvite.id || "link"} created from Barracks.`,
     });
 
     await addAuditEntry(req, "wizarr.invitation.created", { source: integration.name, serverIds, libraryIds });
@@ -6373,7 +6541,7 @@ router.delete("/wizarr/invitations/:id", async (req, res) => {
       integrationEvent: "invite deleted",
       source: integration.name || "Wizarr",
       id: req.params.id,
-      message: `Invite ${req.params.id} deleted from JellyGlance.`,
+      message: `Invite ${req.params.id} deleted from Barracks.`,
     });
     await addAuditEntry(req, "wizarr.invitation.deleted", { source: integration.name, id: req.params.id });
     res.send(response.data || { message: "Invitation deleted" });

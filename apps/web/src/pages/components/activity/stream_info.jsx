@@ -102,10 +102,42 @@ function DetailSection({ title, mode, rows }) {
   );
 }
 
+function formatDate(value) {
+  if (!value) return UNKNOWN_VALUE;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? UNKNOWN_VALUE : date.toLocaleString();
+}
+
+function formatDuration(seconds) {
+  const value = Math.max(0, Math.round(Number(seconds) || 0));
+  const hours = Math.floor(value / 3600);
+  const minutes = Math.floor((value % 3600) / 60);
+  const remainder = value % 60;
+  return [hours ? `${hours}h` : "", minutes ? `${minutes}m` : "", `${remainder}s`].filter(Boolean).join(" ");
+}
+
+function HistoryDetails({ data }) {
+  return <div className="stream-info-history">
+    <div className="stream-info-summary">
+      <div><span>Playback</span><strong>{modeDescriptor(data.PlayMethod || data.SiloPlayMethod).label}</strong></div>
+      <div><span>Watched</span><strong>{formatDuration(data.PlaybackDuration)}</strong></div>
+      <div><span>Status</span><strong>{data.Completed ? "Completed" : "Stopped early"}</strong></div>
+    </div>
+    <DetailSection title="Finalized attempt" rows={<>
+      <DetailRow label="Account" stream={formatValue(data.UserName)} source={formatValue(data.UserId)} />
+      <DetailRow label="Profile" stream={formatValue(data.ProfileName)} source={formatValue(data.ProfileId)} />
+      <DetailRow label="Media type" stream={formatValue(data.SiloMediaType)} source={formatValue(data.NowPlayingItemId)} />
+      <DetailRow label="Started" stream={formatDate(data.DateCreated)} source={formatValue(data.SiloSessionId)} />
+      <DetailRow label="Ended" stream={formatDate(data.EndedAt)} source={data.RunTime == null ? UNKNOWN_VALUE : formatDuration(data.RunTime)} />
+    </>} />
+    <p className="stream-info-history-note">This is Silo’s finalized playback record. Live client, route and codec diagnostics are shown in Live sessions and are not substituted into historical attempts.</p>
+  </div>;
+}
+
 function StreamDetails({ data }) {
-  if (!data || !data.MediaStreams) {
-    return null;
-  }
+  if (!data) return null;
+  if (!data.MediaStreams && data.HistorySource) return <HistoryDetails data={data} />;
+  if (!data.MediaStreams) return null;
 
   const videoStream = data.MediaStreams.find((stream) => stream.Type === "Video");
   const audioStream = data.MediaStreams.find((stream) => stream.Type === "Audio");

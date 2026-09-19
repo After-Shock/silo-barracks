@@ -1,5 +1,5 @@
-export const HOME_SETTINGS_STORAGE_PREFIX = "jellyglance_home_settings";
-export const LEGACY_HOME_ORDER_STORAGE_KEY = "jellyglance_home_section_order";
+export const HOME_SETTINGS_STORAGE_PREFIX = "silo_barracks_home_settings";
+export const LEGACY_HOME_ORDER_STORAGE_KEY = "silo_barracks_home_section_order";
 export const HOME_LAYOUT_VERSION = 3;
 
 const DEFAULT_HIDDEN_SECTION_IDS = ["seasonGaps", "tdarr", "wizarr", "bazarr", "prowlarr"];
@@ -258,6 +258,6 @@ export function loadHomeSettings(scope = "user") {
 export function saveHomeSettings(settings, scope = "user") {
   const normalized = normalizeHomeSettings(settings);
   localStorage.setItem(getHomeSettingsStorageKey(scope), JSON.stringify(normalized));
-  window.dispatchEvent(new CustomEvent("jellyglance-home-settings-updated", { detail: { scope, settings: normalized } }));
+  window.dispatchEvent(new CustomEvent("silo-barracks-home-settings-updated", { detail: { scope, settings: normalized } }));
   return normalized;
 }

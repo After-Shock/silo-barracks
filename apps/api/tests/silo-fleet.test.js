@@ -55,6 +55,56 @@ test('combines healthy servers and scopes colliding session IDs', async () => {
   assert.ok(!JSON.stringify(snapshot).includes('secret'));
 });
 
+test('controls only a current session on the explicitly selected server', async () => {
+  const commands = [];
+  const fleet = createFleet({
+    listServers: async () => [server('one'), server('two')],
+    createClient: current => ({
+      getSessions: async () => [session(`${current.id}-session`)],
+      getSessionCommandCapabilities: async () => ({ available: true, allowed: true, actions: ['pause'] }),
+      controlSession: async (id, action, payload) => { commands.push({ server: current.id, id, action, payload }); return { status: 202 }; },
+    }),
+  });
+  await fleet.refresh();
+  assert.deepEqual((await fleet.sessionCommandCapabilities('one')).actions, ['pause']);
+  assert.equal((await fleet.controlSession('two', 'two-session', 'pause', { reason: 'test' })).status, 202);
+  assert.deepEqual(commands, [{ server: 'two', id: 'two-session', action: 'pause', payload: { reason: 'test' } }]);
+  await assert.rejects(fleet.controlSession('one', 'two-session', 'pause', {}), error => error.status === 409);
+});
+
+test('reads retention-managed history from one explicitly selected server', async () => {
+  const fleet = createFleet({
+    listServers: async () => [server('one'), server('two')],
+    createClient: current => ({
+      getSessions: async () => [],
+      getPlaybackHistoryPage: async options => ({ results: [{ Id: `${current.id}-history` }], currentPage: options.page, hasMore: true, nextCursor: 'next' }),
+      getPlaybackHistoryUsers: async () => [{ Id: `${current.id}-user` }],
+      getPlaybackHistoryProfiles: async userId => [{ id: `${current.id}-${userId}-profile` }],
+      getItemsByID: async ({ ids }) => [{ Id: ids[0], Name: `${current.id} item` }],
+      getUserById: async userId => ({ Id: userId, Name: `${current.id} user` }),
+      getLibraries: async () => [{ Id: 'library', Name: `${current.id} library` }],
+      getLibraryCatalogSummary: async () => ({ total: 3, totalExact: true }),
+      getLibraryStorageMetadata: async () => [{ Id: 'library', Size: 100, files: 2 }],
+      getLibraryItemsPage: async () => [{ Id: 'item-1' }, { Id: 'item-2' }],
+      getLibraryPlaybackHistoryPage: async () => ({ results: [{ Id: 'library-history' }], hasMore: false }),
+    }),
+  });
+  await fleet.refresh();
+  const history = await fleet.playbackHistoryPage('two', { page: 1, limit: 10 });
+  assert.equal(history.serverId, 'two');
+  assert.equal(history.results[0].Id, 'two-history');
+  assert.equal(history.results[0].FleetServerId, 'two');
+  assert.equal((await fleet.playbackHistoryUsers('two')).users[0].Id, 'two-user');
+  assert.equal((await fleet.playbackHistoryProfiles('two', 'user')).profiles[0].id, 'two-user-profile');
+  assert.equal((await fleet.catalogItem('two', 'item')).item.FleetServerId, 'two');
+  assert.equal((await fleet.historyUser('two', 'user')).user.Name, 'two user');
+  assert.equal((await fleet.libraryList('two')).libraries[0].FleetServerId, 'two');
+  assert.equal((await fleet.libraryDetail('two', 'library')).library.Library_Count, 3);
+  assert.equal((await fleet.libraryItems('two', 'library', { limit: 1 })).results[0].FleetServerId, 'two');
+  assert.equal((await fleet.libraryHistoryPage('two', 'library')).results[0].FleetServerId, 'two');
+  await assert.rejects(fleet.playbackHistoryPage('missing', {}), error => error.status === 503);
+});
+
 test('publishes a fast server while another server is still pending', async () => {
   const slow = deferred();
   const events = [];

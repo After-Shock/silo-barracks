@@ -22,7 +22,9 @@ import baseUrl from "./lib/baseurl.jsx";
 import { FIRST_RUN_EXTRAS_KEY } from "./lib/first-run";
 import { languages } from "./lib/languages.jsx";
 import { DEFAULT_THEME, applyTheme } from "./lib/theme";
+import { migrateLegacyBrowserState } from "./lib/legacy-branding-migration";
 
+migrateLegacyBrowserState();
 const setupFlowNeedsDefaultTheme = !localStorage.getItem("token") || localStorage.getItem(FIRST_RUN_EXTRAS_KEY) === "true";
 applyTheme(setupFlowNeedsDefaultTheme ? DEFAULT_THEME : undefined);
 

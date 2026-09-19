@@ -6,8 +6,9 @@ import { Trans } from "react-i18next";
 import { FormControl, FormSelect } from "react-bootstrap";
 import i18next from "i18next";
 import Config from "../../../lib/config.jsx";
+import SiloLibraryActivity from "./silo-library-activity";
 
-function LibraryActivity(props) {
+function LegacyLibraryActivity({ initialConfig, ...props }) {
   const [data, setData] = useState();
   const token = localStorage.getItem("token");
   const [itemCount, setItemCount] = useState(parseInt(localStorage.getItem("PREF_LIBRARY_ACTIVITY_ItemCount") ?? "10"));
@@ -16,7 +17,7 @@ function LibraryActivity(props) {
   const [streamTypeFilter, setStreamTypeFilter] = useState(
     localStorage.getItem("PREF_LIBRARY_ACTIVITY_StreamTypeFilter") ?? "All"
   );
-  const [config, setConfig] = useState();
+  const [config, setConfig] = useState(initialConfig);
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState({ column: "ActivityDateInserted", desc: true });
   const [filterParams, setFilterParams] = useState([]);
@@ -220,4 +221,18 @@ function LibraryActivity(props) {
   );
 }
 
-export default LibraryActivity;
+export default function LibraryActivity(props) {
+  const [config, setConfig] = useState(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    let active = true;
+    Config.getConfig().then((next) => { if (active) setConfig(next); })
+      .catch((requestError) => { if (active) setError(requestError.message || "Activity configuration unavailable."); });
+    return () => { active = false; };
+  }, []);
+  if (error) return <p className="activity-notice is-error" role="alert">{error}</p>;
+  if (!config) return null;
+  return config.IS_SILO
+    ? <SiloLibraryActivity libraryId={props.LibraryId} config={config} />
+    : <LegacyLibraryActivity {...props} initialConfig={config} />;
+}

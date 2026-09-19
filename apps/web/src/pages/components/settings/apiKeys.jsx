@@ -115,7 +115,7 @@ export default function ApiKeys() {
         <div>
           <p className="api-keys-eyebrow">Access tokens</p>
           <h1>API Keys</h1>
-          <p>Create scoped JellyGlance tokens for automation, dashboards, and integrations.</p>
+          <p>Create scoped Barracks tokens for automation, dashboards, and integrations.</p>
         </div>
         <div className="api-keys-count">
           <Key2LineIcon size={22} />
@@ -166,7 +166,7 @@ export default function ApiKeys() {
         <div className="api-keys-empty">
           <Key2LineIcon size={32} />
           <strong>No API keys yet</strong>
-          <p>Create a key when another tool needs to call JellyGlance.</p>
+          <p>Create a key when another tool needs to call Barracks.</p>
         </div>
       )}
     </div>

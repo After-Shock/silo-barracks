@@ -253,3 +253,10 @@
     flex-direction: column;
   }
 }
+
+/* Match Jellyglance-style active-session card sizing in the Silo fleet view. */
+.fleet-streams {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr));
+  gap: 18px;
+  align-items: start;
+}

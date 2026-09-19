@@ -397,6 +397,7 @@
   text-align: right;
 }
 
+.stats-overview-note,
 .stats-overview-error,
 .stats-overview-empty {
   padding: 14px;
@@ -405,6 +406,11 @@
   color: var(--barracks-text-muted-raised);
   font-size: 13px;
   font-weight: 650;
+}
+
+.stats-overview-note {
+  border-style: solid;
+  background: var(--barracks-surface-raised);
 }
 
 .stats-section-heading {

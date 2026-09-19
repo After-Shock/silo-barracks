@@ -149,7 +149,8 @@ function LegacySessions({ surface = "home" }) {
             .sort((a, b) => a.Id.padStart(12, "0").localeCompare(b.Id.padStart(12, "0")))
             .map((session) => (
               <ErrorBoundary key={session.Id}>
-                <SessionCard data={{ session: session, base_url: config?.base_url }} hideIpAddress={hideIpAddress} />
+                <SessionCard data={{ session: session, base_url: config?.base_url }} hideIpAddress={hideIpAddress}
+                  canControl={['Owner', 'Admin'].includes(config?.settings?.auth?.role) && Boolean(config?.settings?.auth?.permissions?.settings)} />
               </ErrorBoundary>
             ))}
       </div>
@@ -158,13 +159,14 @@ function LegacySessions({ surface = "home" }) {
 }
 
 export default function Sessions(props) {
-  const [isSilo, setIsSilo] = useState(null);
+  const [config, setConfig] = useState(null);
   const [configError, setConfigError] = useState(false);
-  useEffect(() => { Config.getConfig().then(config => {
-    if (typeof config?.IS_SILO !== 'boolean') throw new Error('Configuration unavailable');
-    setIsSilo(config.IS_SILO);
+  useEffect(() => { Config.getConfig().then(nextConfig => {
+    if (typeof nextConfig?.IS_SILO !== 'boolean') throw new Error('Configuration unavailable');
+    setConfig(nextConfig);
   }).catch(() => setConfigError(true)); }, []);
   if (configError) return <p role="status">Activity configuration unavailable. Please reload to retry.</p>;
-  if (isSilo === null) return <p role="status">Loading activity…</p>;
-  return isSilo ? <FleetOverview {...props} /> : <LegacySessions {...props} />;
+  if (!config) return <p role="status">Loading activity…</p>;
+  const canControl = ['Owner', 'Admin'].includes(config.settings?.auth?.role) && Boolean(config.settings?.auth?.permissions?.settings);
+  return config.IS_SILO ? <FleetOverview {...props} canControl={canControl} /> : <LegacySessions {...props} />;
 }

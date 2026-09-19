@@ -117,6 +117,7 @@
 }
 
 .activity-control-field select,
+.activity-control-field input,
 .activity-search-input {
   border: 0 !important;
   color: var(--barracks-text-interactive) !important;
@@ -124,7 +125,8 @@
   box-shadow: none !important;
 }
 
-.activity-control-field select {
+.activity-control-field select,
+.activity-control-field input {
   border-radius: 0 !important;
   min-width: 118px;
   padding-right: 36px;
@@ -139,6 +141,54 @@
 
 .activity-search-input::placeholder {
   color: var(--barracks-text-interactive) !important;
+}
+
+.activity-view-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--barracks-border-strong);
+  border-radius: 8px;
+  background: var(--barracks-surface-inset);
+}
+
+.activity-view-tabs button,
+.activity-cursor-pagination button {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 9px 14px;
+  background: transparent;
+  color: var(--barracks-text-inset);
+  font-weight: 680;
+}
+
+.activity-view-tabs button[aria-selected="true"] {
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
+}
+
+.activity-silo-filters {
+  justify-content: flex-start;
+  max-width: none;
+}
+
+.activity-cursor-pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding-top: 12px;
+}
+
+.activity-cursor-pagination button {
+  border-color: var(--barracks-border-strong);
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+}
+
+.activity-cursor-pagination button:disabled {
+  opacity: 0.45;
 }
 
 .activity-table-shell {
@@ -225,6 +275,7 @@
 
 @media (max-width: 640px) {
   .activity-controls,
+  .activity-view-tabs,
   .activity-control-field,
   .activity-search-input,
   .activity-control-button {

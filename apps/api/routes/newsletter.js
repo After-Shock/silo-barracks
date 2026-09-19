@@ -27,7 +27,7 @@ async function saveSettings(settings) {
 function defaultNewsletterSettings() {
   return {
     enabled: false,
-    senderName: "JellyGlance",
+    senderName: "Barracks",
     senderEmail: "",
     recipients: [],
     frequency: "manual",
@@ -105,7 +105,7 @@ function mergeNewsletterSettings(existingSettings, incoming) {
   return {
     ...current,
     enabled: Boolean(incoming.enabled),
-    senderName: String(incoming.senderName || "JellyGlance").trim(),
+    senderName: String(incoming.senderName || "Barracks").trim(),
     senderEmail: String(incoming.senderEmail || "").trim(),
     recipients: normalizeRecipients(incoming.recipients),
     frequency: ["manual", "weekly", "monthly"].includes(incoming.frequency) ? incoming.frequency : "manual",
@@ -232,7 +232,7 @@ async function buildNewsletterData() {
   const repair = repairHub.rows[0] || {};
   return {
     generatedAt: new Date().toISOString(),
-    subject: `JellyGlance weekly digest - ${formatDate(new Date())}`,
+    subject: `Barracks weekly digest - ${formatDate(new Date())}`,
     recentlyAdded: recentlyAdded.rows,
     topWatched: topWatched.rows,
     activeUsers: activeUsers.rows,
@@ -287,7 +287,7 @@ function buildNewsletterHtml(data, options = {}) {
         <title>${escapeHtml(data.subject)}</title>
       </head>
       <body style="margin:0;background:#090d13;color:#edf2f7;font-family:Arial,Helvetica,sans-serif;">
-        <div style="display:none;max-height:0;overflow:hidden;color:transparent;">Recently added media, top watches, active viewers, and repair status from JellyGlance.</div>
+        <div style="display:none;max-height:0;overflow:hidden;color:transparent;">Recently added media, top watches, active viewers, and repair status from Barracks.</div>
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#090d13;">
           <tr>
             <td align="center" style="padding:28px 12px;">
@@ -298,12 +298,12 @@ function buildNewsletterHtml(data, options = {}) {
                       <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                         <tr>
                           <td>
-                            <div style="color:#9ee8ff;font-size:12px;font-weight:900;text-transform:uppercase;">JellyGlance Digest</div>
+                            <div style="color:#9ee8ff;font-size:12px;font-weight:900;text-transform:uppercase;">Barracks Digest</div>
                             <h1 style="margin:8px 0 8px;color:#ffffff;font-size:34px;line-height:1.05;">Weekly media pulse</h1>
                             <p style="margin:0;color:#c7d4e6;font-size:14px;line-height:1.5;">Fresh additions, what everyone watched, who was active, and what needs a little admin attention.</p>
                           </td>
                           <td align="right" width="92" style="padding-left:18px;">
-                            ${logoSrc ? `<img src="${logoSrc}" width="76" height="76" alt="JellyGlance" style="display:block;border-radius:18px;">` : ""}
+                            ${logoSrc ? `<img src="${logoSrc}" width="76" height="76" alt="Barracks" style="display:block;border-radius:18px;">` : ""}
                           </td>
                         </tr>
                       </table>
@@ -396,7 +396,7 @@ function buildNewsletterHtml(data, options = {}) {
                   </td>
                 </tr>
                 <tr>
-                  <td align="center" style="padding:16px;color:#72839a;font-size:12px;">Sent by JellyGlance</td>
+                  <td align="center" style="padding:16px;color:#72839a;font-size:12px;">Sent by Barracks</td>
                 </tr>
               </table>
             </td>
@@ -409,7 +409,7 @@ function buildNewsletterHtml(data, options = {}) {
 
 function buildNewsletterText(data) {
   const lines = [
-    "JellyGlance Newsletter",
+    "Barracks Newsletter",
     `Generated ${formatDate(data.generatedAt)}`,
     "",
     "Recently Added",
@@ -473,7 +473,7 @@ async function sendNewsletter(req, recipients, mode) {
   const data = await buildNewsletterData();
   const transporter = createTransport(newsletter);
   const result = await transporter.sendMail({
-    from: `"${newsletter.senderName || "JellyGlance"}" <${newsletter.senderEmail}>`,
+    from: `"${newsletter.senderName || "Barracks"}" <${newsletter.senderEmail}>`,
     to: targets,
     subject: data.subject,
     text: buildNewsletterText(data),

@@ -173,11 +173,11 @@ h2 {
   color: var(--barracks-action-foreground) !important;
 }
 
-.jellyglance-toast-container {
+.barracks-toast-container {
   width: min(420px, calc(100vw - 28px));
 }
 
-.jellyglance-toast {
+.barracks-toast {
   min-height: 74px;
   overflow: hidden;
   border: 1px solid var(--barracks-border-overlay);
@@ -188,12 +188,12 @@ h2 {
   backdrop-filter: blur(14px);
 }
 
-.jellyglance-toast::before {
+.barracks-toast::before {
   display: none;
   content: none;
 }
 
-.jellyglance-toast .Toastify__toast-icon {
+.barracks-toast .Toastify__toast-icon {
   position: relative;
   z-index: 1;
   width: 38px;
@@ -202,19 +202,19 @@ h2 {
   color: var(--barracks-text-overlay);
 }
 
-.jellyglance-toast.Toastify__toast--info .Toastify__toast-icon {
+.barracks-toast.Toastify__toast--info .Toastify__toast-icon {
   color: var(--barracks-text-overlay);
 }
 
-.jellyglance-toast.Toastify__toast--success .Toastify__toast-icon {
+.barracks-toast.Toastify__toast--success .Toastify__toast-icon {
   color: var(--barracks-state-success);
 }
 
-.jellyglance-toast.Toastify__toast--error .Toastify__toast-icon {
+.barracks-toast.Toastify__toast--error .Toastify__toast-icon {
   color: var(--barracks-state-danger);
 }
 
-.jellyglance-toast-body {
+.barracks-toast-body {
   align-items: center;
   padding: 8px 8px 8px 2px;
   color: var(--barracks-text-overlay);
@@ -223,32 +223,32 @@ h2 {
   line-height: 1.35;
 }
 
-.jellyglance-toast .Toastify__close-button {
+.barracks-toast .Toastify__close-button {
   align-self: flex-start;
   margin-top: 7px;
   color: var(--barracks-text-overlay);
   opacity: 0.72;
 }
 
-.jellyglance-toast .Toastify__close-button:hover {
+.barracks-toast .Toastify__close-button:hover {
   color: var(--barracks-text-overlay);
   opacity: 1;
 }
 
-.jellyglance-toast-progress {
+.barracks-toast-progress {
   height: 3px !important;
   background: var(--barracks-action) !important;
 }
 
-.Toastify__toast--info .jellyglance-toast-progress {
+.Toastify__toast--info .barracks-toast-progress {
   background: var(--barracks-accent-secondary) !important;
 }
 
-.Toastify__toast--success .jellyglance-toast-progress {
+.Toastify__toast--success .barracks-toast-progress {
   background: var(--barracks-state-success) !important;
 }
 
-.Toastify__toast--error .jellyglance-toast-progress {
+.Toastify__toast--error .barracks-toast-progress {
   background: var(--barracks-state-danger) !important;
 }
 

@@ -1,5 +1,5 @@
 {
-  "JELLYSTAT": "JellyGlance",
+  "JELLYSTAT": "Barracks",
   "MENU_TABS": {
     "HOME": "主页",
     "LIBRARIES": "媒体库",
@@ -260,14 +260,14 @@
     "PartialJellyfinSync": "最近添加项目同步",
     "JellyfinSync": "与 Jellyfin 完全同步",
     "Jellyfin_Playback_Reporting_Plugin_Sync": "导入 Playback Reporting 插件数据",
-    "Backup": "备份 JellyGlance"
+    "Backup": "备份 Barracks"
   },
   "ABOUT_PAGE": {
-    "ABOUT_JELLYSTAT": "关于 JellyGlance",
+    "ABOUT_JELLYSTAT": "关于 Barracks",
     "VERSION": "版本",
     "UPDATE_AVAILABLE": "可用更新",
     "GITHUB": "Github",
-    "Backup": "备份 JellyGlance"
+    "Backup": "备份 Barracks"
   },
   "TIMELINE_PAGE": {
     "TIMELINE": "时间线",

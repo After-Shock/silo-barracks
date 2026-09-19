@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "../../lib/axios_instance";
 import baseUrl from "../../lib/baseurl";
 
-const CACHE_KEY = "jellyglance:auth-artwork-background-v2";
+const CACHE_KEY = "silo-barracks:auth-artwork-background-v2";
 const CACHE_TTL = 5 * 60 * 1000;
 const REFRESH_INTERVAL = 5 * 60 * 1000;
 

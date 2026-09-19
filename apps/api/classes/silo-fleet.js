@@ -357,6 +357,119 @@ function createFleet({
     return snapshot();
   }
 
+  async function sessionCommandCapabilities(id) {
+    const record = records.get(String(id));
+    if (!record || !enabled(record.server) || record.state !== 'connected' || !record.client) {
+      const error = new Error('Silo server is unavailable'); error.status = 503; throw error;
+    }
+    if (typeof record.client.getSessionCommandCapabilities !== 'function') {
+      return { available: false, allowed: false, actions: [], state: 'unsupported' };
+    }
+    return record.client.getSessionCommandCapabilities();
+  }
+
+  async function controlSession(serverId, sessionId, action, payload) {
+    const record = records.get(String(serverId));
+    if (!record || !enabled(record.server) || record.state !== 'connected' || !record.client) {
+      const error = new Error('Silo server is unavailable'); error.status = 503; throw error;
+    }
+    const nativeId = String(sessionId || '');
+    if (!record.rawSessions.some(session => String(session?.Id || '') === nativeId)) {
+      const error = new Error('Playback session is no longer active'); error.status = 409; throw error;
+    }
+    if (typeof record.client.controlSession !== 'function') {
+      const error = new Error('Playback controls are unsupported'); error.status = 501; throw error;
+    }
+    const result = await record.client.controlSession(nativeId, action, payload);
+    void requestPoll(record).catch(() => {});
+    return result;
+  }
+
+  function connectedClient(serverId) {
+    const record = records.get(String(serverId));
+    if (!record || !enabled(record.server) || record.state !== 'connected' || !record.client) {
+      const error = new Error('Silo server is unavailable'); error.status = 503; throw error;
+    }
+    return record;
+  }
+
+  async function playbackHistoryPage(serverId, options) {
+    const record = connectedClient(serverId);
+    if (typeof record.client.getPlaybackHistoryPage !== 'function') {
+      const error = new Error('Silo playback history is unsupported'); error.status = 501; throw error;
+    }
+    const history = await record.client.getPlaybackHistoryPage(options);
+    return { ...history, results: history.results.map(row => ({ ...row, FleetServerId: record.id })),
+      serverId: record.id, serverName: String(record.server.name || record.id) };
+  }
+
+  async function playbackHistoryUsers(serverId) {
+    const record = connectedClient(serverId);
+    const users = await record.client.getPlaybackHistoryUsers();
+    return { users, serverId: record.id, serverName: String(record.server.name || record.id) };
+  }
+
+  async function playbackHistoryProfiles(serverId, userId) {
+    const record = connectedClient(serverId);
+    const profiles = await record.client.getPlaybackHistoryProfiles(userId);
+    return { profiles, serverId: record.id, serverName: String(record.server.name || record.id) };
+  }
+
+  async function catalogItem(serverId, itemId) {
+    const record = connectedClient(serverId);
+    const items = await record.client.getItemsByID({ ids: [itemId] });
+    const item = items[0];
+    if (!item) { const error = new Error('Silo item was not found'); error.status = 404; throw error; }
+    return { item: { ...item, FleetServerId: record.id }, serverId: record.id,
+      serverName: String(record.server.name || record.id) };
+  }
+
+  async function historyUser(serverId, userId) {
+    const record = connectedClient(serverId);
+    const user = await record.client.getUserById(userId);
+    if (!user) { const error = new Error('Silo account was not found'); error.status = 404; throw error; }
+    return { user: { ...user, FleetServerId: record.id }, serverId: record.id,
+      serverName: String(record.server.name || record.id) };
+  }
+
+  async function libraryList(serverId) {
+    const record = connectedClient(serverId);
+    const libraries = await record.client.getLibraries();
+    return { libraries: libraries.map(row => ({ ...row, FleetServerId: record.id })), serverId: record.id,
+      serverName: String(record.server.name || record.id) };
+  }
+
+  async function libraryDetail(serverId, libraryId) {
+    const record = connectedClient(serverId);
+    const library = (await record.client.getLibraries()).find(row => String(row.Id) === String(libraryId));
+    if (!library) { const error = new Error('Silo library was not found'); error.status = 404; throw error; }
+    const [summary, metadata] = await Promise.all([
+      record.client.getLibraryCatalogSummary({ id: libraryId }).catch(() => null),
+      record.client.getLibraryStorageMetadata().then(rows => rows.find(row => String(row.Id) === String(libraryId))).catch(() => null),
+    ]);
+    return { library: { ...library, FleetServerId: record.id, Library_Count: summary?.total ?? null,
+      Library_Count_Exact: summary?.totalExact ?? false, Size: metadata?.Size ?? library.Size ?? null,
+      files: metadata?.files ?? library.files ?? null, measurement_pending: Boolean(metadata?.measurement_pending) },
+      serverId: record.id, serverName: String(record.server.name || record.id) };
+  }
+
+  async function libraryItems(serverId, libraryId, options = {}) {
+    const record = connectedClient(serverId);
+    const pageSize = Math.min(100, Math.max(1, Number(options.limit) || 25));
+    const page = Math.max(1, Number(options.page) || 1);
+    const rows = await record.client.getLibraryItemsPage({ id: libraryId, startIndex: (page - 1) * pageSize,
+      limit: pageSize + 1, search: options.search, sort: options.sort || 'title', desc: Boolean(options.desc) });
+    return { results: rows.slice(0, pageSize).map(row => ({ ...row, FleetServerId: record.id })), page,
+      hasMore: rows.length > pageSize, serverId: record.id, serverName: String(record.server.name || record.id) };
+  }
+
+  async function libraryHistoryPage(serverId, libraryId, options = {}) {
+    const record = connectedClient(serverId);
+    const history = await record.client.getLibraryPlaybackHistoryPage({ libraryId, limit: options.limit, cursor: options.cursor });
+    return { ...history, results: history.results.map(row => ({ ...row, FleetServerId: record.id })),
+      serverId: record.id, serverName: String(record.server.name || record.id) };
+  }
+
   function invalidate(id) {
     const record = records.get(String(id));
     if (!record) return;
@@ -369,7 +482,9 @@ function createFleet({
     record.state = enabled(record.server) ? 'connecting' : 'disabled';
   }
 
-  return { refresh, snapshot, invalidate };
+  return { refresh, snapshot, invalidate, sessionCommandCapabilities, controlSession, playbackHistoryPage,
+    playbackHistoryUsers, playbackHistoryProfiles, catalogItem, historyUser,
+    libraryList, libraryDetail, libraryItems, libraryHistoryPage };
 }
 
 module.exports = { createFleet };

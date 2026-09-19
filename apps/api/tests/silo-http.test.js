@@ -33,6 +33,21 @@ test('explicit API major selects v2 without duplicating prefixes', async () => {
   assert.equal(requested, 'https://silo.invalid/proxy/api/v2/admin/sessions');
 });
 
+test('JSON mutations use the requested method and body without exposing credentials', async () => {
+  let captured;
+  const result = await requestJSON({ base: 'https://silo.invalid', apiMajor: 2, path: 'admin/sessions/session/pause',
+    key: 'fixture-secret', method: 'POST', body: { command_id: '3fa85f64-5717-4562-b3fc-2c963f66afa6', sequence: 1 },
+    timeoutMs: 100, fetchImpl: async (_url, options) => {
+      captured = options;
+      return new Response('{"accepted":true}', { status: 202, headers: { 'content-type': 'application/json' } });
+    } });
+  assert.equal(result.status, 202);
+  assert.equal(captured.method, 'POST');
+  assert.equal(captured.headers['Content-Type'], 'application/json');
+  assert.deepEqual(JSON.parse(captured.body), { command_id: '3fa85f64-5717-4562-b3fc-2c963f66afa6', sequence: 1 });
+  assert.equal(captured.body.includes('fixture-secret'), false);
+});
+
 test('Problem Details map only known matching types and never retain private fields', async () => {
   for (const native of [true, false]) {
     const body = { type: 'https://siloserver.org/docs/api/v2/problems/invalid_cursor', status: 400,

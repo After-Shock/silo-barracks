@@ -500,8 +500,8 @@ export default function Requests() {
       });
       setData(response.data || { sources: [], requests: [], syncedAt: null });
       const badgeCount = Number(response.data?.stats?.badgeCount || 0);
-      localStorage.setItem("jellyglance_request_badge_count", String(badgeCount));
-      window.dispatchEvent(new CustomEvent("jellyglance-request-count", { detail: badgeCount }));
+      localStorage.setItem("silo_barracks_request_badge_count", String(badgeCount));
+      window.dispatchEvent(new CustomEvent("silo-barracks-request-count", { detail: badgeCount }));
     } catch (error) {
       console.log("Unable to load requests", error);
       setLoadError(t("OPERATIONAL_STATES.REQUESTS_ERROR"));
