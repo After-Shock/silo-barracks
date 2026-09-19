@@ -43,12 +43,21 @@ session credentials.
 
 On September 12, 2026 the `ghcr.io/silo-server/silo-server:apiv2` deployment was
 healthy and exposed v2 discovery and the contract above. Local contract validation,
-adapter/fleet tests, branding audit, zero-warning frontend lint, and production build
-pass against this revision.
+adapter/fleet tests, branding and theme audits, zero-warning frontend lint, and the
+production build pass against this revision.
 
-Before broad rollout, exercise pause/resume/seek/end/disconnect/reconnect and every
-administrator command against expendable live playback sessions, including denied
-credentials, revoked keys, duplicate requests, rate limiting, and unsupported player
-capabilities. Also complete prolonged mixed-server observation and intentional
-partial-fleet outage testing. Capability visibility must not be treated as mutation
-authority; Silo's response to each command remains authoritative.
+On September 19, 2026 an attached production Silo session was discovered with live
+position/transcode diagnostics. Capability-checked pause and resume each returned
+202 and their state transitions were observed. Restarting Barracks preserved the
+player and rediscovered the same session after a clean reconnect. Normal player
+shutdown removed it from live state and finalized the same session in Silo history;
+live-only diagnostics were not copied into the retained attempt. Headless desktop
+and mobile Chrome checks covered Activity, history paging, account/profile and item
+navigation, keyboard focus, and horizontal overflow.
+
+Before broad rollout, test `stop`, `message`, and authority-revoking `terminate`
+against explicitly expendable sessions, plus denied credentials, revoked keys,
+duplicate requests, rate limiting, unsupported player capabilities, prolonged
+mixed-server observation, and intentional partial-fleet outages. Capability
+visibility must not be treated as mutation authority; Silo's response to each
+command remains authoritative.

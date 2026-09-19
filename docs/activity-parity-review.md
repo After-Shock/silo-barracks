@@ -235,16 +235,31 @@ sort, or grouping parameters. Barracks therefore does not present page-local
 search/sort as global, and does not add an expensive bounded read-through mode
 that could be mistaken for complete retention history.
 
-Remaining deployment acceptance (requires a reachable Silo and real players):
+## Live acceptance — 2026-09-19
 
-1. **Live-session acceptance:** exercise fleet state, REST recovery and
-   capability-checked controls with expendable playback sessions. Live diagnostics
-   must not be copied into a finalized historical record.
-2. **Browser acceptance:** test rapid server/filter switching, overlapping IDs,
-   cursor expiry, profile authority changes, mobile layout and keyboard operation.
+A real Chrome 153 playback session on the attached Silo deployment was exercised
+against the production Barracks container:
 
-Acceptance tests should cover server-switch races with overlapping IDs, failed
-refreshes, empty history, missing catalog permissions, cursor expiry/loops,
-page-size/filter resets, deep history, malformed preferences, and user/item
-navigation. Add browser interaction tests: successful compilation cannot catch
-these table-state and navigation problems.
+- Barracks discovered one playing session with account, profile, player, position,
+  bitrate, direct H.264 video, AAC audio conversion and DirectStream diagnostics.
+- Silo advertised sequenced `pause`, `resume`, `stop`, `message`, and `terminate`
+  commands. Barracks sent only pause/resume: both returned 202, each state change
+  was observed, position advanced after resume, and the session identity remained
+  stable.
+- Restarting only Barracks did not disturb playback. After startup it reconnected
+  without partial state and rediscovered the same playing session.
+- Normal player shutdown removed the live session and immediately produced a
+  finalized record with the same session, item, account and profile IDs plus media
+  file, method, start/end, duration, runtime and completion fields. Live-only
+  codec/bitrate diagnostics were not copied into the finalized record.
+- Headless Chrome verified desktop Activity, a 25-row history page, retention
+  labeling, Previous/Next controls, primary account/profile and item/back routes,
+  and no Jellyfin SQL totals on the Silo item page. At 390 × 844 there was no
+  horizontal document overflow and keyboard Tab reached a button.
+
+Destructive `stop`/`terminate` and player `message` were not invoked. Multi-server
+rapid switching, real cursor expiry, live profile-authority revocation and denied/
+rate-limited credentials still require dedicated expendable accounts or players.
+Overlapping IDs, cursor loops/expiry errors, failed refreshes, empty results,
+filter/page-size resets and malformed preferences remain covered by automated
+contract and state tests.

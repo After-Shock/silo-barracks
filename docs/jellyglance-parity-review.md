@@ -62,14 +62,17 @@ Silo's rich live Activity and its separate finalized Playback History.
 5. **Upstream additions — intentionally deferred:** Maintainerr is not rendered as
    a dead navigation item because this repository has no matching integration
    backend/settings contract.
-6. **Interaction/playback acceptance — deployment required:** browser and real-
-   player checks in `activity-parity-review.md` and `silo-v2-status.md` require a
-   reachable Silo deployment and expendable active players.
+6. **Interaction/playback acceptance — baseline complete:** the attached Silo was
+   verified with a real stream, pause/resume, Barracks reconnect, finalization, and
+   desktop/mobile headless Chrome. The remaining destructive, denied-authority and
+   multi-server outage cases are listed in `activity-parity-review.md` and
+   `silo-v2-status.md`.
 
 ## Validation
 
 Unit tests cover aggregate semantics, exclusions, duplicate sessions, malformed
 responses, cursor loops, bounded sampling and upstream failures. An HTTP fixture
 checks the adapter uses admin history without catalog/profile access. Full test suite, production frontend build, zero-warning frontend lint, branding
-audit, theme-color audit and contract validation pass locally. Live Silo playback
-and browser interaction verification remain deployment acceptance items.
+audit, theme-color audit and contract validation pass locally. Baseline live Silo
+playback and browser interaction verification passed on September 19, 2026; the
+remaining destructive and failure-mode cases are explicitly documented.
