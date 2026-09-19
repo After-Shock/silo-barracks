@@ -1,12 +1,10 @@
 const express = require('express');
 const { RegistryError } = require('../classes/silo-server-registry');
 const { addAuditEntry } = require('../classes/admin-history');
+const { historyFailure } = require('../classes/silo/history-errors');
 
 function createFleetRouter({ registry, fleet }) {
   const router = express.Router();
-  const historyFailure = error => error?.category === 'invalid_cursor'
-    ? { status: 400, message: 'Silo playback history cursor expired or is invalid; restart from the first page' }
-    : { status: error?.status || 503, message: error?.message || 'Unable to load Silo playback history.' };
   const recordAuditSafely = async (req, action, details) => {
     try { await addAuditEntry(req, action, details); }
     catch (error) { console.error(`[Silo Barracks] Audit logging failed for ${action}:`, error.message); }

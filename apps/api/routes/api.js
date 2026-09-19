@@ -21,6 +21,7 @@ const { axios } = require("../classes/axios");
 const triggertype = require("../logging/triggertype");
 const { addAuditEntry, getAuditLog, getWebhookDeliveryHistory } = require("../classes/admin-history");
 const { sendConfiguredMail, validateEmail } = require("../classes/smtp-mailer");
+const { historyFailure: siloHistoryFailure } = require("../classes/silo/history-errors");
 const { getBackupDir } = require("../utils/storage-paths");
 const {
   getIntegrations,
@@ -34,12 +35,6 @@ const {
 const dayjs = require("dayjs");
 
 const router = express.Router();
-
-function siloHistoryError(error) {
-  return error?.category === "invalid_cursor"
-    ? { status: 400, message: "Silo playback history cursor expired or is invalid; restart from the first page" }
-    : { status: error?.status || 503, message: error?.message || "Unable to load Silo playback history" };
-}
 
 async function recordAuditSafely(req, action, details) {
   try {
@@ -5669,7 +5664,7 @@ router.get("/getHistory", async (req, res) => {
         results: history.results.map(row => ({ ...row, FleetServerId: "primary" })), has_more: history.hasMore,
         next_cursor: history.nextCursor, source: "Silo retention", retention_managed_by: "Silo" });
     } catch (error) {
-      const failure = siloHistoryError(error);
+      const failure = siloHistoryFailure(error);
       return res.status(failure.status).json({ error: failure.message });
     }
   }
@@ -6102,7 +6097,7 @@ router.post("/getItemHistory", async (req, res) => {
     res.send(response);
   } catch (error) {
     if (API.isSilo) {
-      const failure = siloHistoryError(error);
+      const failure = siloHistoryFailure(error);
       return res.status(failure.status).json({ error: failure.message });
     }
     console.log(error);
@@ -6259,7 +6254,7 @@ router.post("/deletePlaybackActivity", async (req, res) => {
     res.send(`${ids.length} Records Deleted`);
   } catch (error) {
     if (API.isSilo) {
-      const failure = siloHistoryError(error);
+      const failure = siloHistoryFailure(error);
       return res.status(failure.status).json({ error: failure.message });
     }
     console.log(error);
