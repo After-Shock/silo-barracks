@@ -38,7 +38,7 @@ export default function SiloServers() {
   return <section className="server-settings">
     <header className="fleet-heading"><div><span className="fleet-eyebrow">Connections</span><h1>Silo Servers</h1></div><Link to="/">View all activity</Link></header>
     <p>Add Silo servers to monitor their live activity together. Use a Silo administrator API key for each server.</p>
-    <p className="fleet-footnote">The primary server continues to provide saved playback history and library statistics.</p>
+    <p className="fleet-footnote">The primary server continues to provide saved playback history and library statistics. Every physical Silo instance must report a unique Server ID under Silo Admin Settings → Compatibility Proxies; cloned instances must change that ID and restart before being added.</p>
     {error && <p role="alert" className="fleet-notice">{error}</p>}
     {notice && <p role="status">{notice}</p>}
     <form onSubmit={submit}>

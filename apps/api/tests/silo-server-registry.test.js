@@ -49,10 +49,19 @@ test('rejects primary duplicates, invalid input, and primary deletion', async ()
   await assert.rejects(registry.remove('primary'), /primary/i);
 });
 
-test('enforces unique upstream identity even when addresses differ', async () => {
+test('duplicate upstream identity explains how to repair a separately cloned Silo', async () => {
   const { registry } = fixture();
   await registry.add({ name: 'Extra', url: 'https://extra.test', apiKey: 'sa_test' });
-  await assert.rejects(registry.add({ name: 'Alias', url: 'https://alias.test', apiKey: 'sa_test' }), /already/);
+  await assert.rejects(registry.add({ name: 'Alias', url: 'https://alias.test', apiKey: 'sa_test' }),
+    error => error.status === 409 && /same server identity/i.test(error.message)
+      && /Compatibility Proxies/i.test(error.message) && /restart Silo/i.test(error.message));
+});
+
+test('primary identity collision gives the cloned-instance repair instead of calling it the primary URL', async () => {
+  const { registry } = fixture();
+  await assert.rejects(registry.add({ name: 'Primary clone', url: 'https://primary-clone.test', apiKey: 'sa_test' }),
+    error => error.status === 409 && /same server identity as the primary/i.test(error.message)
+      && /unique Server ID/i.test(error.message));
 });
 
 test('requires plain object input and a string server name', async () => {
