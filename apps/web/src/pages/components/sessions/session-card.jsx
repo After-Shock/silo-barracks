@@ -212,6 +212,9 @@ function SessionCard(props) {
   }
 
   function handleCardKeyDown(event) {
+    if (event.target.closest("a, button, input, textarea, select, [contenteditable='true'], [data-session-card-ignore]")) {
+      return;
+    }
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       setSessionModalVisible(true);
