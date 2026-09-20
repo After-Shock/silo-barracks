@@ -218,7 +218,7 @@ Empty intermediate slices say to continue rather than claiming no retained match
 
 User and item drill-downs now share the read-only cursor navigator, including
 cancellation, replayable Previous/Next state, page-size resets and Retry. Secondary
-server history rows link only to explicit `/fleet/:serverId/...` detail pages;
+server history rows link only to explicit `/silo-fleet/:serverId/...` detail pages;
 those pages fetch item/account identity and history through the selected fleet
 client, so overlapping IDs cannot resolve against the primary server. Primary
 Silo item pages no longer render Jellyfin SQL playback totals.
@@ -284,8 +284,21 @@ against the production Barracks container:
   `invalid_cursor` category into an actionable restart-from-first-page message on
   primary, item/account and fleet history routes.
 
-Rapid switching between two healthy physical servers with overlapping IDs,
-account/profile-authority revocation, an actual upstream 429, and primary-key
+Four healthy physical Silo connections were subsequently exercised together.
+Every server returned independently scoped history and account collections while
+account ID `1` overlapped on all four. Rapid primary/secondary/primary/secondary
+browser changes settled on the final server without stale rows; secondary account,
+item and library links retained the selected registry ID. Disabling and re-enabling
+one secondary left the primary stream/count intact and restored the secondary to
+connected state.
+
+This pass also found that frontend `/fleet/...` deep links collided with the
+authenticated backend `/fleet` API mount on a full refresh. Fleet pages now use
+`/silo-fleet/:serverId/...` while requests remain under `/fleet/...`. Direct reloads
+of a secondary account, item and 12-library page then succeeded without errors or
+lost authentication.
+
+Account/profile-authority revocation, an actual upstream 429, and primary-key
 revocation still require dedicated expendable infrastructure. Cursor loops/expiry,
 failed refreshes, empty results, filter/page-size resets and malformed preferences
 also remain covered by automated contract and state tests.

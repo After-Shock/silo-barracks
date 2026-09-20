@@ -133,7 +133,7 @@ export default function SiloActivity({ config }) {
         <label className="activity-control-field is-compact"><span>Items</span><select value={pageSize} onChange={(event) => resetQuery(filters, Number(event.target.value))}>{sizes.map((size) => <option key={size}>{size}</option>)}</select></label>
         <button type="button" className="activity-control-button" onClick={() => setRefreshKey((value) => value + 1)} disabled={loading}>Refresh</button>
       </div>
-      {selectedServer && serverId !== "primary" ? <p className="activity-notice">Viewing {selectedServer.name}. Item and account links remain explicitly scoped to this server. <Link to={`/fleet/${encodeURIComponent(serverId)}/libraries`}>Browse its libraries</Link>.</p> : null}
+      {selectedServer && serverId !== "primary" ? <p className="activity-notice">Viewing {selectedServer.name}. Item and account links remain explicitly scoped to this server. <Link to={`/silo-fleet/${encodeURIComponent(serverId)}/libraries`}>Browse its libraries</Link>.</p> : null}
       {error ? <p className="activity-notice is-error" role="alert">{error} <button type="button" onClick={() => setRefreshKey((value) => value + 1)}>Retry</button></p> : null}
       {!data && loading ? <div aria-busy="true"><Loading /></div> : <div className="Activity activity-table-shell">
         <ActivityTable data={rows} itemCount={pageSize} isBusy={loading} readOnly siloHistory serverId={serverId} cursorMode />

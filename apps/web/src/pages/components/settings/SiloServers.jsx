@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from '../../../lib/axios_instance';
 import useFleet from '../../../lib/use-fleet';
+import { toast } from 'react-toastify';
 import '../../css/fleet.css';
 
 const emptyForm = { name: '', url: '', apiKey: '' };
@@ -20,20 +21,30 @@ export default function SiloServers() {
     setServers(result.data);
   };
   useEffect(() => { load().catch(() => setError('Could not load server connections. Check your settings access and try again.')); }, []);
-  const run = async operation => {
+  const run = async (operation, successMessage) => {
     setBusy(true); setError(''); setNotice('');
-    try { await operation(); await load(); await refresh(); }
-    catch (error) { setError(error.response?.data?.error || 'The request failed. Check the connection and try again.'); }
-    finally { setBusy(false); }
+    try {
+      await operation();
+      await load();
+      await refresh();
+      if (successMessage) {
+        setNotice(successMessage);
+        toast.success(successMessage);
+      }
+    } catch (requestError) {
+      const message = requestError.response?.data?.error || 'The request failed. Check the connection and try again.';
+      setError(message);
+      toast.error(message);
+    } finally { setBusy(false); }
   };
   const submit = event => {
     event.preventDefault();
+    const successMessage = editing ? 'Silo server updated successfully.' : `${form.name.trim()} connected successfully. Activity will appear shortly.`;
     void run(async () => {
       if (editing) await axios.put(`/fleet/servers/${editing}`, form, { timeout: 30000 });
       else await axios.post('/fleet/servers', form, { timeout: 30000 });
-      setNotice(editing ? 'Server updated.' : 'Server connected. Activity will appear shortly.');
       setForm(emptyForm); setEditing(null);
-    });
+    }, successMessage);
   };
   return <section className="server-settings">
     <header className="fleet-heading"><div><span className="fleet-eyebrow">Connections</span><h1>Silo Servers</h1></div><Link to="/">View all activity</Link></header>
@@ -60,11 +71,12 @@ export default function SiloServers() {
           </div>
           {server.isPrimary ? <Link to="/settings/integrations/media-server">Primary connection settings</Link> : <div className="server-settings-actions">
             <button disabled={busy} onClick={() => { setEditing(server.id); setForm({ name: server.name, url: server.url, apiKey: '' }); setError(''); }}>Edit</button>
-            <button disabled={busy} onClick={() => run(() => axios.put(`/fleet/servers/${server.id}`, { enabled: !server.enabled }))}>{server.enabled ? 'Disable' : 'Enable'}</button>
+            <button disabled={busy} onClick={() => run(() => axios.put(`/fleet/servers/${server.id}`, { enabled: !server.enabled }),
+              `${server.name} monitoring ${server.enabled ? 'disabled' : 'enabled'} successfully.`)}>{server.enabled ? 'Disable' : 'Enable'}</button>
             {confirmRemove === server.id ? <><button disabled={busy} onClick={() => run(async () => {
               await axios.delete(`/fleet/servers/${server.id}`); setConfirmRemove(null);
               if (editing === server.id) { setEditing(null); setForm(emptyForm); }
-            })}>Confirm remove</button><button onClick={() => setConfirmRemove(null)}>Keep server</button></> : <button disabled={busy} onClick={() => setConfirmRemove(server.id)}>Remove</button>}
+            }, `${server.name} removed successfully.`)}>Confirm remove</button><button onClick={() => setConfirmRemove(null)}>Keep server</button></> : <button disabled={busy} onClick={() => setConfirmRemove(server.id)}>Remove</button>}
           </div>}
         </article>;
       })}

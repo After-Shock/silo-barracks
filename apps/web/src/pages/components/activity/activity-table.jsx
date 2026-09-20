@@ -264,7 +264,7 @@ export default function ActivityTable(props) {
         </span>;
         if (!itemId) return <span className="activity-table-link activity-title-link">{content}</span>;
         return secondaryServer
-          ? <Link to={`/fleet/${encodeURIComponent(props.serverId)}/items/${encodeURIComponent(itemId)}`} className="activity-table-link activity-title-link">{content}</Link>
+          ? <Link to={`/silo-fleet/${encodeURIComponent(props.serverId)}/items/${encodeURIComponent(itemId)}`} className="activity-table-link activity-title-link">{content}</Link>
           : <Link to={`/libraries/item/${row.EpisodeId || row.NowPlayingItemId}`} className="activity-table-link activity-title-link">{content}</Link>;
       },
     },
@@ -278,7 +278,7 @@ export default function ActivityTable(props) {
           <span>{row.UserName || "Unknown"}{row.ProfileName ? <small className="activity-profile-name">{row.ProfileName}</small> : null}</span></>;
         if (props.siloHistory && row.UserId) {
           const path = props.serverId !== "primary"
-            ? `/fleet/${encodeURIComponent(props.serverId)}/users/${encodeURIComponent(row.UserId)}`
+            ? `/silo-fleet/${encodeURIComponent(props.serverId)}/users/${encodeURIComponent(row.UserId)}`
             : `/silo/users/${encodeURIComponent(row.UserId)}`;
           return <Link to={path} className="activity-table-link activity-user-link">{content}</Link>;
         }

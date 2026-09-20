@@ -54,14 +54,14 @@ export default function FleetLibraries() {
   if (!libraryId) return <div className="fleet-libraries-page">
     <Link to="/activity">← Activity</Link><header><span>{payload.serverName}</span><h1>Libraries</h1></header>
     <div className="fleet-library-grid">{payload.libraries.map((library) => <Link key={library.Id}
-      to={`/fleet/${encodeURIComponent(serverId)}/libraries/${encodeURIComponent(library.Id)}`}>
+      to={`/silo-fleet/${encodeURIComponent(serverId)}/libraries/${encodeURIComponent(library.Id)}`}>
       <img src={library.SiloPosterUrl || siloIcon} alt="" onError={(event) => { event.currentTarget.src = siloIcon; }} />
       <strong>{library.Name}</strong><span>{library.CollectionType || "Library"}</span></Link>)}</div>
   </div>;
 
   const library = payload.library;
   return <div className="fleet-libraries-page">
-    <Link to={`/fleet/${encodeURIComponent(serverId)}/libraries`}>← {payload.serverName} libraries</Link>
+    <Link to={`/silo-fleet/${encodeURIComponent(serverId)}/libraries`}>← {payload.serverName} libraries</Link>
     <header><span>{payload.serverName} · {library.CollectionType || "Library"}</span><h1>{library.Name}</h1></header>
     <div className="fleet-library-metrics"><article><span>Catalog items</span><strong>{library.Library_Count == null ? "Pending" : Number(library.Library_Count).toLocaleString()}</strong></article>
       <article><span>Files</span><strong>{library.files == null ? "Pending" : Number(library.files).toLocaleString()}</strong></article>
@@ -69,7 +69,7 @@ export default function FleetLibraries() {
     <section className="fleet-library-items"><div className="fleet-library-items-head"><h2>Media</h2><form onSubmit={(event) => { event.preventDefault(); setPage(1); setQuery(search.trim()); }}>
       <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search this library" /><button type="submit">Search</button></form></div>
       {!items ? <Loading /> : <><div className="fleet-item-grid">{items.results.map((item) => <Link key={item.Id}
-        to={`/fleet/${encodeURIComponent(serverId)}/items/${encodeURIComponent(item.Id)}`}><img src={item.SiloPosterUrl || siloIcon} alt="" onError={(event) => { event.currentTarget.src = siloIcon; }} /><strong>{item.Name}</strong><span>{item.Type}</span></Link>)}</div>
+        to={`/silo-fleet/${encodeURIComponent(serverId)}/items/${encodeURIComponent(item.Id)}`}><img src={item.SiloPosterUrl || siloIcon} alt="" onError={(event) => { event.currentTarget.src = siloIcon; }} /><strong>{item.Name}</strong><span>{item.Type}</span></Link>)}</div>
         <nav className="activity-cursor-pagination"><button disabled={page === 1} onClick={() => setPage((value) => value - 1)}>Previous</button><span>Page {page}</span><button disabled={!items.hasMore} onClick={() => setPage((value) => value + 1)}>Next</button></nav></>}
     </section>
     <SiloScopedActivity endpoint={`/fleet/history/${encodeURIComponent(serverId)}/libraries/${encodeURIComponent(libraryId)}`}
