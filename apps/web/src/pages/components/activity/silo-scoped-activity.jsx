@@ -5,7 +5,7 @@ import Loading from "../general/loading";
 
 const PAGE_SIZES = [10, 25, 50, 100];
 
-export default function SiloScopedActivity({ endpoint, body = {}, query = {}, method = "post", scopeLabel, config, serverId = "primary" }) {
+export default function SiloScopedActivity({ endpoint, body = {}, query = {}, method = "post", scopeLabel, config, serverId = "primary", sparseContinuation = false }) {
   const token = config.token || localStorage.getItem("token");
   const [pageSize, setPageSize] = useState(() => Math.min(100, Math.max(10,
     Number(localStorage.getItem("PREF_ACTIVITY_ItemCount")) || 25)));
@@ -72,7 +72,9 @@ export default function SiloScopedActivity({ endpoint, body = {}, query = {}, me
         <span>Page {page}</span>
         <button type="button" disabled={!data?.has_more || !cursors[page + 1] || loading} onClick={() => setPage((value) => value + 1)}>Next</button>
       </nav>
-      {!loading && !data?.results?.length ? <p className="activity-state is-empty">No finalized attempts were found for this {scopeLabel.toLowerCase()}.</p> : null}
+      {!loading && !data?.results?.length ? <p className="activity-state is-empty">{sparseContinuation && data?.has_more
+        ? "No matching attempts were found in this retained slice. Continue to search older history."
+        : `No finalized attempts were found for this ${scopeLabel.toLowerCase()}.`}</p> : null}
     </>}
   </section>;
 }

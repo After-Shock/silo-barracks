@@ -508,11 +508,17 @@ class SiloAPI {
     }
     const results = [];
     let scannedPages = 0;
+    // Exact library ownership requires one admin-file lookup per distinct item.
+    // Bound each Barracks request to one 25-attempt upstream slice so a sparse
+    // library cannot consume the entire request deadline while trying to fill a
+    // display page. The continuation retains the upstream cursor and pending
+    // matches, allowing complete traversal across explicit Next requests.
+    const scanPageLimit = 1;
     while (results.length < pageSize) {
       while (state.pending.length && results.length < pageSize) results.push(state.pending.shift());
-      if (results.length >= pageSize || state.upstreamDone) break;
-      if (++scannedPages > this.maxPages) throw new SiloRequestError('Silo library history exceeds the safe page limit', 503);
-      const history = await this.getPlaybackHistoryPage({ limit: 100, cursor: state.upstreamCursor, _deadlineAt: deadlineAt });
+      if (results.length >= pageSize || state.upstreamDone || scannedPages >= scanPageLimit) break;
+      scannedPages += 1;
+      const history = await this.getPlaybackHistoryPage({ limit: 25, cursor: state.upstreamCursor, _deadlineAt: deadlineAt });
       const membership = new Map();
       const itemIds = [...new Set(history.results.map(row => String(row.NowPlayingItemId || '')).filter(Boolean))];
       await forEachLimited(itemIds, 8, async itemId => membership.set(itemId, await this._itemLibraryIds(itemId, deadlineAt)));

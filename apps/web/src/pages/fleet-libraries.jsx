@@ -73,6 +73,6 @@ export default function FleetLibraries() {
         <nav className="activity-cursor-pagination"><button disabled={page === 1} onClick={() => setPage((value) => value - 1)}>Previous</button><span>Page {page}</span><button disabled={!items.hasMore} onClick={() => setPage((value) => value + 1)}>Next</button></nav></>}
     </section>
     <SiloScopedActivity endpoint={`/fleet/history/${encodeURIComponent(serverId)}/libraries/${encodeURIComponent(libraryId)}`}
-      method="get" scopeLabel="Library" config={config} serverId={serverId} />
+      method="get" scopeLabel="Library" config={config} serverId={serverId} sparseContinuation />
   </div>;
 }

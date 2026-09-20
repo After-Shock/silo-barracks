@@ -69,7 +69,9 @@ export default function SiloLibraryActivity({ libraryId, config }) {
         <span>Page {page}</span>
         <button type="button" disabled={!data?.has_more || !cursors[page + 1] || loading} onClick={() => setPage((value) => value + 1)}>Next</button>
       </nav>
-      {!loading && !data?.results?.length ? <p className="activity-state is-empty">No finalized playback attempts belong to this library.</p> : null}
+      {!loading && !data?.results?.length ? <p className="activity-state is-empty">{data?.has_more
+        ? "No matching attempts were found in this retained slice. Continue to search older history."
+        : "No finalized playback attempts belong to this library."}</p> : null}
     </>}
   </section>;
 }

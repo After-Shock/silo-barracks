@@ -133,6 +133,29 @@ test('library history uses exact catalog membership and resumable filtered curso
   assert.deepEqual(replay.results.map(row => row.Id), ['three', 'four'], 'back navigation cursors must remain replayable');
 });
 
+test('sparse library history returns a continuation without exhausting upstream history', async () => {
+  const api = new SiloAPI({ timeoutMs: 1000, maxPages: 20 });
+  api._configured = async () => {};
+  api._wire = async () => { api.connectionInfo = { apiMajor: 2 }; };
+  api.connectionInfo = { apiMajor: 2 };
+  api.getLibraries = async () => [{ Id: 'library' }];
+  api._itemLibraryIds = async () => new Set(['other-library']);
+  let historyCalls = 0;
+  api.getPlaybackHistoryPage = async ({ limit, cursor }) => {
+    historyCalls += 1;
+    assert.equal(limit, 25);
+    return { results: [{ Id: cursor || 'first', NowPlayingItemId: `item-${historyCalls}` }],
+      hasMore: true, nextCursor: `upstream-${historyCalls}` };
+  };
+  const first = await api.getLibraryPlaybackHistoryPage({ libraryId: 'library', limit: 10 });
+  assert.deepEqual(first.results, []);
+  assert.equal(first.hasMore, true);
+  assert.ok(first.nextCursor);
+  assert.equal(historyCalls, 1, 'one Barracks request must perform bounded upstream work');
+  await api.getLibraryPlaybackHistoryPage({ libraryId: 'library', limit: 10, cursor: first.nextCursor });
+  assert.equal(historyCalls, 2, 'the continuation resumes from the next upstream page');
+});
+
 test('native dashboard insights use the v2 aggregate endpoints', async t => {
   const seen = new Set();
   const f = await fixture(t, (url, send) => {

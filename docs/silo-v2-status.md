@@ -1,13 +1,20 @@
 # Silo API v2 implementation status
 
-## Deployed contract
+## Pinned compatibility contract and attached runtime
 
-Barracks is pinned to Silo revision
+Barracks is pinned for compatibility tests to Silo revision
 `8eeb9f3e623725ef2b3a267853d3e3fcd27d08cf` (`server_version: 8eeb9f3e`).
-The deployed `/api/v2/openapi.json` contains 575 paths and has contract digest
+That source contract has digest
 `774f49bd02d1b9465b2591013242eeb2aa41042c5303108ffc3ab39fd27c64eb`.
-The selected contract fixture includes the read APIs consumed by Barracks plus the
+The selected fixture includes the read APIs consumed by Barracks plus the
 administrator playback capability and mutation endpoints.
+
+The attached runtime tested on September 19, 2026 reports server version
+`0362b6da`. Its live `/api/v2/openapi.json` contains 577 paths and has digest
+`e46579ccd64acf055bc60d644e5e8d93d3d03b73fee018b288dbff8fde3b0e58`.
+All 28 pinned operations consumed by Barracks remain present with unchanged
+operation IDs. The runtime accepts session limits through 200 and rejects 201 with
+422; Barracks retains its conservative 100-item traversal size.
 
 ## Implemented behavior
 
@@ -58,6 +65,21 @@ the matching sessions in Silo history; live-only diagnostics were not copied int
 retained attempts. Headless desktop and mobile Chrome checks covered Activity,
 history paging, account/profile and item navigation, keyboard focus, and horizontal
 overflow.
+
+Safe direct API probes also verified discovery, sessions/capabilities, two-page
+history traversal without duplicate IDs, fixed newest-first ordering, native
+account/profile/item/completion filters, 12 libraries, and all three dashboard
+aggregate calls. Invalid parameter boundaries returned 422 Problem Details and
+missing authentication returned 401. No rate-limit headers were advertised on
+normal responses, so Barracks did not manufacture rate-limit state.
+
+A cold sparse-library probe exposed request-deadline exhaustion while Barracks
+tried to fill a display page through too much retained history. Library history is
+now bounded to one 25-attempt ownership slice per request and resumes through its
+continuation. All 12 live libraries returned without failure (slowest cold request
+2.4 seconds), and a five-page empty traversal completed without timeout. Empty
+intermediate slices explicitly invite the operator to continue instead of claiming
+that the complete retained history has no matches.
 
 Invalid Barracks authentication, insufficient Barracks role, unsupported actions,
 an invalid Silo key, and a temporary partial-fleet outage were also exercised. The

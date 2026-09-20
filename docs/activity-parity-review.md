@@ -210,6 +210,11 @@ bounded continuation cursor. Deleted catalog items are left unattributed rather
 than guessed. Library Activity uses read-only Previous/Next cursor navigation,
 request cancellation, Refresh/Restart, and no unsupported search/sort controls.
 The consumed admin-file operation and schemas are pinned in the contract fixture.
+A live cold-cache probe found that sparse libraries could exhaust the request
+budget while trying to fill one display page. Each request now scans one bounded
+25-attempt ownership slice and returns a replayable continuation; complete traversal
+therefore remains explicit without one request walking the entire retained log.
+Empty intermediate slices say to continue rather than claiming no retained matches.
 
 User and item drill-downs now share the read-only cursor navigator, including
 cancellation, replayable Previous/Next state, page-size resets and Retry. Secondary
