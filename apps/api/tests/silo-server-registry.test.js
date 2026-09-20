@@ -10,7 +10,7 @@ test('stored keys are authenticated ciphertext and cannot be decrypted with anot
   assert.notEqual(encrypted, encryptKey('sa_private', 'installation-secret'));
 });
 
-function fixture() {
+function fixture(options = {}) {
   const queries = [];
   let saved;
   const pool = { query: async (sql, values = []) => {
@@ -27,8 +27,18 @@ function fixture() {
   return { queries, registry: createRegistry({ pool, secret: 'installation-secret',
     getConfig: async () => ({ state: 2, SILO_URL: 'https://primary.test', SILO_API_KEY: 'sa_primary' }),
     validate: async (url, key) => ({ id: url.includes('primary') ? 'upstream-primary' : 'upstream-extra', name: 'Silo' }),
+    ...options,
   }), getSaved: () => saved };
 }
+
+test('public server URLs hide the internal API discovery suffix', async () => {
+  const { registry } = fixture();
+  await registry.add({ name: 'Basement', url: 'https://extra.test/silo/api/v2', apiKey: 'sa_private' });
+  const publicRows = await registry.listPublic();
+  assert.equal(publicRows[0].url, 'https://primary.test/');
+  assert.equal(publicRows[1].url, 'https://extra.test/silo');
+  assert.match((await registry.listInternal())[1].url, /\/api\/v1$/);
+});
 
 test('management lists never return API keys; collection receives decrypted keys', async () => {
   const { registry, queries } = fixture();
@@ -80,6 +90,16 @@ test('distinct Silo names scope a shared default identity by connection URL', as
   assert.ok(insert);
   assert.match(insert.values[4], /^shared-default-id@/);
   assert.notEqual(insert.values[4], 'shared-default-id');
+});
+
+test('primary display name can be changed without mutating its connection', async () => {
+  let savedName;
+  const { registry } = fixture({ savePrimaryName: async name => { savedName = name; } });
+  const result = await registry.update('primary', { name: 'Main Silo' });
+  assert.equal(savedName, 'Main Silo');
+  assert.equal(result.name, 'Main Silo');
+  assert.equal(result.isPrimary, true);
+  await assert.rejects(registry.update('primary', { name: '', url: 'https://other.test' }), /name/i);
 });
 
 test('requires plain object input and a string server name', async () => {

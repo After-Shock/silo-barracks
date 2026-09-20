@@ -68,7 +68,7 @@ function connectionInput(input, previous = {}, { allowMissingApiKey = false } = 
   return { name, url, apiKey, enabled: input.enabled ?? previous.enabled ?? true };
 }
 
-function createRegistry({ pool, getConfig, secret = process.env.JWT_SECRET, validate = validateConnection }) {
+function createRegistry({ pool, getConfig, savePrimaryName, secret = process.env.JWT_SECRET, validate = validateConnection }) {
   let mutation = Promise.resolve();
   const serial = operation => {
     const next = mutation.then(operation);
@@ -82,7 +82,8 @@ function createRegistry({ pool, getConfig, secret = process.env.JWT_SECRET, vali
     const apiKey = config.SILO_API_KEY || config.JF_API_KEY;
     if (!url || !apiKey || config.state !== 2) return null;
     const normalized = normalizeBase(url);
-    return { id: 'primary', name: new URL(normalized).hostname, url: normalized, apiKey,
+    const configuredName = String(config.settings?.SiloPrimaryServerName || '').trim();
+    return { id: 'primary', name: configuredName || new URL(normalized).hostname, url: normalized, apiKey,
       isPrimary: true, enabled: true };
   }
   function internal(row) {
@@ -95,7 +96,12 @@ function createRegistry({ pool, getConfig, secret = process.env.JWT_SECRET, vali
     const [first, extra] = await Promise.all([primary(), rows()]);
     return [...(first ? [first] : []), ...extra.map(internal)];
   }
-  const publicServer = server => ({ id: server.id, name: server.name, url: server.url,
+  const displayUrl = value => {
+    const url = new URL(value);
+    url.pathname = url.pathname.replace(/\/api\/v[12]\/?$/, '') || '/';
+    return url.toString().replace(/\/$/, url.pathname === '/' ? '/' : '');
+  };
+  const publicServer = server => ({ id: server.id, name: server.name, url: displayUrl(server.url),
     enabled: server.enabled, isPrimary: server.isPrimary, hasApiKey: Boolean(server.apiKey) });
   async function assertUnique(candidate, exceptId) {
     const all = await listInternal();
@@ -166,7 +172,15 @@ function createRegistry({ pool, getConfig, secret = process.env.JWT_SECRET, vali
       return publicServer({ ...candidate, id, isPrimary: false });
     }),
     update: (id, input) => serial(async () => {
-      requireExtra(id);
+      if (id === 'primary') {
+        if (!isPlainObject(input) || typeof input.name !== 'string') throw new RegistryError('Server name must be a string.');
+        const name = input.name.trim();
+        if (!name || name.length > 80) throw new RegistryError('Server name must contain 1–80 characters.');
+        if (typeof savePrimaryName !== 'function') throw new RegistryError('Primary server naming is unavailable.', 503);
+        await savePrimaryName(name);
+        const server = await primary();
+        return publicServer({ ...server, name });
+      }
       const old = (await rows()).find(row => String(row.id) === String(id));
       if (!old) throw new RegistryError('Server not found.', 404);
       // Permit disabling or renaming an offline connection without a new probe.

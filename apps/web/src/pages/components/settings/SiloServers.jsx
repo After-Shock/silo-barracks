@@ -41,7 +41,7 @@ export default function SiloServers() {
     event.preventDefault();
     const successMessage = editing ? 'Silo server updated successfully.' : `${form.name.trim()} connected successfully. Activity will appear shortly.`;
     void run(async () => {
-      if (editing) await axios.put(`/fleet/servers/${editing}`, form, { timeout: 30000 });
+      if (editing) await axios.put(`/fleet/servers/${editing}`, editing === 'primary' ? { name: form.name } : form, { timeout: 30000 });
       else await axios.post('/fleet/servers', form, { timeout: 30000 });
       setForm(emptyForm); setEditing(null);
     }, successMessage);
@@ -55,8 +55,8 @@ export default function SiloServers() {
     <form onSubmit={submit}>
       <h2>{editing ? 'Edit server' : 'Add server'}</h2>
       <label>Server name<input required maxLength={80} value={form.name} onChange={event => setForm({ ...form, name: event.target.value })} placeholder="Living room Silo" /></label>
-      <label>Silo URL<input required maxLength={2048} value={form.url} onChange={event => setForm({ ...form, url: event.target.value })} placeholder="https://silo.example.com" /></label>
-      <label>Administrator API key<input type="password" autoComplete="new-password" required={!editing} maxLength={4096} value={form.apiKey} onChange={event => setForm({ ...form, apiKey: event.target.value })} placeholder={editing ? 'Leave blank to keep the saved key' : 'sa_…'} /></label>
+      <label>Silo URL<input required readOnly={editing === 'primary'} maxLength={2048} value={form.url} onChange={event => setForm({ ...form, url: event.target.value })} placeholder="https://silo.example.com" /></label>
+      {editing !== 'primary' && <label>Administrator API key<input type="password" autoComplete="new-password" required={!editing} maxLength={4096} value={form.apiKey} onChange={event => setForm({ ...form, apiKey: event.target.value })} placeholder={editing ? 'Leave blank to keep the saved key' : 'sa_…'} /></label>}
       <div className="server-settings-actions"><button type="submit" disabled={busy}>{busy ? 'Checking connection…' : editing ? 'Save server' : 'Test & add server'}</button>
         {editing && <button type="button" disabled={busy} onClick={() => { setEditing(null); setForm(emptyForm); }}>Cancel edit</button>}
       </div>
@@ -69,7 +69,10 @@ export default function SiloServers() {
           <div><strong>{server.name}</strong><small>{server.url}</small><small>{server.isPrimary ? 'Primary server · ' : ''}{!server.enabled ? 'Monitoring disabled' : status?.state === 'connected' ? `${status.activeStreams} active streams` : status?.state || 'Connecting…'}</small>
             {connection?.apiMajor && <small>API v{connection.apiMajor}{connection.apiMajor === 2 ? ` · ${connection.diagnosticsAvailable ? 'Extended diagnostics available' : 'Extended diagnostics unavailable'}` : ' · Legacy API'}</small>}
           </div>
-          {server.isPrimary ? <Link to="/settings/integrations/media-server">Primary connection settings</Link> : <div className="server-settings-actions">
+          {server.isPrimary ? <div className="server-settings-actions">
+            <button disabled={busy} onClick={() => { setEditing(server.id); setForm({ name: server.name, url: server.url, apiKey: '' }); setError(''); }}>Edit display name</button>
+            <Link to="/settings/integrations/media-server">Connection settings</Link>
+          </div> : <div className="server-settings-actions">
             <button disabled={busy} onClick={() => { setEditing(server.id); setForm({ name: server.name, url: server.url, apiKey: '' }); setError(''); }}>Edit</button>
             <button disabled={busy} onClick={() => run(() => axios.put(`/fleet/servers/${server.id}`, { enabled: !server.enabled }),
               `${server.name} monitoring ${server.enabled ? 'disabled' : 'enabled'} successfully.`)}>{server.enabled ? 'Disable' : 'Enable'}</button>

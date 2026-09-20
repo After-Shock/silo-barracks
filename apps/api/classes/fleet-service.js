@@ -16,7 +16,21 @@ function getFleetService() {
     if (data?.status !== 'ok' || !data.server_id) throw new Error('Silo identity unavailable');
     return { id: String(data.server_id) };
   } });
-  const registry = createRegistry({ pool: db.pool, getConfig: () => new Config().getConfig() });
+  const registry = createRegistry({ pool: db.pool, getConfig: () => new Config().getConfig(),
+    savePrimaryName: async name => {
+      const client = await db.pool.connect();
+      try {
+        await client.query('BEGIN');
+        const result = await client.query('SELECT settings FROM app_config WHERE "ID"=1 FOR UPDATE');
+        const settings = { ...(result.rows[0]?.settings || {}), SiloPrimaryServerName: name };
+        await client.query('UPDATE app_config SET settings=$1 WHERE "ID"=1', [settings]);
+        await client.query('COMMIT');
+      } catch (error) {
+        try { await client.query('ROLLBACK'); } catch {}
+        throw error;
+      } finally { client.release(); }
+    },
+  });
   const fleet = createFleet({
     listServers: async () => identity.resolve(await registry.listInternal()),
     createClient: server => {
