@@ -93,9 +93,27 @@ combined/per-server totals and unique fleet session IDs on desktop and mobile.
 A Barracks restart rediscovered all three unchanged sessions without partial state
 or playback interruption.
 
-Before broad rollout, test primary-key/profile revocation, an actual upstream 429,
-unsupported capabilities from a real limited player, prolonged soak operation,
-and intentional network-loss recovery.
+A final API matrix ran against all four servers. Every live contract had the same
+577-path digest and retained all 28 consumed operation IDs. Sessions, command
+capabilities, cursor history, users, native dashboard aggregates, effective settings,
+profile-scoped library/catalog reads and denied-profile behavior were exercised on
+each connection. All four reported `allow_4k_transcode=false`, playback transcoding
+enabled, and the expected command set.
+
+Rate limiting is enabled with the memory backend, a 100 requests/second elevated
+administrator tier and a 100-request burst. Normal responses advertise no rate
+headers. Barracks did not flood production to manufacture a 429; bounded retry,
+Retry-After handling and rate-limit categorization remain covered by automated
+transport tests.
+
+An idle secondary's Barracks connection was intentionally routed to an unreachable
+port. It progressed from connecting to unavailable while the other three remained
+connected and the snapshot became explicitly partial. Restoring the exact URL
+reconnected it on the first recovery poll and returned the four-server fleet to
+non-partial state.
+
+Primary-key/profile revocation and a real limited-capability player remain unsafe
+or unavailable in this production fixture. Continue prolonged soak observation.
 
 A subsequent live quality change kept one session identity stable while output
 moved from height 800 at 10 Mbps to 720p at 4 Mbps. Barracks displayed the exact

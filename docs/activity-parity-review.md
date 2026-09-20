@@ -306,7 +306,16 @@ authenticated backend `/fleet` API mount on a full refresh. Fleet pages now use
 of a secondary account, item and 12-library page then succeeded without errors or
 lost authentication.
 
-Account/profile-authority revocation, an actual upstream 429, and primary-key
-revocation still require dedicated expendable infrastructure. Cursor loops/expiry,
+A final direct API matrix confirmed all four live contracts retain every consumed
+operation and exercised sessions, command capabilities, cursor history, users,
+aggregates, profile-scoped catalogs and denied-profile behavior independently.
+An idle secondary was then pointed at an unreachable port from Barracks: it became
+unavailable/partial without affecting the other three and reconnected immediately
+when its exact URL was restored.
+
+Primary-key/profile revocation still requires expendable credentials. Production
+rate limiting is enabled at 100 elevated requests/second with a 100-request burst;
+it was not deliberately saturated. Retry-After and 429 handling remain covered by
+automated transport tests. Cursor loops/expiry,
 failed refreshes, empty results, filter/page-size resets and malformed preferences
 also remain covered by automated contract and state tests.
