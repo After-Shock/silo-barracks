@@ -87,9 +87,15 @@ primary remained available, the unavailable member was visible in the browser,
 and cleanup restored the healthy fleet. A real invalid cursor now produces an
 actionable restart-first-page response instead of a generic upstream 400.
 
+Four healthy physical Silo servers now pass scoped history/account reads with
+naturally overlapping account IDs. Three simultaneous streams produced exact
+combined/per-server totals and unique fleet session IDs on desktop and mobile.
+A Barracks restart rediscovered all three unchanged sessions without partial state
+or playback interruption.
+
 Before broad rollout, test primary-key/profile revocation, an actual upstream 429,
-unsupported capabilities from a real limited player, prolonged operation with two
-healthy physical Silo servers, and intentional network-loss recovery.
+unsupported capabilities from a real limited player, prolonged soak operation,
+and intentional network-loss recovery.
 
 A subsequent live quality change kept one session identity stable while output
 moved from height 800 at 10 Mbps to 720p at 4 Mbps. Barracks displayed the exact

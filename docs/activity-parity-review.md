@@ -286,11 +286,19 @@ against the production Barracks container:
 
 Four healthy physical Silo connections were subsequently exercised together.
 Every server returned independently scoped history and account collections while
-account ID `1` overlapped on all four. Rapid primary/secondary/primary/secondary
-browser changes settled on the final server without stale rows; secondary account,
-item and library links retained the selected registry ID. Disabling and re-enabling
-one secondary left the primary stream/count intact and restored the secondary to
-connected state.
+account ID `1` overlapped on all four. Three servers then streamed simultaneously:
+combined totals were 3 active/3 playing, per-server counts summed exactly, every
+fleet session ID was unique, and all rows retained their registry scope. Desktop
+and 390px mobile views rendered three correctly labeled cards and titles without
+alerts or horizontal overflow. All active servers independently advertised the
+same supported command set, but no command was sent during this observation.
+
+Rapid primary/secondary/primary/secondary browser changes settled on the final
+server without stale rows; secondary account, item and library links retained the
+selected registry ID. Disabling and re-enabling one secondary left the primary
+stream/count intact and restored the secondary to connected state. Restarting only
+Barracks while all three streams played rediscovered the same three fleet session
+IDs, positions and per-server counts without partial state or player interruption.
 
 This pass also found that frontend `/fleet/...` deep links collided with the
 authenticated backend `/fleet` API mount on a full refresh. Fleet pages now use
