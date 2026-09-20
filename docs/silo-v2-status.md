@@ -89,6 +89,15 @@ actionable restart-first-page response instead of a generic upstream 400.
 
 Before broad rollout, test primary-key/profile revocation, an actual upstream 429,
 unsupported capabilities from a real limited player, prolonged operation with two
-healthy physical Silo servers, and intentional network-loss recovery. Capability
+healthy physical Silo servers, and intentional network-loss recovery.
+
+A subsequent live quality change kept one session identity stable while output
+moved from height 800 at 10 Mbps to 720p at 4 Mbps. Barracks displayed the exact
+selected-source/output path (`H264-1080p → H264-720p`, `11.3 Mbps → 4.0 Mbps`),
+EAC3-to-AAC audio conversion, and VAAPI hardware acceleration without horizontal
+overflow. The server's effective `allow_4k_transcode` value was already `false`;
+Silo selected the available 1080p source for the requested 720p transcode instead
+of transcoding a 4K source. Barracks observes this policy outcome but does not
+invent or override Silo playback policy. Capability
 visibility must not be treated as mutation authority; Silo's response to each
 command remains authoritative.

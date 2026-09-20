@@ -275,6 +275,11 @@ against the production Barracks container:
   stayed connected. Headless Chrome displayed that unavailable server without a
   fatal alert or horizontal overflow; removal restored a healthy fleet and left no
   temporary registry row.
+- A live quality transition retained the same session while changing output from
+  height 800/10 Mbps to 720p/4 Mbps. The card showed selected 1080p source versus
+  720p output, video/audio conversion, bitrate change and VAAPI acceleration. Silo's
+  effective `allow_4k_transcode=false` policy selected the non-4K source; Barracks
+  did not mislabel the session as a 4K transcode or attempt to override that policy.
 - A real invalid history cursor returned 400. Barracks now translates its
   `invalid_cursor` category into an actionable restart-from-first-page message on
   primary, item/account and fleet history routes.
