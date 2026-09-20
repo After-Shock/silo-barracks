@@ -57,11 +57,29 @@ test('duplicate upstream identity explains how to repair a separately cloned Sil
       && /Compatibility.*Jellyfin.*Advanced/i.test(error.message) && /restart Silo/i.test(error.message));
 });
 
-test('primary identity collision gives the cloned-instance repair instead of calling it the primary URL', async () => {
+test('primary identity collision gives the cloned-instance repair when Silo names also match', async () => {
   const { registry } = fixture();
   await assert.rejects(registry.add({ name: 'Primary clone', url: 'https://primary-clone.test', apiKey: 'sa_test' }),
     error => error.status === 409 && /same server identity as the primary/i.test(error.message)
       && /unique Server ID/i.test(error.message));
+});
+
+test('distinct Silo names scope a shared default identity by connection URL', async () => {
+  const queries = [];
+  const pool = { query: async (sql, values = []) => {
+    queries.push({ sql, values });
+    if (sql.startsWith('SELECT')) return { rows: [] };
+    return { rows: [], rowCount: 1 };
+  } };
+  const registry = createRegistry({ pool, secret: 'installation-secret',
+    getConfig: async () => ({ state: 2, SILO_URL: 'https://sullyflix-com.test', SILO_API_KEY: 'sa_primary' }),
+    validate: async url => ({ id: 'shared-default-id', name: url.includes('stream') ? 'Sullyflix-stream' : 'Sullyflix-com' }),
+  });
+  await registry.add({ name: 'Stream server', url: 'https://sullyflix-stream.test', apiKey: 'sa_stream' });
+  const insert = queries.find(query => query.sql.startsWith('INSERT'));
+  assert.ok(insert);
+  assert.match(insert.values[4], /^shared-default-id@/);
+  assert.notEqual(insert.values[4], 'shared-default-id');
 });
 
 test('requires plain object input and a string server name', async () => {

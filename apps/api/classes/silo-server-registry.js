@@ -102,16 +102,28 @@ function createRegistry({ pool, getConfig, secret = process.env.JWT_SECRET, vali
     if (all.some(server => server.id !== exceptId && server.url === candidate.url)) {
       throw new RegistryError('This Silo server is already configured.', 409);
     }
-    const info = await validate(candidate.url, candidate.apiKey);
+    let info = await validate(candidate.url, candidate.apiKey);
     if (all.some(server => server.id !== exceptId && server.upstreamId === info.id)) {
       throw new RegistryError('This address reports the same server identity as an existing Silo connection. If this is a separate instance, assign it a unique Server ID in Silo Admin Settings → Compatibility → Jellyfin → Advanced and restart Silo before adding it.', 409);
     }
     const first = all.find(server => server.isPrimary);
     if (first) {
-      // Fail closed when the primary cannot be identified: aliases must not
-      // inflate the combined stream count by adding the same physical server.
+      // Silo's compatibility Server ID has historically had a deterministic
+      // default, so independent installations can report the same ID. Distinct
+      // advertised names at distinct normalized URLs are scoped internally by
+      // URL. Matching names remain fail-closed because that is most likely one
+      // physical server reached through an alias.
       const primaryInfo = await validate(first.url, first.apiKey);
-      if (info.id === primaryInfo.id) throw new RegistryError('This address reports the same server identity as the primary Silo connection. If this is a separate instance, assign it a unique Server ID in Silo Admin Settings → Compatibility → Jellyfin → Advanced and restart Silo before adding it.', 409);
+      if (info.id === primaryInfo.id) {
+        const candidateName = String(info.name || '').trim().toLowerCase();
+        const primaryName = String(primaryInfo.name || '').trim().toLowerCase();
+        if (candidateName && primaryName && candidateName !== primaryName) {
+          const scope = createHash('sha256').update(candidate.url).digest('hex').slice(0, 16);
+          info = { ...info, id: `${info.id}@${scope}` };
+        } else {
+          throw new RegistryError('This address reports the same server identity as the primary Silo connection and the same server name. If this is a separate instance, give it a distinct server name or assign a unique Server ID in Silo Admin Settings → Compatibility → Jellyfin → Advanced, then restart Silo before adding it.', 409);
+        }
+      }
     }
     return info;
   }
