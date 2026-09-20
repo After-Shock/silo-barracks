@@ -104,14 +104,14 @@ function createRegistry({ pool, getConfig, secret = process.env.JWT_SECRET, vali
     }
     const info = await validate(candidate.url, candidate.apiKey);
     if (all.some(server => server.id !== exceptId && server.upstreamId === info.id)) {
-      throw new RegistryError('This address reports the same server identity as an existing Silo connection. If this is a separate cloned instance, assign it a unique Server ID in Silo Admin Settings → Compatibility Proxies and restart Silo before adding it.', 409);
+      throw new RegistryError('This address reports the same server identity as an existing Silo connection. If this is a separate instance, assign it a unique Server ID in Silo Admin Settings → Compatibility → Jellyfin → Advanced and restart Silo before adding it.', 409);
     }
     const first = all.find(server => server.isPrimary);
     if (first) {
       // Fail closed when the primary cannot be identified: aliases must not
       // inflate the combined stream count by adding the same physical server.
       const primaryInfo = await validate(first.url, first.apiKey);
-      if (info.id === primaryInfo.id) throw new RegistryError('This address reports the same server identity as the primary Silo connection. If this is a separate cloned instance, assign it a unique Server ID in Silo Admin Settings → Compatibility Proxies and restart Silo before adding it.', 409);
+      if (info.id === primaryInfo.id) throw new RegistryError('This address reports the same server identity as the primary Silo connection. If this is a separate instance, assign it a unique Server ID in Silo Admin Settings → Compatibility → Jellyfin → Advanced and restart Silo before adding it.', 409);
     }
     return info;
   }

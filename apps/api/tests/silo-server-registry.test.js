@@ -54,7 +54,7 @@ test('duplicate upstream identity explains how to repair a separately cloned Sil
   await registry.add({ name: 'Extra', url: 'https://extra.test', apiKey: 'sa_test' });
   await assert.rejects(registry.add({ name: 'Alias', url: 'https://alias.test', apiKey: 'sa_test' }),
     error => error.status === 409 && /same server identity/i.test(error.message)
-      && /Compatibility Proxies/i.test(error.message) && /restart Silo/i.test(error.message));
+      && /Compatibility.*Jellyfin.*Advanced/i.test(error.message) && /restart Silo/i.test(error.message));
 });
 
 test('primary identity collision gives the cloned-instance repair instead of calling it the primary URL', async () => {
