@@ -994,7 +994,6 @@
   overflow: auto;
   padding-right: 6px;
   scrollbar-color: color-mix(in srgb, var(--barracks-focus-light) 50%, transparent) color-mix(in srgb, var(--barracks-text-raised) 6%, transparent);
-  height: 100%;
 }
 
 .setup-card.is-wide .setup-extra-panel {

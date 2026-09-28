@@ -1153,19 +1153,13 @@
   }
 
   .settings-mobile-menu-list button {
-    display: flex;
     flex: 0 0 auto;
-    align-items: center;
     justify-content: center;
-    gap: 10px;
-    width: auto;
-    min-width: 0;
+
     min-height: 38px;
     max-width: 176px;
     padding: 0 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 900;
+
   }
 
   .settings-mobile-menu-list .settings-tab-title span {
@@ -1384,7 +1378,6 @@
 
 @media (max-width: 640px) {
   .settings {
-    padding: 8px 10px calc(env(safe-area-inset-bottom, 0px) + 34px);
   padding-top: 0;
 }
 
@@ -1392,37 +1385,31 @@
 
     border-bottom: 1px solid color-mix(in srgb, var(--barracks-focus-light) 12%, transparent);
     background: color-mix(in srgb, var(--barracks-surface-inset) 56%, transparent);
-    margin-bottom: 10px;
   margin: 0 -10px;
   min-height: 0;
   padding: 12px 20px 16px;
 }
 
   .settings-page-header h1 {
-    font-size: 22px;
-    line-height: 1.1;
+    font-size: 20px;
 }
 
   .has-mobile-settings-menu .settings-mobile-menu {
     top: calc(env(safe-area-inset-top, 0px) + 62px);
 
-    padding: 7px 10px;
-  margin-left: -10px;
-  margin-right: -10px;
   margin-bottom: 10px;
   padding-block: 6px;
 }
 
   .settings-mobile-menu-list button {
-    min-height: 36px;
-    max-width: 148px;
-    padding: 0 10px;
-    font-size: 11px;
+    min-height: 34px;
+    max-width: 136px;
+    padding: 0 9px;
   border-radius: 13px;
 }
 
   .settings-mobile-menu-list .settings-tab-title span {
-    max-width: 102px;
+    max-width: 92px;
   }
 
   .settings .tab-pane > * {

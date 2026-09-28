@@ -416,14 +416,12 @@
 
 .integrations-page.is-embedded .integration-grid {
   grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-  gap: 10px;
 }
 
 .integrations-page.is-embedded .integration-section {
 
   padding: 12px;
-  border-radius: 14px;
-  gap: 10px;
+
   align-self: start;
   display: flex !important;
   flex-direction: column !important;
@@ -930,20 +928,14 @@
 .integration-fields input,
 .client-adder select {
   border-color: var(--barracks-border-inset);
-  border-radius: 10px;
+  border-radius: 8px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
-  padding: 0 12px;
-  color-scheme: dark;
-  min-height: 42px;
-  min-width: 0;
-  width: 100%;
+
 }
 
 .integration-status-light {
   box-shadow: none;
-  border-radius: 999px;
-  height: 13px;
-  width: 13px;
+
 }
 
 .integration-uptime-timeline i.is-ok {
