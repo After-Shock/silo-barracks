@@ -811,8 +811,7 @@
 }
 
 .session-controls-heading,
-.session-control-buttons,
-.session-control-message {
+.session-control-buttons {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -841,16 +840,11 @@
   margin-bottom: 10px;
 }
 
-.session-control-message input {
-  min-width: 0;
-}
-
 .session-control-notice.is-error { color: var(--barracks-state-danger); }
 .session-control-notice.is-success { color: var(--barracks-state-success); }
 
 @media (max-width: 520px) {
-  .session-controls-heading,
-  .session-control-message { align-items: stretch; flex-direction: column; }
+  .session-controls-heading { align-items: stretch; flex-direction: column; }
   .session-controls-heading small { align-self: flex-start; }
 }
 
@@ -1085,5 +1079,344 @@
 
   .session-user-name {
     max-width: 58px;
+  }
+}
+
+/* Ported from the upstream session card: popout detail rows, actions and message templates. */
+.session-details-value-short {
+  max-width: min(200px, 100%);
+}
+
+.session-popout-reason {
+  margin: 8px 0 0;
+  color: var(--barracks-state-warning);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.session-popout-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 10px;
+  align-items: stretch;
+}
+
+.session-command {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 0 14px;
+  color: var(--barracks-text-raised);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease, opacity 160ms ease;
+}
+
+.session-command svg {
+  flex: 0 0 auto;
+}
+
+.session-command.is-message {
+  border-color: rgba(var(--barracks-action-rgb), 0.42);
+  background: linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.96), rgba(var(--barracks-action-rgb), 0.9));
+  box-shadow: 0 14px 28px rgba(var(--barracks-action-rgb), 0.22);
+}
+
+.session-command.is-stop {
+  color: var(--barracks-state-danger);
+  border-color: color-mix(in srgb, var(--barracks-state-danger) 38%, transparent);
+  background: color-mix(in srgb, var(--barracks-state-danger-interactive) 16%, var(--barracks-surface-inset));
+  box-shadow: none;
+}
+
+.session-command.is-ghost {
+  color: var(--barracks-text-raised);
+  border-color: var(--barracks-border-raised);
+  background: var(--barracks-surface-interactive);
+}
+
+.session-command:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.session-command.is-message:hover:not(:disabled) {
+  box-shadow: 0 18px 34px rgba(var(--barracks-action-rgb), 0.3);
+}
+
+.session-command.is-stop:hover:not(:disabled) {
+  color: var(--barracks-state-danger);
+  border-color: color-mix(in srgb, var(--barracks-state-danger) 55%, transparent);
+  background: color-mix(in srgb, var(--barracks-state-danger-interactive) 28%, var(--barracks-surface-inset));
+}
+
+.session-command:disabled {
+  cursor: wait;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
+}
+
+.session-action-error {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin: 0;
+  color: var(--barracks-state-danger);
+  font-size: 13px;
+}
+
+.session-message-modal {
+  overflow: visible;
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: 16px;
+  background:
+    linear-gradient(145deg, rgba(var(--barracks-action-rgb), 0.16), var(--barracks-surface-inset)),
+    var(--barracks-surface-inset);
+  color: var(--barracks-text-raised);
+}
+
+.session-message-modal .modal-body {
+  overflow: visible;
+}
+
+.session-message-modal .modal-header,
+.session-message-modal .modal-footer {
+  border-color: var(--barracks-border-raised);
+}
+
+.session-message-modal .btn-close {
+  filter: invert(1);
+}
+
+.session-message-hint {
+  margin: 0 0 10px;
+  color: var(--barracks-text-muted);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.session-message-select-label {
+  display: block;
+  margin: 0 0 6px;
+  color: var(--barracks-text);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.session-message-picker {
+  position: relative;
+  margin: 0 0 12px;
+}
+
+.session-message-trigger {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: 12px;
+  color: var(--barracks-text-raised);
+  background: linear-gradient(180deg, var(--barracks-surface-interactive), var(--barracks-surface-inset));
+  text-align: left;
+  cursor: pointer;
+}
+
+.session-message-picker.is-open .session-message-trigger {
+  border-color: rgba(var(--barracks-action-rgb), 0.55);
+  box-shadow: 0 0 0 3px rgba(var(--barracks-action-rgb), 0.16);
+}
+
+.session-message-trigger svg {
+  margin-left: auto;
+  color: var(--barracks-text);
+  transition: transform 160ms ease;
+}
+
+.session-message-picker.is-open .session-message-trigger svg {
+  transform: rotate(180deg);
+}
+
+.session-message-trigger-emoji {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(var(--barracks-action-rgb), 0.14);
+  font-size: 18px;
+}
+
+.session-message-trigger-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.session-message-trigger-copy strong,
+.session-message-menu button strong {
+  display: block;
+  overflow: hidden;
+  color: var(--barracks-text-raised);
+  font-size: 14px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.session-message-trigger-copy small,
+.session-message-menu button small {
+  display: block;
+  overflow: hidden;
+  color: var(--barracks-text-muted);
+  font-size: 11px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.session-message-menu {
+  position: absolute;
+  z-index: 8;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  max-height: 280px;
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: 14px;
+  background: var(--barracks-surface-inset);
+  box-shadow: 0 22px 50px color-mix(in srgb, var(--barracks-canvas) 45%, transparent);
+}
+
+.session-message-menu-group {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.session-message-menu-group > span {
+  padding: 6px 8px 2px;
+  color: var(--barracks-action-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.session-message-menu button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.session-message-menu button:hover,
+.session-message-menu button.is-selected {
+  background: rgba(var(--barracks-action-rgb), 0.16);
+}
+
+.session-message-time-label {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 12px;
+  color: var(--barracks-text);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.session-message-time-label small {
+  color: var(--barracks-text-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.session-message-time {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: 12px;
+  color: var(--barracks-text-raised);
+  background: linear-gradient(180deg, var(--barracks-surface-interactive), var(--barracks-surface-inset));
+  font-size: 14px;
+  font-weight: 750;
+  color-scheme: dark;
+}
+
+.session-message-modal textarea {
+  color: var(--barracks-text-raised);
+  border-color: var(--barracks-border-raised);
+  background: var(--barracks-surface-inset);
+}
+
+.session-message-modal .modal-footer {
+  display: flex;
+  gap: 10px;
+}
+
+.session-message-modal .modal-footer .session-command {
+  flex: 1;
+}
+
+.session-popout-viewer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.session-popout-viewer img,
+.session-popout-viewer svg {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--barracks-action-text);
+  object-fit: cover;
+}
+
+.session-popout-client {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.session-popout-client-icon {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  fill: var(--platform-icon-color, var(--primary-color));
+  color: var(--platform-icon-color, var(--primary-color));
+}
+
+.session-popout-client-icon.is-roku {
+  --platform-icon-color: var(--barracks-action) !important;
+}
+
+@media (max-width: 900px) {
+  .session-details-value,
+  .session-details-value-short {
+    max-width: 100%;
+  }
+
+  .session-popout-actions {
+    grid-template-columns: 1fr;
   }
 }

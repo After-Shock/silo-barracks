@@ -6,13 +6,15 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
 import FormControl from "react-bootstrap/FormControl";
 import axios from "../../../lib/axios_instance";
 
 import AccountCircleFillIcon from "remixicon-react/AccountCircleFillIcon";
 import PlayFillIcon from "remixicon-react/PlayFillIcon";
 import PauseFillIcon from "remixicon-react/PauseFillIcon";
+import ChatSmile2LineIcon from "remixicon-react/ChatSmile2LineIcon";
+import ArrowDownSLineIcon from "remixicon-react/ArrowDownSLineIcon";
+import StopCircleLineIcon from "remixicon-react/StopCircleLineIcon";
 
 import { PlatformIcon } from "../../../lib/platform-icons";
 import Tooltip from "@mui/material/Tooltip";
@@ -20,6 +22,37 @@ import IpInfoModal from "../ip-info";
 import { Trans } from "react-i18next";
 import baseUrl from "../../../lib/baseurl";
 import siloIcon from "../../../../public/brand/barracks-mark.svg";
+import {
+  SESSION_MESSAGE_TEMPLATES,
+  SESSION_MESSAGE_TEMPLATE_GROUPS,
+  applySessionMessageTemplate,
+  defaultMessageDateTime,
+  formatMessageTime,
+  timeForTemplate,
+} from "../../../lib/session-messages";
+
+function formatTranscodeReasons(session) {
+  const reasons = session?.TranscodingInfo?.TranscodeReasons;
+  if (Array.isArray(reasons) && reasons.length) {
+    return reasons
+      .map((reason) => String(reason).replace(/([a-z])([A-Z])/g, "$1 $2"))
+      .join(", ");
+  }
+  const transcoding = session?.TranscodingInfo;
+  if (!transcoding) return "";
+  const parts = [];
+  if (transcoding.IsVideoDirect === false) parts.push("Video remux/transcode");
+  if (transcoding.IsAudioDirect === false) parts.push("Audio remux/transcode");
+  return parts.join(", ");
+}
+
+function readTwelveHour() {
+  try {
+    return Boolean(JSON.parse(localStorage.getItem("12hr")));
+  } catch {
+    return false;
+  }
+}
 
 function publicSiloPoster(value) {
   try {
@@ -82,11 +115,11 @@ function SessionDetailItem({ label, value, wide = false }) {
   );
 }
 
-function SessionCardDetailRow({ label, children, className = "" }) {
+function SessionCardDetailRow({ label, children, className = "", short = false }) {
   return (
     <div className={`session-details-row ${className}`.trim()}>
       <span className="session-details-title text-end text-uppercase">{label}</span>
-      <div className="ellipse session-details-value">{children}</div>
+      <div className={`ellipse session-details-value${short ? " session-details-value-short" : ""}`}>{children}</div>
     </div>
   );
 }
@@ -104,7 +137,13 @@ function SessionCard(props) {
   const [controlCapabilities, setControlCapabilities] = useState(null);
   const [controlPending, setControlPending] = useState("");
   const [controlNotice, setControlNotice] = useState(null);
-  const [controlMessage, setControlMessage] = useState("");
+  const [messageOpen, setMessageOpen] = useState(false);
+  const [messageText, setMessageText] = useState("");
+  const [messageTemplateId, setMessageTemplateId] = useState("custom");
+  const [templateMenuOpen, setTemplateMenuOpen] = useState(false);
+  const [messageWhen, setMessageWhen] = useState(() => defaultMessageDateTime(15));
+  const canControl = Boolean(props.canControl) && !props.kiosk;
+  const twelveHour = readTwelveHour();
   const [positionAnchor, setPositionAnchor] = useState(() => ({
     sessionId: session.Id,
     positionTicks: Number(playState.PositionTicks || 0),
@@ -166,6 +205,7 @@ function SessionCard(props) {
       : "";
   const playbackMethod = playState.PlayMethod || "Unknown";
   const isTranscoding = Boolean(session.TranscodingInfo);
+  const transcodeReason = formatTranscodeReasons(session);
   const title =
     nowPlaying.Type === "Episode" && nowPlaying.SeriesName
       ? nowPlaying.SeriesName
@@ -222,7 +262,7 @@ function SessionCard(props) {
   }
 
   useEffect(() => {
-    if (!sessionModalVisible || !props.canControl) return undefined;
+    if (!sessionModalVisible || !canControl) return undefined;
     let active = true;
     setControlNotice(null);
     const endpoint = session.FleetServerId
@@ -234,15 +274,25 @@ function SessionCard(props) {
       if (active) setControlNotice({ type: "error", text: error.response?.data?.error || "Playback controls are unavailable." });
     });
     return () => { active = false; };
-  }, [sessionModalVisible, props.canControl, session.FleetServerId]);
+  }, [sessionModalVisible, canControl, session.FleetServerId]);
 
-  async function runControl(action) {
+  const selectedMessageTemplate = SESSION_MESSAGE_TEMPLATES.find((item) => item.id === messageTemplateId) || SESSION_MESSAGE_TEMPLATES[0];
+  function fillMessageTemplate(template, when = messageWhen) {
+    return applySessionMessageTemplate(template?.text, session, title, when, twelveHour);
+  }
+  function closeMessage() {
+    setMessageOpen(false);
+    setTemplateMenuOpen(false);
+  }
+
+  async function runControl(action, text) {
     if (controlPending) return;
     if (["stop", "terminate"].includes(action) && !window.confirm(
       action === "terminate" ? "Terminate this playback session and revoke its authority?" : "Stop this playback session?"
     )) return;
-    const payload = action === "message" ? { message: controlMessage, title: "Barracks administrator" } : {};
-    if (action === "message" && !controlMessage.trim()) {
+    const message = String(text ?? "").trim();
+    const payload = action === "message" ? { message, title: "Barracks administrator" } : {};
+    if (action === "message" && !message) {
       setControlNotice({ type: "error", text: "Enter a message first." });
       return;
     }
@@ -254,7 +304,12 @@ function SessionCard(props) {
     try {
       await axios.post(endpoint, payload);
       setControlNotice({ type: "success", text: `${action === "message" ? "Message" : action[0].toUpperCase() + action.slice(1)} command accepted.` });
-      if (action === "message") setControlMessage("");
+      if (action === "message") {
+        closeMessage();
+        setMessageText("");
+        setMessageTemplateId("custom");
+        setMessageWhen(defaultMessageDateTime(15));
+      }
     } catch (error) {
       setControlNotice({ type: "error", text: error.response?.data?.error || error.response?.data?.message || "Playback command failed." });
     } finally {
@@ -321,6 +376,7 @@ function SessionCard(props) {
               </div>
               <h2>{title}</h2>
               <p>{subtitle}</p>
+              {transcodeReason ? <p className="session-popout-reason">{transcodeReason}</p> : null}
               <div className="session-popout-progress" aria-label={`Playback progress ${Math.round(progressPercent)} percent`}>
                 <div style={{ width: `${progressPercent}%` }} />
               </div>
@@ -332,10 +388,35 @@ function SessionCard(props) {
           </div>
           <div className="session-popout-grid">
             <SessionDetailItem label="Server" value={session.FleetServerName || session.ServerId} />
-            <SessionDetailItem label="Viewer" value={session.UserName} />
-            {session.ProfileName && <SessionDetailItem label="Profile" value={session.ProfileName} />}
+            <div className="session-popout-detail">
+              <span>Viewer</span>
+              <div className="session-popout-viewer">
+                {!isSilo && session.UserPrimaryImageTag !== undefined ? (
+                  <img
+                    src={`${baseUrl}/proxy/Users/Images/Primary?id=${session.UserId}&fillWidth=72&quality=55`}
+                    loading="lazy"
+                    decoding="async"
+                    alt=""
+                  />
+                ) : (
+                  <AccountCircleFillIcon aria-hidden="true" />
+                )}
+                <strong>{session.UserName}{session.ProfileName ? ` · ${session.ProfileName}` : ""}</strong>
+              </div>
+            </div>
             <SessionDetailItem label="Device" value={session.DeviceName} />
-            <SessionDetailItem label="Client" value={`${session.Client || "Unknown"} ${session.ApplicationVersion || ""}`.trim()} />
+            <div className="session-popout-detail">
+              <span>Client</span>
+              <div className="session-popout-client">
+                <PlatformIcon
+                  client={session.Client}
+                  deviceName={session.DeviceName}
+                  className={`session-popout-client-icon${String(session.Client || "").toLowerCase().includes("roku") ? " is-roku" : ""}`}
+                />
+                <strong>{clientLabel}</strong>
+              </div>
+            </div>
+            {transcodeReason ? <SessionDetailItem label="Transcode reason" value={transcodeReason} wide /> : null}
             {!hideIpAddress ? <SessionDetailItem label="IP address" value={session.RemoteEndPoint} /> : null}
             <SessionDetailItem label="Container" value={nowPlaying.ContainerStream} />
             <SessionDetailItem label="Video" value={nowPlaying.VideoStream} wide />
@@ -353,7 +434,7 @@ function SessionCard(props) {
             <SessionDetailItem label="Target audio" value={[diagnostics.targetAudioCodec, diagnostics.targetAudioChannels != null ? `${diagnostics.targetAudioChannels} channels` : ''].filter(Boolean).join(' · ')} />
             <SessionDetailItem label="Reported stream bitrate" value={diagnostics.reportedBitrate != null ? `${(diagnostics.reportedBitrate / 1000000).toFixed(2)} Mbps` : ''} />
           </div>
-          {props.canControl && <section className="session-controls" data-session-card-ignore>
+          {canControl && <section className="session-controls" data-session-card-ignore>
             <div className="session-controls-heading">
               <div><strong>Administrator controls</strong><span>Commands affect only this session on {session.FleetServerName || "the primary server"}.</span></div>
               {controlCapabilities && <small>{controlCapabilities.available && controlCapabilities.allowed ? "Available" : controlCapabilities.state || "Unavailable"}</small>}
@@ -361,21 +442,129 @@ function SessionCard(props) {
             {controlNotice && <p role={controlNotice.type === "error" ? "alert" : "status"} className={`session-control-notice is-${controlNotice.type}`}>{controlNotice.text}</p>}
             {!controlCapabilities && !controlNotice && <p role="status" className="session-control-notice">Checking upstream permissions…</p>}
             {controlCapabilities?.available && controlCapabilities?.allowed && <>
-              <div className="session-control-buttons">
+              <div className="session-popout-actions">
                 {playState.IsPaused
-                  ? controlActions.has("resume") && <Button disabled={Boolean(controlPending)} onClick={() => runControl("resume")}>Resume</Button>
-                  : controlActions.has("pause") && <Button disabled={Boolean(controlPending)} onClick={() => runControl("pause")}>Pause</Button>}
-                {controlActions.has("stop") && <Button variant="outline-danger" disabled={Boolean(controlPending)} onClick={() => runControl("stop")}>Stop</Button>}
-                {controlActions.has("terminate") && <Button variant="danger" disabled={Boolean(controlPending)} onClick={() => runControl("terminate")}>Terminate</Button>}
+                  ? controlActions.has("resume") && <button type="button" className="session-command" disabled={Boolean(controlPending)} onClick={() => runControl("resume")}><PlayFillIcon size={17} />Resume</button>
+                  : controlActions.has("pause") && <button type="button" className="session-command" disabled={Boolean(controlPending)} onClick={() => runControl("pause")}><PauseFillIcon size={17} />Pause</button>}
+                {controlActions.has("message") && <button
+                  type="button"
+                  className="session-command is-message"
+                  disabled={Boolean(controlPending)}
+                  onClick={() => {
+                    setControlNotice(null);
+                    setMessageTemplateId("custom");
+                    setMessageWhen(defaultMessageDateTime(15));
+                    setMessageOpen(true);
+                  }}
+                >
+                  <ChatSmile2LineIcon size={17} />
+                  Message
+                </button>}
+                {controlActions.has("stop") && <button type="button" className="session-command is-stop" disabled={Boolean(controlPending)} onClick={() => runControl("stop")}><StopCircleLineIcon size={17} />Stop playback</button>}
+                {controlActions.has("terminate") && <button type="button" className="session-command is-stop" disabled={Boolean(controlPending)} onClick={() => runControl("terminate")}><StopCircleLineIcon size={17} />Terminate</button>}
               </div>
-              {controlActions.has("message") && <div className="session-control-message">
-                <FormControl maxLength={2048} value={controlMessage} disabled={Boolean(controlPending)}
-                  onChange={event => setControlMessage(event.target.value)} placeholder="Message this player" aria-label="Message this player" />
-                <Button variant="outline-primary" disabled={Boolean(controlPending) || !controlMessage.trim()} onClick={() => runControl("message")}>Send</Button>
-              </div>}
             </>}
           </section>}
         </Modal.Body>
+      </Modal>
+      <Modal show={messageOpen} onHide={closeMessage} centered contentClassName="session-message-modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Message {session.UserName}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="session-message-hint">Choose a template from the menu, then edit before sending. It shows as an on-screen notice on their Silo client.</p>
+          <div className={`session-message-picker${templateMenuOpen ? " is-open" : ""}`}>
+            <span className="session-message-select-label">Message template</span>
+            <button
+              type="button"
+              className="session-message-trigger"
+              aria-haspopup="listbox"
+              aria-expanded={templateMenuOpen}
+              onClick={() => setTemplateMenuOpen((open) => !open)}
+            >
+              <span className="session-message-trigger-emoji">{selectedMessageTemplate.emoji}</span>
+              <span className="session-message-trigger-copy">
+                <strong>{selectedMessageTemplate.label}</strong>
+                <small>{selectedMessageTemplate.group}</small>
+              </span>
+              <ArrowDownSLineIcon size={20} />
+            </button>
+            {templateMenuOpen ? (
+              <div className="session-message-menu" role="listbox">
+                {SESSION_MESSAGE_TEMPLATE_GROUPS.map((group) => (
+                  <div key={group} className="session-message-menu-group">
+                    <span>{group}</span>
+                    {SESSION_MESSAGE_TEMPLATES.filter((template) => template.group === group).map((template) => (
+                      <button
+                        type="button"
+                        key={template.id}
+                        role="option"
+                        aria-selected={messageTemplateId === template.id}
+                        className={messageTemplateId === template.id ? "is-selected" : ""}
+                        onClick={() => {
+                          const when = timeForTemplate(template);
+                          setMessageTemplateId(template.id);
+                          setMessageWhen(when);
+                          setTemplateMenuOpen(false);
+                          if (template.id !== "custom") setMessageText(fillMessageTemplate(template, when));
+                        }}
+                      >
+                        <span className="session-message-trigger-emoji">{template.emoji}</span>
+                        <span className="session-message-trigger-copy">
+                          <strong>{template.label}</strong>
+                          <small>{template.id === "custom" ? "Write your own message" : fillMessageTemplate(template, timeForTemplate(template))}</small>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          {selectedMessageTemplate.needsTime ? (
+            <label className="session-message-time-label">
+              <span>When</span>
+              <input
+                type="datetime-local"
+                className="session-message-time"
+                value={messageWhen}
+                onChange={(event) => {
+                  const when = event.target.value;
+                  setMessageWhen(when);
+                  setMessageText(fillMessageTemplate(selectedMessageTemplate, when));
+                }}
+              />
+              <small>Fills into the message as {formatMessageTime(messageWhen, twelveHour)}</small>
+            </label>
+          ) : null}
+          <FormControl
+            as="textarea"
+            rows={3}
+            maxLength={2048}
+            value={messageText}
+            aria-label="Message this player"
+            onChange={(event) => {
+              setMessageTemplateId("custom");
+              setMessageText(event.target.value);
+            }}
+            placeholder="Keep it short — this pops up over playback."
+          />
+          {controlNotice?.type === "error" && messageOpen ? <p role="alert" className="session-action-error">{controlNotice.text}</p> : null}
+        </Modal.Body>
+        <Modal.Footer>
+          <button type="button" className="session-command is-ghost" onClick={closeMessage}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="session-command is-message"
+            disabled={Boolean(controlPending) || !messageText.trim()}
+            onClick={() => runControl("message", messageText)}
+          >
+            <ChatSmile2LineIcon size={17} />
+            {controlPending === "message" ? "Sending…" : "Send message"}
+          </button>
+        </Modal.Footer>
       </Modal>
       <div style={cardBgStyle} className="session-card-main rounded-top">
         <Row className="h-100 p-0 m-0">
@@ -429,7 +618,7 @@ function SessionCard(props) {
                     {diagnostics.hardwareAcceleration && <SessionCardDetailRow label="Hardware"><span>{diagnostics.hardwareAcceleration}</span></SessionCardDetailRow>}
                     {diagnostics.executionNode && <SessionCardDetailRow label="Worker"><span>{diagnostics.executionNode}</span></SessionCardDetailRow>}
                     {props.data.session.NowPlayingItem.ContainerStream !== "" && (
-                      <SessionCardDetailRow label={<Trans i18nKey="CONTAINER" />} className="mt-2">
+                      <SessionCardDetailRow label={<Trans i18nKey="CONTAINER" />} className="mt-2" short>
                           <Tooltip title={props.data.session.NowPlayingItem.ContainerStream}>
                             <span
                               style={{
@@ -444,7 +633,7 @@ function SessionCard(props) {
                       </SessionCardDetailRow>
                     )}
                     {props.data.session.NowPlayingItem.VideoStream !== "" && (
-                      <SessionCardDetailRow label={<Trans i18nKey="VIDEO" />}>
+                      <SessionCardDetailRow label={<Trans i18nKey="VIDEO" />} short>
                           <Tooltip title={props.data.session.NowPlayingItem.VideoStream}>
                             <span
                               style={{
@@ -459,7 +648,7 @@ function SessionCard(props) {
                       </SessionCardDetailRow>
                     )}
                     {props.data.session.NowPlayingItem.VideoBitrateStream !== "" && (
-                      <SessionCardDetailRow label="">
+                      <SessionCardDetailRow label="" short>
                           <Tooltip title={props.data.session.NowPlayingItem.VideoBitrateStream}>
                             <span
                               style={{
@@ -474,7 +663,7 @@ function SessionCard(props) {
                       </SessionCardDetailRow>
                     )}
                     {props.data.session.NowPlayingItem.AudioStream !== "" && (
-                      <SessionCardDetailRow label={<Trans i18nKey="AUDIO" />}>
+                      <SessionCardDetailRow label={<Trans i18nKey="AUDIO" />} short>
                           <Tooltip title={props.data.session.NowPlayingItem.AudioStream}>
                             <span
                               style={{
@@ -489,7 +678,7 @@ function SessionCard(props) {
                       </SessionCardDetailRow>
                     )}
                     {props.data.session.NowPlayingItem.AudioBitrateStream !== "" && (
-                      <SessionCardDetailRow label="">
+                      <SessionCardDetailRow label="" short>
                           <Tooltip title={props.data.session.NowPlayingItem.AudioBitrateStream}>
                             <span
                               style={{
@@ -504,7 +693,7 @@ function SessionCard(props) {
                       </SessionCardDetailRow>
                     )}
                     {props.data.session.NowPlayingItem.SubtitleStream !== "" && (
-                      <SessionCardDetailRow label={<Trans i18nKey="SUBTITLES" />}>
+                      <SessionCardDetailRow label={<Trans i18nKey="SUBTITLES" />} short>
                           <Tooltip title={props.data.session.NowPlayingItem.SubtitleStream}>
                             <span
                               style={{
