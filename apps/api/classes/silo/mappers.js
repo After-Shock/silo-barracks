@@ -58,6 +58,14 @@ function mediaStreams(row) {
   return streams;
 }
 
+// Unknown or missing decisions stay undefined rather than implying a transcode.
+function isDirectDecision(value) {
+  const decision = String(value || '').toLowerCase();
+  if (['direct', 'remux'].includes(decision)) return true;
+  if (['transcode', 'audio'].includes(decision)) return false;
+  return undefined;
+}
+
 // Silo exposes decisions, not reasons; describe only what changed.
 function transcodeReasons(row) {
   const change = (from, to) => (from && to && String(from) !== String(to) ? `${from} → ${to}` : '');
@@ -89,8 +97,8 @@ function sessionToJellyfin(row, detail, serverId) {
     AudioChannels: row.target_audio_channels ?? row.source_audio_channels ?? undefined,
     Height: resolutionHeight(row.target_resolution || row.source_video_resolution),
     VideoBitrate: bps(row.target_bitrate_kbps),
-    IsVideoDirect: ['direct', 'remux'].includes(String(row.video_decision || '').toLowerCase()),
-    IsAudioDirect: ['direct', 'remux'].includes(String(row.audio_decision || '').toLowerCase()),
+    IsVideoDirect: isDirectDecision(row.video_decision),
+    IsAudioDirect: isDirectDecision(row.audio_decision),
     TranscodeReasons: transcodeReasons(row),
   } : null;
   const item = {

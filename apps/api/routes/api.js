@@ -6281,7 +6281,10 @@ router.post("/getActivityTimeLine", async (req, res) => {
     }
 
     // Silo history carries no library IDs, so the library filter does not apply.
-    if (API.isSilo) return res.send(await buildSiloTimeline(API, userId));
+    if (API.isSilo) {
+      try { return res.send(await buildSiloTimeline(API, userId)); }
+      catch (error) { return res.status(error.status === 400 ? 400 : 503).json({ error: error.status === 400 ? error.message : "Unable to load Silo timeline" }); }
+    }
     const { rows } = await db.query(`SELECT * FROM fs_get_user_activity($1, $2);`, [userId, libraries]);
     res.send(rows);
   } catch (error) {

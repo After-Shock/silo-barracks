@@ -43,3 +43,13 @@ test('transcode reasons are derived only from Silo decisions and requested targe
   const direct = sessionToJellyfin({ session_id: 'd', user_id: 'u', effective_play_method: 'direct' }, null, 'server');
   assert.equal(direct.TranscodingInfo, null);
 });
+
+test('unknown Silo decisions are not reported as remux or transcode', () => {
+  const s = sessionToJellyfin({ session_id: 's', user_id: 'u', effective_play_method: 'transcode' }, null, 'server');
+  assert.equal(s.TranscodingInfo.IsVideoDirect, undefined);
+  assert.equal(s.TranscodingInfo.IsAudioDirect, undefined);
+  const known = sessionToJellyfin({ session_id: 'k', user_id: 'u', effective_play_method: 'transcode',
+    video_decision: 'transcode', audio_decision: 'direct' }, null, 'server');
+  assert.equal(known.TranscodingInfo.IsVideoDirect, false);
+  assert.equal(known.TranscodingInfo.IsAudioDirect, true);
+});

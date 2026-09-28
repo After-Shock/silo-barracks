@@ -7,22 +7,33 @@ const PAGE_SIZE = 100;
 const MAX_EPISODE_LOOKUPS = 100;
 const LOOKUP_BATCH = 10;
 
+// Mirrors fs_get_user_activity: walk plays oldest-first and start a new run when the title
+// changes or more than a month passes, then split each run by season.
 function historyToTimeline(rows, seriesById) {
   const groups = new Map();
-  for (const row of rows) {
+  let run = 0;
+  let prevTitle;
+  let prevAt;
+  const ordered = [...rows].sort((a, b) => (a.ActivityDateInserted < b.ActivityDateInserted ? -1 : a.ActivityDateInserted > b.ActivityDateInserted ? 1 : 0));
+  for (const row of ordered) {
     const isEpisode = row.SiloMediaType === 'episode';
     const series = isEpisode ? seriesById.get(row.NowPlayingItemId) : null;
-    const key = series ? `s:${series.seriesId}:${series.seasonName}` : `i:${row.NowPlayingItemId}`;
+    const title = series?.seriesTitle || row.NowPlayingItemName || '';
     const at = row.ActivityDateInserted;
+    const gapLimit = prevAt ? new Date(prevAt) : null;
+    if (gapLimit) gapLimit.setUTCMonth(gapLimit.getUTCMonth() + 1);
+    if (title !== prevTitle || !gapLimit || new Date(at) > gapLimit) run += 1;
+    prevTitle = title;
+    prevAt = at;
+    const key = `${run}:${series?.seasonName ?? ''}`;
     const group = groups.get(key) || {
-      UserName: row.UserName, Title: series?.seriesTitle || row.NowPlayingItemName || '', episodes: new Set(),
+      UserName: row.UserName, Title: title, episodes: new Set(),
       FirstActivityDate: at, LastActivityDate: at, TotalPlaybackDuration: 0,
       SeasonName: series?.seasonName || null, MediaType: series ? 'tvshows' : 'movies',
       NowPlayingItemId: series?.seriesId || row.NowPlayingItemId,
     };
     if (isEpisode) group.episodes.add(row.NowPlayingItemId);
-    if (at < group.FirstActivityDate) group.FirstActivityDate = at;
-    if (at > group.LastActivityDate) group.LastActivityDate = at;
+    group.LastActivityDate = at;
     group.TotalPlaybackDuration += Number(row.PlaybackDuration) || 0;
     groups.set(key, group);
   }
@@ -32,6 +43,9 @@ function historyToTimeline(rows, seriesById) {
 }
 
 async function buildSiloTimeline(api, userId) {
+  if (typeof userId !== 'string' || !userId.trim()) {
+    throw Object.assign(new Error('A userId is required.'), { status: 400 });
+  }
   const rows = [];
   let cursor;
   for (let page = 0; page < MAX_PAGES; page += 1) {

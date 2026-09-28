@@ -56,3 +56,23 @@ test('failed episode detail lookups keep the timeline and resolve the rest', asy
   const out = await buildSiloTimeline(api, 'u1');
   assert.deepEqual(out.map(r => [r.Title, r.SeasonName]), [['Show', 'Season 2'], ['Ep gone', null]]);
 });
+
+test('a title rewatched after more than a month, or interrupted by another title, starts a new entry', () => {
+  const show = { seriesTitle: 'Show', seasonName: 'Season 1', seriesId: 's' };
+  const rows = [ep('e3', '2026-09-20T00:00:00Z', 5), ep('e2', '2026-01-10T00:00:00Z', 5),
+    { NowPlayingItemId: 'm', SiloMediaType: 'movie', NowPlayingItemName: 'Heat', UserName: 'sam',
+      ActivityDateInserted: '2026-01-05T00:00:00Z', PlaybackDuration: 5 },
+    ep('e1', '2026-01-01T00:00:00Z', 5)];
+  const out = historyToTimeline(rows, new Map([['e1', show], ['e2', show], ['e3', show]]));
+  assert.deepEqual(out.map(r => [r.Title, r.FirstActivityDate.slice(0, 10), r.EpisodeCount]),
+    [['Show', '2026-09-20', 1], ['Show', '2026-01-10', 1], ['Heat', '2026-01-05', 0], ['Show', '2026-01-01', 1]]);
+});
+
+test('a missing or blank user id is rejected instead of returning every user\'s history', async () => {
+  let called = false;
+  const api = { async getPlaybackHistoryPage() { called = true; return { results: [], hasMore: false }; } };
+  for (const userId of [null, '', '   ', undefined, 42]) {
+    await assert.rejects(buildSiloTimeline(api, userId), error => error.status === 400);
+  }
+  assert.equal(called, false);
+});
