@@ -1,4 +1,8 @@
 :root {
+    --jg-page-pad: clamp(0.55rem, 0.7vw, 0.8rem);
+    --jg-type-display: clamp(1.55rem, 2vw, 2rem);
+    --jg-type-title: clamp(1.1rem, 1.2vw, 1.3rem);
+    --jg-type-stat: clamp(1.25rem, 1.45vw, 1.55rem);
     --barracks-canvas: #161410;
     --barracks-nav: #1e1913;
     --barracks-surface-raised: #221c14;
