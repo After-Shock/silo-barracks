@@ -12,14 +12,6 @@ html body .home-dashboard-backdrop {
   background: none;
 }
 
-html body .navitem:not(:disabled):not(.disabled).active {
-  background: var(--barracks-action) !important;
-  border-left: 3px solid var(--barracks-action);
-  border-radius: 0 3px 3px 0;
-  box-shadow: none;
-  color: var(--barracks-action-text) !important;
-}
-
 html body :is(.navbar-brand-icon, .setup-logo-mark, .setup-jellyfin-logo, .login-logo) {
   background: transparent;
   border: 0;

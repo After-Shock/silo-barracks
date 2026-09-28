@@ -807,6 +807,7 @@ export default function Navbar() {
         </div>
 
         <Nav className="flex-row flex-md-column w-100">
+          <div className="navbar-links-scroll">
           {visibleNavData.map((item) => {
             const isActive = isNavItemActive(item, location);
             const badgeCount =
@@ -866,6 +867,16 @@ export default function Navbar() {
               </OverlayTrigger>
             );
           })}
+          <button
+            type="button"
+            className="navbar-collapse-toggle"
+            onClick={() => setIsNavCollapsed((current) => !current)}
+            aria-label={isNavCollapsed ? "Expand side menu" : "Collapse side menu"}
+            title={isNavCollapsed ? "Expand side menu" : "Collapse side menu"}
+          >
+            {isNavCollapsed ? <ArrowRightSLineIcon size={16} /> : <ArrowLeftSLineIcon size={16} />}
+          </button>
+          </div>
           <div className="navbar-inline-footer">
             <div className="navbar-footer-account-row">
               <button
@@ -885,15 +896,6 @@ export default function Navbar() {
                   <strong>{accountName}</strong>
                   <small>{accountRole}</small>
                 </span>
-              </button>
-              <button
-                type="button"
-                className="navbar-collapse-toggle"
-                onClick={() => setIsNavCollapsed((current) => !current)}
-                aria-label={isNavCollapsed ? "Expand side menu" : "Collapse side menu"}
-                title={isNavCollapsed ? "Expand side menu" : "Collapse side menu"}
-              >
-                {isNavCollapsed ? <ArrowRightSLineIcon size={20} /> : <ArrowLeftSLineIcon size={20} />}
               </button>
             </div>
             <div className="navbar-version-row">
