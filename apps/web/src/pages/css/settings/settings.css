@@ -1153,16 +1153,20 @@
   }
 
   .settings-mobile-menu-list button {
-
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: auto;
+    min-width: 0;
+    min-height: 38px;
+    max-width: 176px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 12px;
     font-weight: 900;
-  font-size: 12px;
-  border-radius: 999px;
-  gap: 10px;
-  align-items: center;
-  min-width: 0;
-  width: auto;
-  display: flex;
-}
+  }
 
   .settings-mobile-menu-list .settings-tab-title span {
     max-width: 126px;
@@ -1381,6 +1385,7 @@
 @media (max-width: 640px) {
   .settings {
     padding: 8px 10px calc(env(safe-area-inset-bottom, 0px) + 34px);
+  padding-top: 0;
 }
 
   .settings-page-header {
@@ -1388,6 +1393,9 @@
     border-bottom: 1px solid color-mix(in srgb, var(--barracks-focus-light) 12%, transparent);
     background: color-mix(in srgb, var(--barracks-surface-inset) 56%, transparent);
     margin-bottom: 10px;
+  margin: 0 -10px;
+  min-height: 0;
+  padding: 12px 20px 16px;
 }
 
   .settings-page-header h1 {
@@ -1401,6 +1409,8 @@
     padding: 7px 10px;
   margin-left: -10px;
   margin-right: -10px;
+  margin-bottom: 10px;
+  padding-block: 6px;
 }
 
   .settings-mobile-menu-list button {
@@ -1408,6 +1418,7 @@
     max-width: 148px;
     padding: 0 10px;
     font-size: 11px;
+  border-radius: 13px;
 }
 
   .settings-mobile-menu-list .settings-tab-title span {
@@ -1421,16 +1432,6 @@
 
 .settings {
   background: transparent;
-  padding: 1.15rem clamp(0.9rem, 2vw, 1.6rem) 1.8rem;
-  overflow-x: hidden;
-  min-height: 0;
-  max-width: 100%;
-  min-width: 0;
-  width: 100%;
-  gap: 22px;
-  align-items: start;
-  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
-  display: grid;
 }
 
 .settings-page-header h1,
@@ -1478,14 +1479,6 @@
   padding: 0 12px !important;
   line-height: 1;
   transition: background-color 160ms ease, color 160ms ease;
-  text-align: left;
-  font-weight: 850;
-  font-size: 13px;
-  border-radius: 11px !important;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  display: flex !important;
 }
 
 .settings > .nav-pills .nav-link.active,

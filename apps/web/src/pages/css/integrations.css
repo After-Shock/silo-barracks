@@ -424,6 +424,12 @@
   padding: 12px;
   border-radius: 14px;
   gap: 10px;
+  align-self: start;
+  display: flex !important;
+  flex-direction: column !important;
+  height: auto !important;
+  justify-content: flex-start !important;
+  min-height: 0 !important;
 }
 
 .integrations-page.is-embedded .jellyfin-integration-card {

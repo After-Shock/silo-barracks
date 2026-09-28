@@ -397,6 +397,8 @@
 
     padding: 14px;
   gap: 10px;
+  align-items: flex-start;
+  flex-direction: column;
 }
 
   .transcode-job-main h2 {
@@ -405,6 +407,7 @@
 
   .transcode-job-meta {
     gap: 5px;
+  justify-content: flex-start;
 }
 
   .transcode-reason {
