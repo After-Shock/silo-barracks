@@ -29,3 +29,17 @@ test('diagnostics preserve routing, client and source/target values without priv
   assert.ok(!JSON.stringify(session).includes('do-not-copy'));
   assert.equal(session.PlayState.PlayMethod, 'Future-Format');
 });
+
+test('transcode reasons are derived only from Silo decisions and requested targets', () => {
+  const s = sessionToJellyfin({ session_id: 's', user_id: 'u', effective_play_method: 'transcode',
+    video_decision: 'transcode', audio_decision: 'direct', source_video_resolution: '2160p',
+    requested_video_resolution: '1080p', source_video_codec: 'hevc', requested_video_codec: 'h264',
+    file_duration: 100, position_seconds: 50 }, null, 'server');
+  assert.deepEqual(s.TranscodingInfo.TranscodeReasons, ['Video transcode (2160p → 1080p, hevc → h264)']);
+  assert.equal(s.TranscodingInfo.CompletionPercentage, undefined);
+  const bare = sessionToJellyfin({ session_id: 'b', user_id: 'u', effective_play_method: 'transcode',
+    video_decision: 'transcode', audio_decision: 'transcode' }, null, 'server');
+  assert.deepEqual(bare.TranscodingInfo.TranscodeReasons, ['Video transcode', 'Audio transcode']);
+  const direct = sessionToJellyfin({ session_id: 'd', user_id: 'u', effective_play_method: 'direct' }, null, 'server');
+  assert.equal(direct.TranscodingInfo, null);
+});

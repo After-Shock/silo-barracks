@@ -58,6 +58,19 @@ function mediaStreams(row) {
   return streams;
 }
 
+// Silo exposes decisions, not reasons; describe only what changed.
+function transcodeReasons(row) {
+  const change = (from, to) => (from && to && String(from) !== String(to) ? `${from} → ${to}` : '');
+  const reasons = [];
+  if (String(row.video_decision || '').toLowerCase() === 'transcode') {
+    const detail = [change(row.source_video_resolution, row.requested_video_resolution),
+      change(row.source_video_codec, row.requested_video_codec)].filter(Boolean).join(', ');
+    reasons.push(detail ? `Video transcode (${detail})` : 'Video transcode');
+  }
+  if (String(row.audio_decision || '').toLowerCase() === 'transcode') reasons.push('Audio transcode');
+  return reasons;
+}
+
 function sessionToJellyfin(row, detail, serverId) {
   if (!row || typeof row !== 'object' || !row.session_id || row.user_id === undefined || row.user_id === null) {
     throw new TypeError('Invalid Silo session response');
@@ -70,7 +83,6 @@ function sessionToJellyfin(row, detail, serverId) {
   const effectiveMethod = String(row.effective_play_method || row.play_method || '').toLowerCase();
   const transcoding = ['transcode', 'audio'].includes(effectiveMethod) ? {
     Bitrate: streamBitrate,
-    CompletionPercentage: row.file_duration > 0 ? Number(row.position_seconds || 0) / row.file_duration * 100 : undefined,
     Container: String(row.target_container || row.source_container || ''),
     VideoCodec: String(row.target_video_codec || row.source_video_codec || 'unknown'),
     AudioCodec: String(row.target_audio_codec || row.source_audio_codec || 'unknown'),
@@ -79,7 +91,7 @@ function sessionToJellyfin(row, detail, serverId) {
     VideoBitrate: bps(row.target_bitrate_kbps),
     IsVideoDirect: ['direct', 'remux'].includes(String(row.video_decision || '').toLowerCase()),
     IsAudioDirect: ['direct', 'remux'].includes(String(row.audio_decision || '').toLowerCase()),
-    TranscodeReasons: [],
+    TranscodeReasons: transcodeReasons(row),
   } : null;
   const item = {
     Id: row.content_id ? String(row.content_id) : '', SiloUnattributed: !row.content_id,
