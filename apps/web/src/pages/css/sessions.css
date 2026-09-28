@@ -862,7 +862,7 @@
 /* Jellyglance-style active session cards, rebranded for Silo Barracks. */
 .sessions-container,
 .fleet-streams {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 416px), 496px));
   gap: 18px;
   align-items: start;
 }

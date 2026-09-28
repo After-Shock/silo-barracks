@@ -130,8 +130,9 @@
 
 .fleet-streams {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 496px));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 416px), 496px));
   gap: 18px;
+  align-items: start;
 }
 
 .fleet-stream,
@@ -254,9 +255,3 @@
   }
 }
 
-/* Match Jellyglance-style active-session card sizing in the Silo fleet view. */
-.fleet-streams {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr));
-  gap: 18px;
-  align-items: start;
-}

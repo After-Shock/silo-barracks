@@ -24,6 +24,25 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
   const count = filter === 'all' ? snapshot?.totalActiveStreams : selectedServer.activeStreams;
   const partial = Boolean(error || (filter === 'all' ? snapshot?.partial : selectedServer?.state !== 'connected'));
   const streams = visible.flatMap(server => normalizeSessions(server.sessions || []).map(session => ({ server, session })));
+  const card = ({ server, session }) => <SessionCard data={{ session: { ...session, FleetServerId: server.id } }}
+    hideIpAddress={shouldHideActiveSessionIp(surface, privacy)} kiosk={surface === 'kiosk'}
+    canControl={canControl && server.state === 'connected' && !session.stale} />;
+  // One server: render the plain upstream sessions widget; fleet chrome only earns its space with several servers.
+  if (servers.filter(server => server.enabled).length <= 1) {
+    if (!snapshot && !error) return <div className="sessions-widget sessions-widget-loading">
+      <h1 className="my-3">Active Sessions</h1>
+      <div className="sessions-loading-strip" aria-hidden="true"><span /><span /></div>
+    </div>;
+    const unavailable = Boolean(error) || (visible[0] && visible[0].state !== 'connected');
+    return <div className="sessions-widget">
+      <h1 className="my-3">Active Sessions</h1>
+      {unavailable && <p role="status" className="fleet-notice">{error || (streams.length ? 'Your Silo server is unavailable. Showing last-known activity.' : 'Your Silo server is unavailable.')} <button onClick={refresh}>Retry</button></p>}
+      {streams.length === 0
+        ? !unavailable && <div className="sessions-empty-state">No Active Sessions Found</div>
+        : <div className="sessions-container">{streams.map(stream =>
+          <ErrorBoundary key={`${stream.server.id}:${stream.session.Id}`}>{card(stream)}</ErrorBoundary>)}</div>}
+    </div>;
+  }
   return <section className="fleet-overview" aria-label="All Silo servers">
     <header className="fleet-heading">
       <div><span className="fleet-eyebrow">{filter === 'all' ? 'All servers' : selectedServer.name}</span><h1>Active Sessions</h1></div>
@@ -56,8 +75,7 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
     <div className="fleet-streams">
       {streams.map(({ server, session }) => <div key={`${server.id}:${session.Id}`} className="fleet-stream">
         <div className="fleet-source"><strong>{server.name}</strong>{(session.stale || server.state !== 'connected' || error) && <span>Stale · last known activity</span>}</div>
-        <ErrorBoundary><SessionCard data={{ session: { ...session, FleetServerId: server.id } }}
-          hideIpAddress={shouldHideActiveSessionIp(surface, privacy)} canControl={canControl && server.state === 'connected' && !session.stale} /></ErrorBoundary>
+        <ErrorBoundary>{card({ server, session })}</ErrorBoundary>
       </div>)}
     </div>
     {servers.length > 1 && <p className="fleet-footnote">Live activity includes all enabled servers. Playback History can be scoped to one connected server; library statistics remain primary-server scoped.</p>}
