@@ -107,7 +107,7 @@ export default function SiloActivity({ config }) {
 
   return <div className="Activity" data-theme-screen="activity">
     <header className="activity-page-header">
-      <div><p>Silo activity</p><h1>Activity</h1><span>Live playback diagnostics and finalized playback history from Silo API v2.</span></div>
+      <div><p>Silo activity</p><h1>Activity</h1><span>Review watch history, playback method, device, and session details. <Link to="/timeline">Open Timeline view</Link>.</span></div>
       <div className="activity-view-tabs" role="tablist" aria-label="Activity view">
         <button type="button" role="tab" aria-selected={view === "live"} onClick={() => setView("live")}>Live sessions</button>
         <button type="button" role="tab" aria-selected={view === "history"} onClick={() => setView("history")}>Playback history</button>
