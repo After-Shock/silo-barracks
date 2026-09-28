@@ -219,3 +219,7 @@
     text-align: center;
   }
 }
+
+.activity-timeline-screen .user-selection select {
+  min-width: 12rem;
+}

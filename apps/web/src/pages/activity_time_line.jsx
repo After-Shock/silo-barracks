@@ -10,6 +10,17 @@ import Loading from "./components/general/loading";
 import LibraryFilterModal from "./components/library/library-filter-modal";
 import "./css/timeline/activity-timeline.css";
 
+const NO_LIBRARY_FILTER = [];
+
+function readStoredLibraries() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem("PREF_ACTIVITY_TIMELINE_selectedLibraries"));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 function ActivityTimeline(props) {
   const { preselectedUser } = props;
   const [users, setUsers] = useState();
@@ -25,14 +36,7 @@ function ActivityTimeline(props) {
   const [libraryError, setLibraryError] = useState("");
   const [timelineDataState, setTimelineDataState] = useState("loading");
   const [showLibraryFilters, setShowLibraryFilters] = useState(false);
-  const [selectedLibraries, setSelectedLibraries] = useState(
-    localStorage.getItem("PREF_ACTIVITY_TIMELINE_selectedLibraries") !=
-      undefined
-      ? JSON.parse(
-          localStorage.getItem("PREF_ACTIVITY_TIMELINE_selectedLibraries")
-        )
-      : []
-  );
+  const [selectedLibraries, setSelectedLibraries] = useState(readStoredLibraries);
 
   const handleLibraryFilter = (selectedOptions) => {
     setTimelineDataState("loading");
@@ -96,7 +100,7 @@ function ActivityTimeline(props) {
         .then((users) => {
           setUsers(users.data);
           setUserError("");
-          if (!selectedUser && users.data[0]) {
+          if (users.data[0] && !users.data.some((user) => user.UserId === selectedUser)) {
             setSelectedUser(users.data[0].UserId);
           }
         })
@@ -107,8 +111,11 @@ function ActivityTimeline(props) {
     }
   }, [config, preselectedUser]);
 
+  // Silo history has no library IDs, so its timeline is unfiltered.
+  const isSilo = Boolean(config?.IS_SILO);
+
   useEffect(() => {
-    if (config) {
+    if (config && !config.IS_SILO) {
       const url = `/stats/getLibraryMetadata`;
       axios
         .get(url, {
@@ -136,9 +143,9 @@ function ActivityTimeline(props) {
   }, [config]);
 
   const filterError = configError || userError || libraryError;
-  const filtersResolved = Boolean(filterError) || Boolean(config && libraries !== undefined && (preselectedUser || users !== undefined));
-  const hasFilters = Boolean((preselectedUser || users?.length > 0) && libraries?.length > 0);
-  const hasSelection = Boolean(selectedUser && selectedLibraries?.length > 0);
+  const filtersResolved = Boolean(filterError) || Boolean(config && (isSilo || libraries !== undefined) && (preselectedUser || users !== undefined));
+  const hasFilters = Boolean((preselectedUser || users?.length > 0) && (isSilo || libraries?.length > 0));
+  const hasSelection = Boolean(selectedUser && (isSilo || selectedLibraries?.length > 0));
   const routeResolved = !hasSelection || timelineDataState !== "loading";
 
   if (!filtersResolved) {
@@ -203,7 +210,7 @@ function ActivityTimeline(props) {
               )}
             </div>
           </div>
-          <div className="library-selection d-flex flex-column flex-sm-row">
+          {!isSilo && <div className="library-selection d-flex flex-column flex-sm-row">
             <Button
               onClick={() => setShowLibraryFilters(true)}
               className="ms-sm-3 mb-3 my-sm-1"
@@ -237,14 +244,14 @@ function ActivityTimeline(props) {
                 </Button>
               </Modal.Footer>
             </Modal>
-          </div>
+          </div>}
         </div>
       </div>
       <div>
-        {selectedUser && selectedLibraries?.length > 0 && (
+        {hasSelection && (
           <ActivityTimelineComponent
             userId={selectedUser}
-            libraries={selectedLibraries}
+            libraries={isSilo ? NO_LIBRARY_FILTER : selectedLibraries}
             onStateChange={setTimelineDataState}
           />
         )}

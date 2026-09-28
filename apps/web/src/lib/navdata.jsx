@@ -3,6 +3,7 @@
 import HomeFillIcon from 'remixicon-react/HomeFillIcon';
 import BarChartFillIcon from 'remixicon-react/BarChartFillIcon';
 import HistoryFillIcon from 'remixicon-react/HistoryFillIcon';
+import TimeFillIcon from 'remixicon-react/TimeFillIcon';
 import SettingsFillIcon from 'remixicon-react/SettingsFillIcon';
 import GalleryFillIcon from 'remixicon-react/GalleryFillIcon';
 import UserFillIcon from 'remixicon-react/UserFillIcon';
@@ -53,6 +54,13 @@ export const navData = [
         text: <Trans i18nKey="MENU_TABS.ACTIVITY" />,
         label: "Activity",
         link: "activity"
+    },
+    {
+        id: 16,
+        icon: <TimeFillIcon />,
+        text: <Trans i18nKey="MENU_TABS.TIMELINE" />,
+        label: "Timeline",
+        link: "timeline"
     },
     {
         id: 5,

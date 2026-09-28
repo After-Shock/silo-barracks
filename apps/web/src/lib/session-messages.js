@@ -1,4 +1,4 @@
-// Player message templates, ported from JellyGlance session cards.
+// Player message templates, ported from the upstream dashboard session cards.
 export function defaultMessageDateTime(minutesAhead = 15) {
   const date = new Date(Date.now() + minutesAhead * 60 * 1000);
   date.setSeconds(0, 0);
