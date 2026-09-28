@@ -1,14 +1,6 @@
 /* Silo's warm console palette and printed, three-colour identity. */
-html body, html body * {
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-}
-
 html body :is(code, pre, .session-details-title, .setup-brand-kicker) {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
-}
-
-html body :is(.home-glass-card, .setup-card, .form-box, .activity-sessions-panel, .session-card) {
-  border-radius: 4px;
 }
 
 html body :is(.home-dashboard-backdrop, .home-glass-card)::before,
@@ -83,7 +75,6 @@ html body :is(.home-icon-bubble, .home-accent-purple .home-icon-bubble) {
   color: var(--barracks-action);
   background: var(--barracks-surface-interactive);
   border-color: var(--barracks-border-strong);
-  border-radius: 4px;
   box-shadow: none;
 }
 
