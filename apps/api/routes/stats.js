@@ -775,6 +775,10 @@ router.get("/getAllUserActivity", async (req, res) => {
     res.set("Pragma", "no-cache");
     res.set("Expires", "0");
     res.set("Surrogate-Control", "no-store");
+    if (await isSiloProvider()) {
+      const users = await API.getPlaybackHistoryUsers();
+      return res.send(users.map((user) => ({ UserId: user.Id, UserName: user.Name })));
+    }
     const { rows } = await db.query("SELECT * FROM jf_all_user_activity");
     res.send(rows);
   } catch (error) {

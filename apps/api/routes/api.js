@@ -12,6 +12,7 @@ const { randomUUID } = require("crypto");
 const configClass = require("../classes/config");
 const { checkForUpdates, fetchGithubContributors, fetchReleaseNotes } = require("../version-control");
 const API = require("../classes/api-loader");
+const { buildSiloTimeline } = require("../classes/silo/timeline");
 const { sendUpdate } = require("../ws");
 const { tables } = require("../global/backup_tables");
 const TaskScheduler = require("../classes/task-scheduler-singleton");
@@ -6279,6 +6280,8 @@ router.post("/getActivityTimeLine", async (req, res) => {
       return;
     }
 
+    // Silo history carries no library IDs, so the library filter does not apply.
+    if (API.isSilo) return res.send(await buildSiloTimeline(API, userId));
     const { rows } = await db.query(`SELECT * FROM fs_get_user_activity($1, $2);`, [userId, libraries]);
     res.send(rows);
   } catch (error) {
