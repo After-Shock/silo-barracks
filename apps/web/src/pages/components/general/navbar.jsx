@@ -268,7 +268,8 @@ export default function Navbar() {
 
   useEffect(() => {
     localStorage.setItem(NAV_COLLAPSED_KEY, String(isNavCollapsed));
-    document.documentElement.style.setProperty("--jg-sidebar-width", isNavCollapsed ? "78px" : "250px");
+    if (isNavCollapsed) document.documentElement.style.setProperty("--jg-sidebar-width", "78px");
+    else document.documentElement.style.removeProperty("--jg-sidebar-width");
   }, [isNavCollapsed]);
 
   useEffect(() => {

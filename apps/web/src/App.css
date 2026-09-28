@@ -1,18 +1,16 @@
 @import "pages/css/variables.css";
-:root {
-  --jg-sidebar-width: 250px;
-}
 
 .app-shell-main {
   flex: 1 1 auto;
   width: auto !important;
   min-width: 0;
   max-width: 100%;
-  min-height: 125vh;
+  min-height: 100dvh;
   margin-inline: 0;
-  padding: 16px;
+  padding: var(--jg-page-pad, 8px);
   overflow: auto;
   background: var(--barracks-canvas);
+  overflow-x: hidden;
 }
 
 .App > .d-flex {
@@ -35,10 +33,15 @@
 }
 
 @media (min-width: 901px) and (hover: hover) {
-  .app-shell-main {
-    width: calc(125vw - var(--jg-sidebar-width, 250px)) !important;
-    max-width: calc(125vw - var(--jg-sidebar-width, 250px));
-    overflow-x: hidden;
+  .app-shell-main > *:not(.libraries):not(.calendar-dashboard):not(.downloads-page):not(.transcodes-page):not(.watch-stats):not(.about-page):not(.Home) {
+    transform: scale(var(--jg-content-scale, 0.82));
+    transform-origin: top left;
+    width: calc(100% / var(--jg-content-scale, 0.82)) !important;
+  }
+
+  .app-shell-main > :is(.libraries, .calendar-dashboard, .downloads-page, .transcodes-page, .watch-stats, .about-page, .Home) {
+    transform: none;
+    width: 100% !important;
   }
 }
 
@@ -48,7 +51,7 @@
   }
 
   .app-shell-main {
-    min-height: 125vh;
+    min-height: 100dvh;
     padding: 10px 10px calc(88px + env(safe-area-inset-bottom, 0px));
     overflow-x: hidden;
   }

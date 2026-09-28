@@ -285,6 +285,6 @@
 
   .activity-control-field,
   .activity-control-field.is-compact {
-    grid-template-columns: 86px 1fr;
+    grid-template-columns: 7.5rem 1fr;
   }
 }

@@ -85,7 +85,7 @@
 .integration-page-header h1 {
   margin: 4px 0 6px !important;
   color: var(--barracks-text-raised);
-  font-size: clamp(28px, 2.6vw, 42px);
+  font-size: var(--jg-type-display);
   font-weight: 950;
   line-height: 0.95;
 }
@@ -416,16 +416,14 @@
 
 .integrations-page.is-embedded .integration-grid {
   grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 10px;
 }
 
 .integrations-page.is-embedded .integration-section {
-  display: flex !important;
-  flex-direction: column !important;
-  align-self: start;
-  height: auto !important;
-  min-height: 0 !important;
-  justify-content: flex-start !important;
+
   padding: 12px;
+  border-radius: 14px;
+  gap: 10px;
 }
 
 .integrations-page.is-embedded .jellyfin-integration-card {
@@ -926,12 +924,20 @@
 .integration-fields input,
 .client-adder select {
   border-color: var(--barracks-border-inset);
-  border-radius: 8px;
+  border-radius: 10px;
   background: color-mix(in srgb, var(--barracks-surface-inset) 88%, transparent);
+  padding: 0 12px;
+  color-scheme: dark;
+  min-height: 42px;
+  min-width: 0;
+  width: 100%;
 }
 
 .integration-status-light {
   box-shadow: none;
+  border-radius: 999px;
+  height: 13px;
+  width: 13px;
 }
 
 .integration-uptime-timeline i.is-ok {
@@ -940,4 +946,28 @@
 
 .integration-uptime-timeline i.is-error {
   background: var(--barracks-state-danger);
+}
+
+/* Density port from upstream d717ebc. */
+.calendar-dashboard {
+  gap: 0.7rem;
+  padding: var(--jg-page-pad) clamp(0.55rem, 1.2vw, 1rem) 1.1rem;
+}
+
+.calendar-dashboard .integration-page-header {
+  gap: 0.7rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.75rem;
+}
+
+.calendar-dashboard .calendar-toolbar {
+  padding: 0;
+  gap: 0.45rem;
+}
+
+.calendar-dashboard .calendar-toolbar button,
+.calendar-dashboard .calendar-toolbar a {
+  min-height: 2rem;
+  padding: 0 0.75rem;
+  font-size: 0.8rem;
 }

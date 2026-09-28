@@ -1,7 +1,7 @@
 @import "./variables.css";
 .loading {
-  margin: 0px;
-  height: calc(100vh - 100px);
+  margin: 0;
+  height: 100%;
 
   display: flex;
   justify-content: center;
@@ -10,6 +10,9 @@
   color: var(--barracks-text);
   transition: opacity 800ms ease-in;
   opacity: 1;
+  gap: 16px;
+  flex-direction: column;
+  min-height: 100dvh;
 }
 
 .busy {

@@ -67,4 +67,8 @@
     --text-color: var(--barracks-text);
     --muted-text-color: var(--barracks-text-muted);
     --subtle-text-color: var(--barracks-state-unavailable);
+    --jg-font-size: clamp(12.5px, 0.1vw + 12.1px, 13px);
+    --bs-root-font-size: var(--jg-font-size);
+    --jg-content-scale: 0.82;
+    --jg-sidebar-width: clamp(12.75rem, 14vw, 13.75rem);
   }

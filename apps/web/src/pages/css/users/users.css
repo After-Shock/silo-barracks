@@ -1,7 +1,7 @@
 .Users.users-page {
   min-height: auto;
   margin: 0;
-  padding: 10px clamp(12px, 2vw, 24px) 28px;
+  padding: var(--jg-page-pad) clamp(0.55rem, 1.2vw, 1rem) 1.1rem;
   background: var(--barracks-canvas);
   color: var(--barracks-text);
 }
@@ -38,9 +38,9 @@
 
 .users-title-icon {
   display: inline-flex;
-  width: 46px;
-  height: 46px;
-  flex: 0 0 46px;
+  width: 2.15rem;
+  height: 2.15rem;
+  flex: 0 0 2.15rem;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--barracks-action);
@@ -54,7 +54,6 @@
   justify-content: flex-end;
   gap: 10px;
   margin-left: auto;
-  margin-right: clamp(18px, 4vw, 72px);
 }
 
 .users-header-actions .users-primary-action {
@@ -77,7 +76,7 @@
 
 .users-hero h1 {
   margin: 0;
-  font-size: clamp(28px, 3vw, 42px);
+  font-size: var(--jg-type-display);
   font-weight: 950;
   line-height: 1;
 }
@@ -112,9 +111,9 @@
 
 .users-stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 12px;
-  margin-bottom: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-bottom: 0.65rem;
 }
 
 .users-stat-card,
@@ -133,9 +132,10 @@
   grid-template-columns: auto 1fr;
   gap: 8px 12px;
   align-items: center;
-  min-height: 68px;
-  padding: 10px 12px;
-  border-radius: 13px;
+  min-height: 3.4rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.7rem;
+  height: 100%;
 }
 
 .users-stat-card svg {
@@ -152,7 +152,7 @@
 }
 
 .users-stat-card strong {
-  font-size: 22px;
+  font-size: var(--jg-type-stat);
   font-weight: 950;
 }
 
@@ -189,7 +189,7 @@
 .users-panel-header h2 {
   margin: 0;
   color: var(--barracks-text-raised);
-  font-size: clamp(20px, 2vw, 30px);
+  font-size: var(--jg-type-title);
   font-weight: 950;
 }
 
@@ -278,20 +278,24 @@
 
 .users-profile-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(292px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(15.25rem, 15.25rem));
+  gap: 0.6rem;
+  justify-content: start;
+  grid-auto-rows: 1fr;
 }
 
 .users-profile-card {
   display: grid;
-  gap: 14px;
+  gap: 0.45rem;
   min-width: 0;
-  padding: 16px;
+  padding: 0.6rem 0.65rem;
   border: 1px solid var(--barracks-border-raised);
   border-radius: 16px;
   background: var(--barracks-surface-raised);
   color: var(--barracks-text-raised);
   box-shadow: 0 22px 58px var(--barracks-scrim);
+  height: 100%;
+  grid-template-rows: auto auto auto 1fr auto;
 }
 
 .users-profile-card.is-account-card {
@@ -328,7 +332,7 @@
   display: block;
   overflow: hidden;
   color: var(--barracks-text-raised);
-  font-size: 22px;
+  font-size: var(--jg-type-title);
   font-weight: 950;
   line-height: 1.16;
   text-decoration: none;
@@ -338,9 +342,9 @@
 
 .users-profile-name span {
   display: block;
-  margin-top: 7px;
+  margin-top: 0.2rem;
   color: var(--barracks-text-muted-raised);
-  font-size: 12px;
+  font-size: 0.7rem;
   font-weight: 850;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -359,17 +363,23 @@
 
 .users-profile-metrics {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  align-content: start;
+  grid-auto-rows: 3.15rem;
 }
 
 .users-profile-metrics span {
   min-width: 0;
-  padding: 10px 12px;
+  padding: 0.35rem 0.45rem;
   border: 1px solid var(--barracks-border-inset);
-  border-radius: 12px;
+  border-radius: 0.55rem;
   background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
+  min-height: 3.15rem;
+  justify-content: center;
+  flex-direction: column;
+  display: flex;
 }
 
 .users-profile-metrics small,
@@ -389,12 +399,14 @@
 }
 
 .users-profile-metrics strong {
-  margin-top: 6px;
+  margin-top: 0.15rem;
   color: var(--barracks-text-inset);
-  font-size: 14px;
+  font-size: 0.75rem;
   font-weight: 850;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .users-profile-role {
@@ -904,7 +916,7 @@
 .users-modal-topline strong {
   display: block;
   color: var(--barracks-text-inset);
-  font-size: 17px;
+  font-size: var(--jg-type-title);
   font-weight: 950;
 }
 

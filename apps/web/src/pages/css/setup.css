@@ -994,6 +994,7 @@
   overflow: auto;
   padding-right: 6px;
   scrollbar-color: color-mix(in srgb, var(--barracks-focus-light) 50%, transparent) color-mix(in srgb, var(--barracks-text-raised) 6%, transparent);
+  height: 100%;
 }
 
 .setup-card.is-wide .setup-extra-panel {
@@ -1152,9 +1153,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 125vh;
-  height: 125vh;
-  width: 125vw;
+  min-height: 100dvh;
+  height: 100%;
+  width: 100%;
   padding: 24px;
   overflow: hidden;
   background:
@@ -1330,5 +1331,26 @@
 
   .setup-form-panel {
     padding: 18px;
+  }
+}
+
+/* Density port from upstream d717ebc. */
+@media (max-width: 720px) {
+  .auth-page {
+    padding: 0;
+    align-items: stretch;
+    justify-content: stretch;
+  }
+}
+
+@media (max-width: 720px) {
+  .form-box {
+    width: 100%;
+    max-width: none;
+    min-height: 100dvh;
+    border-radius: 0;
+    border: 0;
+    padding: 28px 20px calc(28px + env(safe-area-inset-bottom));
+    justify-content: center;
   }
 }

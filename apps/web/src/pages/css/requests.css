@@ -2288,14 +2288,18 @@
 }
 
 .requests-page .requests-hero {
-  grid-area: hero;
-  min-height: 156px;
-  overflow: hidden;
-  position: relative;
+  min-height: 132px;
+
   border-color: var(--barracks-border-strong);
   background:
     linear-gradient(120deg, rgba(var(--barracks-action-rgb), 0.52) 0%, color-mix(in srgb, var(--barracks-surface-inset) 76%, transparent) 46%, color-mix(in srgb, var(--barracks-surface-inset) 92%, transparent) 100%),
     color-mix(in srgb, var(--barracks-surface-inset) 94%, transparent);
+  border-radius: 8px;
+  padding: 20px;
+  gap: 18px;
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  display: grid;
 }
 
 .requests-page .requests-hero::after {
@@ -2303,11 +2307,16 @@
 }
 
 .requests-page .requests-hero h1 {
-  font-size: clamp(42px, 5vw, 72px);
+  font-size: var(--jg-type-display);
+  letter-spacing: 0;
+  margin: 5px 0 8px !important;
 }
 
 .requests-page .requests-hero > div:first-child > span {
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 720;
+  max-width: 760px;
+  display: block;
 }
 
 .requests-page .requests-action-message {
@@ -2315,19 +2324,19 @@
 }
 
 .requests-page .requests-summary-grid {
-  grid-area: summary;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+
+  grid-template-columns: repeat(5, minmax(150px, 1fr));
   gap: 10px;
-  position: static;
 }
 
 .requests-page .requests-summary-grid article {
-  min-height: 92px;
+  min-height: 94px;
   border-color: color-mix(in srgb, var(--barracks-text-raised) 12%, transparent);
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--barracks-text-raised) 8%, transparent), color-mix(in srgb, var(--barracks-text-raised) 3%, transparent)),
     color-mix(in srgb, var(--barracks-surface-inset) 90%, transparent);
+  border-radius: 8px;
+  padding: 14px;
 }
 
 .requests-page .requests-summary-grid article:nth-child(3) {
@@ -2347,19 +2356,19 @@
 }
 
 .requests-page .requests-discovery {
-  grid-area: discover;
-  padding: 20px;
+  padding: 16px;
   border-color: var(--barracks-border-strong);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--barracks-surface-inset) 96%, transparent), color-mix(in srgb, var(--barracks-surface-inset) 98%, transparent)),
     color-mix(in srgb, var(--barracks-surface-inset) 95%, transparent);
+  border-radius: 8px;
 }
 
 .requests-page .requests-discovery-head {
-  gap: 16px;
-  padding-bottom: 12px;
+
   border-bottom: 1px solid color-mix(in srgb, var(--barracks-text-raised) 8%, transparent);
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+  align-items: center;
 }
 
 .requests-page .requests-discovery-head h2 {
@@ -2368,15 +2377,16 @@
 }
 
 .requests-page .requests-media-search {
-  margin-top: 8px;
-  padding: 14px;
+  padding: 10px 12px;
   border-color: var(--barracks-border-strong);
   background: var(--barracks-surface-inset);
+  border-radius: 8px;
+  grid-template-columns: auto minmax(0, 1fr) 118px;
 }
 
 .requests-page .requests-media-search input {
-  height: 58px;
-  font-size: 20px;
+  height: 46px;
+  font-size: 18px;
 }
 
 .requests-page .requests-media-search button {
@@ -2413,9 +2423,9 @@
 }
 
 .requests-page .requests-board {
-  grid-area: board;
-  grid-template-columns: 1fr;
+
   background: color-mix(in srgb, var(--barracks-surface-inset) 78%, transparent);
+  padding: 14px;
 }
 
 .requests-page .requests-board article {
@@ -2425,8 +2435,8 @@
     linear-gradient(180deg, color-mix(in srgb, var(--barracks-text-raised) 6%, transparent), color-mix(in srgb, var(--barracks-text-raised) 3%, transparent)),
     var(--request-backdrop),
     color-mix(in srgb, var(--barracks-surface-inset) 92%, transparent);
-  background-position: center;
-  background-size: cover;
+
+  border-radius: 8px;
 }
 
 .requests-page .requests-discovery .requests-control-bar {
@@ -2621,6 +2631,16 @@
 
 .requests-page {
   background: transparent;
+  padding: 14px;
+  gap: 14px;
+  overflow-x: hidden;
+  padding: 10px;
+  min-height: 0;
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
+  gap: 10px;
+  display: grid;
 }
 
 .requests-hero,
