@@ -19,11 +19,12 @@ export default function HistoryItemSearch({ searchUrl, token, selected, onSelect
   // Focus moves only after a user picks or clears a title (never on first render).
   const pendingFocus = useRef(null);
 
+  // Consumed on the next render either way, so a pick the parent ignores can't steal focus later.
   useEffect(() => {
-    if (pendingFocus.current === "chip" && clearRef.current) clearRef.current.focus();
-    else if (pendingFocus.current === "input" && inputRef.current) inputRef.current.focus();
-    else return;
+    const target = pendingFocus.current;
     pendingFocus.current = null;
+    if (target === "chip") clearRef.current?.focus();
+    else if (target === "input") inputRef.current?.focus();
   });
 
   useEffect(() => () => window.clearTimeout(blurTimer.current), []);
@@ -80,9 +81,11 @@ export default function HistoryItemSearch({ searchUrl, token, selected, onSelect
 
   const showMenu = open && query.trim().length >= 2;
   const showList = showMenu && status !== "error" && results.length > 0;
-  const statusText = status === "loading" ? "Searching…"
-    : status === "error" ? error
-      : status === "done" && results.length === 0 ? "No movies or episodes match" : "";
+  const isError = status === "error";
+  const statusText = !showMenu ? ""
+    : status === "loading" ? "Searching…"
+      : isError ? error
+        : status === "done" && results.length === 0 ? "No movies or episodes match" : "";
   return (
     <div className="activity-search">
       <input
@@ -109,7 +112,7 @@ export default function HistoryItemSearch({ searchUrl, token, selected, onSelect
       />
       {showMenu ? (
         <div className="activity-search-menu">
-          {statusText ? <p className={`activity-search-state${status === "error" ? " is-error" : ""}`} role="status" aria-live="polite">{statusText}</p> : null}
+          {statusText ? <p className={`activity-search-state${isError ? " is-error" : ""}`} aria-hidden="true">{statusText}</p> : null}
           {showList ? (
             <ul id={listId} role="listbox" aria-label="Matching titles">
               {results.map((result, index) => (
@@ -129,6 +132,9 @@ export default function HistoryItemSearch({ searchUrl, token, selected, onSelect
           ) : null}
         </div>
       ) : null}
+      {/* Live regions stay mounted so screen readers announce text changes; errors interrupt. */}
+      <p className="visually-hidden" role="status">{isError ? "" : statusText}</p>
+      <p className="visually-hidden" role="alert">{isError ? statusText : ""}</p>
     </div>
   );
 }

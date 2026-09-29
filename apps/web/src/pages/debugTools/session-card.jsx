@@ -264,7 +264,10 @@ function SessionCard(props) {
 
                   <Row className="p-0 m-0">
                     <Col className="col-auto p-0">
-                      {props.data.session.PlayState.IsPaused ? <PauseFillIcon /> : <PlayFillIcon />}
+                      {/* Player convention: a paused stream shows play, a playing stream shows pause. */}
+                      <span role="img" aria-label={props.data.session.PlayState.IsPaused ? "Paused" : "Playing"}>
+                        {props.data.session.PlayState.IsPaused ? <PlayFillIcon /> : <PauseFillIcon />}
+                      </span>
                     </Col>
 
                     <Col>

@@ -65,13 +65,12 @@ async function buildSiloTimeline(api, userId, { lookupBudgetMs = 8000 } = {}) {
   });
   for (let i = 0; i < episodeIds.length && Date.now() < deadlineAt; i += LOOKUP_BATCH) {
     await Promise.all(episodeIds.slice(i, i + LOOKUP_BATCH).map(async id => {
-      try {
-        const detail = await withinBudget(api._detail(id, { deadlineAt, timeoutMs: api.enrichmentTimeoutMs }));
-        if (detail?.series_id) {
-          seriesById.set(id, { seriesTitle: detail.series_title || '', seriesId: String(detail.series_id),
-            seasonName: detail.season_number != null ? `Season ${detail.season_number}` : null });
-        }
-      } catch { /* Unresolvable episodes stay as standalone entries. */ }
+      // withinBudget never rejects: unresolvable episodes come back null and stay standalone entries.
+      const detail = await withinBudget(api._detail(id, { deadlineAt, timeoutMs: api.enrichmentTimeoutMs }));
+      if (detail?.series_id) {
+        seriesById.set(id, { seriesTitle: detail.series_title || '', seriesId: String(detail.series_id),
+          seasonName: detail.season_number != null ? `Season ${detail.season_number}` : null });
+      }
     }));
   }
   return historyToTimeline(rows, seriesById);

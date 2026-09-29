@@ -17,7 +17,13 @@ export default function PageTabs({ title, tabs, visible, reachable, empty = null
   const withBar = shownTabs.length > 1;
 
   const select = (id) => {
-    if (id !== active.id) setParams({ tab: id }, { replace: true });
+    // Push (not replace) so Back returns to the previous tab; keep any other query params.
+    if (id === active.id) return;
+    setParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("tab", id);
+      return next;
+    });
   };
   const onKeyDown = (event) => {
     const index = shownTabs.findIndex((tab) => tab.id === active.id);
