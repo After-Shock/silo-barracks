@@ -415,6 +415,12 @@ function createFleet({
     return { profiles, serverId: record.id, serverName: String(record.server.name || record.id) };
   }
 
+  async function playbackHistorySearch(serverId, q) {
+    const record = connectedClient(serverId);
+    const results = await record.client.searchPlaybackHistoryItems(q);
+    return { results, serverId: record.id, serverName: String(record.server.name || record.id) };
+  }
+
   async function catalogItem(serverId, itemId) {
     const record = connectedClient(serverId);
     const items = await record.client.getItemsByID({ ids: [itemId] });
@@ -483,7 +489,7 @@ function createFleet({
   }
 
   return { refresh, snapshot, invalidate, sessionCommandCapabilities, controlSession, playbackHistoryPage,
-    playbackHistoryUsers, playbackHistoryProfiles, catalogItem, historyUser,
+    playbackHistoryUsers, playbackHistoryProfiles, playbackHistorySearch, catalogItem, historyUser,
     libraryList, libraryDetail, libraryItems, libraryHistoryPage };
 }
 

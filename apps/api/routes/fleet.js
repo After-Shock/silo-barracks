@@ -29,6 +29,11 @@ function createFleetRouter({ registry, fleet }) {
       res.status(failure.status).json({ error: failure.message });
     }
   });
+  router.get('/history/:serverId/search', async (req, res) => {
+    if (!req.permissions?.dashboard) return res.status(403).json({ error: 'Dashboard access required.' });
+    try { res.json(await fleet.playbackHistorySearch(req.params.serverId, req.query.q)); }
+    catch (error) { res.status(error.status || 503).json({ error: error.message || 'Unable to search the Silo catalog.' }); }
+  });
   router.get('/history/:serverId/users', async (req, res) => {
     if (!req.permissions?.dashboard) return res.status(403).json({ error: 'Dashboard access required.' });
     try { res.json(await fleet.playbackHistoryUsers(req.params.serverId)); }

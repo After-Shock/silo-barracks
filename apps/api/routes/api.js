@@ -5577,6 +5577,12 @@ router.post("/setExcludedBackupTable", async (req, res) => {
 });
 
 //DB Queries - History
+router.get("/getHistory/search", async (req, res) => {
+  if (!API.isSilo) return res.status(404).json({ error: "Silo history search is unavailable" });
+  try { return res.json({ results: await API.searchPlaybackHistoryItems(req.query.q), serverId: "primary" }); }
+  catch (error) { return res.status(error.status || 503).json({ error: error.message || "Unable to search the Silo catalog" }); }
+});
+
 router.get("/getHistory/users", async (req, res) => {
   if (!API.isSilo) return res.status(404).json({ error: "Silo activity users are unavailable" });
   try { return res.json({ users: await API.getPlaybackHistoryUsers(), serverId: "primary" }); }

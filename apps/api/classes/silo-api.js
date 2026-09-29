@@ -2,7 +2,7 @@
 
 const {
   isEpisodeSession, sessionToJellyfin, userToJellyfin, libraryToJellyfin, itemToJellyfin,
-  seasonToJellyfin, episodeToJellyfin, versionToMediaSource, forEachLimited,
+  seasonToJellyfin, episodeToJellyfin, versionToMediaSource, forEachLimited, historySearchResult,
 } = require('./silo/mappers');
 const { SiloRequestError, normalizeBase, requestJSON } = require('./silo/http');
 const { discoverSilo } = require('./silo/discovery');
@@ -541,6 +541,15 @@ class SiloAPI {
 
   async getPlaybackHistoryUsers() {
     return this.getUsers(true);
+  }
+
+  // History filters by exact item, so only movies and episodes are offered (never series).
+  async searchPlaybackHistoryItems(q) {
+    if (typeof q !== 'string') return [];
+    const query = q.trim();
+    if (query.length < 2 || query.length > 100) return [];
+    const body = await this._catalogPage({ search: query, limit: 20 });
+    return body.items.map(historySearchResult).filter(Boolean).slice(0, 8);
   }
 
   async getPlaybackHistoryProfiles(userId) {

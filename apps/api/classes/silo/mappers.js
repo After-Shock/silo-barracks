@@ -236,5 +236,16 @@ async function forEachLimited(values, limit, operation) {
   await Promise.all(workers);
 }
 
+function historySearchResult(row) {
+  const type = String(row?.type || '').toLowerCase();
+  if (!row?.content_id || !['movie', 'episode'].includes(type)) return null;
+  const num = value => (value === undefined || value === null || value === '' ? null : Number(value));
+  return { id: String(row.content_id), title: String(row.title || ''), type,
+    seriesName: type === 'episode' ? (row.series_title || row.series_name || null) : null,
+    seasonNumber: type === 'episode' ? num(row.season_number) : null,
+    episodeNumber: type === 'episode' ? num(row.episode_number) : null,
+    year: num(row.year) };
+}
+
 module.exports = { isEpisodeSession, sessionToJellyfin, userToJellyfin, libraryToJellyfin, itemToJellyfin,
-  seasonToJellyfin, episodeToJellyfin, versionToMediaSource, forEachLimited };
+  seasonToJellyfin, episodeToJellyfin, versionToMediaSource, forEachLimited, historySearchResult };
