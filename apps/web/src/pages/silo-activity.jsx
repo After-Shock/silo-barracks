@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "../lib/axios_instance";
 import { Link } from "react-router-dom";
+import { OverlayTrigger, Popover, Tooltip } from "react-bootstrap";
 import ActivityTable from "./components/activity/activity-table";
 import FleetOverview from "./components/sessions/FleetOverview";
+import HistoryItemSearch from "./components/activity/history-item-search";
 import Loading from "./components/general/loading";
 import "./css/activity.css";
 
@@ -21,7 +23,7 @@ export default function SiloActivity({ config }) {
   const [users, setUsers] = useState([]);
   const [profiles, setProfiles] = useState([]);
   const [filters, setFilters] = useState({ userId: "", profileId: "", mediaItemId: "", completed: "all" });
-  const [mediaItemInput, setMediaItemInput] = useState("");
+  const [searchItem, setSearchItem] = useState(null);
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(1);
   const [cursors, setCursors] = useState({ 1: "" });
@@ -105,34 +107,54 @@ export default function SiloActivity({ config }) {
   const selectedServer = useMemo(() => servers.find((server) => server.id === serverId), [servers, serverId]);
   const rows = data?.results || [];
 
+  const secondaryFilterCount = (filters.profileId ? 1 : 0) + (filters.completed !== "all" ? 1 : 0);
+  const secondaryFilters = <Popover id="activity-secondary-filters" className="activity-filters-popover">
+    <Popover.Body>
+      <label className="activity-control-field"><span>Profile</span><select value={filters.profileId} disabled={!filters.userId} onChange={(event) => resetQuery({ ...filters, profileId: event.target.value })}>
+        <option value="">{filters.userId ? "All profiles" : "Choose an account first"}</option>{profiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.name}</option>)}</select></label>
+      <label className="activity-control-field"><span>Completion</span><select value={filters.completed} onChange={(event) => resetQuery({ ...filters, completed: event.target.value })}>
+        <option value="all">All attempts</option><option value="true">Completed</option><option value="false">Not completed</option></select></label>
+    </Popover.Body>
+  </Popover>;
+
   return <div className="Activity" data-theme-screen="activity">
-    <header className="activity-page-header">
-      <div><p>Silo activity</p><h1>Activity</h1><span>Review watch history, playback method, device, and session details. <Link to="/timeline">Open Timeline view</Link>.</span></div>
-      <div className="activity-view-tabs" role="tablist" aria-label="Activity view">
-        <button type="button" role="tab" aria-selected={view === "live"} onClick={() => setView("live")}>Live sessions</button>
-        <button type="button" role="tab" aria-selected={view === "history"} onClick={() => setView("history")}>Playback history</button>
+    <header className="activity-page-header is-compact">
+      <div className="activity-page-title">
+        <p>Playback log</p>
+        <h1>Activity</h1>
+        <span>Review watch history, playback method, device, and session details. <Link to="/timeline">Open Timeline view</Link>.
+          {view === "history" && <OverlayTrigger placement="bottom" overlay={<Tooltip id="activity-retention-note">Finalized attempts are read directly from Silo retention. Barracks does not duplicate or delete them.</Tooltip>}>
+            <button type="button" className="activity-info-button" aria-label="About Silo playback history">ⓘ</button>
+          </OverlayTrigger>}
+        </span>
+      </div>
+      <div className="activity-controls activity-silo-filters">
+        <div className="activity-view-toggle" role="tablist" aria-label="Activity view">
+          <button type="button" role="tab" aria-selected={view === "live"} onClick={() => setView("live")}>Live</button>
+          <button type="button" role="tab" aria-selected={view === "history"} onClick={() => setView("history")}>History</button>
+        </div>
+        {view === "history" && <>
+          {servers.length > 1 && <label className="activity-control-field"><span>Server</span><select value={serverId} onChange={(event) => {
+            setServerId(event.target.value); setSearchItem(null); resetQuery({ userId: "", profileId: "", mediaItemId: "", completed: "all" });
+          }}><option value="primary">Primary server</option>{servers.filter((server) => !server.isPrimary).map((server) =>
+            <option key={server.id} value={server.id} disabled={server.state !== "connected"}>{server.name}{server.state === "connected" ? "" : " (unavailable)"}</option>)}</select></label>}
+          <label className="activity-control-field"><span>Account</span><select value={filters.userId} onChange={(event) => resetQuery({ ...filters, userId: event.target.value, profileId: "" })}>
+            <option value="">All accounts</option>{users.map((user) => <option key={user.Id} value={user.Id}>{user.Name}</option>)}</select></label>
+          <HistoryItemSearch searchUrl={`${historyBase}/search`} token={token} selected={searchItem}
+            onSelect={(item) => { setSearchItem(item); resetQuery({ ...filters, mediaItemId: item.id }); }}
+            onClear={() => { setSearchItem(null); resetQuery({ ...filters, mediaItemId: "" }); }} />
+          <OverlayTrigger trigger="click" rootClose placement="bottom-end" overlay={secondaryFilters}>
+            <button type="button" className="activity-control-button activity-filters-button">
+              Filters{secondaryFilterCount > 0 ? <span className="activity-filter-badge">{secondaryFilterCount}</span> : null}
+            </button>
+          </OverlayTrigger>
+          <label className="activity-control-field is-compact"><span>Items</span><select value={pageSize} onChange={(event) => resetQuery(filters, Number(event.target.value))}>{sizes.map((size) => <option key={size}>{size}</option>)}</select></label>
+          <button type="button" className="activity-control-button" onClick={() => setRefreshKey((value) => value + 1)} disabled={loading}>Refresh</button>
+        </>}
       </div>
     </header>
 
     {view === "live" ? <FleetOverview surface="activity" canControl={canControl} /> : <>
-      <p className="activity-notice" role="status">Finalized attempts are read directly from Silo retention. Barracks does not duplicate or delete them.</p>
-      <div className="activity-controls activity-silo-filters">
-        {servers.length > 1 && <label className="activity-control-field"><span>Silo server</span><select value={serverId} onChange={(event) => {
-          setServerId(event.target.value); setMediaItemInput(""); resetQuery({ userId: "", profileId: "", mediaItemId: "", completed: "all" });
-        }}><option value="primary">Primary server</option>{servers.filter((server) => !server.isPrimary).map((server) =>
-          <option key={server.id} value={server.id} disabled={server.state !== "connected"}>{server.name}{server.state === "connected" ? "" : " (unavailable)"}</option>)}</select></label>}
-        <label className="activity-control-field"><span>Account</span><select value={filters.userId} onChange={(event) => resetQuery({ ...filters, userId: event.target.value, profileId: "" })}>
-          <option value="">All accounts</option>{users.map((user) => <option key={user.Id} value={user.Id}>{user.Name}</option>)}</select></label>
-        <label className="activity-control-field"><span>Profile</span><select value={filters.profileId} disabled={!filters.userId} onChange={(event) => resetQuery({ ...filters, profileId: event.target.value })}>
-          <option value="">All profiles</option>{profiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.name}</option>)}</select></label>
-        <label className="activity-control-field"><span>Completion</span><select value={filters.completed} onChange={(event) => resetQuery({ ...filters, completed: event.target.value })}>
-          <option value="all">All attempts</option><option value="true">Completed</option><option value="false">Not completed</option></select></label>
-        <label className="activity-control-field"><span>Media item ID</span><input value={mediaItemInput} placeholder="All items" onChange={(event) => setMediaItemInput(event.target.value)}
-          onKeyDown={(event) => { if (event.key === "Enter") resetQuery({ ...filters, mediaItemId: mediaItemInput.trim() }); }}
-          onBlur={() => { if (mediaItemInput.trim() !== filters.mediaItemId) resetQuery({ ...filters, mediaItemId: mediaItemInput.trim() }); }} /></label>
-        <label className="activity-control-field is-compact"><span>Items</span><select value={pageSize} onChange={(event) => resetQuery(filters, Number(event.target.value))}>{sizes.map((size) => <option key={size}>{size}</option>)}</select></label>
-        <button type="button" className="activity-control-button" onClick={() => setRefreshKey((value) => value + 1)} disabled={loading}>Refresh</button>
-      </div>
       {selectedServer && serverId !== "primary" ? <p className="activity-notice">Viewing {selectedServer.name}. Item and account links remain explicitly scoped to this server. <Link to={`/silo-fleet/${encodeURIComponent(serverId)}/libraries`}>Browse its libraries</Link>.</p> : null}
       {error ? <p className="activity-notice is-error" role="alert">{error} <button type="button" onClick={() => setRefreshKey((value) => value + 1)}>Retry</button></p> : null}
       {!data && loading ? <div aria-busy="true"><Loading /></div> : <div className="Activity activity-table-shell">
