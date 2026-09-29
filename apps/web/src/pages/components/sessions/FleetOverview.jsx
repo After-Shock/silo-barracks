@@ -32,6 +32,10 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
       <h1 className="my-3">Active Sessions</h1>
       <div className="sessions-loading-strip" aria-hidden="true"><span /><span /></div>
     </div>;
+    if (snapshot && s.noServers) return <div className="sessions-widget">
+      <h1 className="my-3">Active Sessions</h1>
+      <div className="sessions-empty-state">No Silo servers are enabled.{surface !== 'kiosk' && <> <Link to="/settings/servers">Manage servers</Link></>}</div>
+    </div>;
     const unavailable = Boolean(error) || (visible[0] && visible[0].state !== 'connected');
     return <div className="sessions-widget">
       <h1 className="my-3">Active Sessions</h1>
@@ -44,17 +48,15 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
   }
   const fleetStreams = s.visibleServers.flatMap(server => normalizeSessions(server.sessions || []).map(session => ({ server, session })));
   const kiosk = surface === 'kiosk';
-  const emptyText = !snapshot && !error ? 'Connecting to your Silo servers…'
-    : s.partial ? 'No current activity can be confirmed for this selection.' : 'No Active Sessions Found';
   const showSummary = fleetStreams.length > 0 || s.partial;
   return <section className={`fleet-overview is-compact${fleetStreams.length ? '' : ' is-empty'}`} aria-label="All Silo servers">
     <header className="fleet-heading">
       <h1>Active Sessions</h1>
       {showSummary ? <p className="fleet-summary">
         <strong data-testid="fleet-total">{s.total ?? '—'}</strong>{' '}
-        {error ? <span>Current total unavailable</span> : <>streaming{s.partial && s.total != null ? ' · partial total' : ''}
-        {' · '}{s.paused ?? '—'} paused · {s.connected}/{s.enabled} servers</>}
-      </p> : <p className="fleet-summary is-empty"><span data-testid="fleet-total" hidden>{s.total ?? '—'}</span>{emptyText}</p>}
+        {error ? <span>Current total unavailable</span> : <>active{s.partial && s.total != null ? ' (partial)' : ''}
+        {' · '}{s.playing ?? '—'} playing · {s.paused ?? '—'} paused · {s.connected}/{s.enabled} servers</>}
+      </p> : <p className="fleet-summary is-empty">No Active Sessions Found</p>}
       <OverlayTrigger placement="bottom" overlay={<Tooltip id="fleet-note">Live activity includes all enabled servers. Paused streams are included in the total; stale streams are not. Playback History can be scoped to one connected server; library statistics remain primary-server scoped.</Tooltip>}>
         <button type="button" className="fleet-info-button" aria-label="About live activity across servers">ⓘ</button>
       </OverlayTrigger>
@@ -65,10 +67,11 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
         const button = <button key={pill.id} type="button" className={`fleet-pill is-${pill.state}`} aria-pressed={pill.selected} onClick={() => setSelected(pill.id)}>
           {pill.state !== 'all' && <span className="fleet-pill-dot" aria-hidden="true" />}
           <span className="fleet-pill-label">{pill.label}</span>
+          {pill.state === 'connecting' || pill.state === 'unavailable' ? <span className="visually-hidden">, {pill.state}</span> : null}
           <span className="fleet-pill-count">{pill.count ?? '—'}</span>
         </button>;
         return pill.state === 'connected' || pill.state === 'all' ? button
-          : <OverlayTrigger key={pill.id} placement="bottom" overlay={<Tooltip id={`fleet-pill-${pill.id}`}>{pill.state === 'connecting' ? 'Connecting…' : 'Unavailable'}{pill.lastSuccessAt ? ` · Last seen ${new Date(pill.lastSuccessAt).toLocaleTimeString()}` : ''}</Tooltip>}>{button}</OverlayTrigger>;
+          : <OverlayTrigger key={pill.id} placement="bottom" overlay={<Tooltip id={`fleet-pill-${pill.id}`}>{pill.state === 'connecting' ? 'Connecting…' : 'Unavailable'}{pill.lastSuccessAt ? ` · Last seen ${new Date(pill.lastSuccessAt).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}` : ''}</Tooltip>}>{button}</OverlayTrigger>;
       })}
     </div>
     {error && <p role="status" className="fleet-notice">{error} <button onClick={refresh}>Retry</button></p>}
@@ -77,7 +80,7 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
       {fleetStreams.map(({ server, session }) => {
         const stale = session.stale || server.state !== 'connected' || Boolean(error);
         return <div key={`${server.id}:${session.Id}`} className="fleet-stream">
-          <span className={`fleet-card-badge${stale ? ' is-stale' : ''}`}>{server.name}{stale && <span className="fleet-card-badge-state">Stale · last known activity</span>}</span>
+          <span className={`fleet-card-badge${stale ? ' is-stale' : ''}`}>{server.name}{stale && <><span className="visually-hidden">, </span><span className="fleet-card-badge-state">Stale · last known activity</span></>}</span>
           <ErrorBoundary>{card({ server, session })}</ErrorBoundary>
         </div>;
       })}

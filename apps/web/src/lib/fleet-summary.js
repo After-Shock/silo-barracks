@@ -6,6 +6,7 @@ export function summarizeFleet(snapshot, selectedId, error) {
   const ok = Boolean(snapshot) && !error;
   const total = !ok ? null : (filter === 'all' ? snapshot.totalActiveStreams : selected.activeStreams) ?? null;
   const paused = !ok ? null : (filter === 'all' ? snapshot.pausedStreams : selected.pausedStreams) ?? null;
+  const playing = !ok ? null : (filter === 'all' ? snapshot.playingStreams : selected.playingStreams) ?? null;
   const partial = Boolean(error) || (filter === 'all' ? Boolean(snapshot?.partial) : selected.state !== 'connected');
   const pills = [
     { id: 'all', label: 'All', count: ok ? snapshot.totalActiveStreams ?? null : null, state: 'all', lastSuccessAt: null, isPrimary: false, selected: filter === 'all' },
@@ -17,7 +18,8 @@ export function summarizeFleet(snapshot, selectedId, error) {
     })),
   ];
   return {
-    filter, total, paused, partial, pills,
+    filter, total, playing, paused, partial, pills,
+    noServers: enabledServers.length === 0,
     connected: enabledServers.filter((server) => server.state === 'connected').length,
     enabled: enabledServers.length,
     visibleServers: enabledServers.filter((server) => filter === 'all' || server.id === filter),

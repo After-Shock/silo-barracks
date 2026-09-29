@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import { summarizeFleet } from './fleet-summary.js';
 
 const snap = {
-  totalActiveStreams: 3, pausedStreams: 1, partial: true,
+  totalActiveStreams: 3, playingStreams: 2, pausedStreams: 1, partial: true,
   servers: [
-    { id: 'p', name: 'Primary', isPrimary: true, enabled: true, state: 'connected', activeStreams: 2, pausedStreams: 1 },
+    { id: 'p', name: 'Primary', isPrimary: true, enabled: true, state: 'connected', activeStreams: 2, playingStreams: 1, pausedStreams: 1 },
     { id: 'x', name: 'Extra', enabled: true, state: 'unavailable', activeStreams: null, pausedStreams: null, lastSuccessAt: '2026-09-28T10:00:00Z' },
     { id: 'off', name: 'Off', enabled: false, state: 'disabled', activeStreams: 0 },
   ],
@@ -43,4 +43,17 @@ test('during a transport error server pills do not show last-known counts as liv
   const s = summarizeFleet(snap, 'all', 'Unavailable');
   assert.deepEqual(s.pills.map(p => [p.id, p.count, p.state]),
     [['all', null, 'all'], ['p', null, 'unavailable'], ['x', null, 'unavailable']]);
+});
+
+test('summary exposes playing streams separately from the active total', () => {
+  const s = summarizeFleet(snap, 'all', '');
+  assert.deepEqual([s.total, s.playing, s.paused], [3, 2, 1]);
+  assert.equal(summarizeFleet(snap, 'p', '').playing, 1);
+  assert.equal(summarizeFleet(snap, 'all', 'down').playing, null);
+});
+
+test('no enabled servers is its own state', () => {
+  const s = summarizeFleet({ servers: [{ id: 'off', enabled: false }] }, 'all', '');
+  assert.deepEqual([s.enabled, s.noServers], [0, true]);
+  assert.equal(summarizeFleet(snap, 'all', '').noServers, false);
 });

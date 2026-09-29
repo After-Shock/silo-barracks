@@ -28,6 +28,7 @@
 }
 
 .fleet-footnote {
+  margin-top: 14px;
   color: var(--barracks-text);
   font-size: 12px;
 }
@@ -47,6 +48,7 @@
   border-radius: 4px;
   background: var(--barracks-canvas);
   color: var(--barracks-text);
+  width: 100%;
 }
 
 .fleet-streams {
@@ -60,10 +62,6 @@
 .fleet-stream .session-card {
   min-width: 0;
   width: 100%;
-}
-
-.fleet-footnote {
-  margin-top: 14px;
 }
 
 .server-settings form {
@@ -80,10 +78,6 @@
   display: grid;
   gap: 6px;
   font-size: 13px;
-}
-
-.server-settings input {
-  width: 100%;
 }
 
 .server-settings-actions {
