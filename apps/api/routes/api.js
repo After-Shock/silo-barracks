@@ -22,7 +22,7 @@ const { axios } = require("../classes/axios");
 const triggertype = require("../logging/triggertype");
 const { addAuditEntry, getAuditLog, getWebhookDeliveryHistory } = require("../classes/admin-history");
 const { sendConfiguredMail, validateEmail } = require("../classes/smtp-mailer");
-const { historyFailure: siloHistoryFailure } = require("../classes/silo/history-errors");
+const { historyFailure: siloHistoryFailure, upstreamStatus } = require("../classes/silo/history-errors");
 const { getBackupDir } = require("../utils/storage-paths");
 const {
   getIntegrations,
@@ -3830,7 +3830,7 @@ router.post("/session-controls/:sessionId/:action", async (req, res) => {
   } catch (error) {
     await recordAuditSafely(req, "playback.command.failed", { serverId: "primary", sessionId: req.params.sessionId,
       action, status: error.status || error.response?.status || 503 });
-    res.status(error.status || error.response?.status || 503).json({ error: error.message || "Playback command failed." });
+    res.status(upstreamStatus({ status: error.status || error.response?.status })).json({ error: error.message || "Playback command failed." });
   }
 });
 
@@ -5580,19 +5580,19 @@ router.post("/setExcludedBackupTable", async (req, res) => {
 router.get("/getHistory/search", async (req, res) => {
   if (!API.isSilo) return res.status(404).json({ error: "Silo history search is unavailable" });
   try { return res.json({ results: await API.searchPlaybackHistoryItems(req.query.q), serverId: "primary" }); }
-  catch (error) { return res.status(error.status || 503).json({ error: error.message || "Unable to search the Silo catalog" }); }
+  catch (error) { return res.status(upstreamStatus(error)).json({ error: error.message || "Unable to search the Silo catalog" }); }
 });
 
 router.get("/getHistory/users", async (req, res) => {
   if (!API.isSilo) return res.status(404).json({ error: "Silo activity users are unavailable" });
   try { return res.json({ users: await API.getPlaybackHistoryUsers(), serverId: "primary" }); }
-  catch (error) { return res.status(error.status || 503).json({ error: error.message || "Unable to load Silo users" }); }
+  catch (error) { return res.status(upstreamStatus(error)).json({ error: error.message || "Unable to load Silo users" }); }
 });
 
 router.get("/getHistory/users/:userId/profiles", async (req, res) => {
   if (!API.isSilo) return res.status(404).json({ error: "Silo activity profiles are unavailable" });
   try { return res.json({ profiles: await API.getPlaybackHistoryProfiles(req.params.userId), serverId: "primary" }); }
-  catch (error) { return res.status(error.status || 503).json({ error: error.message || "Unable to load Silo profiles" }); }
+  catch (error) { return res.status(upstreamStatus(error)).json({ error: error.message || "Unable to load Silo profiles" }); }
 });
 
 router.get("/getHistory/users/:userId", async (req, res) => {
@@ -5603,7 +5603,7 @@ router.get("/getHistory/users/:userId", async (req, res) => {
     ]);
     return user ? res.json({ user, profiles, serverId: "primary", serverName: "Primary server" })
       : res.status(404).json({ error: "Silo account was not found" });
-  } catch (error) { return res.status(error.status || 503).json({ error: error.message || "Unable to load Silo account" }); }
+  } catch (error) { return res.status(upstreamStatus(error)).json({ error: error.message || "Unable to load Silo account" }); }
 });
 
 router.get("/getHistory", async (req, res) => {

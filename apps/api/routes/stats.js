@@ -4,6 +4,7 @@ const db = require("../db");
 const dbHelper = require("../classes/db-helper");
 const configClass = require("../classes/config");
 const API = require("../classes/api-loader");
+const { upstreamStatus } = require("../classes/silo/history-errors");
 
 const dayjs = require("dayjs");
 
@@ -572,7 +573,7 @@ router.get("/getNativeOverview", async (req, res) => {
       libraries: [], clients: [], reliability: insights.playback.reliability, stats: insights.stats,
       coverageLimited: requestedDays > days });
   } catch (error) {
-    return res.status(error.status || 503).send({ error: error.message || "Unable to load Silo statistics" });
+    return res.status(upstreamStatus(error)).send({ error: error.message || "Unable to load Silo statistics" });
   }
 });
 
@@ -781,8 +782,7 @@ router.get("/getAllUserActivity", async (req, res) => {
         return res.send(users.map((user) => ({ UserId: user.Id, UserName: user.Name })));
       } catch (error) {
         // Let the timeline show its users error instead of an empty user list.
-        const status = error?.status >= 400 && error?.status < 600 ? error.status : 503;
-        return res.status(status).json({ error: "Unable to load Silo users" });
+        return res.status(upstreamStatus(error)).json({ error: "Unable to load Silo users" });
       }
     }
     const { rows } = await db.query("SELECT * FROM jf_all_user_activity");

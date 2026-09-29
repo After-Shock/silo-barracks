@@ -1,7 +1,7 @@
 const express = require('express');
 const { RegistryError } = require('../classes/silo-server-registry');
 const { addAuditEntry } = require('../classes/admin-history');
-const { historyFailure } = require('../classes/silo/history-errors');
+const { historyFailure, upstreamStatus } = require('../classes/silo/history-errors');
 
 function createFleetRouter({ registry, fleet }) {
   const router = express.Router();
@@ -32,17 +32,17 @@ function createFleetRouter({ registry, fleet }) {
   router.get('/history/:serverId/search', async (req, res) => {
     if (!req.permissions?.dashboard) return res.status(403).json({ error: 'Dashboard access required.' });
     try { res.json(await fleet.playbackHistorySearch(req.params.serverId, req.query.q)); }
-    catch (error) { res.status(error.status || 503).json({ error: error.message || 'Unable to search the Silo catalog.' }); }
+    catch (error) { res.status(upstreamStatus(error)).json({ error: error.message || 'Unable to search the Silo catalog.' }); }
   });
   router.get('/history/:serverId/users', async (req, res) => {
     if (!req.permissions?.dashboard) return res.status(403).json({ error: 'Dashboard access required.' });
     try { res.json(await fleet.playbackHistoryUsers(req.params.serverId)); }
-    catch (error) { res.status(error.status || 503).json({ error: error.message || 'Unable to load Silo users.' }); }
+    catch (error) { res.status(upstreamStatus(error)).json({ error: error.message || 'Unable to load Silo users.' }); }
   });
   router.get('/history/:serverId/users/:userId/profiles', async (req, res) => {
     if (!req.permissions?.dashboard) return res.status(403).json({ error: 'Dashboard access required.' });
     try { res.json(await fleet.playbackHistoryProfiles(req.params.serverId, req.params.userId)); }
-    catch (error) { res.status(error.status || 503).json({ error: error.message || 'Unable to load Silo profiles.' }); }
+    catch (error) { res.status(upstreamStatus(error)).json({ error: error.message || 'Unable to load Silo profiles.' }); }
   });
   router.get('/history/:serverId/libraries/:libraryId', async (req, res) => {
     if (!req.permissions?.dashboard) return res.status(403).json({ error: 'Dashboard access required.' });
@@ -51,34 +51,34 @@ function createFleetRouter({ registry, fleet }) {
         { limit: req.query.size, cursor: req.query.cursor });
       res.json({ results: history.results, has_more: history.hasMore, next_cursor: history.nextCursor,
         server_id: history.serverId, server_name: history.serverName, source: 'Silo retention', coverage: history.coverage });
-    } catch (error) { res.status(error.status || 503).json({ error: error.message || 'Unable to load Silo library history.' }); }
+    } catch (error) { res.status(upstreamStatus(error)).json({ error: error.message || 'Unable to load Silo library history.' }); }
   });
   router.get('/libraries/:serverId', async (req, res) => {
     if (!req.permissions?.dashboard) return res.status(403).json({ error: 'Dashboard access required.' });
     try { res.json(await fleet.libraryList(req.params.serverId)); }
-    catch (error) { res.status(error.status || 503).json({ error: error.message || 'Unable to load Silo libraries.' }); }
+    catch (error) { res.status(upstreamStatus(error)).json({ error: error.message || 'Unable to load Silo libraries.' }); }
   });
   router.get('/libraries/:serverId/:libraryId', async (req, res) => {
     if (!req.permissions?.dashboard) return res.status(403).json({ error: 'Dashboard access required.' });
     try { res.json(await fleet.libraryDetail(req.params.serverId, req.params.libraryId)); }
-    catch (error) { res.status(error.status || 503).json({ error: error.message || 'Unable to load Silo library.' }); }
+    catch (error) { res.status(upstreamStatus(error)).json({ error: error.message || 'Unable to load Silo library.' }); }
   });
   router.get('/libraries/:serverId/:libraryId/items', async (req, res) => {
     if (!req.permissions?.dashboard) return res.status(403).json({ error: 'Dashboard access required.' });
     try { res.json(await fleet.libraryItems(req.params.serverId, req.params.libraryId, { page: req.query.page,
       limit: req.query.size, search: req.query.search, sort: req.query.sort,
       desc: req.query.desc === 'true' })); }
-    catch (error) { res.status(error.status || 503).json({ error: error.message || 'Unable to load Silo library items.' }); }
+    catch (error) { res.status(upstreamStatus(error)).json({ error: error.message || 'Unable to load Silo library items.' }); }
   });
   router.get('/catalog/:serverId/items/:itemId', async (req, res) => {
     if (!req.permissions?.dashboard) return res.status(403).json({ error: 'Dashboard access required.' });
     try { res.json(await fleet.catalogItem(req.params.serverId, req.params.itemId)); }
-    catch (error) { res.status(error.status || 503).json({ error: error.message || 'Unable to load Silo item.' }); }
+    catch (error) { res.status(upstreamStatus(error)).json({ error: error.message || 'Unable to load Silo item.' }); }
   });
   router.get('/users/:serverId/:userId', async (req, res) => {
     if (!req.permissions?.dashboard) return res.status(403).json({ error: 'Dashboard access required.' });
     try { res.json(await fleet.historyUser(req.params.serverId, req.params.userId)); }
-    catch (error) { res.status(error.status || 503).json({ error: error.message || 'Unable to load Silo account.' }); }
+    catch (error) { res.status(upstreamStatus(error)).json({ error: error.message || 'Unable to load Silo account.' }); }
   });
   router.use('/sessions', (req, res, next) => {
     if (!req.permissions?.settings || !['Owner', 'Admin'].includes(req.user?.role)) {
@@ -88,7 +88,7 @@ function createFleetRouter({ registry, fleet }) {
   });
   router.get('/sessions/:serverId/capabilities', async (req, res) => {
     try { res.json(await fleet.sessionCommandCapabilities(req.params.serverId)); }
-    catch (error) { res.status(error.status || 503).json({ error: error.message || 'Playback controls are unavailable.' }); }
+    catch (error) { res.status(upstreamStatus(error)).json({ error: error.message || 'Playback controls are unavailable.' }); }
   });
   router.post('/sessions/:serverId/:sessionId/:action', async (req, res) => {
     const action = String(req.params.action || '').toLowerCase();
@@ -102,8 +102,8 @@ function createFleetRouter({ registry, fleet }) {
       res.status(result.status === 202 ? 202 : 200).json(result);
     } catch (error) {
       await recordAuditSafely(req, 'playback.command.failed', { serverId: req.params.serverId,
-        sessionId: req.params.sessionId, action, status: error.status || 503 });
-      res.status(error.status || 503).json({ error: error.message || 'Playback command failed.' });
+        sessionId: req.params.sessionId, action, status: upstreamStatus(error) });
+      res.status(upstreamStatus(error)).json({ error: error.message || 'Playback command failed.' });
     }
   });
   router.use('/servers', (req, res, next) => req.permissions?.settings ? next() : res.status(403).json({ error: 'Settings access required.' }));
