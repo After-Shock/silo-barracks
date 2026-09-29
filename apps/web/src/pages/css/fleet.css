@@ -27,79 +27,9 @@
   font-size: 13px;
 }
 
-.fleet-totals {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.fleet-totals > div {
-  padding: 16px;
-  border: 1px solid var(--barracks-border-subtle);
-  border-radius: 4px;
-  background: var(--barracks-surface-raised);
-}
-
-.fleet-totals strong {
-  display: block;
-  color: var(--barracks-text-raised);
-  font-size: 34px;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.2;
-}
-
-.fleet-totals span {
-  color: var(--barracks-text-muted-raised);
-  font-size: 12px;
-}
-
 .fleet-footnote {
   color: var(--barracks-text);
   font-size: 12px;
-}
-
-.fleet-server-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.fleet-server {
-  display: grid;
-  gap: 5px;
-  padding: 12px;
-  border: 1px solid var(--barracks-border-subtle);
-  border-top: 3px solid var(--barracks-action);
-  border-radius: 4px;
-  background: var(--barracks-surface-raised);
-  color: var(--barracks-text-raised);
-  text-align: left;
-}
-
-.fleet-server[aria-pressed="true"] {
-  outline: 2px solid var(--barracks-action);
-  outline-offset: 2px;
-}
-
-.fleet-server strong {
-  font-size: 25px;
-}
-
-.fleet-server small {
-  display: block;
-  color: var(--barracks-text-muted-raised);
-  font-size: 11px;
-}
-
-.fleet-server.unavailable,
-.fleet-server.disabled {
-  border-top-color: var(--barracks-state-unavailable);
-}
-
-.fleet-server.disabled {
-  opacity: 0.65;
 }
 
 .fleet-notice {
@@ -110,15 +40,6 @@
   font-size: 13px;
 }
 
-.fleet-filter {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-  font-size: 13px;
-}
-
-.fleet-filter select,
 .server-settings input {
   min-width: 0;
   padding: 9px;
@@ -139,24 +60,6 @@
 .fleet-stream .session-card {
   min-width: 0;
   width: 100%;
-}
-
-.fleet-source {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 8px 2px;
-  font-size: 12px;
-}
-
-.fleet-source span {
-  padding: 2px 6px;
-  border: 1px solid var(--barracks-state-warning);
-  border-radius: 4px;
-  background: var(--barracks-surface-raised);
-  color: var(--barracks-state-warning);
 }
 
 .fleet-footnote {
@@ -234,24 +137,157 @@
   overflow-wrap: anywhere;
 }
 
-@media (max-width: 640px) {
-  .fleet-totals {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .fleet-totals > div {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .fleet-totals strong {
-    font-size: 28px;
-  }
-
-  .fleet-filter {
-    align-items: stretch;
-    flex-direction: column;
-  }
+/* Compact multi-server Active Sessions widget: summary line, server pills, card grid. */
+.fleet-overview.is-compact {
+  display: grid;
+  gap: 0.6rem;
 }
 
+.fleet-overview.is-compact .fleet-heading {
+  justify-content: flex-start;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+  margin: 0;
+}
+
+.fleet-overview.is-compact .fleet-heading h1 {
+  margin: 0;
+  color: var(--barracks-text-raised);
+  font-size: var(--jg-type-title);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.fleet-summary {
+  margin: 0;
+  color: var(--barracks-text-muted-raised);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.fleet-summary strong {
+  color: var(--barracks-text-raised);
+  font-variant-numeric: tabular-nums;
+}
+
+.fleet-info-button {
+  display: inline-grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--barracks-text-muted-raised);
+  line-height: 1;
+}
+
+.fleet-info-button:hover,
+.fleet-info-button:focus-visible {
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-raised);
+}
+
+.fleet-overview.is-compact .fleet-manage-link {
+  margin-left: auto;
+}
+
+.fleet-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.fleet-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: 100%;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--barracks-border-strong);
+  border-radius: 999px;
+  background: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.fleet-pill[aria-pressed="true"] {
+  border-color: var(--barracks-action);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
+}
+
+.fleet-pill-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fleet-pill-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  opacity: 0.85;
+}
+
+.fleet-pill-dot {
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--barracks-state-success);
+}
+
+.fleet-pill.is-connecting .fleet-pill-dot {
+  background: var(--barracks-state-warning);
+}
+
+.fleet-pill.is-unavailable .fleet-pill-dot {
+  background: var(--barracks-state-danger);
+}
+
+.fleet-overview.is-compact .fleet-notice {
+  margin: 0;
+}
+
+.fleet-stream {
+  position: relative;
+}
+
+.fleet-card-badge {
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  left: 8px;
+  max-width: min(calc(100% - 64px), 8.5rem);
+  padding: 2px 8px;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--barracks-canvas) 78%, transparent);
+  color: var(--barracks-text-raised);
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.fleet-card-badge-state {
+  display: block;
+  font-size: 10px;
+  white-space: normal;
+  line-height: 1.25;
+}
+
+.fleet-card-badge.is-stale {
+  border-color: var(--barracks-state-warning);
+  color: var(--barracks-state-warning);
+}
+
+.home-active-sessions:has(.fleet-overview.is-empty) {
+  min-height: 0;
+  padding: 0.55rem 0.75rem;
+}

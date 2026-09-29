@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import useFleet from '../../../lib/use-fleet';
 import { normalizeSessions } from '../../../lib/session-cache';
+import { summarizeFleet } from '../../../lib/fleet-summary';
 import { getActiveSessionIpPrivacy, shouldHideActiveSessionIp, ACTIVE_SESSION_IP_PRIVACY_EVENT } from '../../../lib/privacy-settings';
 import SessionCard from './session-card';
 import ErrorBoundary from '../general/ErrorBoundary';
@@ -21,8 +23,6 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
   const selectedServer = servers.find(server => server.id === selected);
   const filter = selectedServer ? selected : 'all';
   const visible = servers.filter(server => server.enabled && (filter === 'all' || server.id === filter));
-  const count = filter === 'all' ? snapshot?.totalActiveStreams : selectedServer.activeStreams;
-  const partial = Boolean(error || (filter === 'all' ? snapshot?.partial : selectedServer?.state !== 'connected'));
   const streams = visible.flatMap(server => normalizeSessions(server.sessions || []).map(session => ({ server, session })));
   const card = ({ server, session }) => <SessionCard data={{ session: { ...session, FleetServerId: server.id } }}
     hideIpAddress={shouldHideActiveSessionIp(surface, privacy)} kiosk={surface === 'kiosk'}
@@ -43,41 +43,46 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
           <ErrorBoundary key={`${stream.server.id}:${stream.session.Id}`}>{card(stream)}</ErrorBoundary>)}</div>}
     </div>;
   }
-  return <section className="fleet-overview" aria-label="All Silo servers">
+  const s = summarizeFleet(snapshot, selected, error);
+  const fleetStreams = s.visibleServers.flatMap(server => normalizeSessions(server.sessions || []).map(session => ({ server, session })));
+  const kiosk = surface === 'kiosk';
+  const emptyText = !snapshot && !error ? 'Connecting to your Silo servers…'
+    : s.partial ? 'No current activity can be confirmed for this selection.' : 'No Active Sessions Found';
+  const showSummary = fleetStreams.length > 0 || s.partial;
+  return <section className={`fleet-overview is-compact${fleetStreams.length ? '' : ' is-empty'}`} aria-label="All Silo servers">
     <header className="fleet-heading">
-      <div><span className="fleet-eyebrow">{filter === 'all' ? 'All servers' : selectedServer.name}</span><h1>Active Sessions</h1></div>
-      <Link to="/settings/servers" className="fleet-manage-link">Manage servers</Link>
+      <h1>Active Sessions</h1>
+      {showSummary ? <p className="fleet-summary">
+        <strong data-testid="fleet-total">{s.total ?? '—'}</strong>{' '}
+        {error ? <span>Current total unavailable</span> : <>streaming{s.partial && s.total != null ? ' · partial total' : ''}
+        {' · '}{s.paused ?? '—'} paused · {s.connected}/{s.enabled} servers</>}
+      </p> : <p className="fleet-summary is-empty"><span data-testid="fleet-total" hidden>{s.total ?? '—'}</span>{emptyText}</p>}
+      <OverlayTrigger placement="bottom" overlay={<Tooltip id="fleet-note">Live activity includes all enabled servers. Paused streams are included in the total; stale streams are not. Playback History can be scoped to one connected server; library statistics remain primary-server scoped.</Tooltip>}>
+        <button type="button" className="fleet-info-button" aria-label="About live activity across servers">ⓘ</button>
+      </OverlayTrigger>
+      {!kiosk && <Link to="/settings/servers" className="fleet-manage-link">Manage servers</Link>}
     </header>
-    <div className="fleet-totals">
-      <div><strong data-testid="fleet-total">{snapshot && !error ? (count ?? '—') : '—'}</strong><span>{error ? 'Current total unavailable' : partial ? 'Confirmed active streams · partial total' : 'Active streams'}</span></div>
-      <div><strong>{servers.filter(server => server.enabled && server.state === 'connected').length} / {servers.filter(server => server.enabled).length}</strong><span>Servers connected</span></div>
-      <div><strong>{filter === 'all' ? snapshot?.pausedStreams ?? '—' : selectedServer.pausedStreams ?? '—'}</strong><span>Paused · included in active</span></div>
+    <div className="fleet-pills" role="group" aria-label="Show activity">
+      {s.pills.map(pill => {
+        const button = <button key={pill.id} type="button" className={`fleet-pill is-${pill.state}`} aria-pressed={pill.selected} onClick={() => setSelected(pill.id)}>
+          {pill.state !== 'all' && <span className="fleet-pill-dot" aria-hidden="true" />}
+          <span className="fleet-pill-label">{pill.label}</span>
+          <span className="fleet-pill-count">{pill.count ?? '—'}</span>
+        </button>;
+        return pill.state === 'connected' || pill.state === 'all' ? button
+          : <OverlayTrigger key={pill.id} placement="bottom" overlay={<Tooltip id={`fleet-pill-${pill.id}`}>{pill.state === 'connecting' ? 'Connecting…' : 'Unavailable'}{pill.lastSuccessAt ? ` · Last seen ${new Date(pill.lastSuccessAt).toLocaleTimeString()}` : ''}</Tooltip>}>{button}</OverlayTrigger>;
+      })}
     </div>
     {error && <p role="status" className="fleet-notice">{error} <button onClick={refresh}>Retry</button></p>}
-    {!error && partial && <p role="status" className="fleet-notice">Some servers are unavailable or still connecting. Last-known streams are labelled stale and excluded from the total.</p>}
-    <div className="fleet-server-grid">
-      {servers.map(server => <button key={server.id} className={`fleet-server ${server.state}`} disabled={!server.enabled}
-        aria-pressed={filter === server.id} onClick={() => setSelected(server.id)}>
-        <span>{server.name}{server.isPrimary && <small>Primary</small>}</span>
-        <strong>{server.activeStreams ?? '—'}</strong>
-        <small>{server.state === 'connected' ? 'Connected' : server.state === 'disabled' ? 'Monitoring disabled' : server.state === 'connecting' ? 'Connecting…' : 'Unavailable'}</small>
-        {server.lastSuccessAt && server.state !== 'connected' && <small>Last seen {new Date(server.lastSuccessAt).toLocaleTimeString()}</small>}
-      </button>)}
-    </div>
-    <label className="fleet-filter">Show activity
-      <select value={filter} onChange={event => setSelected(event.target.value)}>
-        <option value="all">All servers</option>
-        {servers.filter(server => server.enabled).map(server => <option key={server.id} value={server.id}>{server.name}</option>)}
-      </select>
-    </label>
-    {!snapshot && <p role="status">Connecting to your Silo servers…</p>}
-    {snapshot && streams.length === 0 && <p>{partial ? 'No current activity can be confirmed for this selection.' : 'No active streams on the selected servers.'}</p>}
-    <div className="fleet-streams">
-      {streams.map(({ server, session }) => <div key={`${server.id}:${session.Id}`} className="fleet-stream">
-        <div className="fleet-source"><strong>{server.name}</strong>{(session.stale || server.state !== 'connected' || error) && <span>Stale · last known activity</span>}</div>
-        <ErrorBoundary>{card({ server, session })}</ErrorBoundary>
-      </div>)}
-    </div>
-    {servers.length > 1 && <p className="fleet-footnote">Live activity includes all enabled servers. Playback History can be scoped to one connected server; library statistics remain primary-server scoped.</p>}
+    {!error && snapshot?.partial && s.filter === 'all' && <p role="status" className="fleet-notice">Some servers are unavailable or still connecting. Last-known streams are labelled stale and excluded from the total.</p>}
+    {fleetStreams.length > 0 && <div className="fleet-streams sessions-container">
+      {fleetStreams.map(({ server, session }) => {
+        const stale = session.stale || server.state !== 'connected' || Boolean(error);
+        return <div key={`${server.id}:${session.Id}`} className="fleet-stream">
+          <span className={`fleet-card-badge${stale ? ' is-stale' : ''}`}>{server.name}{stale && <span className="fleet-card-badge-state">Stale · last known activity</span>}</span>
+          <ErrorBoundary>{card({ server, session })}</ErrorBoundary>
+        </div>;
+      })}
+    </div>}
   </section>;
 }

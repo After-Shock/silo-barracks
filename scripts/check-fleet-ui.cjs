@@ -88,9 +88,9 @@ async function main() {
     await page.locator('.session-popout-grid').getByText('hable', { exact: true }).waitFor();
     await page.locator('.session-popout-grid').getByText('Primary Silo', { exact: true }).waitFor();
     await page.getByRole('button', { name: 'Close session details' }).click();
-    await page.getByLabel('Show activity').selectOption('extra');
+    await page.getByRole('group', { name: 'Show activity' }).getByRole('button', { name: /^Remote Silo/ }).click();
     assert.equal(await page.locator('.fleet-stream').count(), 1);
-    await page.getByLabel('Show activity').selectOption('all');
+    await page.getByRole('group', { name: 'Show activity' }).getByRole('button', { name: /^All/ }).click();
     failed = true;
     await page.getByTestId('fleet-total').filter({ hasText: /^1$/ }).waitFor();
     await page.getByText('Stale · last known activity', { exact: true }).waitFor();
