@@ -1339,3 +1339,10 @@
     min-width: var(--heatmap-cell-size);
   }
 }
+
+/* Phones and tablets: keep the sticky profile sub-nav below the sticky mobile top bar. */
+@media (max-width: 900px), (hover: none) and (pointer: coarse) {
+  .user-profile-subnav {
+    top: calc(env(safe-area-inset-top, 0px) + 70px);
+  }
+}

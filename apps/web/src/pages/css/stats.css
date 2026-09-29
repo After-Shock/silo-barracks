@@ -987,3 +987,10 @@ a.stats-rank-row:hover {
     flex-direction: column;
   }
 }
+
+/* Phones and tablets: keep the sticky header below the sticky mobile top bar (same offset as Settings). */
+@media (max-width: 900px), (hover: none) and (pointer: coarse) {
+  .stats-page-header {
+    top: calc(env(safe-area-inset-top, 0px) + 70px);
+  }
+}
