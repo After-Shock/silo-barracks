@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { formatHistorySearchResult, createLatestRequest } from './history-search.js';
 
-test('results read like JellyGlance titles without null fragments', () => {
+test('results read as clean titles without null fragments', () => {
   assert.equal(formatHistorySearchResult({ type: 'movie', title: 'Heat', year: 1995 }), 'Heat (1995)');
   assert.equal(formatHistorySearchResult({ type: 'movie', title: 'Heat', year: null }), 'Heat');
   assert.equal(formatHistorySearchResult({ type: 'episode', title: 'Pilot', seriesName: 'Show', seasonNumber: 1, episodeNumber: 2 }), 'Show · S01E02 · Pilot');
