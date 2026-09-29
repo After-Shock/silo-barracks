@@ -801,7 +801,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
               <span>Review Bazarr subtitles and Prowlarr indexer status from one Barracks view.</span>
             </div>
             <div className="integration-link-actions">
-              <Link to="/automation-health">Open Automation Health</Link>
+              <Link to="/server-management?tab=automation">Open Automation Health</Link>
             </div>
           </div>
         </section>
@@ -966,7 +966,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
               <span>Manage Wizarr invitations or monitor Tdarr active, queued, and finished transcodes from Barracks.</span>
             </div>
             <div className="integration-link-actions">
-              <Link to="/wizarr">Open Wizarr links</Link>
+              <Link to="/users?tab=invites">Open Wizarr links</Link>
               <Link to="/active-transcodes">Open Active Transcodes</Link>
             </div>
           </div>

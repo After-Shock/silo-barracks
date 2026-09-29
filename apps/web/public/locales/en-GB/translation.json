@@ -10,7 +10,7 @@
     "ABOUT": "About",
     "LOGOUT": "Logout",
     "TIMELINE": "Timeline",
-    "JELLYFIN_JOBS": "Jellyfin Jobs"
+    "SERVER": "Server"
   },
   "HOME_PAGE": {
     "SESSIONS": "Sessions",

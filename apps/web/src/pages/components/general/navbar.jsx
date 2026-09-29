@@ -21,7 +21,7 @@ import Config from "../../../lib/config";
 import { FONT_WEIGHT_OPTIONS, getStoredFontWeight, saveFontWeightPreference } from "../../../lib/appearance";
 import { DEFAULT_THEME, THEME_PRESETS, getStoredTheme, resetTheme, saveTheme } from "../../../lib/theme";
 import { applyNavOrder, getStoredHiddenNavLinks, getStoredNavOrder, LOCKED_NAV_LINKS } from "../../../lib/nav-order";
-import { showServerNav } from "../../../lib/hub-tabs";
+import { AUTOMATION_HEALTH_NAV_AVAILABLE_KEY, showServerNav, WIZARR_NAV_AVAILABLE_KEY } from "../../../lib/hub-tabs";
 import useFleet from "../../../lib/use-fleet";
 
 function getTokenPayload() {
@@ -52,9 +52,7 @@ function getCachedConfig() {
 
 const REQUEST_NAV_AVAILABLE_KEY = "silo_barracks_request_nav_available";
 const DOWNLOAD_NAV_AVAILABLE_KEY = "silo_barracks_download_nav_available";
-const WIZARR_NAV_AVAILABLE_KEY = "silo_barracks_wizarr_nav_available";
 const TDARR_NAV_AVAILABLE_KEY = "silo_barracks_tdarr_nav_available";
-const AUTOMATION_HEALTH_NAV_AVAILABLE_KEY = "silo_barracks_automation_health_nav_available";
 const NAV_COLLAPSED_KEY = "silo_barracks_nav_collapsed";
 const INTEGRATIONS_CACHE_TTL_MS = 10000;
 

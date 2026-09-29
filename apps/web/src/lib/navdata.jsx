@@ -99,7 +99,7 @@ export const navData = [
     {
         id: 12,
         icon: <ServerFillIcon />,
-        text: "Server",
+        text: <Trans i18nKey="MENU_TABS.SERVER" />,
         label: "Server",
         link: "server-management"
     },

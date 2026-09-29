@@ -1268,7 +1268,7 @@ export default function Home({ kioskMode = false }) {
             eyebrow="Invite manager"
             widget={integrationWidgets.wizarr ? getWizarrWidget(integrationWidgets.wizarr) : null}
             error={integrationWidgetErrors.wizarr}
-            to="/wizarr"
+            to="/users?tab=invites"
           />
         </section>
       ) : null}
@@ -1281,7 +1281,7 @@ export default function Home({ kioskMode = false }) {
             eyebrow="Subtitle health"
             widget={integrationWidgets.automation ? getAutomationServiceWidget(getServiceByType(integrationWidgets.automation, "bazarr"), "bazarr") : null}
             error={integrationWidgetErrors.bazarr}
-            to="/automation-health"
+            to="/server-management?tab=automation"
           />
         </section>
       ) : null}
@@ -1294,7 +1294,7 @@ export default function Home({ kioskMode = false }) {
             eyebrow="Indexer health"
             widget={integrationWidgets.automation ? getAutomationServiceWidget(getServiceByType(integrationWidgets.automation, "prowlarr"), "prowlarr") : null}
             error={integrationWidgetErrors.prowlarr}
-            to="/automation-health"
+            to="/server-management?tab=automation"
           />
         </section>
       ) : null}

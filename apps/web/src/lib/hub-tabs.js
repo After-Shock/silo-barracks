@@ -20,6 +20,10 @@ export function resolveHubTabs({ visible, reachable, requested }) {
   return { active, shown };
 }
 
+// localStorage keys the navbar writes after checking integrations.
+export const WIZARR_NAV_AVAILABLE_KEY = 'silo_barracks_wizarr_nav_available';
+export const AUTOMATION_HEALTH_NAV_AVAILABLE_KEY = 'silo_barracks_automation_health_nav_available';
+
 // Role, Silo mode and the integration availability the navbar caches.
 export function readFlags() {
   let config = {};
@@ -29,7 +33,7 @@ export function readFlags() {
   return {
     isAdmin: role === 'Owner' || role === 'Admin',
     isSilo: config?.IS_SILO === true,
-    wizarr: flag('silo_barracks_wizarr_nav_available'),
-    automation: flag('silo_barracks_automation_health_nav_available'),
+    wizarr: flag(WIZARR_NAV_AVAILABLE_KEY),
+    automation: flag(AUTOMATION_HEALTH_NAV_AVAILABLE_KEY),
   };
 }
