@@ -759,7 +759,10 @@ function SessionCard(props) {
       </Row>
       <Row className="session-card-meta p-0 m-0">
         <Col className="session-card-now-playing">
-          <span className="session-play-state">{props.data.session.PlayState.IsPaused ? <PauseFillIcon /> : <PlayFillIcon />}</span>
+          {/* Player convention: a paused stream shows play, a playing stream shows pause. */}
+          <span className="session-play-state" role="img" aria-label={props.data.session.PlayState.IsPaused ? "Paused" : "Playing"}>
+            {props.data.session.PlayState.IsPaused ? <PlayFillIcon /> : <PauseFillIcon />}
+          </span>
           <div className="session-title-copy">
             <Card.Text className="session-title">
               <LocalLink to={`/libraries/item/${props.data.session.NowPlayingItem.Id}`} target="_blank" className="item-name">
