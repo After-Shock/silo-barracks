@@ -479,6 +479,8 @@
 }
 
 .activity-filters-popover {
+  width: min(22rem, calc(100vw - 32px));
+  max-width: none;
   border: 1px solid var(--barracks-border-strong);
   background: var(--barracks-surface-raised);
 }
