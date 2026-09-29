@@ -24,8 +24,12 @@ export default function HistoryItemSearch({ searchUrl, token, selected, onSelect
     }
     const controller = new AbortController();
     const requestId = latest.current.next();
+    // Drop previous results immediately so nothing stale can be picked while this search is pending.
+    setResults([]);
+    setActive(-1);
+    setError("");
+    setStatus("loading");
     const timer = window.setTimeout(() => {
-      setStatus("loading");
       axios.get(searchUrl, { headers: { Authorization: `Bearer ${token}` }, params: { q: trimmed }, signal: controller.signal })
         .then(({ data }) => {
           if (!latest.current.isLatest(requestId)) return;
@@ -70,6 +74,7 @@ export default function HistoryItemSearch({ searchUrl, token, selected, onSelect
         aria-expanded={showMenu}
         aria-controls={listId}
         aria-autocomplete="list"
+        aria-activedescendant={showMenu && active >= 0 ? `${listId}-${active}` : undefined}
         value={query}
         maxLength={100}
         onChange={(event) => { setQuery(event.target.value); setOpen(true); }}
@@ -78,8 +83,8 @@ export default function HistoryItemSearch({ searchUrl, token, selected, onSelect
         onKeyDown={(event) => {
           if (event.key === "ArrowDown") { event.preventDefault(); setActive((i) => Math.min(results.length - 1, i + 1)); }
           else if (event.key === "ArrowUp") { event.preventDefault(); setActive((i) => Math.max(0, i - 1)); }
-          else if (event.key === "Enter" && results.length) { event.preventDefault(); choose(results[Math.max(0, active)]); }
-          else if (event.key === "Escape") setOpen(false);
+          else if (event.key === "Enter" && showMenu && status === "done" && results.length) { event.preventDefault(); choose(results[Math.max(0, active)]); }
+          else if (event.key === "Escape") { setOpen(false); setActive(-1); }
         }}
       />
       {showMenu ? (
@@ -90,6 +95,7 @@ export default function HistoryItemSearch({ searchUrl, token, selected, onSelect
           {status !== "error" && results.map((result, index) => (
             <li
               key={result.id}
+              id={`${listId}-${index}`}
               role="option"
               aria-selected={index === active}
               className={index === active ? "is-active" : ""}
