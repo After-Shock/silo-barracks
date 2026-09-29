@@ -385,6 +385,17 @@
   box-shadow: var(--barracks-shadow);
 }
 
+.activity-search-menu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.activity-search-menu p.activity-search-state {
+  margin: 0;
+  padding: 8px 10px;
+}
+
 .activity-search-menu li {
   display: flex;
   flex-direction: column;

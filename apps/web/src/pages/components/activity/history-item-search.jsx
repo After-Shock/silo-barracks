@@ -13,6 +13,20 @@ export default function HistoryItemSearch({ searchUrl, token, selected, onSelect
   const [active, setActive] = useState(-1);
   const latest = useRef(createLatestRequest());
   const listId = useId();
+  const inputRef = useRef(null);
+  const clearRef = useRef(null);
+  const blurTimer = useRef(null);
+  // Focus moves only after a user picks or clears a title (never on first render).
+  const pendingFocus = useRef(null);
+
+  useEffect(() => {
+    if (pendingFocus.current === "chip" && clearRef.current) clearRef.current.focus();
+    else if (pendingFocus.current === "input" && inputRef.current) inputRef.current.focus();
+    else return;
+    pendingFocus.current = null;
+  });
+
+  useEffect(() => () => window.clearTimeout(blurTimer.current), []);
 
   useEffect(() => {
     const trimmed = query.trim();
@@ -48,6 +62,7 @@ export default function HistoryItemSearch({ searchUrl, token, selected, onSelect
   }, [query, searchUrl, token]);
 
   function choose(result) {
+    pendingFocus.current = "chip";
     setOpen(false);
     setQuery("");
     setResults([]);
@@ -58,28 +73,33 @@ export default function HistoryItemSearch({ searchUrl, token, selected, onSelect
     return (
       <span className="activity-search-chip" title={formatHistorySearchResult(selected)}>
         <span>{formatHistorySearchResult(selected)}</span>
-        <button type="button" aria-label="Clear title filter" onClick={onClear}>×</button>
+        <button ref={clearRef} type="button" aria-label="Clear title filter" onClick={() => { pendingFocus.current = "input"; onClear(); }}>×</button>
       </span>
     );
   }
 
   const showMenu = open && query.trim().length >= 2;
+  const showList = showMenu && status !== "error" && results.length > 0;
+  const statusText = status === "loading" ? "Searching…"
+    : status === "error" ? error
+      : status === "done" && results.length === 0 ? "No movies or episodes match" : "";
   return (
     <div className="activity-search">
       <input
+        ref={inputRef}
         className="activity-search-input form-control"
         placeholder="Search titles"
         aria-label="Search titles"
         role="combobox"
-        aria-expanded={showMenu}
-        aria-controls={listId}
+        aria-expanded={showList}
+        aria-controls={showList ? listId : undefined}
         aria-autocomplete="list"
-        aria-activedescendant={showMenu && active >= 0 ? `${listId}-${active}` : undefined}
+        aria-activedescendant={showList && active >= 0 ? `${listId}-${active}` : undefined}
         value={query}
         maxLength={100}
         onChange={(event) => { setQuery(event.target.value); setOpen(true); }}
-        onFocus={() => setOpen(true)}
-        onBlur={() => window.setTimeout(() => setOpen(false), 150)}
+        onFocus={() => { window.clearTimeout(blurTimer.current); setOpen(true); }}
+        onBlur={() => { blurTimer.current = window.setTimeout(() => setOpen(false), 150); }}
         onKeyDown={(event) => {
           if (event.key === "ArrowDown") { event.preventDefault(); setActive((i) => Math.min(results.length - 1, i + 1)); }
           else if (event.key === "ArrowUp") { event.preventDefault(); setActive((i) => Math.max(0, i - 1)); }
@@ -88,24 +108,26 @@ export default function HistoryItemSearch({ searchUrl, token, selected, onSelect
         }}
       />
       {showMenu ? (
-        <ul id={listId} role="listbox" className="activity-search-menu">
-          {status === "loading" ? <li className="activity-search-state">Searching…</li> : null}
-          {status === "error" ? <li className="activity-search-state is-error" role="alert">{error}</li> : null}
-          {status === "done" && results.length === 0 ? <li className="activity-search-state">No movies or episodes match</li> : null}
-          {status !== "error" && results.map((result, index) => (
-            <li
-              key={result.id}
-              id={`${listId}-${index}`}
-              role="option"
-              aria-selected={index === active}
-              className={index === active ? "is-active" : ""}
-              onMouseDown={(event) => { event.preventDefault(); choose(result); }}
-            >
-              <strong>{formatHistorySearchResult(result)}</strong>
-              <small>{result.type === "episode" ? "Episode" : "Movie"}</small>
-            </li>
-          ))}
-        </ul>
+        <div className="activity-search-menu">
+          {statusText ? <p className={`activity-search-state${status === "error" ? " is-error" : ""}`} role="status" aria-live="polite">{statusText}</p> : null}
+          {showList ? (
+            <ul id={listId} role="listbox" aria-label="Matching titles">
+              {results.map((result, index) => (
+                <li
+                  key={result.id}
+                  id={`${listId}-${index}`}
+                  role="option"
+                  aria-selected={index === active}
+                  className={index === active ? "is-active" : ""}
+                  onMouseDown={(event) => { event.preventDefault(); choose(result); }}
+                >
+                  <strong>{formatHistorySearchResult(result)}</strong>
+                  <small>{result.type === "episode" ? "Episode" : "Movie"}</small>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );
