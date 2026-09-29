@@ -8,9 +8,10 @@
   min-height: 100dvh;
   margin-inline: 0;
   padding: var(--jg-page-pad, 8px);
-  overflow: auto;
+  /* The document scrolls, so sticky page headers stick; clip keeps horizontal overflow hidden. */
+  overflow: visible;
+  overflow-x: clip;
   background: var(--barracks-canvas);
-  overflow-x: hidden;
 }
 
 .App > .d-flex {
@@ -53,7 +54,7 @@
   .app-shell-main {
     min-height: 100dvh;
     padding: 10px 10px calc(88px + env(safe-area-inset-bottom, 0px));
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 }
 

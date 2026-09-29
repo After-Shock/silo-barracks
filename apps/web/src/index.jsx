@@ -48,6 +48,10 @@ i18n
     },
   })
   .then(() => {
+    // Apply a saved collapsed sidebar before first paint so the rail never flashes full width.
+    try {
+      if (localStorage.getItem("silo_barracks_nav_collapsed") === "true") document.documentElement.classList.add("jg-nav-collapsed");
+    } catch { /* storage unavailable */ }
     createRoot(document.getElementById("root")).render(
       <React.StrictMode>
         <Suspense fallback={<Loading />}>

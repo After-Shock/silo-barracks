@@ -9,7 +9,7 @@
   min-width: 0;
   max-width: 100%;
   min-height: 0;
-  overflow-x: hidden;
+  overflow-x: clip; /* clip, not hidden: hidden would trap the sticky tab list */
   padding: 28px clamp(18px, 3vw, 42px) 48px;
   background:
     radial-gradient(circle at 15% 0%, color-mix(in srgb, var(--barracks-action) 18%, transparent), transparent 32%),

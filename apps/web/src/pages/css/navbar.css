@@ -828,14 +828,6 @@
   }
 }
 
-@media (min-width: 901px) {
-
-}
-
-@media (max-width: 900px) {
-
-}
-
 @media (max-width: 900px), (hover: none) and (pointer: coarse) {
   .navbar {
     position: fixed !important;
@@ -952,10 +944,6 @@
   }
 }
 
-@media (min-width: 901px) {
-
-}
-
 /* Sidebar: menu links scroll, account + version card stay pinned at the bottom */
 .navbar-links-scroll {
   display: contents;
@@ -1007,7 +995,6 @@
   padding: 7px 8px 8px;
 }
 
-/* Install app button */
 
 /* Barracks-only navigation rules (profile modal, tooltips, interaction states). */
 .barracks-nav-tooltip .tooltip-inner {
@@ -1864,4 +1851,9 @@ html body .navitem:is(:disabled, .disabled) .nav-text {
   .desktop-navigation.is-collapsed .navbar-brand .silo-wordmark {
     display: none;
   }
+}
+
+/* Collapsed sidebar rail (class set before first paint). */
+html.jg-nav-collapsed {
+  --jg-sidebar-width: 4.875rem;
 }

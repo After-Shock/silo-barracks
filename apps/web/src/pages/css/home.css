@@ -473,6 +473,15 @@
   padding: 12px;
 }
 
+.home-widget-size-large.home-week-pulse,
+.home-widget-size-large.home-attention-section,
+.home-widget-size-large.home-watch-party,
+.home-widget-size-large.home-quick-actions,
+.home-widget-size-large.home-active-sessions,
+.home-widget-size-large.home-milestones {
+  padding: 0.7rem 0.8rem;
+}
+
 .home-widget-size-large .home-metric-card,
 .home-widget-size-large .home-catalog-card {
   min-height: 132px;

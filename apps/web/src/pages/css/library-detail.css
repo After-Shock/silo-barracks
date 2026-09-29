@@ -1,5 +1,6 @@
 .library-detail-page {
-  min-height: 100vh;
+  position: relative;
+  min-height: 100dvh;
   padding: var(--jg-page-pad) clamp(0.7rem, 1.7vw, 1.3rem) 1.8rem;
   color: var(--barracks-text);
   background: var(--barracks-canvas);
@@ -7,8 +8,11 @@
 
 .library-detail-page::before {
   content: "";
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 100dvh;
   pointer-events: none;
   background-image:
     linear-gradient(var(--barracks-border-subtle) 1px, transparent 1px),
@@ -396,5 +400,16 @@
 
   .library-native-metrics {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Desktop pages are shrunk by --jg-content-scale (App.css); divide so the page and grid still fill the viewport. */
+@media (min-width: 901px) and (hover: hover) {
+  .library-detail-page {
+    min-height: calc(100dvh / var(--jg-content-scale, 0.82));
+  }
+
+  .library-detail-page::before {
+    height: calc(100dvh / var(--jg-content-scale, 0.82));
   }
 }

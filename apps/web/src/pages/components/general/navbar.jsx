@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useLayoutEffect } from "react";
 import { Button, Modal, Nav, Navbar as BootstrapNavbar, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
 import axios from "../../../lib/axios_instance";
@@ -262,10 +262,9 @@ export default function Navbar() {
 
   const location = useLocation();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     localStorage.setItem(NAV_COLLAPSED_KEY, String(isNavCollapsed));
-    if (isNavCollapsed) document.documentElement.style.setProperty("--jg-sidebar-width", "78px");
-    else document.documentElement.style.removeProperty("--jg-sidebar-width");
+    document.documentElement.classList.toggle("jg-nav-collapsed", isNavCollapsed);
   }, [isNavCollapsed]);
 
   useEffect(() => {
