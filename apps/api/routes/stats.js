@@ -776,8 +776,14 @@ router.get("/getAllUserActivity", async (req, res) => {
     res.set("Expires", "0");
     res.set("Surrogate-Control", "no-store");
     if (await isSiloProvider()) {
-      const users = await API.getPlaybackHistoryUsers();
-      return res.send(users.map((user) => ({ UserId: user.Id, UserName: user.Name })));
+      try {
+        const users = await API.getPlaybackHistoryUsers();
+        return res.send(users.map((user) => ({ UserId: user.Id, UserName: user.Name })));
+      } catch (error) {
+        // Let the timeline show its users error instead of an empty user list.
+        const status = error?.status >= 400 && error?.status < 600 ? error.status : 503;
+        return res.status(status).json({ error: "Unable to load Silo users" });
+      }
     }
     const { rows } = await db.query("SELECT * FROM jf_all_user_activity");
     res.send(rows);

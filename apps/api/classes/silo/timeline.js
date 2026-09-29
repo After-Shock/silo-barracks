@@ -42,7 +42,7 @@ function historyToTimeline(rows, seriesById) {
     .sort((a, b) => (a.LastActivityDate < b.LastActivityDate ? 1 : a.LastActivityDate > b.LastActivityDate ? -1 : 0));
 }
 
-async function buildSiloTimeline(api, userId) {
+async function buildSiloTimeline(api, userId, { lookupBudgetMs = 8000 } = {}) {
   if (typeof userId !== 'string' || !userId.trim()) {
     throw Object.assign(new Error('A userId is required.'), { status: 400 });
   }
@@ -57,10 +57,16 @@ async function buildSiloTimeline(api, userId) {
   const episodeIds = [...new Set(rows.filter(row => row.SiloMediaType === 'episode' && row.NowPlayingItemId)
     .map(row => row.NowPlayingItemId))].slice(0, MAX_EPISODE_LOOKUPS);
   const seriesById = new Map();
-  for (let i = 0; i < episodeIds.length; i += LOOKUP_BATCH) {
+  // Lookups share one budget; anything unresolved when it runs out keeps its own title.
+  const deadlineAt = Date.now() + lookupBudgetMs;
+  const withinBudget = (promise) => new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(null), Math.max(0, deadlineAt - Date.now()));
+    promise.then((value) => { clearTimeout(timer); resolve(value); }, () => { clearTimeout(timer); resolve(null); });
+  });
+  for (let i = 0; i < episodeIds.length && Date.now() < deadlineAt; i += LOOKUP_BATCH) {
     await Promise.all(episodeIds.slice(i, i + LOOKUP_BATCH).map(async id => {
       try {
-        const detail = await api._detail(id);
+        const detail = await withinBudget(api._detail(id, { deadlineAt, timeoutMs: api.enrichmentTimeoutMs }));
         if (detail?.series_id) {
           seriesById.set(id, { seriesTitle: detail.series_title || '', seriesId: String(detail.series_id),
             seasonName: detail.season_number != null ? `Season ${detail.season_number}` : null });

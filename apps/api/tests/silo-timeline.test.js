@@ -76,3 +76,21 @@ test('a missing or blank user id is rejected instead of returning every user\'s 
   }
   assert.equal(called, false);
 });
+
+test('slow item lookups are cut off and the timeline still returns', async () => {
+  const api = {
+    enrichmentTimeoutMs: 20,
+    async getPlaybackHistoryPage() { return { results: [ep('slow', '2026-09-02T00:00:00Z', 10)], hasMore: false }; },
+    async _detail(id, options) {
+      seen.push(options);
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      return { series_id: 1, series_title: 'Late', season_number: 1 };
+    },
+  };
+  const seen = [];
+  const started = Date.now();
+  const out = await buildSiloTimeline(api, 'u1', { lookupBudgetMs: 50 });
+  assert.ok(Date.now() - started < 180, 'did not wait for slow lookups');
+  assert.ok(seen[0]?.deadlineAt, 'lookups carry a deadline');
+  assert.deepEqual(out.map(r => r.Title), ['Ep slow']);
+});
