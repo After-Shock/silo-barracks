@@ -20,9 +20,8 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
     return () => { window.removeEventListener(ACTIVE_SESSION_IP_PRIVACY_EVENT, update); window.removeEventListener('storage', update); };
   }, []);
   const servers = snapshot?.servers || [];
-  const selectedServer = servers.find(server => server.id === selected);
-  const filter = selectedServer ? selected : 'all';
-  const visible = servers.filter(server => server.enabled && (filter === 'all' || server.id === filter));
+  const s = summarizeFleet(snapshot, selected, error);
+  const visible = s.visibleServers;
   const streams = visible.flatMap(server => normalizeSessions(server.sessions || []).map(session => ({ server, session })));
   const card = ({ server, session }) => <SessionCard data={{ session: { ...session, FleetServerId: server.id } }}
     hideIpAddress={shouldHideActiveSessionIp(surface, privacy)} kiosk={surface === 'kiosk'}
@@ -43,7 +42,6 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
           <ErrorBoundary key={`${stream.server.id}:${stream.session.Id}`}>{card(stream)}</ErrorBoundary>)}</div>}
     </div>;
   }
-  const s = summarizeFleet(snapshot, selected, error);
   const fleetStreams = s.visibleServers.flatMap(server => normalizeSessions(server.sessions || []).map(session => ({ server, session })));
   const kiosk = surface === 'kiosk';
   const emptyText = !snapshot && !error ? 'Connecting to your Silo servers…'

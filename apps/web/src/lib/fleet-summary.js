@@ -10,8 +10,9 @@ export function summarizeFleet(snapshot, selectedId, error) {
   const pills = [
     { id: 'all', label: 'All', count: ok ? snapshot.totalActiveStreams ?? null : null, state: 'all', lastSuccessAt: null, isPrimary: false, selected: filter === 'all' },
     ...enabledServers.map((server) => ({
-      id: server.id, label: String(server.name || server.id), count: server.activeStreams ?? null,
-      state: server.state === 'connected' ? 'connected' : server.state === 'connecting' ? 'connecting' : 'unavailable',
+      // Without a fresh snapshot, per-server counts and states are last-known, not live.
+      id: server.id, label: String(server.name || server.id), count: ok ? server.activeStreams ?? null : null,
+      state: !ok ? 'unavailable' : server.state === 'connected' ? 'connected' : server.state === 'connecting' ? 'connecting' : 'unavailable',
       lastSuccessAt: server.lastSuccessAt || null, isPrimary: Boolean(server.isPrimary), selected: filter === server.id,
     })),
   ];

@@ -38,3 +38,9 @@ test('transport error never reports a number', () => {
   assert.equal(s.partial, true);
   assert.equal(summarizeFleet(null, 'all', '').total, null);
 });
+
+test('during a transport error server pills do not show last-known counts as live', () => {
+  const s = summarizeFleet(snap, 'all', 'Unavailable');
+  assert.deepEqual(s.pills.map(p => [p.id, p.count, p.state]),
+    [['all', null, 'all'], ['p', null, 'unavailable'], ['x', null, 'unavailable']]);
+});
