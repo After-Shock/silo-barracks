@@ -1,0 +1,9 @@
+.page-tabs-hub { min-width: 0; }
+.page-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; padding: 5px; width: fit-content; max-width: 100%; border: 1px solid rgba(var(--barracks-action-rgb), 0.18); border-radius: 14px; background: var(--barracks-surface-inset); }
+.page-tabs button { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border: 0; border-radius: 10px; background: transparent; color: var(--barracks-text-muted); font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s; }
+.page-tabs button:hover { color: var(--barracks-text); background: var(--barracks-surface-interactive); }
+.page-tabs button.is-active { color: var(--barracks-action-text); background: var(--barracks-action); }
+.page-tabs-empty { display: grid; gap: 8px; padding: 1rem; color: var(--barracks-text); }
+.page-tabs-empty h1 { margin: 0; font-size: var(--jg-type-title); }
+.page-tabs-empty p { margin: 0; color: var(--barracks-text-muted); }
+@media (max-width: 640px) { .page-tabs { width: 100%; overflow-x: auto; flex-wrap: nowrap; } .page-tabs button { white-space: nowrap; } }
