@@ -2,7 +2,8 @@ import { lazy } from "react";
 import UserLineIcon from "remixicon-react/UserLineIcon";
 import UserAddLineIcon from "remixicon-react/UserAddLineIcon";
 import PageTabs from "./components/general/PageTabs";
-import { readFlags, usersHubTabIds } from "../lib/hub-tabs";
+import { usersHubTabIds } from "../lib/hub-tabs";
+import useHubFlags from "./components/general/use-hub-flags";
 
 const Users = lazy(() => import("./users"));
 const Wizarr = lazy(() => import("./wizarr"));
@@ -13,6 +14,6 @@ const TABS = [
 ];
 
 export default function UsersHub() {
-  const visible = usersHubTabIds(readFlags());
-  return <PageTabs title="Users" tabs={TABS.filter((tab) => visible.includes(tab.id))} />;
+  const visible = usersHubTabIds(useHubFlags());
+  return <PageTabs title="Users" tabs={TABS} visible={visible} reachable={["users", "invites"]} />;
 }

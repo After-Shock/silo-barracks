@@ -12,7 +12,7 @@ import MenuLineIcon from "remixicon-react/MenuLineIcon";
 import logo_dark from "../../../../public/brand/barracks-mark.svg";
 import "../../css/navbar.css";
 import VersionCard from "./version-card";
-import { OPEN_WHATS_NEW_EVENT } from "../../../lib/events";
+import { NAV_AVAILABILITY_EVENT, OPEN_WHATS_NEW_EVENT } from "../../../lib/events";
 import { Trans } from "react-i18next";
 import baseUrl from "../../../lib/baseurl";
 import socket from "../../../socket";
@@ -21,6 +21,7 @@ import Config from "../../../lib/config";
 import { FONT_WEIGHT_OPTIONS, getStoredFontWeight, saveFontWeightPreference } from "../../../lib/appearance";
 import { DEFAULT_THEME, THEME_PRESETS, getStoredTheme, resetTheme, saveTheme } from "../../../lib/theme";
 import { applyNavOrder, getStoredHiddenNavLinks, getStoredNavOrder, LOCKED_NAV_LINKS } from "../../../lib/nav-order";
+import { showServerNav } from "../../../lib/hub-tabs";
 import useFleet from "../../../lib/use-fleet";
 
 function getTokenPayload() {
@@ -218,7 +219,6 @@ export default function Navbar() {
   const currentRole = config?.settings?.auth?.role || "Viewer";
   const isJellyfinAdmin = currentRole === "Owner" || currentRole === "Admin";
   const accountRole = authMode === "quick-connect" ? (isJellyfinAdmin ? "Jellyfin Admin" : "Jellyfin User") : authMode === "oidc" ? "OIDC User" : "Local User";
-  const showServerManagementNav = isJellyfinAdmin && config?.IS_SILO !== true;
   const jellyfinUserId = jellyfinUser?.id || jellyfinUser?.Id || jellyfinUser?.userId || jellyfinUser?.UserId;
   const jellyfinImageTag = jellyfinUser?.primaryImageTag || jellyfinUser?.PrimaryImageTag || jellyfinUser?.imageTags?.Primary || jellyfinUser?.ImageTags?.Primary;
   const jellyfinAvatar = jellyfinUserId
@@ -240,14 +240,12 @@ export default function Navbar() {
           if (item.link === "requests") return showRequestsNav;
           if (item.link === "downloads") return showDownloadsNav;
           if (item.link === "active-transcodes") return showTdarrNav;
-          if (item.link === "automation-health") return showAutomationHealthNav;
-          if (item.link === "wizarr") return showWizarrNav;
-          if (item.link === "server-management") return showServerManagementNav;
+          if (item.link === "server-management") return showServerNav({ isAdmin: isJellyfinAdmin, isSilo: config?.IS_SILO === true, automation: showAutomationHealthNav });
           return true;
         }),
         navOrder
       ),
-    [hiddenNavLinks, navOrder, showAutomationHealthNav, showDownloadsNav, showRequestsNav, showServerManagementNav, showTdarrNav, showWizarrNav]
+    [config?.IS_SILO, hiddenNavLinks, isJellyfinAdmin, navOrder, showAutomationHealthNav, showDownloadsNav, showRequestsNav, showTdarrNav]
   );
 
   const handleLogout = () => {
@@ -287,6 +285,7 @@ export default function Navbar() {
     const setAutomationHealthAvailability = (integrations) => {
       const nextAvailable = getAutomationHealthAvailabilityFromIntegrations(integrations);
       localStorage.setItem(AUTOMATION_HEALTH_NAV_AVAILABLE_KEY, String(nextAvailable));
+      window.dispatchEvent(new Event(NAV_AVAILABILITY_EVENT));
       if (isMounted) {
         setShowAutomationHealthNav(nextAvailable);
       }
@@ -440,6 +439,7 @@ export default function Navbar() {
     const setWizarrAvailability = (integrations) => {
       const nextAvailable = getWizarrAvailabilityFromIntegrations(integrations);
       localStorage.setItem(WIZARR_NAV_AVAILABLE_KEY, String(nextAvailable));
+      window.dispatchEvent(new Event(NAV_AVAILABILITY_EVENT));
       if (isMounted) {
         setShowWizarrNav(nextAvailable);
       }

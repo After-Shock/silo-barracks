@@ -14,7 +14,7 @@ const routes = [
   ["/libraries", "libraries"], ["/libraries/fixture-library", "library-detail"], ["/libraries/item/fixture-item", "item-detail"],
   ["/users", "users"], ["/users/fixture-user", "user-profile"], ["/activity", "activity"], ["/timeline", "timeline"],
   ["/calendar", "calendar"], ["/requests", "requests"], ["/downloads", "downloads"], ["/active-transcodes", "active-transcodes"],
-  ["/wizarr", "wizarr"], ["/automation-health", "automation-health"], ["/statistics", "statistics"],
+  ["/users?tab=invites", "wizarr"], ["/server-management?tab=automation", "automation-health"], ["/statistics", "statistics"],
   ["/server-management", "server-management"], ["/settings", "settings"], ["/integrations", "integrations"], ["/about", "about"],
 ];
 const settings = ["general", "security", "kiosk", "libraries", "activity-monitor", "devices", "plugins", "integrations", "servers", "api-key", "webhooks", "notifications", "newsletter", "tasks", "backup", "imports", "health", "repair", "logs"];
@@ -174,7 +174,7 @@ async function gotoReady(page, routePath, screen, viewport) {
   const marker = page.locator(`[data-theme-screen="${screen}"]`).first(); await marker.waitFor({ state: "visible", timeout: 30000 });
   const whatsNew = page.getByRole("button", { name: "Got it", exact: true });
   if (await whatsNew.isVisible()) { await whatsNew.click(); await whatsNew.waitFor({ state: "hidden" }); }
-  const expectedPath = routePath === "/settings" ? "/settings/general" : routePath;
+  const expectedPath = routePath === "/settings" ? "/settings/general" : routePath.split("?")[0];
   assert.equal(new URL(page.url()).pathname, expectedPath); return marker;
 }
 async function inspect(page, screen) {
@@ -227,7 +227,7 @@ async function stateMatrix(page, fixtures, errors) {
   await gotoReady(page, "/activity", "activity", vp); await page.locator('[role="table"],table').first().waitFor({ state: "visible" }); await page.locator(".MuiTablePagination-root,[aria-label*='pagination' i]").first().waitFor({ state: "visible" });
   fixtures.state.delayLibrary = true; const navPromise = page.goto(`${BASE_URL}/libraries/fixture-library`, { waitUntil: "domcontentloaded", timeout: 30000 }); await page.locator('[data-theme-screen="library-detail"][aria-busy="true"]').waitFor({ state: "visible" }); await navPromise; await page.getByRole("heading", { name: "Fixture Library" }).waitFor({ state: "visible" }); fixtures.state.delayLibrary = false;
   await gotoReady(page, "/requests", "requests", vp); await page.locator(".requests-empty-state").waitFor({ state: "visible" });
-  fixtures.state.automationMode = "error"; await gotoReady(page, "/automation-health", "automation-health", vp); await page.getByRole("alert").filter({ hasText: "Fixture automation unavailable" }).waitFor({ state: "visible" }); fixtures.state.automationMode = "healthy";
+  fixtures.state.automationMode = "error"; await gotoReady(page, "/server-management?tab=automation", "automation-health", vp); await page.getByRole("alert").filter({ hasText: "Fixture automation unavailable" }).waitFor({ state: "visible" }); fixtures.state.automationMode = "healthy";
   fixtures.state.fleetMode = "partial"; await gotoReady(page, "/", "home", vp); await page.getByText(/Some servers are unavailable/i).waitFor({ state: "visible", timeout: 15000 }); await page.getByText("Fixture Stale Silo", { exact: true }).first().waitFor({ state: "visible" }); await page.getByText(/Stale · last known activity/i).first().waitFor({ state: "visible" }); fixtures.state.fleetMode = "connected";
   await page.locator('[aria-label^="Open session details"]').first().click(); await page.locator(".modal-content").waitFor({ state: "visible" }); await page.getByRole("button", { name: "Close session details" }).click();
   fixtures.state.libraryPages.length = 0; await gotoReady(page, "/libraries/fixture-library", "library-detail", vp); await page.getByRole("button", { name: /^Media$/i }).click(); await page.getByText("Fixture Movie 50", { exact: true }).waitFor({ state: "visible", timeout: 30000 });

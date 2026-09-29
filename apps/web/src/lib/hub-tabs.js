@@ -10,8 +10,15 @@ export function serverHubTabIds({ isAdmin, isSilo, automation }) {
 
 export const showServerNav = (flags) => serverHubTabIds(flags).length > 0;
 
-export const pickTab = (visibleIds, requested) =>
-  (visibleIds.includes(requested) ? requested : visibleIds[0] ?? null);
+// Tabs a URL may open even when hidden from the nav (Server Jobs never on Silo).
+export const serverHubReachableIds = ({ isAdmin, isSilo }) => (isAdmin && !isSilo ? ['jobs', 'automation'] : ['automation']);
+
+// Visibility only drives the nav and tab bar; an explicitly requested reachable tab still opens.
+export function resolveHubTabs({ visible, reachable, requested }) {
+  const active = visible.includes(requested) || reachable.includes(requested) ? requested : visible[0] ?? null;
+  const shown = active && !visible.includes(active) ? [...visible, active] : visible;
+  return { active, shown };
+}
 
 // Role, Silo mode and the integration availability the navbar caches.
 export function readFlags() {

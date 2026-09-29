@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { usersHubTabIds, serverHubTabIds, showServerNav, pickTab } from './hub-tabs.js';
+import { usersHubTabIds, serverHubTabIds, serverHubReachableIds, showServerNav, resolveHubTabs } from './hub-tabs.js';
 
 test('users hub always has Users; Invites only with Wizarr', () => {
   assert.deepEqual(usersHubTabIds({ wizarr: false }), ['users']);
@@ -16,9 +16,16 @@ test('server jobs never appear on Silo; automation follows its flag', () => {
   assert.equal(showServerNav({ isAdmin: false, isSilo: true, automation: true }), true);
 });
 
-test('requested tab falls back to the first visible tab', () => {
-  assert.equal(pickTab(['users', 'invites'], 'invites'), 'invites');
-  assert.equal(pickTab(['users'], 'invites'), 'users');
-  assert.equal(pickTab(['users'], null), 'users');
-  assert.equal(pickTab([], 'automation'), null);
+test('explicitly requested tabs stay reachable by URL even when hidden from the nav', () => {
+  assert.deepEqual(resolveHubTabs({ visible: ['users'], reachable: ['users', 'invites'], requested: 'invites' }), { active: 'invites', shown: ['users', 'invites'] });
+  assert.deepEqual(resolveHubTabs({ visible: ['users', 'invites'], reachable: ['users', 'invites'], requested: 'invites' }), { active: 'invites', shown: ['users', 'invites'] });
+  assert.deepEqual(resolveHubTabs({ visible: ['users'], reachable: ['users', 'invites'], requested: 'bogus' }), { active: 'users', shown: ['users'] });
+  assert.deepEqual(resolveHubTabs({ visible: [], reachable: ['automation'], requested: 'automation' }), { active: 'automation', shown: ['automation'] });
+  assert.deepEqual(resolveHubTabs({ visible: [], reachable: ['automation'], requested: null }), { active: null, shown: [] });
+});
+
+test('server jobs are never reachable on Silo', () => {
+  assert.deepEqual(serverHubReachableIds({ isAdmin: true, isSilo: true }), ['automation']);
+  assert.deepEqual(serverHubReachableIds({ isAdmin: true, isSilo: false }), ['jobs', 'automation']);
+  assert.deepEqual(resolveHubTabs({ visible: [], reachable: serverHubReachableIds({ isAdmin: true, isSilo: true }), requested: 'jobs' }), { active: null, shown: [] });
 });

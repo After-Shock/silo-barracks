@@ -3,12 +3,13 @@ import { Navigate } from "react-router-dom";
 
 const Home = lazy(() => import("./pages/home"));
 const Settings = lazy(() => import("./pages/settings"));
-const Users = lazy(() => import("./pages/users"));
 const UserProfilePage = lazy(() => import("./pages/user-profile"));
 const Libraries = lazy(() => import("./pages/libraries"));
 const LibraryInfo = lazy(() => import("./pages/components/library-info"));
 const ItemInfo = lazy(() => import("./pages/components/item-info"));
 const About = lazy(() => import("./pages/about"));
+const UsersHub = lazy(() => import("./pages/users-hub"));
+const ServerHub = lazy(() => import("./pages/server-hub"));
 const TestingRoutes = lazy(() => import("./pages/testing"));
 const Activity = lazy(() => import("./pages/activity"));
 const Statistics = lazy(() => import("./pages/statistics"));
@@ -19,9 +20,6 @@ const Calendar = lazy(() => import("./pages/calendar"));
 const Requests = lazy(() => import("./pages/requests"));
 const Downloads = lazy(() => import("./pages/downloads"));
 const ActiveTranscodes = lazy(() => import("./pages/active-transcodes"));
-const AutomationHealth = lazy(() => import("./pages/automation-health"));
-const ServerManagement = lazy(() => import("./pages/server-management"));
-const Wizarr = lazy(() => import("./pages/wizarr"));
 const FleetHistoryDetail = lazy(() => import("./pages/fleet-history-detail"));
 const SiloAccountDetail = lazy(() => import("./pages/silo-account-detail"));
 const FleetLibraries = lazy(() => import("./pages/fleet-libraries"));
@@ -31,7 +29,7 @@ const routes = [
   { path: "/kiosk", element: <Home kioskMode />, exact: true },
   { path: "/home/kiosk", element: <Home kioskMode />, exact: true },
   { path: "/settings/*", element: <Settings />, exact: true },
-  { path: "/users", element: <Users />, exact: true },
+  { path: "/users", element: <UsersHub />, exact: true },
   { path: "/users/:UserId", element: <UserProfilePage />, exact: true },
   { path: "/silo/users/:userId", element: <SiloAccountDetail />, exact: true },
   { path: "/libraries", element: <Libraries />, exact: true },
@@ -47,9 +45,9 @@ const routes = [
   { path: "/requests", element: <Requests />, exact: true },
   { path: "/downloads", element: <Downloads />, exact: true },
   { path: "/active-transcodes", element: <ActiveTranscodes />, exact: true },
-  { path: "/automation-health", element: <AutomationHealth />, exact: true },
-  { path: "/wizarr", element: <Wizarr />, exact: true },
-  { path: "/server-management", element: <ServerManagement />, exact: true },
+  { path: "/automation-health", element: <Navigate to="/server-management?tab=automation" replace />, exact: true },
+  { path: "/wizarr", element: <Navigate to="/users?tab=invites" replace />, exact: true },
+  { path: "/server-management", element: <ServerHub />, exact: true },
   { path: "/repair", element: <Navigate to="/settings/repair" replace />, exact: true },
   { path: "/statistics", element: <Statistics />, exact: true },
   { path: "/activity", element: <Activity />, exact: true },

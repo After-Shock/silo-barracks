@@ -13,9 +13,7 @@ import CalendarEventFillIcon from 'remixicon-react/CalendarEventFillIcon';
 import ChatCheckFillIcon from 'remixicon-react/ChatCheckFillIcon';
 import DownloadCloud2FillIcon from 'remixicon-react/DownloadCloud2FillIcon';
 import ServerFillIcon from 'remixicon-react/ServerFillIcon';
-import UserAddFillIcon from 'remixicon-react/UserAddFillIcon';
 import CpuFillIcon from 'remixicon-react/CpuFillIcon';
-import RadarFillIcon from 'remixicon-react/RadarFillIcon';
 import { Trans } from 'react-i18next';
 
 
@@ -91,20 +89,6 @@ export const navData = [
         link: "active-transcodes"
     },
     {
-        id: 9,
-        icon: <UserAddFillIcon />,
-        text: "Invites",
-        label: "Invites",
-        link: "wizarr"
-    },
-    {
-        id: 10,
-        icon: <RadarFillIcon />,
-        text: "Automation Health",
-        label: "Automation Health",
-        link: "automation-health"
-    },
-    {
         id: 11,
         icon: <BarChartFillIcon />,
         text: <Trans i18nKey="MENU_TABS.STATISTICS" />,
@@ -115,8 +99,8 @@ export const navData = [
     {
         id: 12,
         icon: <ServerFillIcon />,
-        text: <Trans i18nKey="MENU_TABS.JELLYFIN_JOBS" />,
-        label: "Jellyfin Jobs",
+        text: "Server",
+        label: "Server",
         link: "server-management"
     },
     {
