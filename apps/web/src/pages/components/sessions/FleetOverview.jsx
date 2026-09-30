@@ -10,11 +10,14 @@ import ErrorBoundary from '../general/ErrorBoundary';
 import '../../css/fleet.css';
 
 const peakDate = value => value ? new Date(value).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
-function PeakLine({ peak }) {
+// A server's own peak is labelled with its name; the total lists the servers that made it up.
+const peakServers = (breakdown, serverName) => serverName ? ` · ${serverName}`
+  : breakdown?.length ? ` · ${breakdown.map(server => `${server.serverName} ${server.count}`).join(', ')}` : '';
+function PeakLine({ peak, serverName }) {
   if (!peak) return null;
   return <p className="fleet-peaks" data-testid="fleet-peaks">
-    <span title={peakDate(peak.streamsAt)}>Peak <strong>{peak.streams}</strong> concurrent streams ({peak.streamsTranscodes} transcoding)</span>
-    {' · '}<span title={peakDate(peak.transcodesAt)}>Peak <strong>{peak.transcodes}</strong> concurrent transcodes</span>
+    <span title={peakDate(peak.streamsAt)}>Peak <strong>{peak.streams}</strong> concurrent streams ({peak.streamsTranscodes} transcoding){peakServers(peak.streamsBreakdown, serverName)}</span>
+    {' · '}<span title={peakDate(peak.transcodesAt)}>Peak <strong>{peak.transcodes}</strong> concurrent transcodes{peakServers(peak.transcodesBreakdown, serverName)}</span>
   </p>;
 }
 
@@ -72,7 +75,7 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
       </OverlayTrigger>
       {!kiosk && <Link to="/settings/servers" className="fleet-manage-link">Manage servers</Link>}
     </header>
-    <PeakLine peak={snapshot?.peaks?.[s.filter]} />
+    <PeakLine peak={snapshot?.peaks?.[s.filter]} serverName={s.filter === 'all' ? null : s.pills.find(pill => pill.id === s.filter)?.label} />
     <div className="fleet-pills" role="group" aria-label="Show activity">
       {s.pills.map(pill => {
         const button = <button key={pill.id} type="button" className={`fleet-pill is-${pill.state}`} aria-pressed={pill.selected} onClick={() => setSelected(pill.id)}>
