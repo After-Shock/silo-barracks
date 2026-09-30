@@ -244,7 +244,10 @@ router.get("/getHomeDashboard", async (req, res) => {
       if (dashboard.source === "silo-native") {
         const profiles = await require("../classes/fleet-service").getFleetService().fleet
           .hallOfFame({ days: dashboard.history?.days || 7 }).catch(() => []);
-        if (profiles.length) dashboard.hallOfFame = profiles.slice(0, 5);
+        if (profiles.length) {
+          dashboard.hallOfFame = profiles.slice(0, 5);
+          dashboard.weekPulse = { ...dashboard.weekPulse, mostActiveViewer: profiles[0] };
+        }
       }
       return res.send(dashboard);
     }

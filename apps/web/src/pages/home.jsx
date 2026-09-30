@@ -1149,7 +1149,7 @@ export default function Home({ kioskMode = false }) {
           <article>
             <span>Most active</span>
             <strong className={!dashboard ? "home-value-skeleton" : ""}>{dashboard ? activeViewer?.userName || "Nobody yet" : ""}</strong>
-            {dashboard ? <small>{activeViewer ? `${formatNumber(activeViewer.plays)} plays this week` : "No weekly activity found."}</small> : <small className="home-detail-skeleton" />}
+            {dashboard ? <small>{activeViewer ? `${formatNumber(activeViewer.plays)} plays this week${activeViewer.serverName ? ` · ${activeViewer.serverName}` : ""}` : "No weekly activity found."}</small> : <small className="home-detail-skeleton" />}
           </article>
           <article>
             <span>Quiet users</span>
