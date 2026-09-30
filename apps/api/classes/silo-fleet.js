@@ -399,15 +399,30 @@ function createFleet({
     return record;
   }
 
-  // Every connected server's top profiles, labelled by server and ranked together.
-  async function hallOfFame({ days = 7, limit = 10 } = {}) {
-    const { topProfiles } = require('./silo/home-dashboard');
+  // Every connected server's top profiles and titles, labelled by server and ranked together.
+  async function topActivity({ days = 7, limit = 10 } = {}) {
+    const { topProfiles, topTitles } = require('./silo/home-dashboard');
     const connected = [...records.values()].filter(record => enabled(record.server) && record.state === 'connected'
       && typeof record.client?.getTopActivity === 'function');
-    const results = await Promise.allSettled(connected.map(async record => topProfiles(await record.client.getTopActivity({ days, limit }))
-      .map(profile => ({ ...profile, serverId: record.id, serverName: String(record.server.name || record.id) }))));
-    return results.flatMap(result => result.status === 'fulfilled' ? result.value : [])
-      .sort((a, b) => b.plays - a.plays || b.watchSeconds - a.watchSeconds);
+    const results = (await Promise.allSettled(connected.map(async record => ({ record,
+      top: await record.client.getTopActivity({ days, limit }) }))))
+      .flatMap(result => result.status === 'fulfilled' ? [result.value] : []);
+    const byRank = (a, b) => b.plays - a.plays || b.watchSeconds - a.watchSeconds;
+    const label = record => ({ serverId: record.id, serverName: String(record.server.name || record.id) });
+    const profiles = results.flatMap(({ record, top }) => topProfiles(top).map(profile => ({ ...profile, ...label(record) })));
+    // Servers have separate item ids, so the same title on several servers is combined by name and type.
+    const titles = new Map();
+    for (const { record, top } of results) {
+      for (const title of topTitles(top)) {
+        const key = `${title.mediaType}\u0000${title.name.trim().toLowerCase()}`;
+        const entry = titles.get(key) || { ...title, plays: 0, watchSeconds: 0, servers: [] };
+        entry.plays += title.plays;
+        entry.watchSeconds += title.watchSeconds;
+        entry.servers.push(label(record));
+        titles.set(key, entry);
+      }
+    }
+    return { profiles: profiles.sort(byRank), titles: [...titles.values()].sort(byRank) };
   }
 
   async function playbackHistoryPage(serverId, options) {
@@ -505,7 +520,7 @@ function createFleet({
     record.state = enabled(record.server) ? 'connecting' : 'disabled';
   }
 
-  return { refresh, snapshot, invalidate, sessionCommandCapabilities, controlSession, hallOfFame, playbackHistoryPage,
+  return { refresh, snapshot, invalidate, sessionCommandCapabilities, controlSession, topActivity, playbackHistoryPage,
     playbackHistoryUsers, playbackHistoryProfiles, playbackHistorySearch, catalogItem, historyUser,
     libraryList, libraryDetail, libraryItems, libraryHistoryPage };
 }

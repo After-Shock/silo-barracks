@@ -84,6 +84,10 @@ const topProfiles = top => (top.profiles || []).map(row => ({
   plays: Number(row.plays || 0), watchSeconds: Number(row.total_seconds || 0),
 }));
 
+const topTitles = top => (top.titles || []).map(row => ({ itemId: String(row.media_item_id || ''),
+  name: row.title || 'Unknown item', mediaType: row.media_type || '', plays: Number(row.plays || 0),
+  watchSeconds: Number(row.total_seconds || 0) }));
+
 function buildNativeHomeDashboard({ stats, playback, top }) {
   const reliability = playback.reliability || {};
   const peakHours = Array.from({ length: 24 }, (_, hour) => ({ hour, count: 0 }));
@@ -94,9 +98,7 @@ function buildNativeHomeDashboard({ stats, playback, top }) {
     }
   }
   const profiles = topProfiles(top);
-  const titles = (top.titles || []).map(row => ({ itemId: String(row.media_item_id || ''),
-    name: row.title || 'Unknown item', mediaType: row.media_type || '', plays: Number(row.plays || 0),
-    watchSeconds: Number(row.total_seconds || 0) }));
+  const titles = topTitles(top);
   return {
     source: 'silo-native',
     history: { retentionManaged: true, from: playback.from, to: playback.to,
@@ -118,4 +120,4 @@ function buildNativeHomeDashboard({ stats, playback, top }) {
   };
 }
 
-module.exports = { loadHomeHistory, buildHomeDashboard, buildNativeHomeDashboard, topProfiles };
+module.exports = { loadHomeHistory, buildHomeDashboard, buildNativeHomeDashboard, topProfiles, topTitles };

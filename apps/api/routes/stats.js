@@ -242,12 +242,13 @@ router.get("/getHomeDashboard", async (req, res) => {
     if (await isSiloProvider()) {
       const dashboard = await API.getHomeDashboard({ excludedUsers });
       if (dashboard.source === "silo-native") {
-        const profiles = await require("../classes/fleet-service").getFleetService().fleet
-          .hallOfFame({ days: dashboard.history?.days || 7 }).catch(() => []);
+        const { profiles, titles } = await require("../classes/fleet-service").getFleetService().fleet
+          .topActivity({ days: dashboard.history?.days || 7 }).catch(() => ({ profiles: [], titles: [] }));
         if (profiles.length) {
           dashboard.hallOfFame = profiles.slice(0, 5);
           dashboard.weekPulse = { ...dashboard.weekPulse, mostActiveViewer: profiles[0] };
         }
+        if (titles.length) dashboard.weekPulse = { ...dashboard.weekPulse, topItem: titles[0] };
       }
       return res.send(dashboard);
     }

@@ -1144,7 +1144,7 @@ export default function Home({ kioskMode = false }) {
           <article className="home-week-feature">
             <span>Top item</span>
             <strong className={!dashboard ? "home-value-skeleton" : ""}>{dashboard ? topItem?.name || "No plays yet" : ""}</strong>
-            {dashboard ? <small>{topItem ? `${formatNumber(topItem.plays)} plays · ${formatDuration(topItem.watchSeconds)}` : "Waiting for this week's viewing history."}</small> : <small className="home-detail-skeleton" />}
+            {dashboard ? <small>{topItem ? `${formatNumber(topItem.plays)} plays · ${formatDuration(topItem.watchSeconds)}${topItem.servers?.length ? ` · ${topItem.servers.map((server) => server.serverName).join(", ")}` : ""}` : "Waiting for this week's viewing history."}</small> : <small className="home-detail-skeleton" />}
           </article>
           <article>
             <span>Most active</span>
