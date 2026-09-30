@@ -75,8 +75,11 @@ function buildHomeDashboard({ rows, truncated }, { excludedUsers = [], now = Dat
   };
 }
 
+// Some profiles are named with the account email; never put an email on the dashboard.
+const displayName = row => [row.profile_name, row.username].find(name => name && !String(name).includes('@'))
+  || String(row.profile_name || row.username || '').split('@')[0] || 'Unknown profile';
 const topProfiles = top => (top.profiles || []).map(row => ({
-  userId: String(row.user_id || ''), userName: row.profile_name || row.username || 'Unknown profile',
+  userId: String(row.user_id || ''), userName: displayName(row),
   accountName: row.username || '', profileId: String(row.profile_id || ''),
   plays: Number(row.plays || 0), watchSeconds: Number(row.total_seconds || 0),
 }));

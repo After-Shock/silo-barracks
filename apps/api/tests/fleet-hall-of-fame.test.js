@@ -4,7 +4,7 @@ const { createFleet } = require('../classes/silo-fleet');
 
 test('hall of fame merges every connected server, labelled and ranked', async () => {
   const top = { a: [{ user_id: 'u1', profile_id: 'p1', profile_name: 'Kasper', plays: 7 }],
-    b: [{ user_id: 'u1', profile_id: 'p1', profile_name: 'Jess', plays: 9 }], c: null };
+    b: [{ user_id: 'u1', profile_id: 'p1', profile_name: 'jess@example.com', username: 'Jess', plays: 9 }, { user_id: 'u2', profile_name: 'bo@example.com', username: 'bo@example.com', plays: 1 }], c: null };
   const fleet = createFleet({
     listServers: async () => [{ id: 'a', name: 'Primary', isPrimary: true }, { id: 'b', name: 'Stream' }, { id: 'c', name: 'Broken' }],
     createClient: server => ({ getSessions: async () => [],
@@ -13,5 +13,5 @@ test('hall of fame merges every connected server, labelled and ranked', async ()
   await fleet.refresh();
   const ranked = await fleet.hallOfFame();
   assert.deepEqual(ranked.map(p => [p.userName, p.plays, p.serverId, p.serverName]),
-    [['Jess', 9, 'b', 'Stream'], ['Kasper', 7, 'a', 'Primary']]);
+    [['Jess', 9, 'b', 'Stream'], ['Kasper', 7, 'a', 'Primary'], ['bo', 1, 'b', 'Stream']]);
 });
