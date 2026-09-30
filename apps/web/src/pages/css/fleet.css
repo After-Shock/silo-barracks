@@ -293,3 +293,10 @@
   text-decoration: underline dotted;
   text-underline-offset: 2px;
 }
+
+.fleet-pill-peak {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  opacity: 0.65;
+}

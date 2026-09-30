@@ -99,6 +99,8 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
           <span className="fleet-pill-label">{pill.label}</span>
           {pill.state === 'connecting' || pill.state === 'unavailable' ? <span className="visually-hidden">, {pill.state}</span> : null}
           <span className="fleet-pill-count">{pill.count ?? '—'}</span>
+          {snapshot?.peaks?.[pill.id] && <span className="fleet-pill-peak" title={pill.id === 'all'
+            ? `Reached ${peakDate(snapshot.peaks.all.streamsAt)}` : serverPeakTitle(snapshot.peaks[pill.id])}>peak {snapshot.peaks[pill.id].streams}</span>}
         </button>;
         return pill.state === 'connected' || pill.state === 'all' ? button
           : <OverlayTrigger key={pill.id} placement="bottom" overlay={<Tooltip id={`fleet-pill-${pill.id}`}>{pill.state === 'connecting' ? 'Connecting…' : 'Unavailable'}{pill.lastSuccessAt ? ` · Last seen ${new Date(pill.lastSuccessAt).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}` : ''}</Tooltip>}>{button}</OverlayTrigger>;
