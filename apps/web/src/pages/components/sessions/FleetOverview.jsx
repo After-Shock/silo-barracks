@@ -76,6 +76,10 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
       {!kiosk && <Link to="/settings/servers" className="fleet-manage-link">Manage servers</Link>}
     </header>
     <PeakLine peak={snapshot?.peaks?.[s.filter]} serverName={s.filter === 'all' ? null : s.pills.find(pill => pill.id === s.filter)?.label} />
+    {s.filter === 'all' && servers.some(server => snapshot?.peaks?.[server.id]) && <p className="fleet-peaks" data-testid="fleet-server-transcode-peaks">
+      Transcode peaks by server: {servers.filter(server => snapshot.peaks[server.id]).map((server, index) => <span key={server.id}
+        title={peakDate(snapshot.peaks[server.id].transcodesAt)}>{index ? ' · ' : ''}{server.name} <strong>{snapshot.peaks[server.id].transcodes}</strong></span>)}
+    </p>}
     <div className="fleet-pills" role="group" aria-label="Show activity">
       {s.pills.map(pill => {
         const button = <button key={pill.id} type="button" className={`fleet-pill is-${pill.state}`} aria-pressed={pill.selected} onClick={() => setSelected(pill.id)}>
