@@ -10,14 +10,25 @@ import ErrorBoundary from '../general/ErrorBoundary';
 import '../../css/fleet.css';
 
 const peakDate = value => value ? new Date(value).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+// Hovering any server name shows that server's own all-time peaks and when they happened.
+const serverPeakTitle = peak => peak ? `Peak ${peak.streams} streams · ${peakDate(peak.streamsAt)}\nPeak ${peak.transcodes} transcodes · ${peakDate(peak.transcodesAt)}` : '';
+function ServerName({ id, name, peaks }) {
+  return <span className="fleet-peak-server" title={serverPeakTitle(peaks?.[id])}>{name}</span>;
+}
 // A server's own peak is labelled with its name; the total lists the servers that made it up.
-const peakServers = (breakdown, serverName) => serverName ? ` · ${serverName}`
-  : breakdown?.length ? ` · ${breakdown.map(server => `${server.serverName} ${server.count}`).join(', ')}` : '';
-function PeakLine({ peak, serverName }) {
+function PeakServers({ breakdown, server, peaks }) {
+  if (server) return <> · <ServerName {...server} peaks={peaks} /></>;
+  if (!breakdown?.length) return null;
+  return <> · {breakdown.map((entry, index) => <span key={entry.serverId}>{index ? ', ' : ''}
+    <ServerName id={entry.serverId} name={entry.serverName} peaks={peaks} /> {entry.count}</span>)}</>;
+}
+function PeakLine({ peak, server, peaks }) {
   if (!peak) return null;
   return <p className="fleet-peaks" data-testid="fleet-peaks">
-    <span title={peakDate(peak.streamsAt)}>Peak <strong>{peak.streams}</strong> concurrent streams ({peak.streamsTranscodes} transcoding){peakServers(peak.streamsBreakdown, serverName)}</span>
-    {' · '}<span title={peakDate(peak.transcodesAt)}>Peak <strong>{peak.transcodes}</strong> concurrent transcodes{peakServers(peak.transcodesBreakdown, serverName)}</span>
+    <span title={`Reached ${peakDate(peak.streamsAt)}`}>Peak <strong>{peak.streams}</strong> concurrent streams ({peak.streamsTranscodes} transcoding)</span>
+    <PeakServers breakdown={peak.streamsBreakdown} server={server} peaks={peaks} />
+    {' · '}<span title={`Reached ${peakDate(peak.transcodesAt)}`}>Peak <strong>{peak.transcodes}</strong> concurrent transcodes</span>
+    <PeakServers breakdown={peak.transcodesBreakdown} server={server} peaks={peaks} />
   </p>;
 }
 
@@ -51,7 +62,7 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
     const unavailable = Boolean(error) || (visible[0] && visible[0].state !== 'connected');
     return <div className="sessions-widget">
       <h1 className="my-3">Active Sessions</h1>
-      <PeakLine peak={snapshot?.peaks?.all} />
+      <PeakLine peak={snapshot?.peaks?.all} peaks={snapshot?.peaks} />
       {unavailable && <p role="status" className="fleet-notice">{error || (streams.length ? 'Your Silo server is unavailable. Showing last-known activity.' : 'Your Silo server is unavailable.')} <button onClick={refresh}>Retry</button></p>}
       {streams.length === 0
         ? !unavailable && <div className="sessions-empty-state">No Active Sessions Found</div>
@@ -75,10 +86,11 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
       </OverlayTrigger>
       {!kiosk && <Link to="/settings/servers" className="fleet-manage-link">Manage servers</Link>}
     </header>
-    <PeakLine peak={snapshot?.peaks?.[s.filter]} serverName={s.filter === 'all' ? null : s.pills.find(pill => pill.id === s.filter)?.label} />
+    <PeakLine peak={snapshot?.peaks?.[s.filter]} peaks={snapshot?.peaks}
+      server={s.filter === 'all' ? null : { id: s.filter, name: s.pills.find(pill => pill.id === s.filter)?.label }} />
     {s.filter === 'all' && servers.some(server => snapshot?.peaks?.[server.id]) && <p className="fleet-peaks" data-testid="fleet-server-transcode-peaks">
-      Transcode peaks by server: {servers.filter(server => snapshot.peaks[server.id]).map((server, index) => <span key={server.id}
-        title={peakDate(snapshot.peaks[server.id].transcodesAt)}>{index ? ' · ' : ''}{server.name} <strong>{snapshot.peaks[server.id].transcodes}</strong></span>)}
+      Transcode peaks by server: {servers.filter(server => snapshot.peaks[server.id]).map((server, index) => <span key={server.id}>{index ? ' · ' : ''}
+        <ServerName id={server.id} name={server.name} peaks={snapshot.peaks} /> <strong>{snapshot.peaks[server.id].transcodes}</strong></span>)}
     </p>}
     <div className="fleet-pills" role="group" aria-label="Show activity">
       {s.pills.map(pill => {
