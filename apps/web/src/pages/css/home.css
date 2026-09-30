@@ -2030,3 +2030,10 @@
   box-shadow: none;
   padding: 0;
 }
+
+.home-podium-card .home-hall-server {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

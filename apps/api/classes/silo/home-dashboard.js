@@ -75,6 +75,12 @@ function buildHomeDashboard({ rows, truncated }, { excludedUsers = [], now = Dat
   };
 }
 
+const topProfiles = top => (top.profiles || []).map(row => ({
+  userId: String(row.user_id || ''), userName: row.profile_name || row.username || 'Unknown profile',
+  accountName: row.username || '', profileId: String(row.profile_id || ''),
+  plays: Number(row.plays || 0), watchSeconds: Number(row.total_seconds || 0),
+}));
+
 function buildNativeHomeDashboard({ stats, playback, top }) {
   const reliability = playback.reliability || {};
   const peakHours = Array.from({ length: 24 }, (_, hour) => ({ hour, count: 0 }));
@@ -84,11 +90,7 @@ function buildNativeHomeDashboard({ stats, playback, top }) {
       peakHours[date.getUTCHours()].count += Number(bucket.direct || 0) + Number(bucket.remux || 0) + Number(bucket.transcode || 0);
     }
   }
-  const profiles = (top.profiles || []).map(row => ({
-    userId: String(row.user_id || ''), userName: row.profile_name || row.username || 'Unknown profile',
-    accountName: row.username || '', profileId: String(row.profile_id || ''),
-    plays: Number(row.plays || 0), watchSeconds: Number(row.total_seconds || 0),
-  }));
+  const profiles = topProfiles(top);
   const titles = (top.titles || []).map(row => ({ itemId: String(row.media_item_id || ''),
     name: row.title || 'Unknown item', mediaType: row.media_type || '', plays: Number(row.plays || 0),
     watchSeconds: Number(row.total_seconds || 0) }));
@@ -113,4 +115,4 @@ function buildNativeHomeDashboard({ stats, playback, top }) {
   };
 }
 
-module.exports = { loadHomeHistory, buildHomeDashboard, buildNativeHomeDashboard };
+module.exports = { loadHomeHistory, buildHomeDashboard, buildNativeHomeDashboard, topProfiles };

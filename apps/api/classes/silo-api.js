@@ -571,12 +571,25 @@ class SiloAPI {
     const [stats, playback, top] = await Promise.all([
       this._request(`admin/stats?refresh=${refreshValue}`, { deadlineAt }),
       this._request(`admin/stats/playback-activity?hours=${Math.min(744, Math.max(1, Number(hours) || 168))}&refresh=${refreshValue}`, { deadlineAt }),
-      this._request(`admin/stats/top-activity?days=${Math.min(30, Math.max(1, Number(days) || 7))}&limit=${Math.min(25, Math.max(1, Number(limit) || 10))}&refresh=${refreshValue}`, { deadlineAt }),
+      this._topActivity({ days, limit, refreshValue, deadlineAt }),
     ]);
     if (!stats || !Array.isArray(playback?.buckets) || !playback.reliability || !Array.isArray(top?.titles) || !Array.isArray(top?.profiles)) {
       throw new SiloRequestError('Invalid Silo dashboard insights response');
     }
     return { stats, playback, top };
+  }
+
+  _topActivity({ days, limit, refreshValue = 'false', deadlineAt }) {
+    return this._request(`admin/stats/top-activity?days=${Math.min(30, Math.max(1, Number(days) || 7))}&limit=${Math.min(25, Math.max(1, Number(limit) || 10))}&refresh=${refreshValue}`, { deadlineAt });
+  }
+
+  async getTopActivity({ days = 7, limit = 10 } = {}) {
+    await this._configured(true);
+    await this._wire();
+    if (this.connectionInfo?.apiMajor !== 2) throw new SiloRequestError('Silo dashboard insights require API v2', 501);
+    const top = await this._topActivity({ days, limit, deadlineAt: Date.now() + this.timeoutMs });
+    if (!Array.isArray(top?.profiles)) throw new SiloRequestError('Invalid Silo top activity response');
+    return top;
   }
 
   async getLibraries() {

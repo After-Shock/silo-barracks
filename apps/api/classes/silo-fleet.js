@@ -399,6 +399,17 @@ function createFleet({
     return record;
   }
 
+  // Every connected server's top profiles, labelled by server and ranked together.
+  async function hallOfFame({ days = 7, limit = 10 } = {}) {
+    const { topProfiles } = require('./silo/home-dashboard');
+    const connected = [...records.values()].filter(record => enabled(record.server) && record.state === 'connected'
+      && typeof record.client?.getTopActivity === 'function');
+    const results = await Promise.allSettled(connected.map(async record => topProfiles(await record.client.getTopActivity({ days, limit }))
+      .map(profile => ({ ...profile, serverId: record.id, serverName: String(record.server.name || record.id) }))));
+    return results.flatMap(result => result.status === 'fulfilled' ? result.value : [])
+      .sort((a, b) => b.plays - a.plays || b.watchSeconds - a.watchSeconds);
+  }
+
   async function playbackHistoryPage(serverId, options) {
     const record = connectedClient(serverId);
     if (typeof record.client.getPlaybackHistoryPage !== 'function') {
@@ -494,7 +505,7 @@ function createFleet({
     record.state = enabled(record.server) ? 'connecting' : 'disabled';
   }
 
-  return { refresh, snapshot, invalidate, sessionCommandCapabilities, controlSession, playbackHistoryPage,
+  return { refresh, snapshot, invalidate, sessionCommandCapabilities, controlSession, hallOfFame, playbackHistoryPage,
     playbackHistoryUsers, playbackHistoryProfiles, playbackHistorySearch, catalogItem, historyUser,
     libraryList, libraryDetail, libraryItems, libraryHistoryPage };
 }

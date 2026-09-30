@@ -498,6 +498,7 @@ export default function Home({ kioskMode = false }) {
         { rank: 3, medal: "Bronze", avatarSize: 58 },
       ];
   const runners = hallOfFame.slice(3, 5);
+  const hallKey = (user) => `${user.serverId || ""}:${user.profileId || user.userId || user.userName}`;
   const concentration = Number(dashboard?.libraryBalance?.concentration || 0);
   const requestStats = operations.requests?.stats || {};
   const recentRequests = (operations.requests?.requests || []).slice(0, 4);
@@ -1018,7 +1019,7 @@ export default function Home({ kioskMode = false }) {
           <div className="home-podium">
             {podiumSlots.map(({ user, rank, medal, avatarSize }, index) => (
               <article
-                key={dashboard ? user.userId || user.userName : `loading-${rank}`}
+                key={dashboard ? hallKey(user) : `loading-${rank}`}
                 className={`home-podium-card rank-${rank}`}
                 style={dashboard && podium[0]?.plays ? { "--hall-share": `${Math.max(10, (Number(user.plays || 0) / Number(podium[0].plays || 1)) * 100)}%` } : undefined}
               >
@@ -1029,6 +1030,7 @@ export default function Home({ kioskMode = false }) {
                 {dashboard ? <HomeAvatar user={user} size={avatarSize} /> : <span className="home-avatar home-avatar-skeleton" style={{ width: avatarSize, height: avatarSize }} />}
                 <strong className={!dashboard ? "home-name-skeleton" : ""}>{dashboard ? user.userName || "Unknown" : ""}</strong>
                 {dashboard ? <small>{formatNumber(user.plays)} plays</small> : <small className="home-detail-skeleton" />}
+                {dashboard && user.serverName ? <small className="home-hall-server">{user.serverName}</small> : null}
                 <span className="home-podium-share" aria-hidden="true" />
               </article>
             ))}
@@ -1037,15 +1039,15 @@ export default function Home({ kioskMode = false }) {
           <div className="home-runner-list">
             {runners.length > 0 ? (
               runners.map((user, index) => (
-                <article key={user.userId || user.userName} className="home-runner-row">
+                <article key={hallKey(user)} className="home-runner-row">
                   <span>#{index + 4}</span>
                   <HomeAvatar user={user} size={38} />
                   <strong>{user.userName || "Unknown"}</strong>
-                  <small>{formatNumber(user.plays)} plays</small>
+                  <small>{formatNumber(user.plays)} plays{user.serverName ? ` · ${user.serverName}` : ""}</small>
                 </article>
               ))
             ) : (
-              <article className="home-runner-empty">{isNativeSiloDashboard ? "No additional profiles in Silo’s leaderboard window." : isSiloDashboard ? "No additional viewers in the retained history." : "More playback history will appear here as Silo Barracks observes playback."}</article>
+              <article className="home-runner-empty">{isNativeSiloDashboard ? `No other viewers in the last ${formatNumber(dashboard.history?.days || 7)} days.` : isSiloDashboard ? "No additional viewers in the retained history." : "More playback history will appear here as Silo Barracks observes playback."}</article>
             )}
           </div>
         </div>

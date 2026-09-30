@@ -240,7 +240,13 @@ router.get("/getHomeDashboard", async (req, res) => {
     const settingsResult = await db.query('SELECT settings FROM app_config where "ID"=1').catch(() => ({ rows: [] }));
     const excludedUsers = Array.isArray(settingsResult.rows?.[0]?.settings?.ExcludedUsers) ? settingsResult.rows[0].settings.ExcludedUsers : [];
     if (await isSiloProvider()) {
-      return res.send(await API.getHomeDashboard({ excludedUsers }));
+      const dashboard = await API.getHomeDashboard({ excludedUsers });
+      if (dashboard.source === "silo-native") {
+        const profiles = await require("../classes/fleet-service").getFleetService().fleet
+          .hallOfFame({ days: dashboard.history?.days || 7 }).catch(() => []);
+        if (profiles.length) dashboard.hallOfFame = profiles.slice(0, 5);
+      }
+      return res.send(dashboard);
     }
     const [
       playbackTotals,
