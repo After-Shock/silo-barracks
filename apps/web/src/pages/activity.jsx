@@ -365,9 +365,8 @@ function LegacyActivity({ initialConfig }) {
               setHistoryServerId(event.target.value);
               setCurrentPage(1);
             }}>
-              <option value="primary">Primary server</option>
-              {historyServers.filter(server => !server.isPrimary).map(server => (
-                <option key={server.id} value={server.id}>{server.name}{server.state === "connected" ? "" : " (unavailable)"}</option>
+              {historyServers.map(server => (
+                <option key={server.id} value={server.id}>{server.name}{server.isPrimary || server.state === "connected" ? "" : " (unavailable)"}</option>
               ))}
             </FormSelect>
           </label>}

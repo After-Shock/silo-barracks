@@ -3,7 +3,7 @@ const { RegistryError } = require('../classes/silo-server-registry');
 const { addAuditEntry } = require('../classes/admin-history');
 const { historyFailure, upstreamStatus } = require('../classes/silo/history-errors');
 
-function createFleetRouter({ registry, fleet }) {
+function createFleetRouter({ registry, fleet, peaks }) {
   const router = express.Router();
   const recordAuditSafely = async (req, action, details) => {
     try { await addAuditEntry(req, action, details); }
@@ -11,7 +11,7 @@ function createFleetRouter({ registry, fleet }) {
   };
   router.use((_req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
   router.get('/', (req, res) => req.permissions?.dashboard
-    ? res.json(fleet.snapshot()) : res.status(403).json({ error: 'Dashboard access required.' }));
+    ? res.json({ ...fleet.snapshot(), ...(peaks && { peaks: peaks.current() }) }) : res.status(403).json({ error: 'Dashboard access required.' }));
   router.get('/history/:serverId', async (req, res) => {
     if (!req.permissions?.dashboard) return res.status(403).json({ error: 'Dashboard access required.' });
     try {

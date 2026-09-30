@@ -191,13 +191,16 @@ function createFleet({
     let activeStreams = null;
     let playingStreams = null;
     let pausedStreams = null;
+    let transcodeStreams = null;
     if (state === 'disabled') {
       activeStreams = 0;
       playingStreams = 0;
       pausedStreams = 0;
+      transcodeStreams = 0;
     } else if (state === 'connected') {
       const active = sessions.filter(session => session && session.NowPlayingItem);
       activeStreams = active.length;
+      transcodeStreams = active.filter(session => session.PlayState?.PlayMethod === 'Transcode').length;
       pausedStreams = active.filter(session => Boolean(session.PlayState?.IsPaused)).length;
       playingStreams = activeStreams - pausedStreams;
     }
@@ -211,6 +214,7 @@ function createFleet({
       activeStreams,
       playingStreams,
       pausedStreams,
+      transcodeStreams,
       sessions,
       connection: record.client?.getConnectionInfo?.() || null,
     };
@@ -224,15 +228,17 @@ function createFleet({
         totals.totalActiveStreams += server.activeStreams;
         totals.playingStreams += server.playingStreams;
         totals.pausedStreams += server.pausedStreams;
+        totals.totalTranscodeStreams += server.transcodeStreams;
       }
       if (server.enabled && server.state !== 'connected') totals.partial = true;
       return totals;
-    }, { totalActiveStreams: 0, playingStreams: 0, pausedStreams: 0, partial: registryFailure });
+    }, { totalActiveStreams: 0, playingStreams: 0, pausedStreams: 0, totalTranscodeStreams: 0, partial: registryFailure });
     return {
       updatedAt: isoTime(time),
       totalActiveStreams: aggregate.totalActiveStreams,
       playingStreams: aggregate.playingStreams,
       pausedStreams: aggregate.pausedStreams,
+      totalTranscodeStreams: aggregate.totalTranscodeStreams,
       partial: aggregate.partial,
       servers,
     };

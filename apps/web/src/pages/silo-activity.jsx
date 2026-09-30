@@ -136,8 +136,8 @@ export default function SiloActivity({ config }) {
         {view === "history" && <>
           {servers.length > 1 && <label className="activity-control-field"><span>Server</span><select value={serverId} onChange={(event) => {
             setServerId(event.target.value); setSearchItem(null); resetQuery({ userId: "", profileId: "", mediaItemId: "", completed: "all" });
-          }}><option value="primary">Primary server</option>{servers.filter((server) => !server.isPrimary).map((server) =>
-            <option key={server.id} value={server.id} disabled={server.state !== "connected"}>{server.name}{server.state === "connected" ? "" : " (unavailable)"}</option>)}</select></label>}
+          }}>{servers.map((server) =>
+            <option key={server.id} value={server.id} disabled={!server.isPrimary && server.state !== "connected"}>{server.name}{server.isPrimary || server.state === "connected" ? "" : " (unavailable)"}</option>)}</select></label>}
           <label className="activity-control-field"><span>Account</span><select value={filters.userId} onChange={(event) => resetQuery({ ...filters, userId: event.target.value, profileId: "" })}>
             <option value="">All accounts</option>{users.map((user) => <option key={user.Id} value={user.Id}>{user.Name}</option>)}</select></label>
           <HistoryItemSearch searchUrl={`${historyBase}/search`} token={token} selected={searchItem}

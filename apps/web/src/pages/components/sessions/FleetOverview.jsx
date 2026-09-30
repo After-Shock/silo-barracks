@@ -9,6 +9,15 @@ import SessionCard from './session-card';
 import ErrorBoundary from '../general/ErrorBoundary';
 import '../../css/fleet.css';
 
+const peakDate = value => value ? new Date(value).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+function PeakLine({ peak }) {
+  if (!peak) return null;
+  return <p className="fleet-peaks" data-testid="fleet-peaks">
+    <span title={peakDate(peak.streamsAt)}>Peak <strong>{peak.streams}</strong> concurrent streams ({peak.streamsTranscodes} transcoding)</span>
+    {' · '}<span title={peakDate(peak.transcodesAt)}>Peak <strong>{peak.transcodes}</strong> concurrent transcodes</span>
+  </p>;
+}
+
 export default function FleetOverview({ surface = 'home', canControl = false }) {
   const { snapshot, error, refresh } = useFleet();
   const [selected, setSelected] = useState('all');
@@ -39,6 +48,7 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
     const unavailable = Boolean(error) || (visible[0] && visible[0].state !== 'connected');
     return <div className="sessions-widget">
       <h1 className="my-3">Active Sessions</h1>
+      <PeakLine peak={snapshot?.peaks?.all} />
       {unavailable && <p role="status" className="fleet-notice">{error || (streams.length ? 'Your Silo server is unavailable. Showing last-known activity.' : 'Your Silo server is unavailable.')} <button onClick={refresh}>Retry</button></p>}
       {streams.length === 0
         ? !unavailable && <div className="sessions-empty-state">No Active Sessions Found</div>
@@ -62,6 +72,7 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
       </OverlayTrigger>
       {!kiosk && <Link to="/settings/servers" className="fleet-manage-link">Manage servers</Link>}
     </header>
+    <PeakLine peak={snapshot?.peaks?.[s.filter]} />
     <div className="fleet-pills" role="group" aria-label="Show activity">
       {s.pills.map(pill => {
         const button = <button key={pill.id} type="button" className={`fleet-pill is-${pill.state}`} aria-pressed={pill.selected} onClick={() => setSelected(pill.id)}>

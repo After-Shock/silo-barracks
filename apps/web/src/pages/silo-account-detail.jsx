@@ -33,7 +33,7 @@ export default function SiloAccountDetail() {
     <Link className="fleet-detail-back" to="/activity">← Activity</Link>
     <header className="fleet-detail-hero">
       <span className="fleet-detail-avatar">{String(user.Name || "?").slice(0, 1).toUpperCase()}</span>
-      <div><span>Primary server · {user.SiloRole || "Account"}</span><h1>{user.Name || userId}</h1><small>Account ID: {userId}</small>
+      <div><span>{detail.serverName || "Primary server"} · {user.SiloRole || "Account"}</span><h1>{user.Name || userId}</h1><small>Account ID: {userId}</small>
         <div className="fleet-profile-list">{(detail.profiles || []).map((profile) => <span key={profile.id}>{profile.name}</span>)}</div></div>
     </header>
     <SiloScopedActivity endpoint="/api/getUserHistory" body={{ userid: userId }} scopeLabel="Account" config={config} />

@@ -5601,7 +5601,8 @@ router.get("/getHistory/users/:userId", async (req, res) => {
     const [user, profiles] = await Promise.all([
       API.getUserById(req.params.userId), API.getPlaybackHistoryProfiles(req.params.userId),
     ]);
-    return user ? res.json({ user, profiles, serverId: "primary", serverName: "Primary server" })
+    return user ? res.json({ user, profiles, serverId: "primary",
+      serverName: require("../classes/fleet-service").getFleetService().fleet.snapshot().servers.find(server => server.isPrimary)?.name || "Primary server" })
       : res.status(404).json({ error: "Silo account was not found" });
   } catch (error) { return res.status(upstreamStatus(error)).json({ error: error.message || "Unable to load Silo account" }); }
 });

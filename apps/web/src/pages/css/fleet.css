@@ -152,14 +152,16 @@
   line-height: 1.1;
 }
 
-.fleet-summary {
+.fleet-summary,
+.fleet-peaks {
   margin: 0;
   color: var(--barracks-text-muted-raised);
   font-size: 13px;
   font-weight: 600;
 }
 
-.fleet-summary strong {
+.fleet-summary strong,
+.fleet-peaks strong {
   color: var(--barracks-text-raised);
   font-variant-numeric: tabular-nums;
 }

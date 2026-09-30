@@ -42,13 +42,14 @@ function getFleetService() {
     // Fleet activity is served only by the permission-checked REST route.
     // The legacy broadcast channel does not enforce dashboard permissions.
   });
-  instance = { registry, fleet };
+  const peaks = require('./stream-peaks').createPeakTracker(db.pool);
+  instance = { registry, fleet, peaks };
   return instance;
 }
 
 function startFleet() {
-  const { fleet } = getFleetService();
-  const refresh = () => { void fleet.refresh().catch(() => {}); };
+  const { fleet, peaks } = getFleetService();
+  const refresh = () => { void fleet.refresh().then(() => peaks.record(fleet.snapshot())).catch(() => {}); };
   refresh();
   const timer = setInterval(refresh, 5000);
   return () => clearInterval(timer);
