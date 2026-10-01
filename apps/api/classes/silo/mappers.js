@@ -163,6 +163,7 @@ function libraryToJellyfin(row, serverId) {
     Type: 'CollectionFolder', CollectionType: collectionType, LocationType: 'FileSystem',
     ImageTags: {}, BackdropImageTags: [], SiloPosterUrl: row.poster_url || row.image_url || row.artwork_url || row.backdrop_url || undefined,
     ...(size !== undefined ? { Size: size } : {}), ...(files !== undefined ? { files } : {}),
+    ...(row.last_scanned_at ? { LastScannedAt: row.last_scanned_at } : {}),
   };
 }
 

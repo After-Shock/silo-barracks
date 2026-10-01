@@ -6,6 +6,7 @@ const {
 } = require('./silo/mappers');
 const { SiloRequestError, normalizeBase, requestJSON } = require('./silo/http');
 const { discoverSilo } = require('./silo/discovery');
+const { summarizeLibraryPlays, storageNeedsRefresh, measureLibraryStorage } = require('./silo/library-stats');
 const createV1 = require('./silo/v1');
 const createV2 = require('./silo/v2');
 const { randomUUID } = require('node:crypto');
@@ -39,6 +40,8 @@ class SiloAPI {
       : Math.max(0, Number.parseInt(process.env.SILO_DEFAULT_RATE_LIMIT_RETRY_MS || '5000', 10) || 5000);
     this.maxRateLimitRetries = Number.isFinite(options.maxRateLimitRetries) ? Math.max(0, options.maxRateLimitRetries)
       : Math.max(0, Number.parseInt(process.env.SILO_MAX_RATE_LIMIT_RETRIES || '3', 10) || 3);
+    // Background storage walks stay under ~4 requests/s (Silo 429s bursts of ~180 requests).
+    this.storagePauseMs = Number.isFinite(options.storagePauseMs) ? Math.max(0, options.storagePauseMs) : 250;
     this.nextRequestAt = 0;
     this.requestQueue = Promise.resolve();
     this.getConfig = options.getConfig || (async () => {
@@ -63,7 +66,10 @@ class SiloAPI {
     this.capabilityCache = null;
     this.commandSequences = new Map();
     this.itemLibraryCache = new Map();
+    this.itemLibraryLookups = new Map();
     this.libraryHistoryContinuations = new Map();
+    this.libraryPlayStatsCache = null;
+    this.libraryPlayStatsRefresh = null;
   }
 
   _clearUpstreamCaches() {
@@ -85,6 +91,7 @@ class SiloAPI {
     this.capabilityCache = null;
     this.itemLibraryCache.clear();
     this.libraryHistoryContinuations.clear();
+    this.libraryPlayStatsCache = null;
   }
 
   async _configured(refresh = false) {
@@ -456,12 +463,11 @@ class SiloAPI {
     return { results, currentPage: pageNumber, hasMore: body.page.has_more, nextCursor: body.page.has_more ? nextCursor : null };
   }
 
-  async _itemLibraryIds(itemId, deadlineAt) {
+  // Every file Silo holds for a title; a series returns all of its episodes' files.
+  async _itemFiles(itemId, deadlineAt) {
     const key = String(itemId || '');
-    if (!key) return new Set();
-    const cached = this.itemLibraryCache.get(key);
-    if (cached?.expiresAt > Date.now()) return cached.ids;
-    const ids = new Set();
+    const files = [];
+    if (!key) return files;
     const seenCursors = new Set();
     let cursor;
     for (let page = 0; page < this.maxPages; page += 1) {
@@ -476,16 +482,46 @@ class SiloAPI {
         throw error;
       }
       if (!body || !Array.isArray(body.items)) throw new SiloRequestError('Invalid Silo item file response');
-      for (const file of body.items) if (file?.library_id !== undefined && file?.library_id !== null) ids.add(String(file.library_id));
+      files.push(...body.items);
       if (!body.page?.has_more) { cursor = undefined; break; }
       cursor = body.page.next_cursor;
       if (typeof cursor !== 'string' || !cursor || seenCursors.has(cursor)) throw new SiloRequestError('Invalid Silo item file cursor');
       seenCursors.add(cursor);
       if (page === this.maxPages - 1) throw new SiloRequestError('Silo item files exceed the safe page limit', 503);
     }
-    this.itemLibraryCache.set(key, { ids, expiresAt: Date.now() + 60000 });
+    return files;
+  }
+
+  async _itemLibraryIds(itemId, deadlineAt) {
+    return new Set((await this._itemLibraryFiles(itemId, deadlineAt))
+      .filter(file => file?.library_id !== undefined && file?.library_id !== null).map(file => String(file.library_id)));
+  }
+
+  // Files (with library_id) behind a title. Concurrent lookups of one title, e.g. many episodes of
+  // a series, share a single request.
+  async _itemLibraryFiles(itemId, deadlineAt) {
+    const key = String(itemId || '');
+    if (!key) return [];
+    const cached = this.itemLibraryCache.get(key);
+    if (cached?.expiresAt > Date.now()) return cached.files;
+    if (!this.itemLibraryLookups.has(key)) {
+      this.itemLibraryLookups.set(key, this._lookupItemLibraryFiles(key, deadlineAt)
+        .finally(() => this.itemLibraryLookups.delete(key)));
+    }
+    return this.itemLibraryLookups.get(key);
+  }
+
+  async _lookupItemLibraryFiles(key, deadlineAt) {
+    // Silo has no file listing for an episode ID; its series' files carry the library.
+    const episode = /^episode-(.+)-\d+-\d+$/.exec(key);
+    let files = episode ? await this._itemLibraryFiles(`series-${episode[1]}`, deadlineAt) : await this._itemFiles(key, deadlineAt);
+    if (!files.length) {
+      const detail = await this._detail(key, { deadlineAt, timeoutMs: this.enrichmentTimeoutMs }).catch(() => null);
+      if (detail?.series_id && String(detail.series_id) !== key) files = await this._itemLibraryFiles(detail.series_id, deadlineAt);
+    }
+    this.itemLibraryCache.set(key, { files, expiresAt: Date.now() + 60000 });
     while (this.itemLibraryCache.size > 1024) this.itemLibraryCache.delete(this.itemLibraryCache.keys().next().value);
-    return ids;
+    return files;
   }
 
   async getLibraryPlaybackHistoryPage({ libraryId, limit = 50, cursor } = {}) {
@@ -537,6 +573,42 @@ class SiloAPI {
       }
     }
     return { results, hasMore: Boolean(nextCursor), nextCursor, coverage: 'complete-library-membership' };
+  }
+
+  // Per-library plays, watch time and last played, from the whole retained Silo history.
+  async getLibraryPlayStats() {
+    await this._configured(true);
+    const cached = this.libraryPlayStatsCache;
+    if (cached?.expiresAt > Date.now()) return cached.value;
+    // Serve the last result while a refresh runs; only the very first load waits on Silo.
+    if (!this.libraryPlayStatsRefresh) {
+      this.libraryPlayStatsRefresh = this._loadLibraryPlayStats()
+        .finally(() => { this.libraryPlayStatsRefresh = null; });
+    }
+    if (cached) { this.libraryPlayStatsRefresh.catch(() => {}); return cached.value; }
+    return this.libraryPlayStatsRefresh;
+  }
+
+  async _loadLibraryPlayStats() {
+    const deadlineAt = Date.now() + 60000;
+    const rows = [];
+    let cursor;
+    // ponytail: caps at maxPages*100 sessions; page by date window if history outgrows that.
+    for (let page = 0; page < this.maxPages; page += 1) {
+      const query = new URLSearchParams({ limit: '100' });
+      if (cursor) query.set('cursor', cursor);
+      const body = await this._request(`admin/playback-history?${query}`, { deadlineAt });
+      if (!Array.isArray(body?.items)) throw new SiloRequestError('Invalid Silo playback history response');
+      rows.push(...body.items);
+      if (!body.page?.has_more || !body.page.next_cursor) break;
+      cursor = body.page.next_cursor;
+    }
+    const itemIds = [...new Set(rows.map(row => String(row.media_item_id || '')).filter(Boolean))];
+    const files = new Map();
+    await forEachLimited(itemIds, 8, async itemId => files.set(itemId, await this._itemLibraryFiles(itemId, deadlineAt)));
+    const value = summarizeLibraryPlays(rows, files);
+    this.libraryPlayStatsCache = { value, expiresAt: Date.now() + 60000 };
+    return value;
   }
 
   async getPlaybackHistoryUsers() {
@@ -779,13 +851,14 @@ class SiloAPI {
     }
   }
 
-  _refreshLibraryStorageInBackground(id) {
-    const cacheKey = String(id || '');
+  _refreshLibraryStorageInBackground(library) {
+    const cacheKey = String(library?.Id || '');
     if (!cacheKey || this.libraryStorageRefreshes.has(cacheKey)) return;
-    const refresh = this.libraryStorageQueue.then(() => this._calculateLibraryStorage(id)).then(row => {
+    const scannedAt = library.LastScannedAt || null;
+    const refresh = this.libraryStorageQueue.then(() => this._calculateLibraryStorage(library)).then(row => {
       if (!row?.measurement_available) return;
       const store = this._readLibraryStorageStore();
-      store[cacheKey] = { Size: row.Size, files: row.files, updatedAt: new Date().toISOString() };
+      store[cacheKey] = { Size: row.Size, files: row.files, updatedAt: new Date().toISOString(), scannedAt };
       this.libraryStorageStore = store;
       this._writeLibraryStorageStore();
       this.libraryMetadataCache = null;
@@ -794,55 +867,23 @@ class SiloAPI {
     this.libraryStorageRefreshes.set(cacheKey, refresh);
   }
 
-  async _storageDetailsForItem(item, deadlineAt) {
-    if (String(item?.type || '').toLowerCase() !== 'series') {
-      try { return [await this._detail(item.content_id, { timeoutMs: 5000, deadlineAt })]; } catch { return []; }
-    }
-    const details = [];
-    try {
-      const seasonsBody = await this._request(`catalog/series/${encodeURIComponent(String(item.content_id))}/seasons`, { timeoutMs: 8000, deadlineAt });
-      for (const season of seasonsBody?.seasons || []) {
-        if (Date.now() >= deadlineAt - 500) break;
-        const episodesBody = await this._request(`catalog/series/${encodeURIComponent(String(item.content_id))}/seasons/${season.season_number}/episodes`, { timeoutMs: 8000, deadlineAt });
-        await forEachLimited(episodesBody?.episodes || [], 4, async episode => {
-          try { details.push(await this._detail(episode.content_id, { timeoutMs: 5000, deadlineAt })); } catch {}
-        });
-      }
-    } catch {}
-    return details;
-  }
-
-  async _calculateLibraryStorage(id, { maxItems = 5000 } = {}) {
-    let offset = 0;
-    let scanned = 0;
-    let pages = 0;
-    let size = 0;
-    let files = 0;
-    let complete = false;
-    const deadlineAt = Date.now() + 5 * 60 * 1000;
-    while (scanned < maxItems && Date.now() < deadlineAt - 500) {
-      if (++pages > this.maxPages) break;
-      const pageLimit = Math.min(100, maxItems - scanned);
-      const page = await this._catalogPage({ libraryId: id, startIndex: offset, limit: pageLimit, deadlineAt });
-      const items = Array.isArray(page.items) ? page.items : [];
-      scanned += items.length;
-      offset += items.length;
-      for (const item of items) {
-        if (Date.now() >= deadlineAt - 500) break;
-        const details = await this._storageDetailsForItem(item, deadlineAt);
-        await forEachLimited(details, 4, async detail => {
-          const versions = await this._versionsForDetail(detail, { timeoutMs: 5000, deadlineAt });
-          for (const version of versions) {
-            const value = Number(version.file_size ?? version.size ?? version.bytes);
-            if (Number.isFinite(value) && value > 0) size += value;
-            files += 1;
-          }
-        });
-      }
-      if (!page.has_more || items.length === 0) { complete = true; break; }
-    }
-    return { Id: String(id), Size: files > 0 && complete ? size : null, files: files > 0 && complete ? files : null,
-      measurement_available: files > 0 && complete, measurement_source: files > 0 && complete ? 'silo-catalog-versions' : 'unavailable' };
+  // Silo v2 has no per-library storage totals: count files per title (a series is one lookup)
+  // and, for movie libraries, sum version sizes. Episode sizes would cost one call per episode.
+  async _calculateLibraryStorage(library) {
+    const id = String(library.Id);
+    let failed = false;
+    // ponytail: ~2 paced calls per movie (~2.5h for 12k titles); fine for a background refresh
+    // after scans, but needs a native Silo per-library total if libraries grow much larger.
+    const result = await measureLibraryStorage({
+      libraryId: id, measureSize: library.CollectionType === 'movies',
+      catalogPage: ({ startIndex, limit, deadlineAt }) => this._catalogPage({ libraryId: id, startIndex, limit, deadlineAt }),
+      itemFiles: (itemId, deadlineAt) => this._itemFiles(itemId, deadlineAt).catch(() => { failed = true; return []; }),
+      itemVersions: (itemId, deadlineAt) => this._versionsForDetail({ content_id: itemId }, { timeoutMs: 5000, deadlineAt }),
+      deadlineAt: Date.now() + 6 * 60 * 60 * 1000, pauseMs: this.storagePauseMs,
+    });
+    const ok = result.complete && !failed;
+    return { Id: id, Size: ok ? result.size : null, files: ok ? result.files : null,
+      measurement_available: ok, measurement_source: ok ? 'silo-catalog-files' : 'unavailable' };
   }
 
   async getLibraryStorageMetadata() {
@@ -857,14 +898,16 @@ class SiloAPI {
     const rows = libraries.map(library => {
       const nativeSize = Number.isFinite(Number(library.Size)) ? Number(library.Size) : null;
       const nativeFiles = Number.isFinite(Number(library.files)) ? Number(library.files) : null;
-      const stored = store[String(library.Id)] || {};
-      const size = nativeSize ?? (Number.isFinite(Number(stored.Size)) ? Number(stored.Size) : null);
-      const files = nativeFiles ?? (Number.isFinite(Number(stored.files)) ? Number(stored.files) : null);
-      if (size === null && files === null) this._refreshLibraryStorageInBackground(library.Id);
+      // Measurements without scannedAt predate full-catalog counting and undercount; ignore them.
+      const stored = 'scannedAt' in (store[String(library.Id)] || {}) ? store[String(library.Id)] : {};
+      const size = nativeSize ?? (Number.isFinite(Number(stored.Size)) && stored.Size !== null ? Number(stored.Size) : null);
+      const files = nativeFiles ?? (Number.isFinite(Number(stored.files)) && stored.files !== null ? Number(stored.files) : null);
+      if (nativeSize === null && nativeFiles === null && storageNeedsRefresh(stored, library)) this._refreshLibraryStorageInBackground(library);
       return { Id: library.Id, Size: size, files,
         measurement_available: size !== null || files !== null,
-        measurement_source: nativeSize !== null || nativeFiles !== null ? 'silo-library' : stored.updatedAt ? 'silo-catalog-versions' : 'pending',
-        measurement_pending: size === null && files === null };
+        measurement_source: nativeSize !== null || nativeFiles !== null ? 'silo-library' : stored.updatedAt ? 'silo-catalog-files' : 'pending',
+        measurement_pending: size === null && files === null,
+        measurement_refreshing: this.libraryStorageRefreshes.has(String(library.Id)) };
     });
     this.libraryMetadataCache = { key: cacheKey, value: rows, expiresAt: Date.now() + 30 * 1000 };
     return rows;

@@ -85,8 +85,15 @@ async function getSiloLibraryRows() {
     `select *, now() - js_library_stats_overview."ActivityDateInserted" AS "LastActivity" from js_library_stats_overview`
   ).then(result => result.rows).catch(() => []);
   const statsById = new Map(statsRows.map(row => [String(row.Id), row]));
+  // Plays live in Silo history; the local tables only hold imported or legacy activity.
+  const playStats = typeof API.getLibraryPlayStats === 'function'
+    ? await API.getLibraryPlayStats().catch(() => null)
+    : null;
   return Promise.all(libraries.map(async library => {
-    const stats = statsById.get(String(library.Id)) || {};
+    const plays = playStats
+      ? playStats[String(library.Id)] || { Plays: 0, total_playback_duration: 0, LastActivity: null, ItemName: null, ItemId: null }
+      : {};
+    const stats = { ...(statsById.get(String(library.Id)) || {}), ...plays };
     const summary = typeof API.getLibraryCatalogSummary === 'function'
       ? await API.getLibraryCatalogSummary({ id: library.Id }).catch(() => null)
       : null;
