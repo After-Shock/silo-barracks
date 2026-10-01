@@ -867,6 +867,19 @@ class SiloAPI {
     this.libraryStorageRefreshes.set(cacheKey, refresh);
   }
 
+  // Measure the smallest libraries first so they report within minutes instead of waiting
+  // hours behind a large one. Counts are one cheap catalog call per library.
+  _queueLibraryStorageRefreshes(libraries) {
+    const pending = libraries.filter(library => !this.libraryStorageRefreshes.has(String(library.Id)));
+    if (!pending.length) return;
+    this.libraryStorageOrdering = Promise.all(pending.map(async library => {
+      const summary = await this.getLibraryCatalogSummary({ id: library.Id }).catch(() => null);
+      return { library, total: Number.isFinite(summary?.total) ? summary.total : Infinity };
+    })).then(sized => {
+      for (const { library } of sized.sort((a, b) => a.total - b.total)) this._refreshLibraryStorageInBackground(library);
+    }).catch(() => {});
+  }
+
   // Silo v2 has no per-library storage totals: count files per title (a series is one lookup)
   // and, for movie libraries, sum version sizes. Episode sizes would cost one call per episode.
   async _calculateLibraryStorage(library) {
@@ -895,6 +908,7 @@ class SiloAPI {
 
     const libraries = await this.getLibraries();
     const store = this._readLibraryStorageStore();
+    const stale = [];
     const rows = libraries.map(library => {
       const nativeSize = Number.isFinite(Number(library.Size)) ? Number(library.Size) : null;
       const nativeFiles = Number.isFinite(Number(library.files)) ? Number(library.files) : null;
@@ -902,13 +916,14 @@ class SiloAPI {
       const stored = 'scannedAt' in (store[String(library.Id)] || {}) ? store[String(library.Id)] : {};
       const size = nativeSize ?? (Number.isFinite(Number(stored.Size)) && stored.Size !== null ? Number(stored.Size) : null);
       const files = nativeFiles ?? (Number.isFinite(Number(stored.files)) && stored.files !== null ? Number(stored.files) : null);
-      if (nativeSize === null && nativeFiles === null && storageNeedsRefresh(stored, library)) this._refreshLibraryStorageInBackground(library);
+      if (nativeSize === null && nativeFiles === null && storageNeedsRefresh(stored, library)) stale.push(library);
       return { Id: library.Id, Size: size, files,
         measurement_available: size !== null || files !== null,
         measurement_source: nativeSize !== null || nativeFiles !== null ? 'silo-library' : stored.updatedAt ? 'silo-catalog-files' : 'pending',
         measurement_pending: size === null && files === null,
         measurement_refreshing: this.libraryStorageRefreshes.has(String(library.Id)) };
     });
+    if (stale.length) this._queueLibraryStorageRefreshes(stale);
     this.libraryMetadataCache = { key: cacheKey, value: rows, expiresAt: Date.now() + 30 * 1000 };
     return rows;
   }

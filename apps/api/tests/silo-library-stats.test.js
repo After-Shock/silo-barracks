@@ -90,3 +90,19 @@ test('an episode belongs to the libraries holding its series files', async () =>
   assert.deepEqual([...await api._itemLibraryIds('odd-episode')].sort(), ['10', '2']);
   assert.deepEqual([...await api._itemLibraryIds('movie-deleted')], []);
 });
+
+test('stale libraries are measured smallest first', async () => {
+  const SiloAPI = require('../classes/silo-api');
+  const api = new SiloAPI({ getConfig: async () => ({ state: 2, SILO_URL: 'http://silo.invalid', SILO_API_KEY: 'k' }) });
+  const counts = { big: 12000, small: 80, mid: 900 };
+  api.getLibraries = async () => Object.keys(counts).map(Id => ({ Id, CollectionType: 'movies', LastScannedAt: 'now' }));
+  api._readLibraryStorageStore = () => ({});
+  api._writeLibraryStorageStore = () => {};
+  api.getLibraryCatalogSummary = async ({ id }) => ({ total: counts[id] });
+  const order = [];
+  api._calculateLibraryStorage = async library => { order.push(library.Id); return { measurement_available: false }; };
+  await api.getLibraryStorageMetadata();
+  await api.libraryStorageOrdering;
+  await api.libraryStorageQueue;
+  assert.deepEqual(order, ['small', 'mid', 'big']);
+});
