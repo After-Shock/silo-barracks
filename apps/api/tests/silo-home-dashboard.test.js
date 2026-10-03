@@ -88,3 +88,23 @@ test('malformed pages, cursor cycles and upstream failures never become empty su
   await assert.rejects(loadHomeHistory(async () => ({ items: [], page: { has_more: true, next_cursor: 'repeat' } })), /cursor/);
   await assert.rejects(loadHomeHistory(async () => { throw new Error('Permission denied'); }), /Permission denied/);
 });
+
+test('peak hours come from history start times in the viewer time zone', () => {
+  const { peakHoursFromHistory } = require('../classes/silo/home-dashboard');
+  const rows = [
+    row({ session_id: 's1', started_at: '2026-09-18T01:30:00Z', ended_at: '2026-09-18T03:00:00Z' }),
+    row({ session_id: 's1', started_at: '2026-09-18T01:30:00Z' }),
+    row({ session_id: 's2', started_at: '2026-01-10T01:30:00Z' }),
+    row({ session_id: 's3', started_at: 'not a date', ended_at: undefined }),
+    row({ session_id: 's4', user_id: 'hidden', started_at: '2026-09-18T01:30:00Z' }),
+  ];
+  const { peakHours, timeZone } = peakHoursFromHistory(rows, { timeZone: 'America/New_York', excludedUsers: ['hidden'] });
+  assert.equal(timeZone, 'America/New_York');
+  assert.equal(peakHours.length, 24);
+  assert.equal(peakHours[21].count, 1); // 01:30 UTC in September is 21:30 EDT
+  assert.equal(peakHours[20].count, 1); // 01:30 UTC in January is 20:30 EST
+  assert.equal(peakHours.reduce((sum, hour) => sum + hour.count, 0), 2);
+  const fallback = peakHoursFromHistory(rows, { timeZone: 'Not/AZone' });
+  assert.equal(fallback.timeZone, 'UTC');
+  assert.equal(fallback.peakHours[1].count, 3);
+});

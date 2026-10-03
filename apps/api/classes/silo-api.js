@@ -415,9 +415,17 @@ class SiloAPI {
   async getAdmins(refreshConfig = false) { return (await this.getUsers(refreshConfig)).filter(user => user.Policy.IsAdministrator); }
   async getUserById(userid) { return (await this.getUsers()).find(user => user.Id === String(userid)) || null; }
 
-  async getHomeDashboard() {
-    const { buildNativeHomeDashboard } = require('./silo/home-dashboard');
-    return buildNativeHomeDashboard(await this.getAdminDashboardInsights({ hours: 168, days: 7, limit: 10 }));
+  async getHomeDashboard({ excludedUsers = [], timeZone } = {}) {
+    const { buildNativeHomeDashboard, loadHomeHistory, peakHoursFromHistory } = require('./silo/home-dashboard');
+    const dashboard = buildNativeHomeDashboard(await this.getAdminDashboardInsights({ hours: 168, days: 7, limit: 10 }));
+    // Native buckets are daily past 48h; hourly peaks need session start times from history.
+    const history = await loadHomeHistory(path => this._request(path)).catch(() => null);
+    if (history) {
+      const peak = peakHoursFromHistory(history.rows, { timeZone, excludedUsers });
+      dashboard.peakHours = peak.peakHours;
+      dashboard.history = { ...dashboard.history, timeZone: peak.timeZone, peakHoursFrom: 'retained-history' };
+    }
+    return dashboard;
   }
 
   async getPlaybackHistoryPage({ limit = 50, page = 1, cursor, userId, profileId, mediaItemId, completed, _deadlineAt } = {}) {

@@ -23,6 +23,32 @@ async function loadHomeHistory(request, { maxPages = 10 } = {}) {
   return { rows, truncated: true };
 }
 
+// An hour-of-day reader for an IANA zone; unknown or missing zones fall back to UTC.
+function hourReader(timeZone) {
+  try {
+    const format = new Intl.DateTimeFormat('en-US', { timeZone: timeZone || 'UTC', hour: 'numeric', hourCycle: 'h23' });
+    return { timeZone: format.resolvedOptions().timeZone, hourOf: date => Number(format.format(date)) % 24 };
+  } catch {
+    return { timeZone: 'UTC', hourOf: date => date.getUTCHours() };
+  }
+}
+
+// Silo's playback-activity buckets are daily for windows over 48h, so peak hours are built from
+// each retained session's start time instead, in the viewer's time zone.
+function peakHoursFromHistory(rows, { timeZone, excludedUsers = [] } = {}) {
+  const reader = hourReader(timeZone);
+  const excluded = new Set(excludedUsers.map(String));
+  const seen = new Set();
+  const peakHours = Array.from({ length: 24 }, (_, hour) => ({ hour, count: 0 }));
+  for (const row of rows) {
+    if (!row.session_id || seen.has(String(row.session_id)) || excluded.has(String(row.user_id))) continue;
+    seen.add(String(row.session_id));
+    const date = new Date(row.started_at || row.ended_at);
+    if (Number.isFinite(date.getTime())) peakHours[reader.hourOf(date)].count += 1;
+  }
+  return { peakHours, timeZone: reader.timeZone };
+}
+
 function buildHomeDashboard({ rows, truncated }, { excludedUsers = [], now = Date.now() } = {}) {
   const excluded = new Set(excludedUsers.map(String));
   const seen = new Set();
@@ -120,4 +146,4 @@ function buildNativeHomeDashboard({ stats, playback, top }) {
   };
 }
 
-module.exports = { loadHomeHistory, buildHomeDashboard, buildNativeHomeDashboard, topProfiles, topTitles };
+module.exports = { peakHoursFromHistory, loadHomeHistory, buildHomeDashboard, buildNativeHomeDashboard, topProfiles, topTitles };

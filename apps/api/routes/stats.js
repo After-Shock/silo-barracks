@@ -247,7 +247,8 @@ router.get("/getHomeDashboard", async (req, res) => {
     const settingsResult = await db.query('SELECT settings FROM app_config where "ID"=1').catch(() => ({ rows: [] }));
     const excludedUsers = Array.isArray(settingsResult.rows?.[0]?.settings?.ExcludedUsers) ? settingsResult.rows[0].settings.ExcludedUsers : [];
     if (await isSiloProvider()) {
-      const dashboard = await API.getHomeDashboard({ excludedUsers });
+      const timeZone = typeof req.query.timeZone === "string" ? req.query.timeZone.slice(0, 64) : undefined;
+      const dashboard = await API.getHomeDashboard({ excludedUsers, timeZone });
       if (dashboard.source === "silo-native") {
         const { profiles, titles } = await require("../classes/fleet-service").getFleetService().fleet
           .topActivity({ days: dashboard.history?.days || 7 }).catch(() => ({ profiles: [], titles: [] }));

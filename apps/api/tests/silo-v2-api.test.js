@@ -43,7 +43,27 @@ test('home dashboard uses native stats, playback and leaderboard endpoints', asy
   assert.equal(dashboard.peakHours[20].count, 4);
   assert.equal(dashboard.weekPulse.topItem.name, 'Film');
   assert.equal(dashboard.hallOfFame[0].userName, 'Viewer');
-  assert.ok(!f.calls.some(url => /playback-history|profiles|catalog/.test(url.pathname)));
+  // History (403 here) is read only for hourly peaks; a failure keeps the native buckets above.
+  assert.ok(!f.calls.some(url => /profiles|catalog/.test(url.pathname)));
+});
+
+test('home dashboard peak hours use history start times in the requested time zone', async t => {
+  const f = await fixture(t, (url, send) => {
+    const path = url.pathname.replace('/proxy/api/v2/', '');
+    if (path === 'admin/stats') return send({ total_items: 1 });
+    if (path === 'admin/stats/playback-activity') return send({ hours: 168, bucket_seconds: 86400, reliability: {},
+      buckets: [{ hour: '2026-09-17T00:00:00Z', direct: 2, remux: 0, transcode: 0 }] });
+    if (path === 'admin/stats/top-activity') return send({ days: 7, titles: [], profiles: [] });
+    if (path === 'admin/playback-history') return send({ page: { has_more: false }, items: [
+      { session_id: 'a', user_id: '1', started_at: '2026-09-17T01:15:00Z' },
+      { session_id: 'b', user_id: '1', started_at: '2026-09-17T23:40:00Z' }] });
+    return send({}, 403);
+  });
+  const dashboard = await f.api.getHomeDashboard({ timeZone: 'America/New_York' });
+  assert.equal(dashboard.history.timeZone, 'America/New_York');
+  assert.equal(dashboard.peakHours[0].count, 0); // the daily bucket no longer piles into midnight
+  assert.equal(dashboard.peakHours[21].count, 1);
+  assert.equal(dashboard.peakHours[19].count, 1);
 });
 
 test('history uses one opaque cursor request and preserves Silo-native attempt fields', async t => {

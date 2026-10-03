@@ -399,6 +399,16 @@ function HomeIntegrationWidget({ icon: Icon, title, eyebrow, widget, error, to }
   );
 }
 
+// Short zone name for the peak hours label, e.g. "EDT" for America/New_York.
+function timeZoneLabel(timeZone) {
+  try {
+    return new Intl.DateTimeFormat("en-US", { timeZone: timeZone || "UTC", timeZoneName: "short" })
+      .formatToParts(new Date()).find((part) => part.type === "timeZoneName")?.value || "UTC";
+  } catch {
+    return "UTC";
+  }
+}
+
 export default function Home({ kioskMode = false }) {
   const [dashboard, setDashboard] = useState(() => loadHomeCache(HOME_DASHBOARD_CACHE_KEY));
   const [operations, setOperations] = useState(() => loadHomeCache(HOME_OPERATIONS_CACHE_KEY) || { requests: null, health: null });
@@ -420,6 +430,7 @@ export default function Home({ kioskMode = false }) {
       const config = cachedToken ? { token: cachedToken } : await Config.getConfig();
       const response = await axios.get("/stats/getHomeDashboard", {
         headers: { Authorization: `Bearer ${config.token}` },
+        params: { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
       });
       setDashboard(response.data);
       saveHomeCache(HOME_DASHBOARD_CACHE_KEY, response.data);
@@ -481,6 +492,7 @@ export default function Home({ kioskMode = false }) {
   }, [kioskMode]);
 
   const isSiloDashboard = String(dashboard?.source || "").startsWith("silo");
+  const peakZone = timeZoneLabel(dashboard?.history?.timeZone);
   const isNativeSiloDashboard = dashboard?.source === "silo-native";
   const peakHours = dashboard?.peakHours || [];
   const maxPeak = useMemo(() => Math.max(...peakHours.map((hour) => Number(hour.count || 0)), 1), [peakHours]);
@@ -833,7 +845,7 @@ export default function Home({ kioskMode = false }) {
             {isNativeSiloDashboard
               ? `Native Silo activity covers the last ${formatNumber(dashboard.history?.hours || 168)} hours; leaderboards cover ${formatNumber(dashboard.history?.days || 7)} days.`
               : dashboard.history?.truncated ? `Showing a limited sample of ${formatNumber(dashboard.history.sampledRows)} retained history records, not all-time totals.` : "Playback statistics use Silo’s retained history, not all-time totals."}
-            {" "}Peak hours are in UTC. Widgets without a native data source are omitted.
+            {" "}Peak hours are in {peakZone}. Widgets without a native data source are omitted.
           </span>
           <Link to="/activity">View activity</Link>
         </div>
@@ -983,7 +995,7 @@ export default function Home({ kioskMode = false }) {
         <article className="home-glass-card home-peak-card">
           <div className="home-card-label">
             <TimeLineIcon size={17} />
-            <span>Peak viewing hours{isSiloDashboard ? " (UTC)" : ""}</span>
+            <span>Peak viewing hours{isSiloDashboard ? ` (${peakZone})` : ""}</span>
           </div>
           <div className="home-hour-bars" aria-label="Playback count by hour">
             {peakHours.map((hour) => (
