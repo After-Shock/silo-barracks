@@ -843,7 +843,7 @@ export default function Home({ kioskMode = false }) {
         <div className="home-glass-card home-data-notice" role="status">
           <span>
             {isNativeSiloDashboard
-              ? `Native Silo activity covers the last ${formatNumber(dashboard.history?.hours || 168)} hours; leaderboards cover ${formatNumber(dashboard.history?.days || 7)} days.`
+              ? `Native Silo activity${dashboard.history?.servers > 1 ? ` across ${formatNumber(dashboard.history.servers)} servers` : ""} covers the last ${formatNumber(dashboard.history?.hours || 168)} hours; leaderboards cover ${formatNumber(dashboard.history?.days || 7)} days.`
               : dashboard.history?.truncated ? `Showing a limited sample of ${formatNumber(dashboard.history.sampledRows)} retained history records, not all-time totals.` : "Playback statistics use Silo’s retained history, not all-time totals."}
             {" "}Peak hours are in {peakZone}. Widgets without a native data source are omitted.
           </span>

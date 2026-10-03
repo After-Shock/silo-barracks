@@ -248,9 +248,17 @@ router.get("/getHomeDashboard", async (req, res) => {
     const excludedUsers = Array.isArray(settingsResult.rows?.[0]?.settings?.ExcludedUsers) ? settingsResult.rows[0].settings.ExcludedUsers : [];
     if (await isSiloProvider()) {
       const timeZone = typeof req.query.timeZone === "string" ? req.query.timeZone.slice(0, 64) : undefined;
-      const dashboard = await API.getHomeDashboard({ excludedUsers, timeZone });
+      const { fleet } = require("../classes/fleet-service").getFleetService();
+      // Playback starts, viewers and peak hours cover every connected server, like the Hall of Fame.
+      const home = await fleet.homeActivity({ timeZone, excludedUsers }).catch(() => null);
+      const dashboard = home?.primary || await API.getHomeDashboard({ excludedUsers, timeZone });
+      if (home?.servers) {
+        dashboard.totals = home.totals;
+        dashboard.peakHours = home.peakHours;
+        dashboard.history = { ...dashboard.history, servers: home.servers };
+      }
       if (dashboard.source === "silo-native") {
-        const { profiles, titles } = await require("../classes/fleet-service").getFleetService().fleet
+        const { profiles, titles } = await fleet
           .topActivity({ days: dashboard.history?.days || 7 }).catch(() => ({ profiles: [], titles: [] }));
         if (profiles.length) {
           dashboard.hallOfFame = profiles.slice(0, 5);

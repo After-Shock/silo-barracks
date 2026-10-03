@@ -425,6 +425,30 @@ function createFleet({
     return { profiles: profiles.sort(byRank), titles: [...titles.values()].sort(byRank) };
   }
 
+  // Home playback starts, viewers and peak hours summed over every connected server. primary is
+  // the primary server's own dashboard (catalog, history window) when it answered.
+  async function homeActivity({ timeZone, excludedUsers = [] } = {}) {
+    const connected = [...records.values()].filter(record => enabled(record.server) && record.state === 'connected'
+      && typeof record.client?.getHomeDashboard === 'function');
+    const results = (await Promise.allSettled(connected.map(async record => ({ record,
+      // Excluded users are primary-server user IDs; on another server the same ID is someone else.
+      dashboard: await record.client.getHomeDashboard({ timeZone, excludedUsers: record.server.isPrimary ? excludedUsers : [] }) }))))
+      .flatMap(result => result.status === 'fulfilled' ? [result.value] : []);
+    const sum = field => results.reduce((total, { dashboard }) => total + Number(dashboard.totals?.[field] || 0), 0);
+    const finalizedPlaybacks = sum('finalizedPlaybacks');
+    const completedPlaybacks = sum('completedPlaybacks');
+    const peakHours = Array.from({ length: 24 }, (_, hour) => ({ hour,
+      count: results.reduce((total, { dashboard }) => total + Number(dashboard.peakHours?.[hour]?.count || 0), 0) }));
+    return {
+      servers: results.length,
+      primary: results.find(({ record }) => record.server.isPrimary)?.dashboard || null,
+      totals: { totalPlaybacks: sum('totalPlaybacks'), finalizedPlaybacks, completedPlaybacks,
+        completionRate: finalizedPlaybacks ? completedPlaybacks / finalizedPlaybacks : 0,
+        totalWatchSeconds: null, uniqueViewers: sum('uniqueViewers') },
+      peakHours,
+    };
+  }
+
   async function playbackHistoryPage(serverId, options) {
     const record = connectedClient(serverId);
     if (typeof record.client.getPlaybackHistoryPage !== 'function') {
@@ -520,7 +544,7 @@ function createFleet({
     record.state = enabled(record.server) ? 'connecting' : 'disabled';
   }
 
-  return { refresh, snapshot, invalidate, sessionCommandCapabilities, controlSession, topActivity, playbackHistoryPage,
+  return { refresh, snapshot, invalidate, sessionCommandCapabilities, controlSession, topActivity, homeActivity, playbackHistoryPage,
     playbackHistoryUsers, playbackHistoryProfiles, playbackHistorySearch, catalogItem, historyUser,
     libraryList, libraryDetail, libraryItems, libraryHistoryPage };
 }
