@@ -10,9 +10,7 @@ function startSiloActivityMonitor() {
   const interval = Math.max(1000, Math.min(60000, Number(process.env.SILO_POLL_INTERVAL_MS) || 5000));
   const store = createActivityStore(db.pool, {
     maxGapSeconds: interval * 3 / 1000,
-    onCompleted: async () => {
-      await Promise.all(db.materializedViews.map(view => db.refreshMaterializedView(view)));
-    },
+    onCompleted: async () => db.scheduleMaterializedViewRefreshes(),
   });
   const poll = createPoller({ api, getConfig: () => new Config().getConfig(), store,
     publish: async (tag, payload) => {

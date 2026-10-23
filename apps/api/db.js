@@ -1,5 +1,6 @@
 const { Pool } = require("pg");
 const pgp = require("pg-promise")();
+const { createRefreshThrottle } = require("./classes/refresh-throttle");
 const { update_query: update_query_map } = require("./models/bulk_insert_update_handler");
 
 const _POSTGRES_USER = process.env.POSTGRES_USER;
@@ -52,9 +53,7 @@ async function deleteBulk(table_name, data, pkName) {
     message = data.length + " Rows removed.";
 
     if (table_name === "jf_playback_activity") {
-      for (const view of materializedViews) {
-        refreshMaterializedView(view);
-      }
+      scheduleMaterializedViewRefreshes();
     }
   } catch (error) {
     await client.query("ROLLBACK");
@@ -137,6 +136,19 @@ async function refreshMaterializedView(view_name) {
   return { Result: result, message: "" + message };
 }
 
+// Background refreshes (playback writes, completed sessions) are throttled; each batch runs
+// the views in order because the stats overview reads latest playback activity.
+const scheduleMaterializedViewRefreshes = createRefreshThrottle(
+  async () => {
+    for (const view of materializedViews) {
+      const result = await refreshMaterializedView(view);
+      if (result.Result !== "SUCCESS") console.error(result.message);
+    }
+  },
+  Number(process.env.MATERIALIZED_VIEW_REFRESH_INTERVAL_MS) || 60000,
+  (error) => console.error("Materialized view refresh batch failed:", error)
+);
+
 async function insertBulk(table_name, data, columns) {
   //dedupe data
 
@@ -167,9 +179,7 @@ async function insertBulk(table_name, data, columns) {
     await client.query("COMMIT");
 
     if (table_name === "jf_playback_activity") {
-      for (const view of materializedViews) {
-        refreshMaterializedView(view);
-      }
+      scheduleMaterializedViewRefreshes();
     }
   } catch (error) {
     await client.query("ROLLBACK");
@@ -193,9 +203,7 @@ async function query(text, params, refreshViews = false) {
     const result = await pool.query(text, params);
 
     if (refreshViews) {
-      for (const view of materializedViews) {
-        refreshMaterializedView(view);
-      }
+      scheduleMaterializedViewRefreshes();
     }
 
     const skippedColumns = [
@@ -268,6 +276,7 @@ module.exports = {
   updateSingleFieldBulk: updateSingleFieldBulk,
   querySingle: querySingle,
   refreshMaterializedView: refreshMaterializedView,
+  scheduleMaterializedViewRefreshes: scheduleMaterializedViewRefreshes,
   materializedViews: materializedViews,
 
   // initDB: initDB,
