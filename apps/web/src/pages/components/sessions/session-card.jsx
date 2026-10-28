@@ -152,7 +152,9 @@ function SessionCard(props) {
   }));
   const isSilo = session.MediaServerProvider === "silo";
   const diagnostics = session.SiloDiagnostics || {};
-  const clientLabel = `${session.Client || 'Unknown'} ${session.ApplicationVersion || ''}`.trim();
+  // Silo's client label already carries the version ("Findroid 1.2.0").
+  const clientLabel = String(session.Client || 'Unknown').includes(session.ApplicationVersion || '\0')
+    ? String(session.Client) : `${session.Client || 'Unknown'} ${session.ApplicationVersion || ''}`.trim();
   // Additional-server IDs must never navigate into primary-server catalog/users.
   const LocalLink = ({ to, target, ...rest }) => (session.FleetServerId && session.FleetServerId !== 'primary')
     || (to.startsWith('/libraries/') && nowPlaying.SiloUnattributed)
