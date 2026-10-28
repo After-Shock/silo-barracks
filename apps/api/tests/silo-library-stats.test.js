@@ -115,4 +115,8 @@ test('watch time never exceeds the session wall-clock length', () => {
   assert.equal(watchedSeconds({ watched_seconds: 600, started_at: '2026-10-28T01:00:00Z', ended_at: '2026-10-28T02:00:00Z' }), 600);
   assert.equal(watchedSeconds({ watched_seconds: 600, started_at: '2026-10-28T01:00:00Z' }), 600);
   assert.equal(watchedSeconds({ watched_seconds: -5 }), 0);
+  // Silo's measured played_seconds wins when present (Findroid, 2026-10-28).
+  assert.equal(watchedSeconds({ watched_seconds: 91.87, played_seconds: 87.662, started_at: '2026-10-28T15:50:13.326Z', ended_at: '2026-10-28T15:52:44.488Z' }), 87.662);
+  assert.equal(watchedSeconds({ watched_seconds: 4867.487, played_seconds: 16.487, started_at: '2026-10-28T15:18:50.077Z', ended_at: '2026-10-28T15:19:12.325Z' }), 16.487);
+  assert.equal(watchedSeconds({ watched_seconds: 600, played_seconds: null }), 600);
 });
