@@ -2,7 +2,7 @@
 
 const {
   isEpisodeSession, sessionToJellyfin, userToJellyfin, libraryToJellyfin, itemToJellyfin,
-  seasonToJellyfin, episodeToJellyfin, versionToMediaSource, forEachLimited, historySearchResult,
+  seasonToJellyfin, episodeToJellyfin, versionToMediaSource, forEachLimited, historySearchResult, watchedSeconds,
 } = require('./silo/mappers');
 const { SiloRequestError, normalizeBase, requestJSON } = require('./silo/http');
 const { discoverSilo } = require('./silo/discovery');
@@ -461,10 +461,10 @@ class SiloAPI {
         EpisodeId: String(row.media_type || '').toLowerCase() === 'episode' ? itemId : null,
         NowPlayingItemName: row.media_title || '', SiloMediaType: String(row.media_type || ''),
         SiloMediaFileId: String(row.media_file_id || ''), PlayMethod: methodName(row.play_method),
-        SiloPlayMethod: String(row.play_method || ''), PlaybackDuration: Math.max(0, Number(row.watched_seconds) || 0),
+        SiloPlayMethod: String(row.play_method || ''), PlaybackDuration: watchedSeconds(row),
         ActivityDateInserted: row.ended_at || row.started_at, DateCreated: row.started_at, EndedAt: row.ended_at,
         RunTime: row.duration_seconds, Completed: row.completed === true, Client: '', DeviceName: '', RemoteEndPoint: '',
-        TotalPlays: 1, TotalDuration: Math.max(0, Number(row.watched_seconds) || 0), MediaServerProvider: 'silo',
+        TotalPlays: 1, TotalDuration: watchedSeconds(row), MediaServerProvider: 'silo',
         HistorySource: 'Silo retention',
       };
     });

@@ -1,5 +1,7 @@
 'use strict';
 
+const { watchedSeconds } = require('./mappers');
+
 // Silo v2 has no per-library play or storage totals, so Barracks derives them from
 // playback history and the per-title file/version endpoints.
 
@@ -24,7 +26,7 @@ function summarizeLibraryPlays(rows, filesByItem, now = Date.now()) {
     for (const libraryId of libraryIdsForPlay(row, filesByItem.get(String(row.media_item_id || '')) || [])) {
       const entry = stats[libraryId] ||= { Plays: 0, total_playback_duration: 0, lastAt: -Infinity, ItemName: null, ItemId: null };
       entry.Plays += 1;
-      entry.total_playback_duration += Math.max(0, Number(row.watched_seconds) || 0);
+      entry.total_playback_duration += watchedSeconds(row);
       if (Number.isFinite(at) && at > entry.lastAt) Object.assign(entry, { lastAt: at, ItemName: row.media_title || null, ItemId: row.media_item_id });
     }
   }

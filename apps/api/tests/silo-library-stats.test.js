@@ -106,3 +106,13 @@ test('stale libraries are measured smallest first', async () => {
   await api.libraryStorageQueue;
   assert.deepEqual(order, ['small', 'mid', 'big']);
 });
+
+test('watch time never exceeds the session wall-clock length', () => {
+  const { watchedSeconds } = require('../classes/silo/mappers');
+  // Live case: Findroid resumed at 81 min, played 22 s; Silo reported the position.
+  assert.equal(watchedSeconds({ watched_seconds: 4867.487, started_at: '2026-10-28T15:18:50.077Z', ended_at: '2026-10-28T15:19:12.325Z' }), 22.248);
+  assert.equal(watchedSeconds({ watched_seconds: 3474, started_at: '2026-10-28T01:24:02Z', ended_at: '2026-10-28T02:17:59Z' }), 3237);
+  assert.equal(watchedSeconds({ watched_seconds: 600, started_at: '2026-10-28T01:00:00Z', ended_at: '2026-10-28T02:00:00Z' }), 600);
+  assert.equal(watchedSeconds({ watched_seconds: 600, started_at: '2026-10-28T01:00:00Z' }), 600);
+  assert.equal(watchedSeconds({ watched_seconds: -5 }), 0);
+});

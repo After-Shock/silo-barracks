@@ -1,4 +1,5 @@
 // Read-only aggregates over Silo's retained history, never the Jellyfin SQL tables.
+const { watchedSeconds } = require('./mappers');
 const UNAVAILABLE_SECTIONS = ['library', 'catalog', 'milestones', 'trends', 'issues', 'watchParty', 'seasonGaps', 'automation'];
 
 async function loadHomeHistory(request, { maxPages = 10 } = {}) {
@@ -68,8 +69,7 @@ function buildHomeDashboard({ rows, truncated }, { excludedUsers = [], now = Dat
   for (const row of rows) {
     if (!row.session_id || seen.has(String(row.session_id)) || excluded.has(String(row.user_id))) continue;
     seen.add(String(row.session_id));
-    const duration = Number(row.watched_seconds);
-    const seconds = Number.isFinite(duration) ? Math.max(0, duration) : 0;
+    const seconds = watchedSeconds(row);
     const date = new Date(row.ended_at || row.started_at);
     const time = date.getTime();
     const user = { userId: String(row.user_id), userName: row.username || 'Unknown user' };

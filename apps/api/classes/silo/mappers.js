@@ -237,6 +237,15 @@ async function forEachLimited(values, limit, operation) {
   await Promise.all(workers);
 }
 
+// Silo can report the resume position as watched_seconds (seen on Jellyfin-compat
+// clients), so a 20-second resumed session counts as 80 minutes. Never credit
+// more watch time than the session's wall-clock length.
+function watchedSeconds(row) {
+  const watched = Math.max(0, Number(row?.watched_seconds) || 0);
+  const elapsed = (Date.parse(row?.ended_at) - Date.parse(row?.started_at)) / 1000;
+  return elapsed >= 0 ? Math.min(watched, elapsed) : watched;
+}
+
 function historySearchResult(row) {
   const type = String(row?.type || '').toLowerCase();
   if (!row?.content_id || !['movie', 'episode'].includes(type)) return null;
@@ -249,4 +258,4 @@ function historySearchResult(row) {
 }
 
 module.exports = { isEpisodeSession, sessionToJellyfin, userToJellyfin, libraryToJellyfin, itemToJellyfin,
-  seasonToJellyfin, episodeToJellyfin, versionToMediaSource, forEachLimited, historySearchResult };
+  seasonToJellyfin, episodeToJellyfin, versionToMediaSource, forEachLimited, historySearchResult, watchedSeconds };
