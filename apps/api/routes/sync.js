@@ -12,6 +12,7 @@ const triggertype = require("../logging/triggertype");
 
 const configClass = require("../classes/config");
 const API = require("../classes/api-loader");
+const { retryTransient } = require("../classes/silo/http");
 const TaskManager = require("../classes/task-manager-singleton");
 const TaskScheduler = require("../classes/task-scheduler-singleton");
 
@@ -115,7 +116,7 @@ async function syncUserData() {
 
   const _sync = new sync();
 
-  const data = await API.getUsers();
+  const data = await retryTransient(() => API.getUsers());
 
   const existingIds = await _sync.getExistingIDsforTable("jf_users"); // get existing user Ids from the db
 
@@ -654,13 +655,13 @@ async function scanSingleLibrary(library) {
   const wsMessage = "Scanning Library : " + library.Name;
   sendUpdate(syncTask.wsKey, { type: "Update", message: wsMessage });
 
-  let libraryItems = await API.getItemsFromParentId({
+  let libraryItems = await retryTransient(() => API.getItemsFromParentId({
     id: library.Id,
     ws: sendUpdate,
     syncTask,
     wsMessage,
     params: { startIndex, increment },
-  });
+  }));
 
   while (libraryItems.length !== 0) {
     const libraryItemsWithParent = libraryItems.map((item) => ({
@@ -701,13 +702,13 @@ async function scanSingleLibrary(library) {
     episodes = null;
     startIndex += increment;
 
-    libraryItems = await API.getItemsFromParentId({
+    libraryItems = await retryTransient(() => API.getItemsFromParentId({
       id: library.Id,
       ws: sendUpdate,
       syncTask,
       wsMessage,
       params: { startIndex, increment },
-    });
+    }));
   }
 
   sendUpdate(syncTask.wsKey, { type: "Update", message: "Data Fetched for Library : " + library.Name });
@@ -732,7 +733,7 @@ async function fullSync(triggertype) {
     //syncUserData
     await syncUserData();
 
-    let libraries = await API.getLibraries();
+    let libraries = await retryTransient(() => API.getLibraries());
     if (libraries.length === 0) {
       syncTask.loggedData.push({ Message: "Error: No Libararies found to sync." });
       await logging.updateLog(syncTask.uuid, syncTask.loggedData, taskstate.FAILED);
@@ -784,7 +785,7 @@ async function fullSync(triggertype) {
         message: wsMessage,
       });
 
-      let libraryItems = await API.getItemsFromParentId({
+      let libraryItems = await retryTransient(() => API.getItemsFromParentId({
         id: item.Id,
         ws: sendUpdate,
         syncTask: syncTask,
@@ -793,7 +794,7 @@ async function fullSync(triggertype) {
           startIndex: startIndex,
           increment: increment,
         },
-      });
+      }));
 
       while (libraryItems.length != 0) {
         if (libraryItems.length === 0 && startIndex === 0) {
@@ -849,7 +850,7 @@ async function fullSync(triggertype) {
 
         startIndex += increment;
 
-        libraryItems = await API.getItemsFromParentId({
+        libraryItems = await retryTransient(() => API.getItemsFromParentId({
           id: item.Id,
           ws: sendUpdate,
           syncTask: syncTask,
@@ -858,7 +859,7 @@ async function fullSync(triggertype) {
             startIndex: startIndex,
             increment: increment,
           },
-        });
+        }));
       }
 
       sendUpdate(syncTask.wsKey, { type: "Update", message: "Data Fetched for Library : " + item.Name });
@@ -946,7 +947,7 @@ async function partialSync(triggertype) {
       return { success: false, error: config.error };
     }
 
-    const libraries = await API.getLibraries();
+    const libraries = await retryTransient(() => API.getLibraries());
 
     if (libraries.length === 0) {
       syncTask.loggedData.push({ Message: "Error: No Libararies found to sync." });
@@ -1008,7 +1009,7 @@ async function partialSync(triggertype) {
 
       const wsMessage = "Syncing Library : " + library.Name + ` (${i + 1}/${filtered_libraries.length})`;
 
-      let libraryItems = await API.getItemsFromParentId({
+      let libraryItems = await retryTransient(() => API.getItemsFromParentId({
         id: library.Id,
         ws: sendUpdate,
         syncTask: syncTask,
@@ -1016,8 +1017,9 @@ async function partialSync(triggertype) {
         params: {
           startIndex: startIndex,
           increment: increment,
+          createdAfter: lastSyncDate,
         },
-      });
+      }));
 
       libraryItems = libraryItems.filter((item) => dayjs(item.DateCreated).isAfter(lastSyncDate));
 
@@ -1073,7 +1075,7 @@ async function partialSync(triggertype) {
 
         startIndex += increment;
 
-        libraryItems = await API.getItemsFromParentId({
+        libraryItems = await retryTransient(() => API.getItemsFromParentId({
           id: library.Id,
           ws: sendUpdate,
           syncTask: syncTask,
@@ -1081,8 +1083,9 @@ async function partialSync(triggertype) {
           params: {
             startIndex: startIndex,
             increment: increment,
+            createdAfter: lastSyncDate,
           },
-        });
+        }));
 
         libraryItems = libraryItems.filter((item) => dayjs(item.DateCreated).isAfter(lastSyncDate));
       }

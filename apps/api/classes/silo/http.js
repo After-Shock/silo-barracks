@@ -40,6 +40,9 @@ function statusError(status, headers, body) {
   if (status >= 300 && status < 400) return new SiloRequestError('Silo request refused redirect', status);
   if (status >= 200 && status < 300) return null;
   const error = new SiloRequestError(`Silo request failed (${status})`, status);
+  // Silo answers errors in JSON; a non-JSON body came from the gateway (e.g. Traefik while Silo restarts).
+  const contentType = typeof headers?.get === 'function' ? headers.get('content-type') : headers?.['content-type'];
+  error.gateway = !/json/i.test(String(contentType || ''));
   error.category = ({ 401: 'authentication_required', 403: 'permission_denied', 404: 'not_found',
     429: 'rate_limited', 503: 'dependency_unavailable' })[status] || 'upstream_error';
   if (body?.status === status && typeof body.type === 'string') {
@@ -142,4 +145,21 @@ async function requestJSON({ path, base, key, timeoutMs = 8000, apiMajor = 1, pr
   }
 }
 
-module.exports = { SiloRequestError, normalizeBase, requestJSON };
+function isTransientSiloError(error) {
+  if (['Silo request timed out', 'Unable to connect to Silo'].includes(error?.message)) return true;
+  if ([429, 502, 503, 504].includes(error?.status)) return true;
+  return error?.status === 404 && error.gateway === true;
+}
+
+// For long-running syncs: wait out a Silo restart or rate limit instead of failing the whole run.
+async function retryTransient(fn, { attempts = 20, delayMs = 15000, sleep = ms => new Promise(r => setTimeout(r, ms)) } = {}) {
+  for (let attempt = 1; ; attempt++) {
+    try { return await fn(); }
+    catch (error) {
+      if (attempt >= attempts || !isTransientSiloError(error)) throw error;
+      await sleep(Math.max(delayMs, error.retryAfterMs || 0));
+    }
+  }
+}
+
+module.exports = { SiloRequestError, normalizeBase, requestJSON, isTransientSiloError, retryTransient };

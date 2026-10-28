@@ -58,3 +58,39 @@ test('Problem Details map only known matching types and never retain private fie
     error => error.category === 'invalid_cursor' && !JSON.stringify(error).includes('private') && !error.message.includes('secret'));
   }
 });
+
+test('transient Silo errors cover restarts but not Silo-reported failures', async () => {
+  const { SiloRequestError, isTransientSiloError } = require('../classes/silo/http');
+  const fail = (status, contentType) => requestJSON({ base: 'https://silo.invalid', path: 'catalog', apiMajor: 1,
+    key: 'fixture', timeoutMs: 100, fetchImpl: async () => new Response(contentType ? '{"error":"not_found"}' : '404 page not found',
+      { status, headers: contentType ? { 'content-type': contentType } : {} }) }).catch(error => error);
+  assert.equal(isTransientSiloError(await fail(502)), true);
+  assert.equal(isTransientSiloError(await fail(404)), true, 'gateway 404 while Silo is recreated');
+  assert.equal(isTransientSiloError(await fail(404, 'application/json')), false, 'Silo says the item is gone');
+  assert.equal(isTransientSiloError(await fail(401, 'application/json')), false);
+  assert.equal(isTransientSiloError(new SiloRequestError('Unable to connect to Silo')), true);
+  assert.equal(isTransientSiloError(new SiloRequestError('Silo request failed (429)', 429)), true);
+});
+
+test('retryTransient rides out transient failures and rethrows everything else at once', async () => {
+  const { SiloRequestError, retryTransient } = require('../classes/silo/http');
+  const sleeps = [];
+  const sleep = async ms => { sleeps.push(ms); };
+  let calls = 0;
+  const value = await retryTransient(async () => {
+    if (++calls < 3) throw new SiloRequestError('Silo request failed (502)', 502);
+    return 'ok';
+  }, { attempts: 5, delayMs: 10, sleep });
+  assert.equal(value, 'ok');
+  assert.deepEqual(sleeps, [10, 10]);
+
+  calls = 0;
+  await assert.rejects(retryTransient(async () => { calls++; throw new SiloRequestError('Invalid Silo URL', 400); },
+    { attempts: 5, delayMs: 10, sleep }), /Invalid Silo URL/);
+  assert.equal(calls, 1);
+
+  calls = 0;
+  await assert.rejects(retryTransient(async () => { calls++; throw new SiloRequestError('Silo request failed (503)', 503); },
+    { attempts: 3, delayMs: 10, sleep }), /503/);
+  assert.equal(calls, 3);
+});

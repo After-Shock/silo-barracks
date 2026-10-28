@@ -10,6 +10,7 @@ const { summarizeLibraryPlays, storageNeedsRefresh, measureLibraryStorage } = re
 const createV1 = require('./silo/v1');
 const createV2 = require('./silo/v2');
 const { randomUUID } = require('node:crypto');
+const dayjs = require('dayjs');
 const fs = require('node:fs');
 const path = require('node:path');
 const { sessionCapabilities, supportedSession } = require('./silo/capabilities');
@@ -715,12 +716,14 @@ class SiloAPI {
     if (itemid !== undefined && itemid !== null) items = [await this._detail(itemid)];
     else items = await this._catalogSlice({ libraryId: id, startIndex: params.startIndex ?? 0,
       limit: params.increment ?? params.limit ?? 100 });
-    const result = items.map(row => itemToJellyfin(row, serverId));
+    let result = items.map(row => itemToJellyfin(row, serverId));
     for (const row of items.filter(item => String(item.type).toLowerCase() === 'series')) {
       const seasons = await this.getSeasons(row.content_id, false, row.title);
       result.push(...seasons);
       for (const season of seasons) result.push(...await this.getEpisodes({ SeriesId: row.content_id, SeasonId: season.Id }, false));
     }
+    // Partial syncs keep only new rows; filter before the per-item detail requests, not after.
+    if (params.createdAfter) result = result.filter(item => dayjs(item.DateCreated).isAfter(params.createdAfter));
     await forEachLimited(result, 6, item => this._attachMediaSources(item));
     if (ws && syncTask && wsMessage) ws(syncTask.wsKey, { type: 'Update', message: wsMessage });
     return result;

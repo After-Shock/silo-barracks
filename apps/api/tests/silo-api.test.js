@@ -444,3 +444,34 @@ test('maps detail versions for item info and resolves only catalog-owned image U
   assert.equal(await api.getImageUrl('https://evil.invalid/a', 'Primary'), null);
   assert.equal(detailCalls, 1, 'detail is reused from the bounded cache');
 });
+
+test('partial sync slices fetch item details only for rows created after the cutoff', async t => {
+  const details = [];
+  const fixture = await fixtureServer((req, res) => {
+    const url = new URL(req.url, 'http://fixture');
+    if (url.pathname.endsWith('/health')) return json(res, 200, { status: 'ok', server_id: 'server' });
+    if (url.pathname === '/proxy/api/v1/catalog') return json(res, 200, { total: 2, has_more: false, items: [
+      { content_id: 'movie-old', type: 'movie', title: 'Old', added_at: '2026-01-01T00:00:00Z' },
+      { content_id: 'series-1', type: 'series', title: 'Series', added_at: '2026-01-02T00:00:00Z' },
+    ] });
+    if (url.pathname.endsWith('/catalog/series/series-1/seasons')) return json(res, 200, { seasons: [
+      { content_id: 'season-1', season_number: 1, title: 'Season 1', air_date: '2026-01-03' },
+    ] });
+    if (url.pathname.endsWith('/seasons/1/episodes')) return json(res, 200, { episodes: [
+      { content_id: 'ep-old', season_number: 1, episode_number: 1, title: 'Old', air_date: '2026-01-03' },
+      { content_id: 'ep-new', season_number: 1, episode_number: 2, title: 'New', air_date: '2026-03-01' },
+    ] });
+    const item = url.pathname.match(/\/catalog\/items\/([^/]+)$/);
+    if (item) {
+      details.push(item[1]);
+      return json(res, 200, { content_id: item[1], type: 'episode', versions: [{ file_id: 7, duration: 60 }] });
+    }
+    json(res, 404, {});
+  });
+  t.after(fixture.close);
+  const rows = await apiFor(fixture.url).getItemsFromParentId({ id: 3,
+    params: { startIndex: 0, increment: 2, createdAfter: '2026-02-01T00:00:00Z' } });
+  assert.deepEqual(rows.map(row => row.Id), ['ep-new']);
+  assert.deepEqual(details, ['ep-new']);
+  assert.equal(rows[0].MediaSources[0].Id, '7');
+});
