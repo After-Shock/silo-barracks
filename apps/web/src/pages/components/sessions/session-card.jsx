@@ -330,7 +330,11 @@ function SessionCard(props) {
       aria-label={`Open session details for ${title}`}
     >
       <div className="card-device-image-overlay">
-        {isSilo ? <img className="card-device-image" src={siloIcon} alt="Silo" /> : <PlatformIcon
+        {session.SiloJellyfinCompat ? (
+          <Tooltip title="Connected through Silo's Jellyfin compatibility layer">
+            <span><PlatformIcon className="card-device-image" client="jellyfin" /></span>
+          </Tooltip>
+        ) : isSilo ? <img className="card-device-image" src={siloIcon} alt="Silo" /> : <PlatformIcon
           className="card-device-image"
           client={props.data.session.Client}
           deviceName={props.data.session.DeviceName}
@@ -416,6 +420,7 @@ function SessionCard(props) {
                 <strong>{clientLabel}</strong>
               </div>
             </div>
+            {session.SiloJellyfinCompat ? <SessionDetailItem label="Connection" value="Jellyfin compatibility" /> : null}
             {transcodeReason ? <SessionDetailItem label="Transcode reason" value={transcodeReason} wide /> : null}
             {!hideIpAddress ? <SessionDetailItem label="IP address" value={session.RemoteEndPoint} /> : null}
             <SessionDetailItem label="Container" value={nowPlaying.ContainerStream} />

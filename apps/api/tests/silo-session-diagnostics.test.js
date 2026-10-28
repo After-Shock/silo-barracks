@@ -28,6 +28,8 @@ test('diagnostics preserve routing, client and source/target values without priv
   assert.equal(session.SiloDiagnostics.sourceAudioChannels, 6);
   assert.ok(!JSON.stringify(session).includes('do-not-copy'));
   assert.equal(session.PlayState.PlayMethod, 'Future-Format');
+  assert.equal(session.SiloJellyfinCompat, false);
+  assert.equal(sessionToJellyfin({ session_id: 'j', user_id: 'u', is_jellyfin_client: true }, null, 'server').SiloJellyfinCompat, true);
 });
 
 test('transcode reasons are derived only from Silo decisions and requested targets', () => {

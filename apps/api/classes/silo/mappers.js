@@ -122,6 +122,7 @@ function sessionToJellyfin(row, detail, serverId) {
     DeviceId: row.device_id ? String(row.device_id) : `silo-session:${row.session_id}`,
     ApplicationVersion: row.client_version || '', RemoteEndPoint: row.client_ip || '',
     ServerId: serverId || '', NowPlayingItem: item, SiloPosterUrl: poster || undefined,
+    SiloJellyfinCompat: row.is_jellyfin_client === true,
     PlayState: { IsPaused: Boolean(row.is_paused), PositionTicks: ticks(row.position_seconds), PlayMethod: method,
       AudioStreamIndex: streams.findIndex(stream => stream.Type === 'Audio'), SubtitleStreamIndex: -1 },
     TranscodingInfo: transcoding,
