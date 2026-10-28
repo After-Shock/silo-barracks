@@ -84,11 +84,12 @@ test('optional health and episode lookups do not stack full request timeouts', a
     // Both optional endpoints hang until their request is aborted.
   });
   t.after(fixture.close);
-  const api = apiFor(fixture.url, 'test', { timeoutMs: 300, enrichmentTimeoutMs: 40 });
+  // A full timeout far above the bound keeps a regression (>=1000ms) distinct from scheduler noise.
+  const api = apiFor(fixture.url, 'test', { timeoutMs: 1000, enrichmentTimeoutMs: 40 });
   const start = Date.now();
   const rows = await api.getSessions();
   assert.equal(rows.length, 1);
-  assert.ok(Date.now() - start < 200, 'optional enrichment must have a short, parallel budget');
+  assert.ok(Date.now() - start < 500, 'optional enrichment must have a short, parallel budget');
 });
 
 test('minimal direct sessions keep frontend-accessed string fields safe', () => {
