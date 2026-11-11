@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Button, Modal } from "react-bootstrap";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { RiMagicLine, RiMailLine, RiMovie2Line, RiPaletteLine, RiSpeedLine, RiUploadCloud2Line } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 import { APP_VERSION_STORAGE_KEY, OPEN_WHATS_NEW_EVENT } from "../../../lib/events";
@@ -98,8 +99,21 @@ export default function WhatsNewModal({ enabled = true }) {
   const notes = getNotes(version);
 
   return (
-    <Modal show={show} onHide={closeModal} centered dialogClassName="whats-new-modal">
-      <Modal.Body>
+    <Dialog
+      open={show}
+      onOpenChange={(open) => {
+        if (!open) {
+          closeModal();
+        }
+      }}
+    >
+      <DialogContent
+        className="whats-new-modal tw:max-w-[min(920px,calc(100vw-28px))] tw:sm:max-w-[min(920px,calc(100vw-28px))]"
+        showCloseButton={false}
+      >
+        <DialogTitle className="tw:sr-only">What&apos;s new</DialogTitle>
+        <DialogDescription className="tw:sr-only">The newest Silo Barracks changes</DialogDescription>
+        <div className="whats-new-body">
         <button type="button" className="whats-new-close" onClick={closeModal} aria-label="Close what's new">
           ×
         </button>
@@ -130,7 +144,8 @@ export default function WhatsNewModal({ enabled = true }) {
             Got it
           </Button>
         </div>
-      </Modal.Body>
-    </Modal>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

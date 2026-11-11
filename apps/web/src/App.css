@@ -195,19 +195,16 @@ h2 {
 }
 
 .whats-new-modal {
-  --bs-modal-width: min(920px, calc(100vw - 28px));
-}
-
-.whats-new-modal .modal-content {
   overflow: hidden;
-  border: 1px solid var(--barracks-border-raised);
-  border-radius: 12px;
-  background: var(--barracks-surface-raised);
+  border: 1px solid var(--barracks-border-raised) !important;
+  border-radius: 12px !important;
+  background: var(--barracks-surface-raised) !important;
   color: var(--barracks-text-raised);
-  box-shadow: var(--barracks-shadow);
+  box-shadow: var(--barracks-shadow) !important;
+  padding: 0 !important;
 }
 
-.whats-new-modal .modal-body {
+.whats-new-body {
   position: relative;
   display: grid;
   gap: 14px;
@@ -312,10 +309,6 @@ h2 {
 }
 
 @media (max-width: 720px) {
-  .whats-new-modal {
-    --bs-modal-width: calc(100vw - 18px);
-  }
-
   .whats-new-list {
     grid-template-columns: 1fr;
     max-height: 56vh;
