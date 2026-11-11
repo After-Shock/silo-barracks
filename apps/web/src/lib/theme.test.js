@@ -118,8 +118,16 @@ function createStorage(initial = {}, { getItem, setItem, removeItem } = {}) {
 
 function createRoot(log = []) {
   const values = new Map();
+  const classes = new Set();
   return {
     log,
+    classList: {
+      classes,
+      toggle(name, force) {
+        if (force) classes.add(name);
+        else classes.delete(name);
+      },
+    },
     style: {
       colorScheme: "",
       values,
@@ -759,6 +767,18 @@ test("applyTheme chooses a matching color scheme for dark and light canvases", (
     storage: createStorage(),
   });
   assert.equal(lightRoot.style.colorScheme, "light");
+});
+
+test("applyTheme toggles the .dark class used by Tailwind dark: variants", () => {
+  const root = createRoot();
+  applyTheme(DEFAULT_THEME, { root, storage: createStorage() });
+  assert.equal(root.classList.classes.has("dark"), true);
+
+  applyTheme({ primary: "#123456", secondary: "#654321", background: "#ffffff", surface: "#f0f0f0" }, {
+    root,
+    storage: createStorage(),
+  });
+  assert.equal(root.classList.classes.has("dark"), false);
 });
 
 test("saveTheme applies before emitting the resolved Barracks theme event", () => {

@@ -483,7 +483,10 @@ function writeThemeToRoot(root, tokens) {
     return;
   }
   const values = getCssPropertyValues(tokens);
-  root.style.colorScheme = tokens.text === TEXT_DARK ? "light" : "dark";
+  const isLight = tokens.text === TEXT_DARK;
+  root.style.colorScheme = isLight ? "light" : "dark";
+  // Drives Tailwind `dark:` variants for shadcn components.
+  root.classList?.toggle("dark", !isLight);
   for (const [property, value] of Object.entries(values)) {
     root.style.setProperty(property, value);
   }

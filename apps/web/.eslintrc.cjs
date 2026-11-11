@@ -22,5 +22,12 @@ module.exports = {
       "warn",
       { allowConstantExport: true }
     ]
-  }
+  },
+  overrides: [
+    {
+      // shadcn/ui primitives export cva variant helpers next to components.
+      files: ["src/components/ui/**/*.{js,jsx}"],
+      rules: { "react-refresh/only-export-components": "off" }
+    }
+  ]
 };

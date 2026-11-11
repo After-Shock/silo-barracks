@@ -752,6 +752,26 @@ function scanGradientViolations(source, extension) {
   return occurrences;
 }
 
+// Tailwind (tw: prefix) color utilities that bypass the semantic tokens:
+// built-in palette colors (tw:text-red-500, tw:bg-black/50) and arbitrary
+// literals (tw:bg-[#ff0000], tw:border-[rgb(1,2,3)]). Token-backed utilities
+// such as tw:bg-primary or tw:text-muted-foreground stay allowed.
+const TAILWIND_COLOR_UTILITY = "(?:bg|text|border(?:-[xytrblse])?|ring|ring-offset|outline|fill|stroke|from|via|to|decoration|shadow|inset-shadow|inset-ring|accent|caret|divide|placeholder)";
+const TAILWIND_PALETTE = "(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone|taupe|mauve|mist|olive|white|black)";
+const TAILWIND_COLOR_CLASS = new RegExp(
+  `tw:(?:[a-z0-9@*\\[\\]&=_-]+:)*!?${TAILWIND_COLOR_UTILITY}-(?:${TAILWIND_PALETTE}(?:-\\d{2,3})?(?![a-z0-9-])|\\[(?:#|rgba?\\(|hsla?\\(|hwb\\(|oklch\\(|oklab\\(|lab\\(|lch\\(|color\\()[^\\]\\s]*\\])(?:\\/[\\w.\\[\\]%]+)?`,
+  "g",
+);
+
+function scanTailwindColorClasses(source, extension) {
+  if (extension === ".css") return [];
+  const occurrences = [];
+  for (const match of source.matchAll(TAILWIND_COLOR_CLASS)) {
+    occurrences.push({ start: match.index, end: match.index + match[0].length, value: match[0], isTailwind: true });
+  }
+  return occurrences;
+}
+
 function loadExceptions(root) {
   const file = path.join(root, "apps/web/theme-color-exceptions.json");
   if (!fs.existsSync(file)) return [];
@@ -809,7 +829,11 @@ function auditSources({ root = process.cwd(), files, exceptions } = {}) {
     const source = fs.readFileSync(file, "utf8");
     const extension = path.extname(file).toLowerCase();
     const variablesFile = path.basename(file).toLowerCase() === "variables.css";
-    const occurrences = [...scanColors(source, extension), ...scanGradientViolations(source, extension)];
+    const occurrences = [
+      ...scanColors(source, extension),
+      ...scanGradientViolations(source, extension),
+      ...scanTailwindColorClasses(source, extension),
+    ];
     const starts = lineStarts(source);
     const maskedSource = variablesFile ? maskComments(source, extension) : null;
     for (const occurrence of occurrences) {
@@ -824,8 +848,10 @@ function auditSources({ root = process.cwd(), files, exceptions } = {}) {
         column: position.column,
         value: occurrence.value,
         property,
-        message: occurrence.isGradient
-          ? `Gradient ${occurrence.value} contains literal color stops or non-Barracks variables; use only --barracks-* semantic tokens.`
+        message: occurrence.isTailwind
+          ? `Tailwind color class ${occurrence.value} bypasses the theme; use a token utility (tw:bg-primary, tw:text-muted-foreground, tw:bg-live...) backed by --barracks-* variables.`
+          : occurrence.isGradient
+          ?`Gradient ${occurrence.value} contains literal color stops or non-Barracks variables; use only --barracks-* semantic tokens.`
           : variablesFile
           ? `Color literal ${occurrence.value} is not allowed in variables.css declaration ${property || "<unknown>"}; use an approved semantic token declaration.`
           : `Color literal ${occurrence.value} is not allowed; use a --barracks-* semantic token or an approved exact exception.`,

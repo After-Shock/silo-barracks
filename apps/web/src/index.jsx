@@ -11,6 +11,8 @@ import "./pages/css/framework-theme.css";
 import "./pages/css/width_breakpoint_css.css";
 import "./pages/css/radius_breakpoint_css.css";
 import "./pages/css/barracks.css";
+// Tailwind + shadcn bridge must load after Bootstrap and legacy CSS.
+import "./styles/shadcn-bridge.css";
 
 import i18n from "i18next";
 import Backend from "i18next-http-backend";
