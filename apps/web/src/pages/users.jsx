@@ -16,7 +16,16 @@ import PriceTag3LineIcon from "remixicon-react/PriceTag3LineIcon";
 import UserAddLineIcon from "remixicon-react/UserAddLineIcon";
 import UserSettingsLineIcon from "remixicon-react/UserSettingsLineIcon";
 import ShieldKeyholeLineIcon from "remixicon-react/ShieldKeyholeLineIcon";
-import { Alert, Badge, Button, ButtonGroup, Form, FormControl, FormSelect, Modal, Spinner } from "react-bootstrap";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { Spinner } from "@/components/ui/spinner";
+import { Switch } from "@/components/ui/switch";
 
 import "./css/users/users.css";
 
@@ -499,25 +508,25 @@ export default function Users() {
   function renderRoleControl(user) {
     if (user.IsLocalAccount && !user.IsPrimaryLocal) {
       return (
-        <FormSelect className="users-role-select" value={user.Role} onChange={(event) => changeLocalRole(user.LocalUser, event.target.value)} disabled={savingUserId === `local-${user.LocalUser.id}`}>
+        <NativeSelect className="users-role-select" value={user.Role} onChange={(event) => changeLocalRole(user.LocalUser, event.target.value)} disabled={savingUserId === `local-${user.LocalUser.id}`}>
           {access.roles.map((role) => (
-            <option key={role} value={role}>
+            <NativeSelectOption key={role} value={role}>
               {role}
-            </option>
+            </NativeSelectOption>
           ))}
-        </FormSelect>
+        </NativeSelect>
       );
     }
 
     if (user.Source === "Jellyfin") {
       return (
-        <FormSelect className="users-role-select" value={user.Role} onChange={(event) => changeJellyfinRole(user.UserId, event.target.value)} disabled={savingUserId === user.UserId}>
+        <NativeSelect className="users-role-select" value={user.Role} onChange={(event) => changeJellyfinRole(user.UserId, event.target.value)} disabled={savingUserId === user.UserId}>
           {access.roles.map((role) => (
-            <option key={role} value={role}>
+            <NativeSelectOption key={role} value={role}>
               {role}
-            </option>
+            </NativeSelectOption>
           ))}
-        </FormSelect>
+        </NativeSelect>
       );
     }
 
@@ -528,13 +537,14 @@ export default function Users() {
     if (user.Source === "Jellyfin") {
       return (
         <Button
+          variant="ghost"
           className={`users-track-button ${user.Tracked ? "is-tracked" : ""}`}
           type="button"
           onClick={() => toggleTrackedState(user.UserId)}
           disabled={savingUserId === user.UserId}
           title={user.Tracked ? "Hide user" : "Unhide user"}
         >
-          {savingUserId === user.UserId ? <Spinner size="sm" animation="border" /> : user.Tracked ? <EyeLineIcon size={20} /> : <EyeOffLineIcon size={20} />}
+          {savingUserId === user.UserId ? <Spinner className="tw:size-4" /> : user.Tracked ? <EyeLineIcon size={20} /> : <EyeOffLineIcon size={20} />}
         </Button>
       );
     }
@@ -554,6 +564,7 @@ export default function Users() {
           {!user.IsPrimaryLocal ? (
             <Button
               type="button"
+              variant="destructive"
               className="users-row-action-button is-danger"
               title="Delete local user"
               aria-label={`Delete ${user.UserName}`}
@@ -587,11 +598,11 @@ export default function Users() {
           </div>
         </div>
         <div className="users-header-actions">
-          <Button className="users-primary-action" onClick={() => setShowUsersManager(true)}>
+          <Button type="button" className="users-primary-action" onClick={() => setShowUsersManager(true)}>
             <UserAddLineIcon size={17} />
             Add Users
           </Button>
-          <Button className="users-primary-action" onClick={() => setShowRolesManager(true)}>
+          <Button type="button" className="users-primary-action" onClick={() => setShowRolesManager(true)}>
             <PriceTag3LineIcon size={17} />
             Roles
           </Button>
@@ -599,8 +610,11 @@ export default function Users() {
       </section>
 
       {alert && (
-        <Alert variant={alert.variant} onClose={() => setAlert(null)} dismissible>
-          {alert.message}
+        <Alert variant={alert.variant === "danger" ? "destructive" : alert.variant === "success" ? "success" : "default"} className="users-alert">
+          <AlertDescription>{alert.message}</AlertDescription>
+          <button type="button" className="users-alert-close" aria-label="Close alert" onClick={() => setAlert(null)}>
+            <CloseFillIcon size={16} />
+          </button>
         </Alert>
       )}
 
@@ -645,23 +659,23 @@ export default function Users() {
               </div>
               <div className="users-search">
                 <SearchLineIcon size={17} />
-                <FormControl type="text" placeholder="Search users, media, clients" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} />
+                <Input type="text" placeholder="Search users, media, clients" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} />
               </div>
-              <FormSelect value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}>
-                <option value="All">All roles</option>
+              <NativeSelect value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}>
+                <NativeSelectOption value="All">All roles</NativeSelectOption>
                 {access.roles.map((role) => (
-                  <option key={role} value={role}>
+                  <NativeSelectOption key={role} value={role}>
                     {role}
-                  </option>
+                  </NativeSelectOption>
                 ))}
-              </FormSelect>
-              <FormSelect value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value)}>
-                <option value="All">All accounts</option>
-                <option value="Jellyfin">{config.IS_SILO ? 'Silo' : 'Media server'}</option>
-                <option value="OIDC">OIDC</option>
-                <option value="Local">Local</option>
-              </FormSelect>
-              <FormSelect
+              </NativeSelect>
+              <NativeSelect value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value)}>
+                <NativeSelectOption value="All">All accounts</NativeSelectOption>
+                <NativeSelectOption value="Jellyfin">{config.IS_SILO ? 'Silo' : 'Media server'}</NativeSelectOption>
+                <NativeSelectOption value="OIDC">OIDC</NativeSelectOption>
+                <NativeSelectOption value="Local">Local</NativeSelectOption>
+              </NativeSelect>
+              <NativeSelect
                 value={rowsPerPage}
                 onChange={(event) => {
                   const value = parseInt(event.target.value);
@@ -670,12 +684,12 @@ export default function Users() {
                   setPage(0);
                 }}
               >
-                <option value="10">10 rows</option>
-                <option value="25">25 rows</option>
-                <option value="50">50 rows</option>
-              </FormSelect>
+                <NativeSelectOption value="10">10 rows</NativeSelectOption>
+                <NativeSelectOption value="25">25 rows</NativeSelectOption>
+                <NativeSelectOption value="50">50 rows</NativeSelectOption>
+              </NativeSelect>
               <label className="users-hidden-toggle">
-                <Form.Check type="switch" checked={showHiddenUsers} onChange={(event) => updateShowHiddenUsers(event.target.checked)} />
+                <Switch checked={showHiddenUsers} onCheckedChange={(checked) => updateShowHiddenUsers(checked)} />
                 <span>Show hidden</span>
                 <small>{hiddenUserCount}</small>
               </label>
@@ -751,17 +765,17 @@ export default function Users() {
             <span>
               {filteredRows.length ? page * rowsPerPage + 1 : 0}-{Math.min(page * rowsPerPage + rowsPerPage, filteredRows.length)} of {filteredRows.length}
             </span>
-            <ButtonGroup>
-              <Button onClick={() => setPage(0)} disabled={page === 0}>
+            <div className="users-pagination-buttons" role="group">
+              <Button type="button" onClick={() => setPage(0)} disabled={page === 0}>
                 First
               </Button>
-              <Button onClick={() => setPage((currentPage) => Math.max(currentPage - 1, 0))} disabled={page === 0}>
+              <Button type="button" onClick={() => setPage((currentPage) => Math.max(currentPage - 1, 0))} disabled={page === 0}>
                 Previous
               </Button>
-              <Button onClick={() => setPage((currentPage) => currentPage + 1)} disabled={page >= Math.ceil(filteredRows.length / rowsPerPage) - 1}>
+              <Button type="button" onClick={() => setPage((currentPage) => currentPage + 1)} disabled={page >= Math.ceil(filteredRows.length / rowsPerPage) - 1}>
                 Next
               </Button>
-            </ButtonGroup>
+            </div>
           </div>
         </div>
 
@@ -771,7 +785,7 @@ export default function Users() {
               <h2>Permissions</h2>
               <p>Role access is saved to the backend and checked on protected API routes.</p>
             </div>
-            <Button className="users-primary-action" onClick={() => setShowRolesManager(true)}>
+            <Button type="button" className="users-primary-action" onClick={() => setShowRolesManager(true)}>
               <PriceTag3LineIcon size={17} />
               Roles
             </Button>
@@ -779,13 +793,13 @@ export default function Users() {
 
           <div className="users-role-selector">
             <span>Editing role</span>
-            <FormSelect value={previewRole} onChange={(event) => setPreviewRole(event.target.value)}>
+            <NativeSelect value={previewRole} onChange={(event) => setPreviewRole(event.target.value)}>
               {access.roles.map((role) => (
-                <option key={role} value={role}>
+                <NativeSelectOption key={role} value={role}>
                   {role}
-                </option>
+                </NativeSelectOption>
               ))}
-            </FormSelect>
+            </NativeSelect>
           </div>
 
           <div className="users-permission-editor">
@@ -795,11 +809,10 @@ export default function Users() {
                   <strong>{permission.label}</strong>
                   <small>{permission.detail}</small>
                 </span>
-                <Form.Check
-                  type="switch"
+                <Switch
                   checked={Boolean(selectedRolePermissions[permission.key])}
                   disabled={selectedRoleLocked}
-                  onChange={(event) => updateRolePermission(previewRole, permission.key, event.target.checked)}
+                  onCheckedChange={(checked) => updateRolePermission(previewRole, permission.key, checked)}
                   aria-label={`${permission.label} permission for ${previewRole}`}
                 />
               </label>
@@ -814,17 +827,19 @@ export default function Users() {
         </aside>
       </section>
 
-      <Modal show={showUsersManager} onHide={() => setShowUsersManager(false)} centered size="lg" contentClassName="users-modal users-manager-modal">
-        <Modal.Header closeButton>
-          <Modal.Title>Local Users</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+      <Dialog open={showUsersManager} onOpenChange={(open) => !open && setShowUsersManager(false)}>
+        <DialogContent className="users-modal users-manager-modal users-dialog tw:max-w-[800px] tw:sm:max-w-[800px]" closeClassName="users-dialog-close">
+        <DialogHeader className="users-modal-header">
+          <DialogTitle asChild><h5 className="users-modal-title">Local Users</h5></DialogTitle>
+          <DialogDescription className="tw:sr-only">Local Users</DialogDescription>
+        </DialogHeader>
+        <div className="users-modal-body">
           <div className="users-modal-topline">
             <div>
               <strong>Silo Barracks accounts</strong>
               <span>{(access.localUsers?.length || 0) + (access.primaryLocalUser ? 1 : 0)} accounts</span>
             </div>
-            <Button className="users-primary-action" onClick={() => setShowAddUser(true)}>
+            <Button type="button" className="users-primary-action" onClick={() => setShowAddUser(true)}>
               <UserAddLineIcon size={17} />
               Add User
             </Button>
@@ -838,7 +853,7 @@ export default function Users() {
                   <span>Primary local account</span>
                 </div>
                 <Badge className="users-role-badge role-owner">Owner</Badge>
-                <Button variant="outline-primary" onClick={() => setResetTarget({ primary: true, username: access.primaryLocalUser })}>
+                <Button type="button" variant="outline" onClick={() => setResetTarget({ primary: true, username: access.primaryLocalUser })}>
                   Reset
                 </Button>
               </article>
@@ -850,18 +865,18 @@ export default function Users() {
                   <strong>{user.username}</strong>
                   <span>Local Silo Barracks user</span>
                 </div>
-                <FormSelect value={user.role} onChange={(event) => changeLocalRole(user, event.target.value)}>
+                <NativeSelect value={user.role} onChange={(event) => changeLocalRole(user, event.target.value)}>
                   {access.roles.map((role) => (
-                    <option key={role} value={role}>
+                    <NativeSelectOption key={role} value={role}>
                       {role}
-                    </option>
+                    </NativeSelectOption>
                   ))}
-                </FormSelect>
+                </NativeSelect>
                 <div className="local-user-actions">
-                  <Button variant="outline-primary" onClick={() => setResetTarget(user)}>
+                  <Button type="button" variant="outline" onClick={() => setResetTarget(user)}>
                     Reset
                   </Button>
-                  <Button variant="outline-danger" onClick={() => setDeleteTarget(user)}>
+                  <Button type="button" variant="destructive" onClick={() => setDeleteTarget(user)}>
                     Remove
                   </Button>
                 </div>
@@ -870,20 +885,23 @@ export default function Users() {
           </div>
 
           {!access.localUsers.length && <div className="users-empty-state">No extra local users yet.</div>}
-        </Modal.Body>
-      </Modal>
+        </div>
+      </DialogContent>
+      </Dialog>
 
-      <Modal show={showRolesManager} onHide={() => setShowRolesManager(false)} centered size="lg" contentClassName="users-modal users-manager-modal">
-        <Modal.Header closeButton>
-          <Modal.Title>Roles</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+      <Dialog open={showRolesManager} onOpenChange={(open) => !open && setShowRolesManager(false)}>
+        <DialogContent className="users-modal users-manager-modal users-dialog tw:max-w-[800px] tw:sm:max-w-[800px]" closeClassName="users-dialog-close">
+        <DialogHeader className="users-modal-header">
+          <DialogTitle asChild><h5 className="users-modal-title">Roles</h5></DialogTitle>
+          <DialogDescription className="tw:sr-only">Roles</DialogDescription>
+        </DialogHeader>
+        <div className="users-modal-body">
           <div className="users-modal-topline">
             <div>
               <strong>Role permissions</strong>
               <span>{access.roles.length} roles</span>
             </div>
-            <Button className="users-primary-action" onClick={() => setShowAddRole(true)}>
+            <Button type="button" className="users-primary-action" onClick={() => setShowAddRole(true)}>
               <PriceTag3LineIcon size={17} />
               Add New Role
             </Button>
@@ -892,13 +910,13 @@ export default function Users() {
           <div className="role-preview-panel">
             <div>
               <strong>Preview as</strong>
-              <FormSelect value={previewRole} onChange={(event) => setPreviewRole(event.target.value)}>
+              <NativeSelect value={previewRole} onChange={(event) => setPreviewRole(event.target.value)}>
                 {access.roles.map((role) => (
-                  <option key={role} value={role}>
+                  <NativeSelectOption key={role} value={role}>
                     {role}
-                  </option>
+                  </NativeSelectOption>
                 ))}
-              </FormSelect>
+              </NativeSelect>
             </div>
             <div className="role-preview-grid">
               {PERMISSION_DEFINITIONS.map((permission) => (
@@ -924,96 +942,107 @@ export default function Users() {
                   </div>
                   <div className="permission-toggle-grid">
                     {PERMISSION_DEFINITIONS.map((permission) => (
-                      <Form.Check
-                        key={permission.key}
-                        type="switch"
-                        id={`role-${role}-${permission.key}`}
-                        label={permission.label}
-                        checked={Boolean(access.rolePermissions?.[role]?.[permission.key])}
-                        disabled={LOCKED_PERMISSION_ROLES.has(role)}
-                        onChange={(event) => updateRolePermission(role, permission.key, event.target.checked)}
-                      />
+                      <div className="permission-toggle" key={permission.key}>
+                        <Switch
+                          id={`role-${role}-${permission.key}`}
+                          checked={Boolean(access.rolePermissions?.[role]?.[permission.key])}
+                          disabled={LOCKED_PERMISSION_ROLES.has(role)}
+                          onCheckedChange={(checked) => updateRolePermission(role, permission.key, checked)}
+                        />
+                        <Label htmlFor={`role-${role}-${permission.key}`}>{permission.label}</Label>
+                      </div>
                     ))}
                   </div>
                 </article>
               ))}
             </div>
           </div>
-        </Modal.Body>
-      </Modal>
+        </div>
+      </DialogContent>
+      </Dialog>
 
-      <Modal show={showAddUser} onHide={() => setShowAddUser(false)} centered contentClassName="users-modal">
-        <Form onSubmit={addLocalUser}>
-          <Modal.Header closeButton>
-            <Modal.Title>Add local user</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form.Group className="mb-3">
-              <Form.Label>Username</Form.Label>
-              <Form.Control value={newLocalUser.username} onChange={(event) => setNewLocalUser({ ...newLocalUser, username: event.target.value })} required />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
+      <Dialog open={showAddUser} onOpenChange={(open) => !open && setShowAddUser(false)}>
+        <DialogContent className="users-modal users-dialog tw:max-w-[500px] tw:sm:max-w-[500px]" closeClassName="users-dialog-close">
+          <form onSubmit={addLocalUser}>
+          <DialogHeader className="users-modal-header">
+            <DialogTitle asChild><h5 className="users-modal-title">Add local user</h5></DialogTitle>
+            <DialogDescription className="tw:sr-only">Add local user</DialogDescription>
+          </DialogHeader>
+          <div className="users-modal-body">
+            <div className="mb-3">
+              <Label htmlFor="users-new-local-username" className="users-form-label">Username</Label>
+              <Input id="users-new-local-username" value={newLocalUser.username} onChange={(event) => setNewLocalUser({ ...newLocalUser, username: event.target.value })} required />
+            </div>
+            <div className="mb-3">
+              <Label htmlFor="users-new-local-password" className="users-form-label">Password</Label>
+              <Input
+                id="users-new-local-password"
                 type="password"
                 minLength={6}
                 value={newLocalUser.password}
                 onChange={(event) => setNewLocalUser({ ...newLocalUser, password: event.target.value })}
                 required
               />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Role</Form.Label>
-              <FormSelect value={newLocalUser.role} onChange={(event) => setNewLocalUser({ ...newLocalUser, role: event.target.value })}>
+            </div>
+            <div>
+              <Label htmlFor="users-new-local-role" className="users-form-label">Role</Label>
+              <NativeSelect id="users-new-local-role" value={newLocalUser.role} onChange={(event) => setNewLocalUser({ ...newLocalUser, role: event.target.value })}>
                 {access.roles.map((role) => (
-                  <option key={role} value={role}>
+                  <NativeSelectOption key={role} value={role}>
                     {role}
-                  </option>
+                  </NativeSelectOption>
                 ))}
-              </FormSelect>
-            </Form.Group>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="outline-secondary" onClick={() => setShowAddUser(false)}>
+              </NativeSelect>
+            </div>
+          </div>
+          <DialogFooter className="users-modal-footer">
+            <Button type="button" variant="secondary" onClick={() => setShowAddUser(false)}>
               Cancel
             </Button>
             <Button type="submit" className="users-primary-action">
               Add User
             </Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+          </DialogFooter>
+        </form>
+        </DialogContent>
+      </Dialog>
 
-      <Modal show={showAddRole} onHide={() => setShowAddRole(false)} centered contentClassName="users-modal">
-        <Form onSubmit={addRole}>
-          <Modal.Header closeButton>
-            <Modal.Title>Add new role</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form.Group>
-              <Form.Label>Role name</Form.Label>
-              <Form.Control value={newRole} onChange={(event) => setNewRole(event.target.value)} placeholder="Technician, Family, Read only..." required />
-            </Form.Group>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="outline-secondary" onClick={() => setShowAddRole(false)}>
+      <Dialog open={showAddRole} onOpenChange={(open) => !open && setShowAddRole(false)}>
+        <DialogContent className="users-modal users-dialog tw:max-w-[500px] tw:sm:max-w-[500px]" closeClassName="users-dialog-close">
+          <form onSubmit={addRole}>
+          <DialogHeader className="users-modal-header">
+            <DialogTitle asChild><h5 className="users-modal-title">Add new role</h5></DialogTitle>
+            <DialogDescription className="tw:sr-only">Add new role</DialogDescription>
+          </DialogHeader>
+          <div className="users-modal-body">
+            <div>
+              <Label htmlFor="users-new-role-name" className="users-form-label">Role name</Label>
+              <Input id="users-new-role-name" value={newRole} onChange={(event) => setNewRole(event.target.value)} placeholder="Technician, Family, Read only..." required />
+            </div>
+          </div>
+          <DialogFooter className="users-modal-footer">
+            <Button type="button" variant="secondary" onClick={() => setShowAddRole(false)}>
               Cancel
             </Button>
             <Button type="submit" className="users-primary-action" disabled={!newRole.trim()}>
               Add New Role
             </Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+          </DialogFooter>
+        </form>
+        </DialogContent>
+      </Dialog>
 
-      <Modal show={!!resetTarget} onHide={() => setResetTarget(null)} centered contentClassName="users-modal">
-        <Form onSubmit={submitPasswordReset}>
-          <Modal.Header closeButton>
-            <Modal.Title>Reset password</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
+      <Dialog open={!!resetTarget} onOpenChange={(open) => !open && setResetTarget(null)}>
+        <DialogContent className="users-modal users-dialog tw:max-w-[500px] tw:sm:max-w-[500px]" closeClassName="users-dialog-close">
+          <form onSubmit={submitPasswordReset}>
+          <DialogHeader className="users-modal-header">
+            <DialogTitle asChild><h5 className="users-modal-title">Reset password</h5></DialogTitle>
+            <DialogDescription className="tw:sr-only">Reset password</DialogDescription>
+          </DialogHeader>
+          <div className="users-modal-body">
             <p className="users-modal-copy">Set a new local password for {resetTarget?.username}.</p>
-            <Form.Control
+            <Input
+              aria-label="New password"
               type="password"
               minLength={6}
               value={resetPassword}
@@ -1021,36 +1050,39 @@ export default function Users() {
               placeholder="New password"
               required
             />
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="outline-secondary" onClick={() => setResetTarget(null)}>
+          </div>
+          <DialogFooter className="users-modal-footer">
+            <Button type="button" variant="secondary" onClick={() => setResetTarget(null)}>
               Cancel
             </Button>
             <Button type="submit" className="users-primary-action">
               Reset Password
             </Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+          </DialogFooter>
+        </form>
+        </DialogContent>
+      </Dialog>
 
-      <Modal show={!!deleteTarget} onHide={() => setDeleteTarget(null)} centered contentClassName="users-modal">
-        <Modal.Header closeButton>
-          <Modal.Title>Delete local user</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p className="users-modal-copy">
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent className="users-modal users-dialog tw:max-w-[500px] tw:sm:max-w-[500px]">
+        <AlertDialogHeader className="users-modal-header">
+          <AlertDialogTitle asChild><h5 className="users-modal-title">Delete local user</h5></AlertDialogTitle>
+        </AlertDialogHeader>
+        <div className="users-modal-body">
+          <AlertDialogDescription className="users-modal-copy">
             Delete {deleteTarget?.username}? This removes the local Silo Barracks account only.
-          </p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="outline-secondary" onClick={() => setDeleteTarget(null)}>
+          </AlertDialogDescription>
+        </div>
+        <AlertDialogFooter className="users-modal-footer">
+          <AlertDialogCancel variant="secondary">
             Cancel
-          </Button>
-          <Button variant="danger" onClick={() => removeLocalUser(deleteTarget)}>
+          </AlertDialogCancel>
+          <Button type="button" variant="destructive" onClick={() => removeLocalUser(deleteTarget)}>
             Delete User
           </Button>
-        </Modal.Footer>
-      </Modal>
+        </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
