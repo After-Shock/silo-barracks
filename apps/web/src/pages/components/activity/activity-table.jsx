@@ -1,13 +1,6 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import axios from "../../../lib/axios_instance";
-import { enUS } from "@mui/material/locale";
-
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-
-import AddCircleFillIcon from "remixicon-react/AddCircleFillIcon";
-import IndeterminateCircleFillIcon from "remixicon-react/IndeterminateCircleFillIcon";
 
 import StreamInfo from "./stream_info";
 
@@ -15,12 +8,27 @@ import "../../css/activity/activity-table.css";
 import i18next from "i18next";
 import IpInfoModal from "../ip-info";
 import BusyLoader from "../general/busyLoader.jsx";
-import { MRT_ShowHideColumnsButton, MRT_TablePagination, MaterialReactTable, useMaterialReactTable } from "material-react-table";
-import { Box, ThemeProvider, Typography, createTheme } from "@mui/material";
-import { grey } from "@mui/material/colors";
+import {
+  DataTable,
+  DataTableColumnsMenu,
+  DataTablePagination,
+  createExpandColumn,
+  createSelectColumn,
+  defaultDataTableLocalization,
+  useDataTable,
+} from "@/components/data-table";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 import { Link } from "react-router-dom";
-import { Button, Modal } from "react-bootstrap";
 import { Trans } from "react-i18next";
 
 function formatTotalWatchTime(seconds) {
@@ -49,26 +57,11 @@ function formatTotalWatchTime(seconds) {
   return timeString.trim();
 }
 
-const colors = {
-  primary: "var(--barracks-action)",
-  secondary: "var(--barracks-accent-secondary)",
-  backgroundColor: "var(--barracks-canvas)",
-  tertiaryBackgroundColor: "var(--barracks-surface-interactive)",
-};
 const token = localStorage.getItem("token");
 const activityColumnVisibilityKey = "PREF_ACTIVITY_ColumnVisibility";
 const defaultColumnVisibility = {
   RemoteEndPoint: false,
 };
-
-function getCssVariableColor(variableName, fallback) {
-  if (typeof window === "undefined") {
-    return fallback;
-  }
-
-  const value = window.getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
-  return value || fallback;
-}
 
 function ActivityPoster({ itemId, title, disabled = false }) {
   const [imageFailed, setImageFailed] = React.useState(false);
@@ -147,27 +140,10 @@ export default function ActivityTable(props) {
 
   const [modalState, setModalState] = React.useState(false);
   const [modalData, setModalData] = React.useState();
-  const [themeTick, setThemeTick] = React.useState(0);
-  const muiColors = useMemo(
-    () => ({
-      primary: getCssVariableColor("--barracks-action", colors.primary),
-      secondary: getCssVariableColor("--barracks-accent-secondary", colors.secondary),
-      surfaceRaised: getCssVariableColor("--barracks-surface-raised", grey[900]),
-      tertiaryBackgroundColor: colors.tertiaryBackgroundColor,
-    }),
-    [themeTick]
-  );
-
-  useEffect(() => {
-    const handleThemeUpdate = () => setThemeTick((current) => current + 1);
-    window.addEventListener("silo-barracks-theme-updated", handleThemeUpdate);
-    return () => window.removeEventListener("silo-barracks-theme-updated", handleThemeUpdate);
-  }, []);
-
   const handlePageChange = (updater) => {
     setPagination((old) => {
       const newPaginationState = typeof updater === "function" ? updater(old) : updater;
-      const newPage = newPaginationState.pageIndex; // MaterialReactTable uses 0-based index
+      const newPage = newPaginationState.pageIndex; // the table uses a 0-based index
       if (props.onPageChange) {
         props.onPageChange(newPage + 1);
       }
@@ -249,7 +225,7 @@ export default function ActivityTable(props) {
       header: i18next.t("TITLE"),
       minSize: 360,
       grow: 1.6,
-      Cell: ({ row }) => {
+      cell: ({ row }) => {
         row = row.original;
         const title = !row.SeriesName
           ? row.NowPlayingItemName
@@ -272,7 +248,7 @@ export default function ActivityTable(props) {
       accessorKey: "UserName",
       header: i18next.t("USER"),
       size: 190,
-      Cell: ({ row }) => {
+      cell: ({ row }) => {
         row = row.original;
         const content = <><ActivityUserAvatar userId={props.siloHistory ? null : row.UserId} userName={row.UserName} />
           <span>{row.UserName || "Unknown"}{row.ProfileName ? <small className="activity-profile-name">{row.ProfileName}</small> : null}</span></>;
@@ -291,7 +267,7 @@ export default function ActivityTable(props) {
       accessorKey: "Client",
       header: i18next.t("ACTIVITY_TABLE.CLIENT"),
       size: 160,
-      Cell: ({ row }) => {
+      cell: ({ row }) => {
         row = row.original;
         return row.Client ? <Link onClick={() => openModal(row)} className="activity-table-link activity-client-link">{row.Client}</Link> : <span>—</span>;
       },
@@ -300,13 +276,13 @@ export default function ActivityTable(props) {
       accessorKey: "DeviceName",
       header: i18next.t("ACTIVITY_TABLE.DEVICE"),
       size: 180,
-      Cell: ({ cell }) => <span className="activity-device-cell">{cell.getValue() || "-"}</span>,
+      cell: ({ cell }) => <span className="activity-device-cell">{cell.getValue() || "-"}</span>,
     },
     {
       accessorKey: "PlayMethod",
       header: i18next.t("TRANSCODE"),
       size: 160,
-      Cell: ({ row }) => {
+      cell: ({ row }) => {
         row = row.original;
         const unavailableLabel = i18next.t("UNAVAILABLE");
         if (row.PlayMethod === "Transcode") {
@@ -357,7 +333,7 @@ export default function ActivityTable(props) {
       header: i18next.t("DATE"),
       size: 170,
       filterVariant: "date-range",
-      Cell: ({ row }) => {
+      cell: ({ row }) => {
         const options = {
           day: "numeric",
           month: "numeric",
@@ -375,7 +351,7 @@ export default function ActivityTable(props) {
       accessorKey: "RemoteEndPoint",
       header: i18next.t("ACTIVITY_TABLE.IP_ADDRESS"),
       size: 150,
-      Cell: ({ row }) => {
+      cell: ({ row }) => {
         row = row.original;
         if (
           isRemoteSession(row.RemoteEndPoint) &&
@@ -396,14 +372,14 @@ export default function ActivityTable(props) {
       size: 160,
       // filterFn: (row, id, filterValue) => formatTotalWatchTime(row.getValue(id)).startsWith(filterValue),
       filterVariant: "range",
-      Cell: ({ cell }) => <span className="activity-duration-cell">{formatTotalWatchTime(Math.round(Number(cell.getValue()) || 0)) || `0 ${i18next.t("UNITS.SECONDS").toLowerCase()}`}</span>,
+      cell: ({ cell }) => <span className="activity-duration-cell">{formatTotalWatchTime(Math.round(Number(cell.getValue()) || 0)) || `0 ${i18next.t("UNITS.SECONDS").toLowerCase()}`}</span>,
     },
     ...(props.siloHistory ? [{
       accessorKey: "Completed",
       header: "Status",
       size: 120,
       enableColumnFilter: false,
-      Cell: ({ cell }) => <span className={`activity-completion ${cell.getValue() ? "is-complete" : "is-incomplete"}`}>{cell.getValue() ? "Completed" : "Stopped early"}</span>,
+      cell: ({ cell }) => <span className={`activity-completion ${cell.getValue() ? "is-complete" : "is-incomplete"}`}>{cell.getValue() ? "Completed" : "Stopped early"}</span>,
     }] : []),
     {
       accessorFn: (row) => Number(row.TotalPlays ?? 1),
@@ -412,7 +388,7 @@ export default function ActivityTable(props) {
       filterFn: "betweenInclusive",
       size: 110,
 
-      Cell: ({ cell }) => <span className="activity-plays-cell">{cell.getValue() ?? 1}</span>,
+      cell: ({ cell }) => <span className="activity-plays-cell">{cell.getValue() ?? 1}</span>,
     },
   ].filter((column) => !props.siloHistory || !["Client", "DeviceName", "RemoteEndPoint", "TotalPlays"].includes(column.accessorKey || column.field));
 
@@ -473,148 +449,45 @@ export default function ActivityTable(props) {
     setData(props.data);
   }, [props.data]);
 
-  const table = useMaterialReactTable({
-    columns,
+  const localizationStrings = {
+    ...defaultDataTableLocalization,
+    expand: i18next.t("ACTIVITY_TABLE.EXPAND"),
+    collapse: i18next.t("ACTIVITY_TABLE.COLLAPSE"),
+    sortByColumnAsc: `${i18next.t("ACTIVITY_TABLE.SORT_BY")} {column} - ${i18next.t("ACTIVITY_TABLE.ASCENDING")}`,
+    sortByColumnDesc: `${i18next.t("ACTIVITY_TABLE.SORT_BY")} {column} - ${i18next.t("ACTIVITY_TABLE.DESCENDING")}`,
+    clearFilter: i18next.t("ACTIVITY_TABLE.CLEAR_FILTER"),
+    clearSort: i18next.t("ACTIVITY_TABLE.CLEAR_SORT"),
+    filterByColumn: `${i18next.t("ACTIVITY_TABLE.FILTER_BY")} {column}`,
+    toggleSelectAll: i18next.t("ACTIVITY_TABLE.TOGGLE_SELECT_ALL"),
+    toggleSelectRow: i18next.t("ACTIVITY_TABLE.TOGGLE_SELECT_ROW"),
+    columnActions: i18next.t("ACTIVITY_TABLE.COLUMN_ACTIONS"),
+  };
+
+  const table = useDataTable({
+    columns: [
+      createExpandColumn({
+        localization: localizationStrings,
+        onToggle: (row, tableInstance) => tableInstance.setExpanded({ [row.id]: !row.getIsExpanded() }),
+      }),
+      createSelectColumn({ localization: localizationStrings, enableBatchRowSelection: true }),
+      ...columns,
+    ],
     data,
-    localization: {
-      expand: i18next.t("ACTIVITY_TABLE.EXPAND"),
-      collapse: i18next.t("ACTIVITY_TABLE.COLLAPSE"),
-      sortByColumnAsc: `${i18next.t("ACTIVITY_TABLE.SORT_BY")} {column} - ${i18next.t("ACTIVITY_TABLE.ASCENDING")}`,
-      sortByColumnDesc: `${i18next.t("ACTIVITY_TABLE.SORT_BY")} {column} - ${i18next.t("ACTIVITY_TABLE.DESCENDING")}`,
-      clearFilter: i18next.t("ACTIVITY_TABLE.CLEAR_FILTER"),
-      clearSort: i18next.t("ACTIVITY_TABLE.CLEAR_SORT"),
-      filterByColumn: `${i18next.t("ACTIVITY_TABLE.FILTER_BY")} {column}`,
-      toggleSelectAll: i18next.t("ACTIVITY_TABLE.TOGGLE_SELECT_ALL"),
-      toggleSelectRow: i18next.t("ACTIVITY_TABLE.TOGGLE_SELECT_ROW"),
-      columnActions: i18next.t("ACTIVITY_TABLE.COLUMN_ACTIONS"),
-    },
-    columnFilterDisplayMode: "popover",
-    layoutMode: "grid",
-    enableExpandAll: false,
     enableExpanding: true,
-    enableDensityToggle: false,
     enableFilters: !props.siloHistory,
     enableSorting: !props.siloHistory,
     manualFiltering: !props.siloHistory,
     onSortingChange: handleSortingChange,
     onColumnFiltersChange: handleFilteringChange,
     onColumnVisibilityChange: handleColumnVisibilityChange,
-    enableTopToolbar: true,
     manualPagination: !props.cursorMode,
     manualSorting: !props.siloHistory,
     autoResetPageIndex: false,
-    initialState: {
-      expanded: false,
-      showGlobalFilter: true,
-      pagination: {
-        pageSize: 10,
-        pageIndex: 0,
-      },
-      sorting: [
-        {
-          id: "Date",
-          desc: true,
-        },
-      ],
-    },
     pageCount: pages,
-    rowCount: pagination.pageSize, // fix for bug causing pagination index to reset when row count changes
-    showAlertBanner: false,
     enableHiding: true,
-    enableFullScreenToggle: false,
-    enableGlobalFilter: false,
-    enableBottomToolbar: false,
-    enableRowSelection: (row) => !props.readOnly && row.original.Id,
+    enableRowSelection: (row) => Boolean(!props.readOnly && row.original.Id),
     enableMultiRowSelection: true,
-    enableBatchRowSelection: true,
     onRowSelectionChange: setRowSelection,
-    positionToolbarAlertBanner: "bottom",
-    renderToolbarInternalActions: ({ table }) => (
-      <Box className="activity-table-actions">
-        <span className="activity-table-actions-label">Columns</span>
-        <MRT_ShowHideColumnsButton table={table} />
-      </Box>
-    ),
-    renderTopToolbarCustomActions: () => {
-      if (!props.readOnly && Object.keys(rowSelection).length > 0) {
-        return (
-          <Box sx={{ display: "flex", gap: "1rem", p: "0px" }}>
-            <span>
-              <Typography variant="h5">
-                {i18next.t("X_ROWS_SELECTED").replace("{ROWS}", Object.keys(rowSelection).length)}
-              </Typography>
-            </span>
-            <Button
-              color="error"
-              onClick={() => {
-                setDeleteShow(true);
-              }}
-              variant="danger"
-            >
-              <Trans i18nKey="DELETE" />
-            </Button>
-          </Box>
-        );
-      }
-      return <span className="activity-table-toolbar-title">Activity view</span>;
-    },
-    renderEmptyRowsFallback: () => (
-      <span style={{ textAlign: "center", fontStyle: "italic", color: "var(--barracks-text-muted-raised)" }} className="py-5">
-        <Trans i18nKey="ERROR_MESSAGES.NO_ACTIVITY" />
-      </span>
-    ),
-    muiTableBodyRowProps: {
-      sx: {
-        backgroundColor: "transparent",
-        "&:nth-of-type(odd) .MuiTableCell-body": {
-          backgroundColor: "var(--barracks-surface-raised)",
-          borderBottom: "1px solid var(--barracks-border-raised)",
-          color: "var(--barracks-text-raised)",
-        },
-        "&:nth-of-type(even) .MuiTableCell-body": {
-          backgroundColor: "var(--barracks-surface-inset)",
-          borderBottom: "1px solid var(--barracks-border-inset)",
-          color: "var(--barracks-text-inset)",
-        },
-        "& .MuiTableCell-body :is(a:not(.activity-method-pill):not(.activity-client-link), .activity-title-copy strong, .activity-title-copy small, .activity-device-cell, .activity-ip-cell, .activity-ip-link, .activity-date-cell, .activity-duration-cell, .activity-user-link, .MuiIconButton-root, .MuiSvgIcon-root)": {
-          color: "inherit !important",
-        },
-        "&:nth-of-type(odd) .MuiTableCell-body .MuiCheckbox-root, &:nth-of-type(odd) .MuiTableCell-body .MuiCheckbox-root .MuiSvgIcon-root": {
-          color: "var(--barracks-text-raised) !important",
-        },
-        "&:nth-of-type(even) .MuiTableCell-body .MuiCheckbox-root, &:nth-of-type(even) .MuiTableCell-body .MuiCheckbox-root .MuiSvgIcon-root": {
-          color: "var(--barracks-text-inset) !important",
-        },
-        "& .MuiTableCell-body:first-of-type": {
-          borderTopLeftRadius: "0",
-          borderBottomLeftRadius: "0",
-        },
-        "& .MuiTableCell-body:last-of-type": {
-          borderTopRightRadius: "0",
-          borderBottomRightRadius: "0",
-        },
-        "&:hover .MuiTableCell-body": {
-          backgroundColor: "var(--barracks-surface-interactive)",
-          borderBottomColor: "var(--barracks-border-strong)",
-          color: "var(--barracks-text-interactive)",
-        },
-        "&:hover .MuiTableCell-body .MuiCheckbox-root, &:hover .MuiTableCell-body .MuiCheckbox-root .MuiSvgIcon-root": {
-          opacity: 1,
-          color: "var(--barracks-text-interactive) !important",
-        },
-      },
-    },
-    muiSelectCheckboxProps: {
-      sx: {
-        opacity: 0.72,
-        "&:hover": {
-          opacity: 1,
-        },
-        "&.Mui-checked": {
-          opacity: 1,
-        },
-      },
-    },
     state: { rowSelection, pagination, sorting, columnFilters, columnVisibility },
     filterFromLeafRows: true,
     getSubRows: (row) => {
@@ -622,187 +495,111 @@ export default function ActivityTable(props) {
     },
     onPaginationChange: handlePageChange,
     getRowId: (row) => row.Id,
-    muiExpandButtonProps: ({ row }) => ({
-      children: row.getIsExpanded() ? <IndeterminateCircleFillIcon /> : <AddCircleFillIcon />,
-      onClick: () => table.setExpanded({ [row.id]: !row.getIsExpanded() }),
-      sx: {
-        transform: row.getIsExpanded() ? "rotate(180deg)" : "rotate(-90deg)",
-        transition: "transform 0.2s",
-      },
-    }),
-    muiPaginationProps: {
-      rowsPerPageOptions: [10, 25, 50, 100],
-      variant: "outlined",
-      showFirstButton: true,
-      showLastButton: true,
-      showRowsPerPage: false,
-    },
-    paginationDisplayMode: "pages",
-    muiTableBodyCellProps: {
-      sx: {
-        fontSize: "13px",
-        fontWeight: 560,
-        lineHeight: 1.35,
-        padding: "12px 14px",
-      },
-    },
-    muiTableHeadCellProps: {
-      sx: {
-        backgroundColor: "var(--barracks-surface-inset)",
-        borderBottom: "1px solid var(--barracks-border-inset)",
-        color: "var(--barracks-text-inset)",
-        fontSize: "11px",
-        fontWeight: 680,
-        letterSpacing: "0.04em",
-        padding: "11px 14px",
-        textTransform: "uppercase",
-      },
-    },
-    muiTablePaperProps: {
-      className: "activity-mrt-paper",
-      elevation: 0,
-      sx: {
-        overflow: "hidden",
-        border: "1px solid var(--barracks-border-raised)",
-        borderRadius: "8px",
-        background: "var(--barracks-surface-raised)",
-        boxShadow: "var(--barracks-shadow)",
-      },
-    },
-    muiTopToolbarProps: {
-      sx: {
-        minHeight: "48px",
-        borderBottom: "1px solid var(--barracks-border-inset)",
-        background: "var(--barracks-surface-inset)",
-      },
-    },
-    muiTableContainerProps: {
-      sx: {
-        backgroundColor: "transparent",
-        padding: "0",
-      },
-    },
-    muiTableProps: {
-      sx: {
-        borderCollapse: "separate",
-        borderSpacing: "0",
-      },
-    },
-    muiFilterAutocompleteProps: {
-      sx: {
-        color: muiColors.primary,
-      },
-    },
-
-    mrtTheme: () => ({
-      baseBackgroundColor: muiColors.surfaceRaised,
-    }),
   });
-  const theme = useMemo(
-    () =>
-      createTheme(
-        {
-          palette: {
-            mode: "dark",
-            primary: {
-              main: muiColors.secondary,
-            },
-            secondary: {
-              main: muiColors.primary,
-            },
-            info: {
-              main: muiColors.primary,
-            },
-            warning: {
-              main: muiColors.primary,
-            },
-          },
-          components: {
-            MuiTooltip: {
-              styleOverrides: {
-                tooltip: {
-                  backgroundColor: colors.tertiaryBackgroundColor,
-                },
-              },
-            },
-          },
-        },
-        enUS
-      ),
-    [muiColors]
-  );
 
-  return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      {isBusy && <BusyLoader />}
-
-      <IpInfoModal show={ipModalVisible} onHide={() => setIPModalVisible(false)} ipAddress={ipAddressLookup} />
-      <Modal
-        show={confirmDeleteShow}
-        dialogClassName="activity-delete-modal"
-        onHide={() => {
-          setDeleteShow(false);
-        }}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            <Trans i18nKey="ITEM_INFO.CONFIRM_ACTION" />
-            {" - "}
-            {i18next.t("X_ROWS_SELECTED").replace("{ROWS}", Object.keys(rowSelection).length)}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>{i18next.t("PURGE_OPTIONS.PURGE_ACTIVITY")}</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <button
-            className="btn btn-danger"
+  const selectedCount = Object.keys(rowSelection).length;
+  const toolbar = (
+    <div className="activity-table-toolbar">
+      {!props.readOnly && selectedCount > 0 ? (
+        <div className="activity-table-selection">
+          <h5>{i18next.t("X_ROWS_SELECTED").replace("{ROWS}", selectedCount)}</h5>
+          <Button
+            variant="destructive"
             onClick={() => {
-              deleteActivity().then(() => setDeleteShow(false));
+              setDeleteShow(true);
             }}
           >
             <Trans i18nKey="DELETE" />
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              setDeleteShow(false);
-            }}
-          >
-            <Trans i18nKey="CLOSE" />
-          </button>
-        </Modal.Footer>
-      </Modal>
-      <Modal show={modalState} onHide={() => setModalState(false)} dialogClassName="stream-info-modal">
-        <Modal.Header>
-          <Modal.Title>
-            <Trans i18nKey="ACTIVITY_TABLE.MODAL.HEADER" />
-            {": "}
-            {!modalData?.SeriesName
-              ? modalData?.NowPlayingItemName
-              : modalData?.SeriesName + " - " + modalData?.NowPlayingItemName}{" "}
-            ({modalData?.UserName})
-          </Modal.Title>
-        </Modal.Header>
-        <StreamInfo data={modalData} />
-        <Modal.Footer>
-          <Button variant="outline-primary" onClick={() => setModalState(false)}>
-            <Trans i18nKey="CLOSE" />
           </Button>
-        </Modal.Footer>
-      </Modal>
-      <ThemeProvider theme={theme}>
-        <MaterialReactTable table={table} />
-        {!props.cursorMode && <Box
-          sx={{
-            display: "flex",
-            justifyContent: "end",
-            alignItems: "center",
-          }}
-        >
-          <MRT_TablePagination table={table} />
-        </Box>}
-      </ThemeProvider>
-    </LocalizationProvider>
+        </div>
+      ) : (
+        <span className="activity-table-toolbar-title">Activity view</span>
+      )}
+      <div className="activity-table-actions">
+        <span className="activity-table-actions-label">Columns</span>
+        <DataTableColumnsMenu table={table} localization={localizationStrings} />
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {isBusy && <BusyLoader />}
+
+      <IpInfoModal show={ipModalVisible} onHide={() => setIPModalVisible(false)} ipAddress={ipAddressLookup} />
+      <AlertDialog
+        open={confirmDeleteShow}
+        onOpenChange={(open) => {
+          if (!open) setDeleteShow(false);
+        }}
+      >
+        <AlertDialogContent className="activity-delete-modal">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              <Trans i18nKey="ITEM_INFO.CONFIRM_ACTION" />
+              {" - "}
+              {i18next.t("X_ROWS_SELECTED").replace("{ROWS}", selectedCount)}
+            </AlertDialogTitle>
+            <AlertDialogDescription>{i18next.t("PURGE_OPTIONS.PURGE_ACTIVITY")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                deleteActivity().then(() => setDeleteShow(false));
+              }}
+            >
+              <Trans i18nKey="DELETE" />
+            </Button>
+            <Button
+              onClick={() => {
+                setDeleteShow(false);
+              }}
+            >
+              <Trans i18nKey="CLOSE" />
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <Dialog open={modalState} onOpenChange={(open) => !open && setModalState(false)}>
+        <DialogContent className="stream-info-modal" showCloseButton={false}>
+          <DialogHeader className="stream-info-modal-header">
+            <DialogTitle className="stream-info-modal-title">
+              <Trans i18nKey="ACTIVITY_TABLE.MODAL.HEADER" />
+              {": "}
+              {!modalData?.SeriesName
+                ? modalData?.NowPlayingItemName
+                : modalData?.SeriesName + " - " + modalData?.NowPlayingItemName}{" "}
+              ({modalData?.UserName})
+            </DialogTitle>
+            <DialogDescription className="tw:sr-only">
+              <Trans i18nKey="ACTIVITY_TABLE.MODAL.HEADER" />
+            </DialogDescription>
+          </DialogHeader>
+          <StreamInfo data={modalData} />
+          <DialogFooter className="stream-info-modal-footer">
+            <Button variant="outline" onClick={() => setModalState(false)}>
+              <Trans i18nKey="CLOSE" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <DataTable
+        table={table}
+        localization={localizationStrings}
+        className="activity-data-table"
+        headClassName="activity-data-table-head"
+        cellClassName="activity-data-table-cell"
+        topToolbar={toolbar}
+        emptyState={
+          <span style={{ textAlign: "center", fontStyle: "italic", color: "var(--barracks-text-muted-raised)" }} className="d-block py-5">
+            <Trans i18nKey="ERROR_MESSAGES.NO_ACTIVITY" />
+          </span>
+        }
+      />
+      {!props.cursorMode && (
+        <DataTablePagination table={table} localization={localizationStrings} className="activity-table-pagination" />
+      )}
+    </>
   );
 }
