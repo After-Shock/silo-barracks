@@ -12,6 +12,8 @@ export default defineConfig(({ mode }) => {
 
   return {
     envPrefix: "JS_",
+    // Lets parallel dev servers (worktrees sharing node_modules) keep separate dep caches.
+    cacheDir: process.env.VITE_CACHE_DIR || undefined,
     base: env.JS_BASE_URL ?? "/",
     envDir: "../api",
 

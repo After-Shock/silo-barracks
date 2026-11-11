@@ -3,31 +3,37 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils"
 import { Slot } from "radix-ui"
 
+// Variants mirror the Bootstrap Barracks theme (pages/css/framework-theme.css):
+//   default     = .btn-primary            secondary/outline = .btn / .btn-outline-*
+//   destructive = .btn-danger (outlined, danger underline)   ghost/link = text buttons
+// Metrics mirror Bootstrap (rem-based; the app root is 13px): 0.375rem x 0.75rem padding,
+// 1rem text, line-height 1.5, 0.375rem radius. Disabled = Bootstrap 0.65 opacity.
+// Focus styling comes from the global :focus-visible rule in framework-theme.css.
 const buttonVariants = cva(
-  "tw:inline-flex tw:shrink-0 tw:items-center tw:justify-center tw:gap-2 tw:rounded-md tw:text-sm tw:font-medium tw:whitespace-nowrap tw:transition-all tw:outline-none tw:focus-visible:border-ring tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50 tw:disabled:pointer-events-none tw:disabled:opacity-50 tw:aria-invalid:border-destructive tw:aria-invalid:ring-destructive/20 tw:dark:aria-invalid:ring-destructive/40 tw:[&_svg]:pointer-events-none tw:[&_svg]:shrink-0 tw:[&_svg:not([class*=size-])]:size-4",
+  "tw:inline-flex tw:shrink-0 tw:cursor-pointer tw:items-center tw:justify-center tw:gap-2 tw:rounded-[0.375rem] tw:border tw:text-base tw:leading-normal tw:font-normal tw:whitespace-nowrap tw:no-underline tw:transition-colors tw:disabled:pointer-events-none tw:disabled:opacity-65 tw:disabled:border-border-inset tw:disabled:bg-surface-inset tw:disabled:text-inset-foreground tw:disabled:no-underline tw:aria-invalid:border-destructive tw:[&_svg]:pointer-events-none tw:[&_svg]:shrink-0 tw:[&_svg:not([class*=size-])]:size-4",
   {
     variants: {
       variant: {
-        default: "tw:bg-primary tw:text-primary-foreground tw:hover:bg-primary/90",
-        destructive:
-          "tw:bg-destructive tw:text-destructive-foreground tw:hover:bg-destructive/90 tw:focus-visible:ring-destructive/20 tw:dark:bg-destructive/60 tw:dark:focus-visible:ring-destructive/40",
-        outline:
-          "tw:border tw:bg-background tw:shadow-xs tw:hover:bg-accent tw:hover:text-accent-foreground tw:dark:border-input tw:dark:bg-input/30 tw:dark:hover:bg-input/50",
+        default: "tw:border-primary tw:bg-primary tw:text-primary-foreground tw:hover:text-primary-foreground",
         secondary:
-          "tw:bg-secondary tw:text-secondary-foreground tw:hover:bg-secondary/80",
+          "tw:border-border-strong tw:bg-surface-interactive tw:text-secondary-foreground tw:hover:border-border-inset tw:hover:bg-surface-inset tw:hover:text-inset-foreground",
+        outline:
+          "tw:border-border-strong tw:bg-surface-interactive tw:text-secondary-foreground tw:hover:border-border-inset tw:hover:bg-surface-inset tw:hover:text-inset-foreground tw:aria-pressed:border-primary tw:aria-pressed:bg-primary tw:aria-pressed:text-primary-foreground tw:data-[state=on]:border-primary tw:data-[state=on]:bg-primary tw:data-[state=on]:text-primary-foreground",
+        destructive:
+          "tw:border-danger-interactive tw:bg-surface-interactive tw:text-secondary-foreground tw:underline tw:decoration-danger-interactive tw:decoration-2 tw:underline-offset-[0.18em] tw:hover:text-secondary-foreground tw:[&_svg]:text-danger-interactive tw:disabled:border-border-subtle tw:disabled:[&_svg]:text-inset-foreground",
         ghost:
-          "tw:hover:bg-accent tw:hover:text-accent-foreground tw:dark:hover:bg-accent/50",
-        link: "tw:text-primary tw:underline-offset-4 tw:hover:underline",
+          "tw:border-transparent tw:bg-transparent tw:text-foreground tw:hover:bg-surface-interactive tw:hover:text-secondary-foreground",
+        link: "tw:border-transparent tw:bg-transparent tw:text-action-foreground tw:underline-offset-4 tw:hover:underline",
       },
       size: {
-        default: "tw:h-9 tw:px-4 tw:py-2 tw:has-[>svg]:px-3",
-        xs: "tw:h-6 tw:gap-1 tw:rounded-md tw:px-2 tw:text-xs tw:has-[>svg]:px-1.5 tw:[&_svg:not([class*=size-])]:size-3",
-        sm: "tw:h-8 tw:gap-1.5 tw:rounded-md tw:px-3 tw:has-[>svg]:px-2.5",
-        lg: "tw:h-10 tw:rounded-md tw:px-6 tw:has-[>svg]:px-4",
-        icon: "tw:size-9",
-        "icon-xs": "tw:size-6 tw:rounded-md tw:[&_svg:not([class*=size-])]:size-3",
-        "icon-sm": "tw:size-8",
-        "icon-lg": "tw:size-10",
+        default: "tw:px-3 tw:py-1.5",
+        xs: "tw:h-6 tw:gap-1 tw:rounded-sm tw:px-2 tw:text-xs tw:[&_svg:not([class*=size-])]:size-3",
+        sm: "tw:gap-1.5 tw:rounded-[0.25rem] tw:px-2 tw:py-1 tw:text-sm",
+        lg: "tw:rounded-[0.5rem] tw:px-4 tw:py-2 tw:text-xl",
+        icon: "tw:size-[calc(2.25rem+2px)]",
+        "icon-xs": "tw:size-6 tw:rounded-sm tw:[&_svg:not([class*=size-])]:size-3",
+        "icon-sm": "tw:size-[calc(1.875rem+2px)]",
+        "icon-lg": "tw:size-12",
       },
     },
     defaultVariants: {
