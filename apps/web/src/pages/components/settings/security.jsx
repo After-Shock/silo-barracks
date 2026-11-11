@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "../../../lib/axios_instance";
-import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
-import Alert from "react-bootstrap/Alert";
-import Spinner from "react-bootstrap/Spinner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import EyeFillIcon from "remixicon-react/EyeFillIcon";
 import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
 import LoginCircleLineIcon from "remixicon-react/LoginCircleLineIcon";
@@ -21,7 +20,9 @@ import {
 } from "../../../lib/privacy-settings";
 
 import "../../css/settings/settings.css";
-import { InputGroup } from "react-bootstrap";
+
+// Keep the remixicon size props; the Button primitive would otherwise force 1rem icons.
+const BUTTON_ICON_NATURAL_SIZE = "tw:[&_svg:not([class*=size-])]:size-auto";
 
 const authModes = [
   {
@@ -165,8 +166,8 @@ export default function SecuritySettings() {
       </header>
 
       {isSubmitted !== "" ? (
-        <Alert bg="dark" data-bs-theme="dark" variant={isSubmitted === "Failed" ? "danger" : "success"} className="security-status-alert">
-          {submissionMessage}
+        <Alert variant={isSubmitted === "Failed" ? "destructive" : "success"} className="security-status-alert tw:mb-4">
+          <AlertDescription>{submissionMessage}</AlertDescription>
         </Alert>
       ) : null}
 
@@ -197,7 +198,7 @@ export default function SecuritySettings() {
         </div>
       </section>
 
-      <Form onSubmit={handleAuthSubmit} className="settings-form security-auth-form">
+      <form onSubmit={handleAuthSubmit} className="settings-form security-auth-form">
         <div className="security-auth-header">
           <div>
             <h2>Authentication</h2>
@@ -235,50 +236,52 @@ export default function SecuritySettings() {
 
         {authMode === "oidc" && (
           <div className="security-auth-panel">
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>Issuer URL</Form.Label>
-              <Col>
-                <Form.Control
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-issuer-url" className="col">Issuer URL</Label>
+              <div className="col">
+                <Input
+                  id="oidc-issuer-url"
                   name="issuerUrl"
                   value={oidcValues.issuerUrl || ""}
                   onChange={handleOidcChange}
                   placeholder="https://auth.example.com/application/o/barracks/"
                   required={authMode === "oidc"}
                 />
-              </Col>
-            </Form.Group>
+              </div>
+            </div>
 
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>Client ID</Form.Label>
-              <Col>
-                <Form.Control name="clientId" value={oidcValues.clientId || ""} onChange={handleOidcChange} required={authMode === "oidc"} />
-              </Col>
-            </Form.Group>
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-client-id" className="col">Client ID</Label>
+              <div className="col">
+                <Input id="oidc-client-id" name="clientId" value={oidcValues.clientId || ""} onChange={handleOidcChange} required={authMode === "oidc"} />
+              </div>
+            </div>
 
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>Client Secret</Form.Label>
-              <Col>
-                <InputGroup>
-                  <Form.Control
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-client-secret" className="col">Client Secret</Label>
+              <div className="col">
+                <div className="settings-input-group">
+                  <Input
+                    id="oidc-client-secret"
                     name="clientSecret"
                     value={oidcValues.clientSecret || ""}
                     onChange={handleOidcChange}
                     type={showOidcSecret ? "text" : "password"}
                     autoComplete="off"
                   />
-                  <Button variant="outline-primary" type="button" onClick={() => setShowOidcSecret(!showOidcSecret)}>
+                  <Button variant="outline" type="button" className={BUTTON_ICON_NATURAL_SIZE} onClick={() => setShowOidcSecret(!showOidcSecret)} aria-label={showOidcSecret ? "Hide client secret" : "Show client secret"}>
                     {showOidcSecret ? <EyeFillIcon /> : <EyeOffFillIcon />}
                   </Button>
-                </InputGroup>
-              </Col>
-            </Form.Group>
+                </div>
+              </div>
+            </div>
 
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>Redirect URI</Form.Label>
-              <Col>
-                <Form.Control name="redirectUri" value={oidcValues.redirectUri || ""} onChange={handleOidcChange} />
-              </Col>
-            </Form.Group>
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-redirect-uri" className="col">Redirect URI</Label>
+              <div className="col">
+                <Input id="oidc-redirect-uri" name="redirectUri" value={oidcValues.redirectUri || ""} onChange={handleOidcChange} />
+              </div>
+            </div>
           </div>
         )}
 
@@ -296,11 +299,11 @@ export default function SecuritySettings() {
         )}
 
         <div className="security-form-actions">
-          <Button variant="outline-success" type="submit" disabled={saving}>
-            {saving ? <Spinner animation="border" size="sm" /> : authMode === "oidc" ? "Test & Save" : "Save Authentication"}
+          <Button variant="secondary" type="submit" disabled={saving}>
+            {saving ? <Spinner className="tw:size-4" /> : authMode === "oidc" ? "Test & Save" : "Save Authentication"}
           </Button>
         </div>
-      </Form>
+      </form>
     </div>
   );
 }
