@@ -1,4 +1,3 @@
-import { Tabs, Tab } from "react-bootstrap";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../lib/axios_instance";
@@ -306,15 +305,45 @@ function Statistics() {
         </div>
 
         <div className="stats-controls">
-          {!isSilo && <div className="stats-tab-nav">
-            <Tabs defaultActiveKey={activeTab} activeKey={activeTab} onSelect={setTab} variant="pills">
-              <Tab eventKey="tabOverview" className="bg-transparent" title="Overview" />
-
-              <Tab eventKey="tabCount" className="bg-transparent" title={<Trans i18nKey="STAT_PAGE.COUNT_VIEW" />} />
-
-              <Tab eventKey="tabDuration" className="bg-transparent" title={<Trans i18nKey="STAT_PAGE.DURATION_VIEW" />} />
-            </Tabs>
-          </div>}
+          {!isSilo && (
+            <div className="stats-tab-nav">
+              <nav className="nav nav-pills" role="tablist" aria-label="Statistics views">
+                <div className="nav-item">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === "tabOverview"}
+                    className={`nav-link ${activeTab === "tabOverview" ? "active" : ""}`.trim()}
+                    onClick={() => setTab("tabOverview")}
+                  >
+                    Overview
+                  </button>
+                </div>
+                <div className="nav-item">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === "tabCount"}
+                    className={`nav-link ${activeTab === "tabCount" ? "active" : ""}`.trim()}
+                    onClick={() => setTab("tabCount")}
+                  >
+                    <Trans i18nKey="STAT_PAGE.COUNT_VIEW" />
+                  </button>
+                </div>
+                <div className="nav-item">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === "tabDuration"}
+                    className={`nav-link ${activeTab === "tabDuration" ? "active" : ""}`.trim()}
+                    onClick={() => setTab("tabDuration")}
+                  >
+                    <Trans i18nKey="STAT_PAGE.DURATION_VIEW" />
+                  </button>
+                </div>
+              </nav>
+            </div>
+          )}
           <div className="stats-range-panel">
             <div className="stats-range-label">
               <RiCalendarLine size={17} />

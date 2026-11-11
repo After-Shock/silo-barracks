@@ -7,7 +7,7 @@ import Loading from "./components/general/loading";
 import LibraryCard from "./components/library/library-card";
 import ErrorBoundary from "./components/general/ErrorBoundary";
 import { RiEyeFill, RiEyeOffFill, RiFileList3Line, RiGridLine, RiRefreshLine, RiSearchLine } from "@remixicon/react";
-import { Tooltip } from "react-bootstrap";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Trans } from "react-i18next";
 import i18next from "i18next";
 
@@ -111,6 +111,7 @@ function Libraries() {
   const showLibraryCardNames = config?.settings?.ShowLibraryCardNames !== false;
 
   return (
+    <TooltipProvider delayDuration={150}>
     <div className="libraries" data-theme-screen="libraries">
       <div className="libraries-header">
         <div>
@@ -126,18 +127,24 @@ function Libraries() {
         </div>
         {data.filter((library) => library.archived === true).length > 0 &&
           (showArchived ? (
-            <Tooltip title={i18next.t("HIDE_ARCHIVED_LIBRARIES")} className="tooltip-icon-button">
-              <button className="libraries-archive-button" onClick={() => setShowArchived(!showArchived)}>
-                <RiEyeFill />
-                <span>Hide archived</span>
-              </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="libraries-archive-button" onClick={() => setShowArchived(!showArchived)}>
+                  <RiEyeFill />
+                  <span>Hide archived</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{i18next.t("HIDE_ARCHIVED_LIBRARIES")}</TooltipContent>
             </Tooltip>
           ) : (
-            <Tooltip title={i18next.t("SHOW_ARCHIVED_LIBRARIES")} className="tooltip-icon-button">
-              <button className="libraries-archive-button" onClick={() => setShowArchived(!showArchived)}>
-                <RiEyeOffFill />
-                <span>Show archived ({archivedCount})</span>
-              </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="libraries-archive-button" onClick={() => setShowArchived(!showArchived)}>
+                  <RiEyeOffFill />
+                  <span>Show archived ({archivedCount})</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{i18next.t("SHOW_ARCHIVED_LIBRARIES")}</TooltipContent>
             </Tooltip>
           ))}
       </div>
@@ -189,6 +196,7 @@ function Libraries() {
         ))}
       </div>
     </div>
+    </TooltipProvider>
   );
 }
 

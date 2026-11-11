@@ -268,18 +268,6 @@
   font-weight: 950;
 }
 
-.tooltip-icon-button {
-  opacity: 100 !important;
-}
-
-.tooltip-icon-button > .tooltip-inner {
-  background-color: transparent;
-}
-
-.tooltip .tooltip-arrow::before {
-  border-style: none !important;
-}
-
 @media (max-width: 720px) {
   .libraries {
     padding: 0.75rem 0.55rem 1.1rem;
