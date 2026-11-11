@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "../../../lib/axios_instance";
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 
 import "../../css/settings/version.css";
-import { Card } from "react-bootstrap";
 
 export default function VersionCard() {
 
@@ -48,30 +45,20 @@ export default function VersionCard() {
 
 
     return (
-    <Card  className="version rounded-0 border-0" >
-       <Card.Body>
-            <Row>
-                 <Col>Silo Barracks {data.current_version}</Col>
-             </Row>
-            <Row className="version-community-row">
-              <Col>
-                <a href="https://github.com/After-Shock/silo-barracks" target="_blank" rel="noreferrer">Project repository</a>
-              </Col>
-            </Row>
-             
+    <div className="version">
+        <div>Silo Barracks {data.current_version}</div>
+        <div className="version-community-row">
+          <a href="https://github.com/After-Shock/silo-barracks" target="_blank" rel="noreferrer">Project repository</a>
+        </div>
 
-            {data.update_available?
-              <>
-                <Row>
-                     <Col ><a href={data.releases_url || "https://github.com/After-Shock/silo-barracks/releases"} target="_blank"  rel="noreferrer"  style={{color:'var(--secondary-color)'}}>New version available: {data.latest_version}</a></Col>
-                 </Row>
-              </>
-               :
-               <></>
-            }
-
-       </Card.Body>
-   </Card>
+        {data.update_available ? (
+          <div>
+            <a href={data.releases_url || "https://github.com/After-Shock/silo-barracks/releases"} target="_blank" rel="noreferrer" style={{ color: "var(--secondary-color)" }}>
+              New version available: {data.latest_version}
+            </a>
+          </div>
+        ) : null}
+    </div>
     );
 
 

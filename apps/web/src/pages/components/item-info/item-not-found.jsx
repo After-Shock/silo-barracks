@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "../../../lib/axios_instance";
 import "../../css/error.css";
-import { Button } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
 import Loading from "../general/loading";
 import { Trans } from "react-i18next";
 
@@ -55,8 +55,8 @@ function ItemNotFound(props) {
       <h1 className="error-title">{props.message}</h1>
 
       <Button
-        variant={resultMessage ? "warning" : "primary"}
-        className="mt-3"
+        variant={resultMessage ? "secondary" : "default"}
+        className="tw:mt-3"
         onClick={() => fetchItem()}
         disabled={resultMessage !== undefined}
       >

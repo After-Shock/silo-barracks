@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Button from "react-bootstrap/Button";
+import { Button } from "@/components/ui/button";
 import { RiExternalLinkLine, RiEyeLine, RiEyeOffLine, RiRestartLine } from "@remixicon/react";
 import {
   DEFAULT_HOME_ORDER,
@@ -124,11 +124,13 @@ export default function KioskSettings() {
           <p>Control the title, density, theme, visible widgets, widget sizes, and order used by the static kiosk view.</p>
         </div>
         <div className="kiosk-settings-actions">
-          <Button as="a" href="/home/kiosk" target="_blank" rel="noreferrer" variant="outline-primary">
-            <RiExternalLinkLine size={16} />
-            Open kiosk
+          <Button asChild variant="outline">
+            <a href="/home/kiosk" target="_blank" rel="noreferrer">
+              <RiExternalLinkLine size={16} />
+              Open kiosk
+            </a>
           </Button>
-          <Button type="button" variant="outline-secondary" onClick={resetKiosk}>
+          <Button type="button" variant="outline" onClick={resetKiosk}>
             <RiRestartLine size={16} />
             Reset
           </Button>
