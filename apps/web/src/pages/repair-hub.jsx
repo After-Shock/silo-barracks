@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Alert, Button, Spinner } from "react-bootstrap";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Link } from "react-router-dom";
 import { RiAlertLine, RiArrowRightLine, RiCheckboxCircleLine, RiDatabase2Line, RiErrorWarningLine, RiFileSearchLine, RiHammerLine, RiImageLine, RiRefreshLine, RiTimeLine, RiTv2Line } from "@remixicon/react";
 import axios from "../lib/axios_instance";
@@ -161,12 +163,16 @@ export default function RepairHub() {
           <p>Artwork gaps, imported-history fixes, empty shows, orphaned activity, and recent task failures in one place.</p>
         </div>
         <Button type="button" onClick={loadRepairHub} disabled={loading}>
-          {loading ? <Spinner size="sm" animation="border" /> : <RiRefreshLine size={17} />}
+          {loading ? <Spinner className="tw:size-4" /> : <RiRefreshLine size={17} />}
           Refresh
         </Button>
       </header>
 
-      {error ? <Alert variant="danger">{error}</Alert> : null}
+      {error ? (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      ) : null}
 
       <section className="repair-overview">
         <RepairMetric

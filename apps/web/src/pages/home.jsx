@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Modal } from "react-bootstrap";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import axios from "../lib/axios_instance";
 import Config from "../lib/config";
 
@@ -1362,11 +1362,10 @@ export default function Home({ kioskMode = false }) {
         </div>
       </section> : null}
       </div>
-      <Modal show={Boolean(detailModal)} onHide={() => setDetailModal(null)} centered contentClassName="home-detail-modal">
-        <Modal.Header closeButton>
-          <Modal.Title>{detailModal?.title}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+      <Dialog open={Boolean(detailModal)} onOpenChange={(open) => { if (!open) setDetailModal(null); }}>
+        <DialogContent className="home-detail-modal">
+          <DialogTitle>{detailModal?.title}</DialogTitle>
+          <DialogDescription className="tw:sr-only">Home dashboard detail</DialogDescription>
           {detailModal?.body ? <p>{detailModal.body}</p> : null}
           {detailModal?.item ? <p>{detailModal.item.name} has overlap across {formatNumber(detailModal.item.users)} users and {formatNumber(detailModal.item.plays)} recent plays.</p> : null}
           {detailModal?.milestone ? (
@@ -1380,8 +1379,8 @@ export default function Home({ kioskMode = false }) {
               <small>No synced episodes found</small>
             </article>
           )) : null}
-        </Modal.Body>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

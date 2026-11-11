@@ -9,7 +9,8 @@ import ErrorBoundary from "./components/general/ErrorBoundary";
 import { RiInformationLine, RiSave3Line } from "@remixicon/react";
 
 import { Tooltip } from "@mui/material";
-import { Alert, Button, Form } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import DismissibleAlert from "./components/settings/dismissible-alert";
 import { Trans } from "react-i18next";
 
 function LibrarySelector() {
@@ -101,29 +102,33 @@ function LibrarySelector() {
         </Tooltip>
       </h1>
 
-      <Form className="library-display-settings" onSubmit={saveDisplaySettings}>
+      <form className="library-display-settings" onSubmit={saveDisplaySettings}>
         <div>
           <span>Library Cards</span>
           <strong>Display library names</strong>
           <small>Hide names when your library artwork already includes the same profile or collection text.</small>
         </div>
-        <Form.Check
-          type="switch"
-          id="show-library-card-names"
-          label="Show library names on cards"
-          checked={showLibraryCardNames}
-          onChange={(event) => setShowLibraryCardNames(event.target.checked)}
-        />
+        <label className="form-check form-switch">
+          <input
+            id="show-library-card-names"
+            type="checkbox"
+            role="switch"
+            className="form-check-input"
+            checked={showLibraryCardNames}
+            onChange={(event) => setShowLibraryCardNames(event.target.checked)}
+          />
+          <span>Show library names on cards</span>
+        </label>
         <Button type="submit" disabled={savingDisplaySettings}>
           <RiSave3Line size={16} />
           <span>{savingDisplaySettings ? "Saving..." : "Save"}</span>
         </Button>
-      </Form>
+      </form>
 
       {displaySettingsMessage ? (
-        <Alert variant={displaySettingsMessage.type} onClose={() => setDisplaySettingsMessage(null)} dismissible>
+        <DismissibleAlert type={displaySettingsMessage.type} onClose={() => setDisplaySettingsMessage(null)}>
           {displaySettingsMessage.text}
-        </Alert>
+        </DismissibleAlert>
       ) : null}
 
       <div xs={1} md={2} lg={4} className="g-0 libraries-container">

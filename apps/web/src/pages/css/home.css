@@ -1062,14 +1062,6 @@
   color: var(--barracks-text-inset) !important;
 }
 
-.home-detail-modal .modal-header {
-  border-bottom-color: var(--barracks-border-subtle) !important;
-}
-
-.home-detail-modal .btn-close {
-  filter: invert(1);
-}
-
 .home-detail-row {
   margin-top: 8px;
   padding: 10px 11px;
