@@ -5,9 +5,9 @@ import Config from "../lib/config";
 import CryptoJS from "crypto-js";
 import "./css/setup.css";
 import Loading from "./components/general/loading";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import { InputGroup } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import EyeFillIcon from "remixicon-react/EyeFillIcon";
 import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
@@ -281,7 +281,7 @@ function Signup() {
           </button>
         </div>
 
-        <Form onSubmit={handleFormSubmit} className="setup-form">
+        <form onSubmit={handleFormSubmit} className="setup-form">
           {authMode === "quick-connect" && (
             <div className="setup-auth-summary">
               <strong>Jellyfin Quick Connect</strong>
@@ -299,11 +299,11 @@ function Signup() {
 
           {authMode === "local" && (
             <>
-              <Form.Group className="inputbox">
-                <Form.Label>
+              <div className="inputbox">
+                <Label htmlFor="JS_USERNAME" className="setup-field-label">
                   <Trans i18nKey={"USERNAME"} />
-                </Form.Label>
-                <Form.Control
+                </Label>
+                <Input
                   id="JS_USERNAME"
                   name="JS_USERNAME"
                   value={formValues.JS_USERNAME || ""}
@@ -311,14 +311,14 @@ function Signup() {
                   placeholder=" "
                   required={authMode === "local"}
                 />
-              </Form.Group>
+              </div>
 
-              <Form.Group className="inputbox">
-                <Form.Label>
+              <div className="inputbox">
+                <Label htmlFor="JS_PASSWORD" className="setup-field-label">
                   <Trans i18nKey={"PASSWORD"} />
-                </Form.Label>
-                <InputGroup>
-                  <Form.Control
+                </Label>
+                <div className="setup-input-group">
+                  <Input
                     id="JS_PASSWORD"
                     name="JS_PASSWORD"
                     value={formValues.JS_PASSWORD || ""}
@@ -330,16 +330,16 @@ function Signup() {
                   <Button className="login-show-password" type="button" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <EyeFillIcon /> : <EyeOffFillIcon />}
                   </Button>
-                </InputGroup>
-              </Form.Group>
+                </div>
+              </div>
             </>
           )}
 
           {authMode === "oidc" && (
             <>
-              <Form.Group className="inputbox">
-                <Form.Label>Issuer URL</Form.Label>
-                <Form.Control
+              <div className="inputbox">
+                <Label htmlFor="OIDC_ISSUER_URL" className="setup-field-label">Issuer URL</Label>
+                <Input
                   id="OIDC_ISSUER_URL"
                   name="OIDC_ISSUER_URL"
                   value={formValues.OIDC_ISSUER_URL || ""}
@@ -347,11 +347,11 @@ function Signup() {
                   placeholder="https://auth.example.com/application/o/jellyglance/"
                   required={authMode === "oidc"}
                 />
-              </Form.Group>
+              </div>
 
-              <Form.Group className="inputbox">
-                <Form.Label>Client ID</Form.Label>
-                <Form.Control
+              <div className="inputbox">
+                <Label htmlFor="OIDC_CLIENT_ID" className="setup-field-label">Client ID</Label>
+                <Input
                   id="OIDC_CLIENT_ID"
                   name="OIDC_CLIENT_ID"
                   value={formValues.OIDC_CLIENT_ID || ""}
@@ -359,12 +359,12 @@ function Signup() {
                   placeholder=" "
                   required={authMode === "oidc"}
                 />
-              </Form.Group>
+              </div>
 
-              <Form.Group className="inputbox">
-                <Form.Label>Client Secret</Form.Label>
-                <InputGroup>
-                  <Form.Control
+              <div className="inputbox">
+                <Label htmlFor="OIDC_CLIENT_SECRET" className="setup-field-label">Client Secret</Label>
+                <div className="setup-input-group">
+                  <Input
                     id="OIDC_CLIENT_SECRET"
                     name="OIDC_CLIENT_SECRET"
                     value={formValues.OIDC_CLIENT_SECRET || ""}
@@ -375,19 +375,19 @@ function Signup() {
                   <Button className="login-show-password" type="button" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <EyeFillIcon /> : <EyeOffFillIcon />}
                   </Button>
-                </InputGroup>
-              </Form.Group>
+                </div>
+              </div>
 
-              <Form.Group className="inputbox">
-                <Form.Label>Redirect URI</Form.Label>
-                <Form.Control
+              <div className="inputbox">
+                <Label htmlFor="OIDC_REDIRECT_URI" className="setup-field-label">Redirect URI</Label>
+                <Input
                   id="OIDC_REDIRECT_URI"
                   name="OIDC_REDIRECT_URI"
                   value={formValues.OIDC_REDIRECT_URI || ""}
                   onChange={handleFormChange}
                   placeholder={`${window.location.origin}/auth/oidc/callback`}
                 />
-              </Form.Group>
+              </div>
             </>
           )}
 
@@ -402,7 +402,7 @@ function Signup() {
                   ? "Test & Save OIDC"
                   : submitButtonText}
           </Button>
-        </Form>
+        </form>
     </SetupShell>
   );
 }

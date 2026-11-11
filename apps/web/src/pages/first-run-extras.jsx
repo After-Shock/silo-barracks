@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Button from "react-bootstrap/Button";
+import { Button } from "@/components/ui/button";
 import Plug2LineIcon from "remixicon-react/Plug2LineIcon";
 import Database2LineIcon from "remixicon-react/Database2LineIcon";
 import RefreshLineIcon from "remixicon-react/RefreshLineIcon";

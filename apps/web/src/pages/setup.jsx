@@ -1,8 +1,8 @@
 import { useState } from "react";
 import axios from "../lib/axios_instance";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import { InputGroup } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import EyeFillIcon from "remixicon-react/EyeFillIcon";
 import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
@@ -112,25 +112,24 @@ function Setup() {
         <div className="setup-jellyfin-logo" aria-hidden="true">
           <img src={jellyfinLogo} alt="" />
         </div>
-        <Form onSubmit={handleFormSubmit} className="setup-form">
-          <Form.Group className="inputbox">
-            <Form.Label>URL</Form.Label>
-            <Form.Control
+        <form onSubmit={handleFormSubmit} className="setup-form">
+          <div className="inputbox">
+            <Label htmlFor="JF_HOST" className="setup-field-label">URL</Label>
+            <Input
               id="JF_HOST"
               name="JF_HOST"
               value={formValues.JF_HOST || ""}
               onChange={handleFormChange}
               placeholder=" "
             />
-          </Form.Group>
+          </div>
 
-          <Form.Group className="inputbox">
-            <Form.Label>
+          <div className="inputbox">
+            <Label htmlFor="JF_API_KEY" className="setup-field-label">
               <Trans i18nKey={"SETTINGS_PAGE.API_KEY"} />
-            </Form.Label>
-            <InputGroup>
-              <Form.Control
-                className="px-0"
+            </Label>
+            <div className="setup-input-group">
+              <Input
                 id="JF_API_KEY"
                 name="JF_API_KEY"
                 value={formValues.JF_API_KEY || ""}
@@ -142,8 +141,8 @@ function Setup() {
               <Button className="login-show-password" type="button" onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <EyeFillIcon /> : <EyeOffFillIcon />}
               </Button>
-            </InputGroup>
-          </Form.Group>
+            </div>
+          </div>
 
           {connectionTest.message && (
             <div className={`setup-connection-status is-${connectionTest.status}`} role="status">
@@ -159,7 +158,7 @@ function Setup() {
               {processing ? `${i18next.t("VALIDATING")}...` : submitButtonText}
             </Button>
           </div>
-        </Form>
+        </form>
     </SetupShell>
   );
 }
