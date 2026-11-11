@@ -3,19 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "../../../lib/axios_instance";
 import Config from "../../../lib/config";
 import { slugifyUserName } from "../../../lib/userProfile";
-import AccountCircleFillIcon from "remixicon-react/AccountCircleFillIcon";
-import CalendarLineIcon from "remixicon-react/CalendarLineIcon";
-import ComputerLineIcon from "remixicon-react/ComputerLineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import FireLineIcon from "remixicon-react/FireLineIcon";
-import MoonLineIcon from "remixicon-react/MoonLineIcon";
-import PlayCircleLineIcon from "remixicon-react/PlayCircleLineIcon";
-import StarSmileLineIcon from "remixicon-react/StarSmileLineIcon";
-import StackLineIcon from "remixicon-react/StackLineIcon";
-import SunLineIcon from "remixicon-react/SunLineIcon";
-import TimeLineIcon from "remixicon-react/TimeLineIcon";
-import TrophyLineIcon from "remixicon-react/TrophyLineIcon";
-import UserSettingsLineIcon from "remixicon-react/UserSettingsLineIcon";
+import { RiAccountCircleFill, RiCalendarLine, RiComputerLine, RiFilmLine, RiFireLine, RiMoonLine, RiPlayCircleLine, RiStackLine, RiStarSmileLine, RiSunLine, RiTimeLine, RiTrophyLine, RiUserSettingsLine } from "@remixicon/react";
 import "../../css/home-user-wrap.css";
 
 const token = localStorage.getItem("token");
@@ -72,7 +60,7 @@ function buildUserAchievements(user, rank) {
       title: rank === 1 ? "Household Champion" : "Leaderboard Climber",
       value: `#${rank}`,
       detail: rank === 1 ? "Top watch-time rank in the household." : "Ranked by total watch time.",
-      icon: TrophyLineIcon,
+      icon: RiTrophyLine,
       unlocked: rank === 1,
       progress: rank === 1 ? 100 : Math.max(12, 100 - rank * 12),
     },
@@ -81,7 +69,7 @@ function buildUserAchievements(user, rank) {
       title: streams >= 1000 ? "Stream Machine" : "Play Counter",
       value: streams.toLocaleString(),
       detail: `${Math.max(streamTarget - streams, 0).toLocaleString()} streams to ${streamTarget.toLocaleString()}`,
-      icon: PlayCircleLineIcon,
+      icon: RiPlayCircleLine,
       unlocked: streams >= 10,
       progress: progress(streams, streamTarget),
     },
@@ -90,7 +78,7 @@ function buildUserAchievements(user, rank) {
       title: watchHours >= 500 ? "Time Lord" : "Time Collector",
       value: formatWatchTime(watchSeconds),
       detail: `${formatWatchTime(Math.max(hourTarget * 3600 - watchSeconds, 0))} to ${hourTarget.toLocaleString()} hours`,
-      icon: TimeLineIcon,
+      icon: RiTimeLine,
       unlocked: watchHours >= 10,
       progress: progress(watchHours, hourTarget),
     },
@@ -99,7 +87,7 @@ function buildUserAchievements(user, rank) {
       title: uniqueTitles >= 100 ? "Taste Explorer" : "Sampler",
       value: uniqueTitles.toLocaleString(),
       detail: `${Math.max(titleTarget - uniqueTitles, 0).toLocaleString()} titles to ${titleTarget.toLocaleString()}`,
-      icon: StarSmileLineIcon,
+      icon: RiStarSmileLine,
       unlocked: uniqueTitles >= 5,
       progress: progress(uniqueTitles, titleTarget),
     },
@@ -108,7 +96,7 @@ function buildUserAchievements(user, rank) {
       title: uniqueClients >= 5 ? "Device Hopper" : "Client Curious",
       value: uniqueClients.toLocaleString(),
       detail: user.TopClient?.Name ? `${user.TopClient.Name} is the favourite client.` : "No client history yet.",
-      icon: ComputerLineIcon,
+      icon: RiComputerLine,
       unlocked: uniqueClients >= 2,
       progress: progress(uniqueClients, clientTarget),
     },
@@ -117,7 +105,7 @@ function buildUserAchievements(user, rank) {
       title: topHour >= 22 || topHour <= 4 ? "Night Owl" : topHour >= 5 && topHour <= 11 ? "Morning Watcher" : "Prime-Time Regular",
       value: formatHour(user.TopHour?.Hour),
       detail: `${user.TopHour?.Count || 0} streams around this time.`,
-      icon: topHour >= 22 || topHour <= 4 ? MoonLineIcon : topHour >= 5 && topHour <= 11 ? SunLineIcon : FireLineIcon,
+      icon: topHour >= 22 || topHour <= 4 ? RiMoonLine : topHour >= 5 && topHour <= 11 ? RiSunLine : RiFireLine,
       unlocked: topHour >= 0,
       progress: progress(Number(user.TopHour?.Count || 0), 25),
     },
@@ -126,7 +114,7 @@ function buildUserAchievements(user, rank) {
       title: "Ritual Day",
       value: user.TopDay?.Name || "N/A",
       detail: `${topDayCount.toLocaleString()} streams on this day.`,
-      icon: CalendarLineIcon,
+      icon: RiCalendarLine,
       unlocked: topDayCount >= 3,
       progress: progress(topDayCount, 25),
     },
@@ -135,7 +123,7 @@ function buildUserAchievements(user, rank) {
       title: topLibraryCount >= 50 ? "Library Loyalist" : "Library Regular",
       value: user.TopLibrary?.Name || "N/A",
       detail: `${topLibraryCount.toLocaleString()} plays in this library.`,
-      icon: StackLineIcon,
+      icon: RiStackLine,
       unlocked: topLibraryCount >= 10,
       progress: progress(topLibraryCount, 100),
     },
@@ -144,7 +132,7 @@ function buildUserAchievements(user, rank) {
       title: recentDays <= 7 ? "Recently Active" : "Comeback Pending",
       value: recentDays === Infinity ? "Never" : `${recentDays}d`,
       detail: recentDays <= 7 ? "Watched within the last week." : "No synced playback in the last week.",
-      icon: FireLineIcon,
+      icon: RiFireLine,
       unlocked: recentDays <= 7,
       progress: recentDays === Infinity ? 0 : Math.max(0, 100 - recentDays * 8),
     },
@@ -173,7 +161,7 @@ function avatar(user, size = 96) {
     return <img src={`/proxy/Users/Images/Primary?id=${user.UserId}&fillWidth=${size * 2}&quality=90`} alt="" />;
   }
 
-  return <AccountCircleFillIcon size={size} />;
+  return <RiAccountCircleFill size={size} />;
 }
 
 function startOfDay(date) {
@@ -413,14 +401,14 @@ export function QuickConnectUserWrap({ user, rank }) {
         </div>
 
         <div className="wrap-metric-grid">
-          <WrapMetric icon={TrophyLineIcon} label="Server rank" value={`#${rank}`} detail={`${user.TotalStreams || 0} streams`} imageId={heroImageId} />
-          <WrapMetric icon={PlayCircleLineIcon} label="Total streams" value={user.TotalStreams || 0} detail={formatWatchTime(user.TotalWatchTime)} imageId={seriesImageId} />
-          <WrapMetric icon={FilmLineIcon} label="Top title" value={user.TopTitle?.Name} detail={`${user.TopTitle?.Count || 0} plays`} imageId={user.TopTitle?.ItemId || heroImageId} />
-          <WrapMetric icon={StackLineIcon} label="Top library" value={user.TopLibrary?.Name} detail={`${user.TopLibrary?.Count || 0} plays`} imageId={heroImageId} />
-          <WrapMetric icon={CalendarLineIcon} label="Top day" value={user.TopDay?.Name} detail={`${user.TopDay?.Count || 0} streams`} imageId={heroImageId} />
-          <WrapMetric icon={TimeLineIcon} label="Time of day" value={formatHour(user.TopHour?.Hour)} detail={`${user.TopHour?.Count || 0} streams`} imageId={seriesImageId} />
-          <WrapMetric icon={FilmLineIcon} label="Top movie" value={user.TopMovie?.Name} detail={`${user.TopMovie?.Count || 0} plays`} imageId={posterImageId} imageType="Primary" />
-          <WrapMetric icon={UserSettingsLineIcon} label="Watch style" value={user.TopClient?.Name} detail={`${user.UniqueClients || 0} clients`} imageId={seriesImageId} />
+          <WrapMetric icon={RiTrophyLine} label="Server rank" value={`#${rank}`} detail={`${user.TotalStreams || 0} streams`} imageId={heroImageId} />
+          <WrapMetric icon={RiPlayCircleLine} label="Total streams" value={user.TotalStreams || 0} detail={formatWatchTime(user.TotalWatchTime)} imageId={seriesImageId} />
+          <WrapMetric icon={RiFilmLine} label="Top title" value={user.TopTitle?.Name} detail={`${user.TopTitle?.Count || 0} plays`} imageId={user.TopTitle?.ItemId || heroImageId} />
+          <WrapMetric icon={RiStackLine} label="Top library" value={user.TopLibrary?.Name} detail={`${user.TopLibrary?.Count || 0} plays`} imageId={heroImageId} />
+          <WrapMetric icon={RiCalendarLine} label="Top day" value={user.TopDay?.Name} detail={`${user.TopDay?.Count || 0} streams`} imageId={heroImageId} />
+          <WrapMetric icon={RiTimeLine} label="Time of day" value={formatHour(user.TopHour?.Hour)} detail={`${user.TopHour?.Count || 0} streams`} imageId={seriesImageId} />
+          <WrapMetric icon={RiFilmLine} label="Top movie" value={user.TopMovie?.Name} detail={`${user.TopMovie?.Count || 0} plays`} imageId={posterImageId} imageType="Primary" />
+          <WrapMetric icon={RiUserSettingsLine} label="Watch style" value={user.TopClient?.Name} detail={`${user.UniqueClients || 0} clients`} imageId={seriesImageId} />
         </div>
 
         <UserAchievements user={user} rank={rank} />
@@ -460,7 +448,7 @@ export function AccountDashboard({ access }) {
         <div className="account-user-strip">
           {localUsers.slice(0, 6).map((user) => (
             <span key={user.id}>
-              <AccountCircleFillIcon size={22} />
+              <RiAccountCircleFill size={22} />
               {user.username}
               <small>{user.role || "Viewer"}</small>
             </span>

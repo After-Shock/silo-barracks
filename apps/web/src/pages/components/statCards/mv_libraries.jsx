@@ -3,10 +3,7 @@ import axios from "../../../lib/axios_instance";
 
 import ItemStatComponent from "./ItemStatComponent";
 
-import TvLineIcon from "remixicon-react/TvLineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import FileMusicLineIcon from "remixicon-react/FileMusicLineIcon";
-import CheckboxMultipleBlankLineIcon from "remixicon-react/CheckboxMultipleBlankLineIcon";
+import { RiCheckboxMultipleBlankLine, RiFileMusicLine, RiFilmLine, RiTvLine } from "@remixicon/react";
 import { Trans } from "react-i18next";
 
 function MVLibraries(props) {
@@ -53,10 +50,10 @@ function MVLibraries(props) {
     return  <></>;
   }
 
-  const SeriesIcon=<TvLineIcon size={"100%"} /> ;
-  const MovieIcon=<FilmLineIcon size={"100%"} /> ;
-  const MusicIcon=<FileMusicLineIcon size={"100%"} /> ;
-  const MixedIcon=<CheckboxMultipleBlankLineIcon size={"100%"} /> ;
+  const SeriesIcon=<RiTvLine size={"100%"} /> ;
+  const MovieIcon=<RiFilmLine size={"100%"} /> ;
+  const MusicIcon=<RiFileMusicLine size={"100%"} /> ;
+  const MixedIcon=<RiCheckboxMultipleBlankLine size={"100%"} /> ;
 
 
   return (

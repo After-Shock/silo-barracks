@@ -5,19 +5,16 @@ import Loading from "./general/loading";
 
 import LibraryStatComponent from "./libraryStatCard/library-stat-component";
 
-import TvLineIcon from "remixicon-react/TvLineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import FileMusicLineIcon from "remixicon-react/FileMusicLineIcon";
-import CheckboxMultipleBlankLineIcon from "remixicon-react/CheckboxMultipleBlankLineIcon";
+import { RiCheckboxMultipleBlankLine, RiFileMusicLine, RiFilmLine, RiTvLine } from "@remixicon/react";
 import { Trans } from "react-i18next";
 import i18next from "i18next";
 
 export default function LibraryOverView() {
   const token = localStorage.getItem("token");
-  const SeriesIcon = <TvLineIcon size={"100%"} />;
-  const MovieIcon = <FilmLineIcon size={"100%"} />;
-  const MusicIcon = <FileMusicLineIcon size={"100%"} />;
-  const MixedIcon = <CheckboxMultipleBlankLineIcon size={"100%"} />;
+  const SeriesIcon = <RiTvLine size={"100%"} />;
+  const MovieIcon = <RiFilmLine size={"100%"} />;
+  const MusicIcon = <RiFileMusicLine size={"100%"} />;
+  const MixedIcon = <RiCheckboxMultipleBlankLine size={"100%"} />;
   const [data, setData] = useState();
 
   useEffect(() => {

@@ -8,8 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import EyeFillIcon from "remixicon-react/EyeFillIcon";
-import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
+import { RiEyeFill, RiEyeOffFill } from "@remixicon/react";
 import logo_dark from "../../public/brand/barracks-mark.svg";
 import AuthArtworkBackground from "./components/AuthArtworkBackground";
 
@@ -320,7 +319,7 @@ function Login() {
                     placeholder=" "
                   />
                   <Button className="login-show-password" type="button" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <EyeFillIcon /> : <EyeOffFillIcon />}
+                    {showPassword ? <RiEyeFill /> : <RiEyeOffFill />}
                   </Button>
                 </div>
               </div>

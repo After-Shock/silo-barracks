@@ -5,12 +5,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Link, useLocation } from "react-router-dom";
 import axios from "../../../lib/axios_instance";
 import { navData } from "../../../lib/navdata";
-import LogoutBoxLineIcon from "remixicon-react/LogoutBoxLineIcon";
-import AccountCircleLineIcon from "remixicon-react/AccountCircleLineIcon";
-import ArrowLeftSLineIcon from "remixicon-react/ArrowLeftSLineIcon";
-import ArrowRightSLineIcon from "remixicon-react/ArrowRightSLineIcon";
-import MagicLineIcon from "remixicon-react/MagicLineIcon";
-import MenuLineIcon from "remixicon-react/MenuLineIcon";
+import { RiAccountCircleLine, RiArrowLeftSLine, RiArrowRightSLine, RiLogoutBoxLine, RiMagicLine, RiMenuLine } from "@remixicon/react";
 import logo_dark from "../../../../public/brand/barracks-mark.svg";
 import "../../css/navbar.css";
 import VersionCard from "./version-card";
@@ -797,7 +792,7 @@ export default function Navbar() {
           aria-controls="mobile-app-navigation"
           aria-expanded={isMobileNavOpen}
         >
-          <MenuLineIcon size={24} />
+          <RiMenuLine size={24} />
         </button>
         <Link className="mobile-app-brand" to="/">
           <img src={logo_dark} alt="" />
@@ -810,7 +805,7 @@ export default function Navbar() {
           aria-label="Open account settings"
           data-testid="theme-account-mobile"
         >
-          {avatarSrc ? <img src={avatarSrc} alt="" onError={(event) => (event.currentTarget.style.display = "none")} /> : <AccountCircleLineIcon />}
+          {avatarSrc ? <img src={avatarSrc} alt="" onError={(event) => (event.currentTarget.style.display = "none")} /> : <RiAccountCircleLine />}
         </button>
       </div>
 
@@ -849,7 +844,7 @@ export default function Navbar() {
                 {avatarSrc ? (
                   <img src={avatarSrc} alt="" onError={(event) => (event.currentTarget.style.display = "none")} />
                 ) : (
-                  <AccountCircleLineIcon />
+                  <RiAccountCircleLine />
                 )}
               </span>
               <span className="account-nav-copy">
@@ -858,7 +853,7 @@ export default function Navbar() {
               </span>
             </button>
             <button className="mobile-app-menu-logout" type="button" onClick={handleLogout}>
-              <LogoutBoxLineIcon size={22} />
+              <RiLogoutBoxLine size={22} />
               <span>
                 <Trans i18nKey="MENU_TABS.LOGOUT" />
               </span>
@@ -946,7 +941,7 @@ export default function Navbar() {
             aria-label={isNavCollapsed ? "Expand side menu" : "Collapse side menu"}
             title={isNavCollapsed ? "Expand side menu" : "Collapse side menu"}
           >
-            {isNavCollapsed ? <ArrowRightSLineIcon size={16} /> : <ArrowLeftSLineIcon size={16} />}
+            {isNavCollapsed ? <RiArrowRightSLine size={16} /> : <RiArrowLeftSLine size={16} />}
           </button>
           </div>
           <div className="navbar-inline-footer">
@@ -961,7 +956,7 @@ export default function Navbar() {
                   {avatarSrc ? (
                     <img src={avatarSrc} alt="" onError={(event) => (event.currentTarget.style.display = "none")} />
                   ) : (
-                    <AccountCircleLineIcon />
+                    <RiAccountCircleLine />
                   )}
                 </span>
                 <span className="account-nav-copy">
@@ -996,7 +991,7 @@ export default function Navbar() {
           <div className="tw:overflow-y-auto tw:px-3.5 tw:pt-2 tw:pb-3 tw:compact:py-3">
           <div className="profile-modal-identity">
             <div className="profile-modal-avatar">
-              {avatarSrc ? <img src={avatarSrc} alt="" onError={(event) => (event.currentTarget.style.display = "none")} /> : <AccountCircleLineIcon />}
+              {avatarSrc ? <img src={avatarSrc} alt="" onError={(event) => (event.currentTarget.style.display = "none")} /> : <RiAccountCircleLine />}
             </div>
             <div>
               <strong>{accountName}</strong>
@@ -1012,7 +1007,7 @@ export default function Navbar() {
           ) : null}
 
           <button className="profile-whats-new-button" type="button" onClick={openWhatsNew}>
-            <MagicLineIcon size={18} />
+            <RiMagicLine size={18} />
             <span>
               <strong>What&apos;s new</strong>
               <small>Open the latest Silo Barracks update notes.</small>

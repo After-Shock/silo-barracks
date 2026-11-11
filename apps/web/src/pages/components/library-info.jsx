@@ -1,12 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "../../lib/axios_instance";
-import TvLineIcon from "remixicon-react/TvLineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import BarChartBoxLineIcon from "remixicon-react/BarChartBoxLineIcon";
-import HistoryLineIcon from "remixicon-react/HistoryLineIcon";
-import Settings3LineIcon from "remixicon-react/Settings3LineIcon";
-import StackLineIcon from "remixicon-react/StackLineIcon";
+import { RiBarChartBoxLine, RiFilmLine, RiHistoryLine, RiSettings3Line, RiStackLine, RiTvLine } from "@remixicon/react";
 
 // import LibraryDetails from './library/library-details';
 import Loading from "./general/loading";
@@ -86,12 +81,12 @@ function LibraryInfo() {
   const isSilo = Boolean(config?.IS_SILO);
   const effectiveActiveTab = isSilo && activeTab === "tabOptions" ? "tabOverview" : activeTab;
   const tabs = [
-    { key: "tabOverview", label: <Trans i18nKey="TAB_CONTROLS.OVERVIEW" />, icon: BarChartBoxLineIcon },
-    { key: "tabItems", label: <Trans i18nKey="MEDIA" />, icon: StackLineIcon },
-    { key: "tabActivity", label: <Trans i18nKey="TAB_CONTROLS.ACTIVITY" />, icon: HistoryLineIcon },
-    ...(!isSilo ? [{ key: "tabOptions", label: <Trans i18nKey="TAB_CONTROLS.OPTIONS" />, icon: Settings3LineIcon }] : []),
+    { key: "tabOverview", label: <Trans i18nKey="TAB_CONTROLS.OVERVIEW" />, icon: RiBarChartBoxLine },
+    { key: "tabItems", label: <Trans i18nKey="MEDIA" />, icon: RiStackLine },
+    { key: "tabActivity", label: <Trans i18nKey="TAB_CONTROLS.ACTIVITY" />, icon: RiHistoryLine },
+    ...(!isSilo ? [{ key: "tabOptions", label: <Trans i18nKey="TAB_CONTROLS.OPTIONS" />, icon: RiSettings3Line }] : []),
   ];
-  const LibraryIcon = data.CollectionType === "tvshows" ? TvLineIcon : FilmLineIcon;
+  const LibraryIcon = data.CollectionType === "tvshows" ? RiTvLine : RiFilmLine;
   const libraryType = data.CollectionType === "tvshows" ? "Series library" : "Movie library";
 
   return (

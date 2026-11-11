@@ -1,11 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "../../../lib/axios_instance";
-import CheckboxCircleLineIcon from "remixicon-react/CheckboxCircleLineIcon";
-import ErrorWarningLineIcon from "remixicon-react/ErrorWarningLineIcon";
-import HeartPulseLineIcon from "remixicon-react/HeartPulseLineIcon";
-import HistoryLineIcon from "remixicon-react/HistoryLineIcon";
-import Notification3LineIcon from "remixicon-react/Notification3LineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
+import { RiCheckboxCircleLine, RiErrorWarningLine, RiHeartPulseLine, RiHistoryLine, RiNotification3Line, RiRefreshLine } from "@remixicon/react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import "../../css/settings/settings.css";
@@ -72,7 +67,7 @@ export default function HealthSettings() {
           <p>Backend reachability, task state, webhook deliveries, backup freshness, and admin changes.</p>
         </div>
         <Button type="button" onClick={loadHealth} disabled={loading}>
-          {loading ? <Spinner className="tw:size-4" /> : <RefreshLineIcon size={17} className="tw:size-[17px]" />}
+          {loading ? <Spinner className="tw:size-4" /> : <RiRefreshLine size={17} className="tw:size-[17px]" />}
           Refresh
         </Button>
       </header>
@@ -80,7 +75,7 @@ export default function HealthSettings() {
       <section className="health-check-grid">
         {(health?.checks || []).map((check) => (
           <article key={check.key} className={check.ok ? "is-ok" : "is-error"}>
-            {check.ok ? <CheckboxCircleLineIcon /> : <ErrorWarningLineIcon />}
+            {check.ok ? <RiCheckboxCircleLine /> : <RiErrorWarningLine />}
             <div>
               <strong>{check.label}</strong>
               <span>{check.message}</span>
@@ -91,7 +86,7 @@ export default function HealthSettings() {
 
       <section className="health-summary-grid">
         <article>
-          <HeartPulseLineIcon />
+          <RiHeartPulseLine />
           <div>
             <span>Overall</span>
             <strong>{health?.ok ? "Healthy" : "Needs attention"}</strong>
@@ -99,7 +94,7 @@ export default function HealthSettings() {
           </div>
         </article>
         <article>
-          <Notification3LineIcon />
+          <RiNotification3Line />
           <div>
             <span>Webhook failures</span>
             <strong>{health?.webhooks?.recentFailures || 0}</strong>
@@ -107,7 +102,7 @@ export default function HealthSettings() {
           </div>
         </article>
         <article>
-          <HistoryLineIcon />
+          <RiHistoryLine />
           <div>
             <span>Audit events</span>
             <strong>{audit.length}</strong>
@@ -118,7 +113,7 @@ export default function HealthSettings() {
 
       <section className="health-panel">
         <div className="health-panel-title">
-          <Notification3LineIcon size={20} />
+          <RiNotification3Line size={20} />
           <h2>Webhook Delivery History</h2>
         </div>
         <div className="health-table">
@@ -139,7 +134,7 @@ export default function HealthSettings() {
 
       <section className="health-panel">
         <div className="health-panel-title">
-          <HistoryLineIcon size={20} />
+          <RiHistoryLine size={20} />
           <h2>Admin Audit Log</h2>
         </div>
         <div className="health-table audit-table">

@@ -1,17 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import AddLineIcon from "remixicon-react/AddLineIcon";
-import CheckboxCircleLineIcon from "remixicon-react/CheckboxCircleLineIcon";
-import ClipboardLineIcon from "remixicon-react/ClipboardLineIcon";
-import DownloadCloud2FillIcon from "remixicon-react/DownloadCloud2FillIcon";
-import ErrorWarningLineIcon from "remixicon-react/ErrorWarningLineIcon";
-import EyeFillIcon from "remixicon-react/EyeFillIcon";
-import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
-import HeartPulseLineIcon from "remixicon-react/HeartPulseLineIcon";
-import Plug2FillIcon from "remixicon-react/Plug2FillIcon";
-import Settings3LineIcon from "remixicon-react/Settings3LineIcon";
-import UploadCloud2LineIcon from "remixicon-react/UploadCloud2LineIcon";
-import UserAddLineIcon from "remixicon-react/UserAddLineIcon";
+import { RiAddLine, RiCheckboxCircleLine, RiClipboardLine, RiDownloadCloud2Fill, RiErrorWarningLine, RiEyeFill, RiEyeOffFill, RiHeartPulseLine, RiPlug2Fill, RiSettings3Line, RiUploadCloud2Line, RiUserAddLine } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import { loadSavedIntegrations, saveSavedIntegrations } from "../lib/integrations-storage";
 import JellyfinIntegrationSettings from "./components/settings/JellyfinIntegrationSettings";
@@ -268,10 +257,10 @@ function IntegrationCard({ app, type, onChange, onRemove, onSave, onTest, onCopy
               autoComplete={usesUserPass || usesPasswordOnly ? "current-password" : "off"}
             />
             <button type="button" title={showSecret ? "Hide secret" : "Reveal secret"} onClick={() => setShowSecret(!showSecret)}>
-              {showSecret ? <EyeOffFillIcon size={17} /> : <EyeFillIcon size={17} />}
+              {showSecret ? <RiEyeOffFill size={17} /> : <RiEyeFill size={17} />}
             </button>
             <button type="button" title="Copy secret" onClick={() => onCopySecret(values.secret || "")} disabled={!values.secret}>
-              <ClipboardLineIcon size={17} />
+              <RiClipboardLine size={17} />
             </button>
           </span>
         </label>
@@ -664,7 +653,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
           <span>Connect automation apps and as many download clients as your stack needs.</span>
         </div>
         <div className="integrations-status">
-          <Plug2FillIcon />
+          <RiPlug2Fill />
           <strong>{connectorCount}</strong>
           <span>connectors</span>
         </div>
@@ -734,27 +723,27 @@ export default function Integrations({ embedded = false, firstRun = false, activ
               <h2>Arr Apps</h2>
               <span>Sonarr, Radarr, Lidarr, Prowlarr, and Bazarr</span>
             </div>
-            <Settings3LineIcon />
+            <RiSettings3Line />
           </div>
           <div className="integration-toolbar">
             {firstRun && !loadedSavedIntegrations && savedIntegrationsAvailable ? (
               <button type="button" onClick={loadExistingIntegrations}>
-                <DownloadCloud2FillIcon size={18} />
+                <RiDownloadCloud2Fill size={18} />
                 Load saved integrations
               </button>
             ) : null}
             {!firstRun || loadedSavedIntegrations ? (
               <button type="button" onClick={testAllIntegrations} disabled={busyAction === "test-all"}>
-                <HeartPulseLineIcon size={18} />
+                <RiHeartPulseLine size={18} />
                 {busyAction === "test-all" ? "Testing" : "Test all"}
               </button>
             ) : null}
             <button type="button" onClick={exportIntegrations}>
-              <DownloadCloud2FillIcon size={18} />
+              <RiDownloadCloud2Fill size={18} />
               Export
             </button>
             <label>
-              <UploadCloud2LineIcon size={18} />
+              <RiUploadCloud2Line size={18} />
               Import
               <input ref={fileInputRef} type="file" accept=".json,application/json" onChange={importIntegrations} />
             </label>
@@ -814,27 +803,27 @@ export default function Integrations({ embedded = false, firstRun = false, activ
               <h2>Seerr Apps</h2>
               <span>Jellyseerr and Overseerr request management</span>
             </div>
-            <Settings3LineIcon />
+            <RiSettings3Line />
           </div>
           <div className="integration-toolbar">
             {firstRun && !loadedSavedIntegrations && savedIntegrationsAvailable ? (
               <button type="button" onClick={loadExistingIntegrations}>
-                <DownloadCloud2FillIcon size={18} />
+                <RiDownloadCloud2Fill size={18} />
                 Load saved integrations
               </button>
             ) : null}
             {!firstRun || loadedSavedIntegrations ? (
               <button type="button" onClick={testAllIntegrations} disabled={busyAction === "test-all"}>
-                <HeartPulseLineIcon size={18} />
+                <RiHeartPulseLine size={18} />
                 {busyAction === "test-all" ? "Testing" : "Test all"}
               </button>
             ) : null}
             <button type="button" onClick={exportIntegrations}>
-              <DownloadCloud2FillIcon size={18} />
+              <RiDownloadCloud2Fill size={18} />
               Export
             </button>
             <label>
-              <UploadCloud2LineIcon size={18} />
+              <RiUploadCloud2Line size={18} />
               Import
               <input ref={fileInputRef} type="file" accept=".json,application/json" onChange={importIntegrations} />
             </label>
@@ -866,22 +855,22 @@ export default function Integrations({ embedded = false, firstRun = false, activ
             <div className="client-adder">
               {firstRun && !loadedSavedIntegrations && savedIntegrationsAvailable ? (
                 <button type="button" onClick={loadExistingIntegrations}>
-                  <DownloadCloud2FillIcon size={18} />
+                  <RiDownloadCloud2Fill size={18} />
                   Load saved integrations
                 </button>
               ) : null}
               {!firstRun || loadedSavedIntegrations ? (
                 <button type="button" onClick={testAllIntegrations} disabled={busyAction === "test-all"}>
-                  <HeartPulseLineIcon size={18} />
+                  <RiHeartPulseLine size={18} />
                   {busyAction === "test-all" ? "Testing" : "Test all"}
                 </button>
               ) : null}
               <button type="button" onClick={exportIntegrations}>
-                <DownloadCloud2FillIcon size={18} />
+                <RiDownloadCloud2Fill size={18} />
                 Export
               </button>
               <label className="integration-import-button">
-                <UploadCloud2LineIcon size={18} />
+                <RiUploadCloud2Line size={18} />
                 Import
                 <input ref={fileInputRef} type="file" accept=".json,application/json" onChange={importIntegrations} />
               </label>
@@ -891,7 +880,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
                 ))}
               </select>
               <button type="button" onClick={addClient}>
-                <AddLineIcon size={18} />
+                <RiAddLine size={18} />
                 Add client
               </button>
             </div>
@@ -921,27 +910,27 @@ export default function Integrations({ embedded = false, firstRun = false, activ
               <h2>Third-party Apps</h2>
               <span>Wizarr invites and Tdarr active transcode monitoring</span>
             </div>
-            <UserAddLineIcon />
+            <RiUserAddLine />
           </div>
           <div className="integration-toolbar">
             {firstRun && !loadedSavedIntegrations && savedIntegrationsAvailable ? (
               <button type="button" onClick={loadExistingIntegrations}>
-                <DownloadCloud2FillIcon size={18} />
+                <RiDownloadCloud2Fill size={18} />
                 Load saved integrations
               </button>
             ) : null}
             {!firstRun || loadedSavedIntegrations ? (
               <button type="button" onClick={testAllIntegrations} disabled={busyAction === "test-all"}>
-                <HeartPulseLineIcon size={18} />
+                <RiHeartPulseLine size={18} />
                 {busyAction === "test-all" ? "Testing" : "Test all"}
               </button>
             ) : null}
             <button type="button" onClick={exportIntegrations}>
-              <DownloadCloud2FillIcon size={18} />
+              <RiDownloadCloud2Fill size={18} />
               Export
             </button>
             <label>
-              <UploadCloud2LineIcon size={18} />
+              <RiUploadCloud2Line size={18} />
               Import
               <input ref={fileInputRef} type="file" accept=".json,application/json" onChange={importIntegrations} />
             </label>
@@ -980,7 +969,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
               <h2>Health History</h2>
               <span>Recent integration checks</span>
             </div>
-            <HeartPulseLineIcon />
+            <RiHeartPulseLine />
           </div>
           <div className="integration-health-grid">
             {enabledIntegrations.map((item) => {
@@ -989,7 +978,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
               const summary = summarizeHealth(healthEntries);
               return (
                 <article key={item.instanceId} className={health?.ok ? "is-ok" : "is-error"}>
-                  {health?.ok ? <CheckboxCircleLineIcon size={18} /> : <ErrorWarningLineIcon size={18} />}
+                  {health?.ok ? <RiCheckboxCircleLine size={18} /> : <RiErrorWarningLine size={18} />}
                   <div>
                     <strong>{item.name}</strong>
                     <span>{health?.message || "No health checks recorded"}</span>

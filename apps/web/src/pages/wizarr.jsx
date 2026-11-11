@@ -1,12 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import AddLineIcon from "remixicon-react/AddLineIcon";
-import ClipboardLineIcon from "remixicon-react/ClipboardLineIcon";
-import DeleteBinLineIcon from "remixicon-react/DeleteBinLineIcon";
-import ExternalLinkLineIcon from "remixicon-react/ExternalLinkLineIcon";
-import MailSendLineIcon from "remixicon-react/MailSendLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import SearchLineIcon from "remixicon-react/SearchLineIcon";
-import UserAddLineIcon from "remixicon-react/UserAddLineIcon";
+import { RiAddLine, RiClipboardLine, RiDeleteBinLine, RiExternalLinkLine, RiMailSendLine, RiRefreshLine, RiSearchLine, RiUserAddLine } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import "./css/integrations.css";
 import "./css/wizarr.css";
@@ -214,7 +207,7 @@ export default function WizarrPage() {
           <span>Create and manage Jellyfin invite links without leaving Barracks.</span>
         </div>
         <button type="button" className="wizarr-refresh-button" onClick={loadWizarr} disabled={loading}>
-          <RefreshLineIcon size={18} />
+          <RiRefreshLine size={18} />
           Refresh
         </button>
       </section>
@@ -255,7 +248,7 @@ export default function WizarrPage() {
                 <h2>New invite</h2>
                 <span>{form.serverIds.length} server selected · {form.libraryIds.length || "all"} libraries</span>
               </div>
-              <UserAddLineIcon />
+              <RiUserAddLine />
             </div>
 
             <div className="wizarr-form-section">
@@ -364,7 +357,7 @@ export default function WizarrPage() {
                   <strong>Email invite</strong>
                   <small>Use the built-in SMTP settings from Newsletter.</small>
                 </span>
-                <MailSendLineIcon size={18} />
+                <RiMailSendLine size={18} />
               </label>
               <input
                 type="email"
@@ -377,7 +370,7 @@ export default function WizarrPage() {
             </div>
 
             <button type="submit" disabled={saving || loading}>
-              <AddLineIcon size={18} />
+              <RiAddLine size={18} />
               {saving ? "Creating" : "Create invite"}
             </button>
           </form>
@@ -389,7 +382,7 @@ export default function WizarrPage() {
                 <span>{visibleInvites.length} shown from {(data?.invites || []).length}</span>
               </div>
               <label className="wizarr-search">
-                <SearchLineIcon size={18} />
+                <RiSearchLine size={18} />
                 <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search code, server, user..." />
               </label>
             </div>
@@ -422,13 +415,13 @@ export default function WizarrPage() {
                 </div>
                 <div className="wizarr-invite-actions">
                   <button type="button" onClick={() => copyInvite(invite)} disabled={!invite.url} title="Copy invite link">
-                    <ClipboardLineIcon size={18} />
+                    <RiClipboardLine size={18} />
                   </button>
                   <a href={invite.url || "#"} target="_blank" rel="noreferrer" title="Open invite" aria-disabled={!invite.url}>
-                    <ExternalLinkLineIcon size={18} />
+                    <RiExternalLinkLine size={18} />
                   </a>
                   <button type="button" className="is-danger" onClick={() => deleteInvite(invite)} title="Delete invite">
-                    <DeleteBinLineIcon size={18} />
+                    <RiDeleteBinLine size={18} />
                   </button>
                 </div>
               </article>

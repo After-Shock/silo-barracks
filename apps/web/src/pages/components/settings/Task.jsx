@@ -1,10 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import i18next from "i18next";
-import PlayCircleLineIcon from "remixicon-react/PlayCircleLineIcon";
-import StopCircleLineIcon from "remixicon-react/StopCircleLineIcon";
-import TimerLineIcon from "remixicon-react/TimerLineIcon";
-import LinksLineIcon from "remixicon-react/LinksLineIcon";
+import { RiLinksLine, RiPlayCircleLine, RiStopCircleLine, RiTimerLine } from "@remixicon/react";
 
 import "../../css/settings/settings.css";
 
@@ -36,11 +33,11 @@ function Task({ task, taskState, processing, taskIntervals, updateTask, onClick,
 
       <div className="task-card-meta">
         <div>
-          <TimerLineIcon size={18} />
+          <RiTimerLine size={18} />
           <span>{task.type === "JOB" ? intervalLabel : "Manual"}</span>
         </div>
         <div className={hasTaskWebhook ? "is-enabled" : ""}>
-          <LinksLineIcon size={18} />
+          <RiLinksLine size={18} />
           <span>{hasTaskWebhook ? "Webhook wired" : "No task webhook"}</span>
         </div>
       </div>
@@ -67,12 +64,12 @@ function Task({ task, taskState, processing, taskIntervals, updateTask, onClick,
 
         {state?.running ? (
           <Button variant="destructive" onClick={() => stopTask(task.name)} disabled={processing}>
-            <StopCircleLineIcon size={17} className="tw:size-[17px]" />
+            <RiStopCircleLine size={17} className="tw:size-[17px]" />
             Stop
           </Button>
         ) : (
           <Button onClick={() => onClick(task.link)} disabled={processing}>
-            <PlayCircleLineIcon size={17} className="tw:size-[17px]" />
+            <RiPlayCircleLine size={17} className="tw:size-[17px]" />
             Start
           </Button>
         )}

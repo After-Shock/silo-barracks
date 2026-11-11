@@ -1,9 +1,6 @@
 import { useState } from "react";
 import Button from "react-bootstrap/Button";
-import ExternalLinkLineIcon from "remixicon-react/ExternalLinkLineIcon";
-import EyeLineIcon from "remixicon-react/EyeLineIcon";
-import EyeOffLineIcon from "remixicon-react/EyeOffLineIcon";
-import RestartLineIcon from "remixicon-react/RestartLineIcon";
+import { RiExternalLinkLine, RiEyeLine, RiEyeOffLine, RiRestartLine } from "@remixicon/react";
 import {
   DEFAULT_HOME_ORDER,
   HOME_PRESETS,
@@ -96,7 +93,7 @@ export default function KioskSettings() {
       <article key={sectionId} className={isHidden ? "is-hidden" : ""}>
         <span className="kiosk-widget-order">{isHidden ? "Hidden" : index + 1}</span>
         <button type="button" title={isHidden ? "Show widget" : "Hide widget"} onClick={() => toggleSection(sectionId)}>
-          {isHidden ? <EyeOffLineIcon size={18} /> : <EyeLineIcon size={18} />}
+          {isHidden ? <RiEyeOffLine size={18} /> : <RiEyeLine size={18} />}
         </button>
         <strong>{sectionLabels[sectionId] || sectionId}</strong>
         <select value={settings.sizes?.[sectionId] || "medium"} onChange={(event) => updateWidgetSize(sectionId, event.target.value)}>
@@ -128,11 +125,11 @@ export default function KioskSettings() {
         </div>
         <div className="kiosk-settings-actions">
           <Button as="a" href="/home/kiosk" target="_blank" rel="noreferrer" variant="outline-primary">
-            <ExternalLinkLineIcon size={16} />
+            <RiExternalLinkLine size={16} />
             Open kiosk
           </Button>
           <Button type="button" variant="outline-secondary" onClick={resetKiosk}>
-            <RestartLineIcon size={16} />
+            <RiRestartLine size={16} />
             Reset
           </Button>
         </div>

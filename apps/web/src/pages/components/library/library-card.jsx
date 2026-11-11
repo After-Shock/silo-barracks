@@ -4,20 +4,17 @@ import "../../css/library/library-card.css";
 
 import Card from 'react-bootstrap/Card';
 
-import TvLineIcon from "remixicon-react/TvLineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import FileMusicLineIcon from "remixicon-react/FileMusicLineIcon";
-import CheckboxMultipleBlankLineIcon from "remixicon-react/CheckboxMultipleBlankLineIcon";
+import { RiCheckboxMultipleBlankLine, RiFileMusicLine, RiFilmLine, RiTvLine } from "@remixicon/react";
 import { Trans } from "react-i18next";
 import i18next from "i18next";
 import baseUrl from "../../../lib/baseurl";
 
 function LibraryCard(props) {
   const [imageLoaded, setImageLoaded] = useState(true);
-  const SeriesIcon=<TvLineIcon size={"50%"} color="var(--barracks-text-overlay)"/> ;
-  const MovieIcon=<FilmLineIcon size={"50%"} color="var(--barracks-text-overlay)"/> ;
-  const MusicIcon=<FileMusicLineIcon size={"50%"} color="var(--barracks-text-overlay)"/> ;
-  const MixedIcon=<CheckboxMultipleBlankLineIcon size={"50%"} color="var(--barracks-text-overlay)"/> ;
+  const SeriesIcon=<RiTvLine size={"50%"} color="var(--barracks-text-overlay)"/> ;
+  const MovieIcon=<RiFilmLine size={"50%"} color="var(--barracks-text-overlay)"/> ;
+  const MusicIcon=<RiFileMusicLine size={"50%"} color="var(--barracks-text-overlay)"/> ;
+  const MixedIcon=<RiCheckboxMultipleBlankLine size={"50%"} color="var(--barracks-text-overlay)"/> ;
 
   const default_image=<div className="default_library_image default_library_image_hover d-flex justify-content-center align-items-center">{props.data.CollectionType==='tvshows' ? SeriesIcon : props.data.CollectionType==='movies'? MovieIcon : props.data.CollectionType==='music'? MusicIcon : MixedIcon} </div>;
   const typeLabel =

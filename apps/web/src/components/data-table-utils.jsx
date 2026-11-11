@@ -10,8 +10,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import AddCircleFillIcon from "remixicon-react/AddCircleFillIcon";
-import IndeterminateCircleFillIcon from "remixicon-react/IndeterminateCircleFillIcon";
+import { RiAddCircleFill, RiIndeterminateCircleFill } from "@remixicon/react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -132,7 +131,7 @@ export function createExpandColumn({ localization = defaultDataTableLocalization
             aria-expanded={canExpand ? expanded : undefined}
             onClick={() => (onToggle ? onToggle(row, table) : row.toggleExpanded())}
           >
-            {expanded ? <IndeterminateCircleFillIcon /> : <AddCircleFillIcon />}
+            {expanded ? <RiIndeterminateCircleFill /> : <RiAddCircleFill />}
           </Button>
         </span>
       );

@@ -1,4 +1,4 @@
-import CloseLineIcon from "remixicon-react/CloseLineIcon";
+import { RiCloseLine } from "@remixicon/react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -20,7 +20,7 @@ export default function DismissibleAlert({ type, title, onClose, className, chil
         className="tw:absolute tw:top-2 tw:right-2 tw:text-raised-foreground"
         onClick={onClose}
       >
-        <CloseLineIcon size={16} />
+        <RiCloseLine size={16} />
       </Button>
     </Alert>
   );

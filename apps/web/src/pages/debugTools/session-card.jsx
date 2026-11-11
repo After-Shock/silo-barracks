@@ -6,9 +6,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 
-import AccountCircleFillIcon from "remixicon-react/AccountCircleFillIcon";
-import PlayFillIcon from "remixicon-react/PlayFillIcon";
-import PauseFillIcon from "remixicon-react/PauseFillIcon";
+import { RiAccountCircleFill, RiPauseFill, RiPlayFill } from "@remixicon/react";
 
 import { clientData } from "../../lib/devices";
 import Tooltip from "@mui/material/Tooltip";
@@ -250,7 +248,7 @@ function SessionCard(props) {
                           alt=""
                         />
                       ) : (
-                        <AccountCircleFillIcon className="session-card-user-image" />
+                        <RiAccountCircleFill className="session-card-user-image" />
                       )}
                       <Card.Text>
                         <Tooltip title={props.data.session.UserName}>
@@ -266,7 +264,7 @@ function SessionCard(props) {
                     <Col className="col-auto p-0">
                       {/* Player convention: a paused stream shows play, a playing stream shows pause. */}
                       <span role="img" aria-label={props.data.session.PlayState.IsPaused ? "Paused" : "Playing"}>
-                        {props.data.session.PlayState.IsPaused ? <PlayFillIcon /> : <PauseFillIcon />}
+                        {props.data.session.PlayState.IsPaused ? <RiPlayFill /> : <RiPauseFill />}
                       </span>
                     </Col>
 

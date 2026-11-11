@@ -6,8 +6,7 @@ import "./css/library/libraries.css";
 import Loading from "./components/general/loading";
 import SelectionCard from "./components/LibrarySelector/SelectionCard";
 import ErrorBoundary from "./components/general/ErrorBoundary";
-import InformationLineIcon from "remixicon-react/InformationLineIcon";
-import Save3LineIcon from "remixicon-react/Save3LineIcon";
+import { RiInformationLine, RiSave3Line } from "@remixicon/react";
 
 import { Tooltip } from "@mui/material";
 import { Alert, Button, Form } from "react-bootstrap";
@@ -97,7 +96,7 @@ function LibrarySelector() {
         <Tooltip title={<Trans i18nKey={"SETTINGS_PAGE.SELECT_LIBRARIES_TO_IMPORT_TOOLTIP"} />}>
           <span>
             {" "}
-            <InformationLineIcon />
+            <RiInformationLine />
           </span>
         </Tooltip>
       </h1>
@@ -116,7 +115,7 @@ function LibrarySelector() {
           onChange={(event) => setShowLibraryCardNames(event.target.checked)}
         />
         <Button type="submit" disabled={savingDisplaySettings}>
-          <Save3LineIcon size={16} />
+          <RiSave3Line size={16} />
           <span>{savingDisplaySettings ? "Saving..." : "Save"}</span>
         </Button>
       </Form>

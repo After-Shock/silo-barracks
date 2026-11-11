@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import MagicLineIcon from "remixicon-react/MagicLineIcon";
-import UploadCloud2LineIcon from "remixicon-react/UploadCloud2LineIcon";
-import PaletteLineIcon from "remixicon-react/PaletteLineIcon";
-import SpeedLineIcon from "remixicon-react/SpeedLineIcon";
-import Movie2LineIcon from "remixicon-react/Movie2LineIcon";
-import MailLineIcon from "remixicon-react/MailLineIcon";
+import { RiMagicLine, RiMailLine, RiMovie2Line, RiPaletteLine, RiSpeedLine, RiUploadCloud2Line } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 import { APP_VERSION_STORAGE_KEY, OPEN_WHATS_NEW_EVENT } from "../../../lib/events";
 import releaseNotes from "../../../whats-new.json";
@@ -13,18 +8,18 @@ import releaseNotes from "../../../whats-new.json";
 const SEEN_VERSION_KEY = "silo_barracks_whats_new_seen_version";
 
 const iconMap = {
-  magic: MagicLineIcon,
-  movie: Movie2LineIcon,
-  palette: PaletteLineIcon,
-  speed: SpeedLineIcon,
-  upload: UploadCloud2LineIcon,
-  mail: MailLineIcon,
+  magic: RiMagicLine,
+  movie: RiMovie2Line,
+  palette: RiPaletteLine,
+  speed: RiSpeedLine,
+  upload: RiUploadCloud2Line,
+  mail: RiMailLine,
 };
 
 function getNotes(version) {
   return releaseNotes[version] || [
     {
-      icon: MagicLineIcon,
+      icon: RiMagicLine,
       title: "Silo Barracks activity monitoring",
       body: "Native Silo sessions now power live activity and observed playback history. Built on the Barracks dashboard.",
     },
@@ -32,7 +27,7 @@ function getNotes(version) {
 }
 
 function resolveIcon(icon) {
-  return iconMap[icon] || MagicLineIcon;
+  return iconMap[icon] || RiMagicLine;
 }
 
 export default function WhatsNewModal({ enabled = true }) {
@@ -110,7 +105,7 @@ export default function WhatsNewModal({ enabled = true }) {
         </button>
         <div className="whats-new-hero">
           <span>
-            <MagicLineIcon size={17} />
+            <RiMagicLine size={17} />
             What&apos;s new
           </span>
           <h2>Silo Barracks {version}</h2>

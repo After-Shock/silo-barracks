@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "../../lib/axios_instance";
-import AccountCircleFillIcon from "remixicon-react/AccountCircleFillIcon";
+import { RiAccountCircleFill } from "@remixicon/react";
 import Config from "../../lib/config";
 import { Tabs, Tab, Button, ButtonGroup } from "react-bootstrap";
 
@@ -75,7 +75,7 @@ function UserInfo() {
       <div className="user-detail-container">
         <div className="user-image-container">
           {imgError ? (
-            <AccountCircleFillIcon size={"100%"} />
+            <RiAccountCircleFill size={"100%"} />
           ) : (
             <img
               className="user-image"

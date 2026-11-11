@@ -2,10 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "../../../lib/axios_instance";
 import { Button } from "@/components/ui/button";
 import DismissibleAlert from "./dismissible-alert";
-import ServerLineIcon from "remixicon-react/ServerLineIcon";
-import PlayCircleLineIcon from "remixicon-react/PlayCircleLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import TimeLineIcon from "remixicon-react/TimeLineIcon";
+import { RiPlayCircleLine, RiRefreshLine, RiServerLine, RiTimeLine } from "@remixicon/react";
 
 import "../../css/settings/settings.css";
 
@@ -100,7 +97,7 @@ export default function ServerManagement() {
           <span>Run Jellyfin scheduled jobs such as library scans, metadata refreshes, subtitle jobs, and plugin maintenance.</span>
         </div>
         <Button type="button" variant="secondary" onClick={loadStatus} disabled={loading}>
-          <RefreshLineIcon size={17} className="tw:size-[17px]" />
+          <RiRefreshLine size={17} className="tw:size-[17px]" />
           Refresh
         </Button>
       </div>
@@ -114,7 +111,7 @@ export default function ServerManagement() {
       <section className="server-management-grid">
         <article className="server-management-panel server-status-panel">
           <div className="server-management-panel-heading">
-            <ServerLineIcon size={20} />
+            <RiServerLine size={20} />
             <div>
               <h2>{status?.jellyfin?.name || "Jellyfin"}</h2>
               <p>{status?.jellyfin?.ok ? "Connected media server" : status?.jellyfin?.error || "Status unavailable"}</p>
@@ -159,7 +156,7 @@ export default function ServerManagement() {
                 <strong>{task.name}</strong>
                 <p>{task.description || formatTaskState(task)}</p>
                 <small>
-                  <TimeLineIcon size={15} />
+                  <RiTimeLine size={15} />
                   {formatLastRun(task)}
                 </small>
               </div>
@@ -171,7 +168,7 @@ export default function ServerManagement() {
                   onClick={() => runAction("runJellyfinTask", { taskId: task.id })}
                   disabled={Boolean(busyAction) || task.state === "Running"}
                 >
-                  <PlayCircleLineIcon size={17} className="tw:size-[17px]" />
+                  <RiPlayCircleLine size={17} className="tw:size-[17px]" />
                   Run
                 </Button>
               </div>

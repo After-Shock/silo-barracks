@@ -5,11 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-import EyeFillIcon from "remixicon-react/EyeFillIcon";
-import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
-import LoginCircleLineIcon from "remixicon-react/LoginCircleLineIcon";
-import ShieldKeyholeLineIcon from "remixicon-react/ShieldKeyholeLineIcon";
-import UserSettingsLineIcon from "remixicon-react/UserSettingsLineIcon";
+import { RiEyeFill, RiEyeOffFill, RiLoginCircleLine, RiShieldKeyholeLine, RiUserSettingsLine } from "@remixicon/react";
 import { Link } from "react-router-dom";
 
 import Config from "../../../lib/config";
@@ -29,19 +25,19 @@ const authModes = [
     id: "quick-connect",
     title: "Jellyfin Login / Quick Connect",
     text: "Use Jellyfin Quick Connect for account access.",
-    Icon: LoginCircleLineIcon,
+    Icon: RiLoginCircleLine,
   },
   {
     id: "oidc",
     title: "OIDC / Authentik",
     text: "Use an external identity provider.",
-    Icon: ShieldKeyholeLineIcon,
+    Icon: RiShieldKeyholeLine,
   },
   {
     id: "local",
     title: "Local",
     text: "Use a Silo Barracks username and password.",
-    Icon: UserSettingsLineIcon,
+    Icon: RiUserSettingsLine,
   },
 ];
 
@@ -153,12 +149,12 @@ export default function SecuritySettings() {
         </div>
         <div className="security-current-stack" aria-label="Current security settings">
           <article>
-            <LoginCircleLineIcon size={18} />
+            <RiLoginCircleLine size={18} />
             <span>Authentication</span>
             <strong>{activeAuthMode.title}</strong>
           </article>
           <article>
-            <ShieldKeyholeLineIcon size={18} />
+            <RiShieldKeyholeLine size={18} />
             <span>IP Privacy</span>
             <strong>{activePrivacyMode.title}</strong>
           </article>
@@ -188,7 +184,7 @@ export default function SecuritySettings() {
               className={`security-auth-card ${activeSessionIpPrivacy === id ? "is-active" : ""}`}
               onClick={() => handleActiveSessionIpPrivacyChange(id)}
             >
-              <ShieldKeyholeLineIcon size={22} />
+              <RiShieldKeyholeLine size={22} />
               <span>
                 <strong>{title}</strong>
                 <small>{text}</small>
@@ -270,7 +266,7 @@ export default function SecuritySettings() {
                     autoComplete="off"
                   />
                   <Button variant="outline" type="button" className={BUTTON_ICON_NATURAL_SIZE} onClick={() => setShowOidcSecret(!showOidcSecret)} aria-label={showOidcSecret ? "Hide client secret" : "Show client secret"}>
-                    {showOidcSecret ? <EyeFillIcon /> : <EyeOffFillIcon />}
+                    {showOidcSecret ? <RiEyeFill /> : <RiEyeOffFill />}
                   </Button>
                 </div>
               </div>

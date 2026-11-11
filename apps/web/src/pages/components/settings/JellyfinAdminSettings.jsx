@@ -2,10 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import axios from "../../../lib/axios_instance";
-import AppsLineIcon from "remixicon-react/AppsLineIcon";
-import DeviceLineIcon from "remixicon-react/DeviceLineIcon";
-import Plug2LineIcon from "remixicon-react/Plug2LineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
+import { RiAppsLine, RiDeviceLine, RiPlug2Line, RiRefreshLine } from "@remixicon/react";
 import { PlatformIcon } from "../../../lib/platform-icons.jsx";
 
 import "../../css/settings/settings.css";
@@ -79,7 +76,7 @@ export default function JellyfinAdminSettings({ view = "devices" }) {
           </span>
         </div>
         <Button type="button" variant="outline-light" onClick={loadJellyfinAdmin} disabled={loading}>
-          <RefreshLineIcon size={17} />
+          <RiRefreshLine size={17} />
           Refresh
         </Button>
       </div>
@@ -94,7 +91,7 @@ export default function JellyfinAdminSettings({ view = "devices" }) {
         <section className="jellyfin-admin-section">
           <div className="jellyfin-admin-section-heading">
             <div>
-              <DeviceLineIcon size={20} />
+              <RiDeviceLine size={20} />
               <div>
                 <h2>Authorised Devices</h2>
                 <p>{devices.length} devices returned by Jellyfin.</p>
@@ -128,7 +125,7 @@ export default function JellyfinAdminSettings({ view = "devices" }) {
         <section className="jellyfin-admin-section">
           <div className="jellyfin-admin-section-heading">
             <div>
-              <AppsLineIcon size={20} />
+              <RiAppsLine size={20} />
               <div>
                 <h2>Installed Plugins</h2>
                 <p>{pluginCounts.enabled}/{pluginCounts.total} enabled.</p>
@@ -157,7 +154,7 @@ export default function JellyfinAdminSettings({ view = "devices" }) {
                 <div className="jellyfin-plugin-body">
                   <div className="jellyfin-plugin-top">
                     <span className="jellyfin-plugin-icon">
-                      <Plug2LineIcon size={18} />
+                      <RiPlug2Line size={18} />
                       {plugin.enabled ? "Enabled" : "Disabled"}
                     </span>
                     {plugin.canUninstall ? <em>Removable</em> : null}

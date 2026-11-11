@@ -12,11 +12,13 @@ import {
   DataTable,
   DataTableColumnsMenu,
   DataTablePagination,
+} from "@/components/data-table";
+import {
   createExpandColumn,
   createSelectColumn,
   defaultDataTableLocalization,
   useDataTable,
-} from "@/components/data-table";
+} from "@/components/data-table-utils";
 import {
   AlertDialog,
   AlertDialogContent,

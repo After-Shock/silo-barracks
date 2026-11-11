@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "../../../lib/axios_instance";
 import { Alert, Button, Form, Spinner } from "react-bootstrap";
-import AddLineIcon from "remixicon-react/AddLineIcon";
-import ClipboardLineIcon from "remixicon-react/ClipboardLineIcon";
-import DeleteBinLineIcon from "remixicon-react/DeleteBinLineIcon";
-import Key2LineIcon from "remixicon-react/Key2LineIcon";
+import { RiAddLine, RiClipboardLine, RiDeleteBinLine, RiKey2Line } from "@remixicon/react";
 
 import "../../css/settings/apiKeys.css";
 
@@ -118,7 +115,7 @@ export default function ApiKeys() {
           <p>Create scoped Barracks tokens for automation, dashboards, and integrations.</p>
         </div>
         <div className="api-keys-count">
-          <Key2LineIcon size={22} />
+          <RiKey2Line size={22} />
           <span>{keys.length}</span>
         </div>
       </div>
@@ -135,7 +132,7 @@ export default function ApiKeys() {
           <Form.Control value={name} onChange={(event) => setName(event.target.value)} placeholder="Automation, Grafana, Home Assistant..." />
         </div>
         <Button type="submit" disabled={saving}>
-          {saving ? <Spinner animation="border" size="sm" /> : <AddLineIcon size={18} />}
+          {saving ? <Spinner animation="border" size="sm" /> : <RiAddLine size={18} />}
           Add Key
         </Button>
       </Form>
@@ -145,7 +142,7 @@ export default function ApiKeys() {
           {sortedKeys.map((apiKey) => (
             <article className="api-key-card" key={apiKey.key}>
               <div className="api-key-icon">
-                <Key2LineIcon size={20} />
+                <RiKey2Line size={20} />
               </div>
               <div className="api-key-main">
                 <strong>{apiKey.name}</strong>
@@ -153,10 +150,10 @@ export default function ApiKeys() {
               </div>
               <div className="api-key-actions">
                 <Button variant="outline-primary" onClick={() => copyKey(apiKey.key)} title="Copy key">
-                  <ClipboardLineIcon size={17} />
+                  <RiClipboardLine size={17} />
                 </Button>
                 <Button variant="outline-danger" onClick={() => deleteKey(apiKey.key)} title="Delete key">
-                  <DeleteBinLineIcon size={17} />
+                  <RiDeleteBinLine size={17} />
                 </Button>
               </div>
             </article>
@@ -164,7 +161,7 @@ export default function ApiKeys() {
         </div>
       ) : (
         <div className="api-keys-empty">
-          <Key2LineIcon size={32} />
+          <RiKey2Line size={32} />
           <strong>No API keys yet</strong>
           <p>Create a key when another tool needs to call Barracks.</p>
         </div>

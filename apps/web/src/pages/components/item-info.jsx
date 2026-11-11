@@ -5,15 +5,7 @@ import { useParams, Link } from "react-router-dom";
 import { Blurhash } from "react-blurhash";
 import { Tabs, Tab, Button } from "react-bootstrap";
 
-import ExternalLinkFillIcon from "remixicon-react/ExternalLinkFillIcon";
-import ArchiveDrawerFillIcon from "remixicon-react/ArchiveDrawerFillIcon";
-import ArrowLeftSLineIcon from "remixicon-react/ArrowLeftSLineIcon";
-import InformationLineIcon from "remixicon-react/InformationLineIcon";
-import PlayFillIcon from "remixicon-react/PlayFillIcon";
-import TvLineIcon from "remixicon-react/TvLineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import FileMusicLineIcon from "remixicon-react/FileMusicLineIcon";
-import CheckboxMultipleBlankLineIcon from "remixicon-react/CheckboxMultipleBlankLineIcon";
+import { RiArchiveDrawerFill, RiArrowLeftSLine, RiCheckboxMultipleBlankLine, RiExternalLinkFill, RiFileMusicLine, RiFilmLine, RiInformationLine, RiPlayFill, RiTvLine } from "@remixicon/react";
 
 import "../css/items/item-details.css";
 
@@ -74,10 +66,10 @@ function ItemInfo() {
   const [loaded, setLoaded] = useState(false);
   const [fallback, setFallback] = useState(false);
 
-  const SeriesIcon = <TvLineIcon size={"50%"} />;
-  const MovieIcon = <FilmLineIcon size={"50%"} />;
-  const MusicIcon = <FileMusicLineIcon size={"50%"} />;
-  const MixedIcon = <CheckboxMultipleBlankLineIcon size={"50%"} />;
+  const SeriesIcon = <RiTvLine size={"50%"} />;
+  const MovieIcon = <RiFilmLine size={"50%"} />;
+  const MusicIcon = <RiFileMusicLine size={"50%"} />;
+  const MixedIcon = <RiCheckboxMultipleBlankLine size={"50%"} />;
 
   const currentLibraryDefaultIcon =
     data?.Type === "Movie" ? MovieIcon : data?.Type === "Episode" ? SeriesIcon : data?.Type === "Audio" ? MusicIcon : MixedIcon;
@@ -198,7 +190,7 @@ function ItemInfo() {
           )}
           {["Episode", "Season"].includes(data.Type) && (
             <>
-              <ArrowLeftSLineIcon size={18} />
+              <RiArrowLeftSLine size={18} />
               <Link to={`/libraries/item/${data.SeriesId}`} className="item-crumb">
                 {data.SeriesName}
               </Link>
@@ -206,7 +198,7 @@ function ItemInfo() {
           )}
           {data.Type === "Episode" && (
             <>
-              <ArrowLeftSLineIcon size={18} />
+              <RiArrowLeftSLine size={18} />
               <Link to={`/libraries/item/${data.SeasonId}`} className="item-crumb">
                 {data.SeasonName}
               </Link>
@@ -230,7 +222,7 @@ function ItemInfo() {
               />
             ) : (
               <div className="item-poster-fallback">
-                {data.archived ? <ArchiveDrawerFillIcon size={58} /> : currentLibraryDefaultIcon}
+                {data.archived ? <RiArchiveDrawerFill size={58} /> : currentLibraryDefaultIcon}
                 <span>{data.archived ? <Trans i18nKey="ARCHIVED" /> : data.Type}</span>
               </div>
             )}
@@ -247,7 +239,7 @@ function ItemInfo() {
                   <span>{ticksToTimeString(data.RunTimeTicks)}</span>
                   {jellyfinUrl ? (
                     <a href={jellyfinUrl} target="_blank" rel="noreferrer" title={`Open in ${mediaServerName}`}>
-                      <ExternalLinkFillIcon size={22} />
+                      <RiExternalLinkFill size={22} />
                     </a>
                   ) : null}
                 </div>
@@ -320,7 +312,7 @@ function ItemInfo() {
             <div className="item-action-row">
               {actionLinks.map((link) => (
                 <a key={`${link.label}-${link.url}`} href={link.url} target="_blank" rel="noreferrer" className={`item-action-link ${link.primary ? "is-primary" : ""}`}>
-                  <ExternalLinkFillIcon size={16} />
+                  <RiExternalLinkFill size={16} />
                   {link.label}
                 </a>
               ))}
@@ -331,7 +323,7 @@ function ItemInfo() {
 
       <section className="item-technical-panel">
         <div className="item-section-heading">
-          <InformationLineIcon size={22} />
+          <RiInformationLine size={22} />
           <div>
             <span>Media details</span>
             <strong>{data.FileName || data.Name}</strong>
@@ -359,16 +351,16 @@ function ItemInfo() {
 
       <div className="item-tabs-row">
         <Button onClick={() => setActiveTab("tabOverview")} active={activeTab === "tabOverview"} variant="outline-primary" type="button">
-          <PlayFillIcon size={16} />
+          <RiPlayFill size={16} />
           <Trans i18nKey="TAB_CONTROLS.OVERVIEW" />
         </Button>
         <Button onClick={() => setActiveTab("tabActivity")} active={activeTab === "tabActivity"} variant="outline-primary" type="button">
-          <InformationLineIcon size={16} />
+          <RiInformationLine size={16} />
           <Trans i18nKey="TAB_CONTROLS.ACTIVITY" />
         </Button>
         {data.archived && (
           <Button onClick={() => setActiveTab("tabOptions")} active={activeTab === "tabOptions"} variant="outline-primary" type="button">
-            <ArchiveDrawerFillIcon size={16} />
+            <RiArchiveDrawerFill size={16} />
             <Trans i18nKey="TAB_CONTROLS.OPTIONS" />
           </Button>
         )}

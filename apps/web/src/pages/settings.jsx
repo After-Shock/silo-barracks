@@ -13,23 +13,7 @@ import "./css/settings/version.css";
 import { Trans } from "react-i18next";
 import ErrorBoundary from "./components/general/ErrorBoundary";
 import Loading from "./components/general/loading";
-import Settings3LineIcon from "remixicon-react/Settings3LineIcon";
-import ShieldKeyholeLineIcon from "remixicon-react/ShieldKeyholeLineIcon";
-import PulseLineIcon from "remixicon-react/PulseLineIcon";
-import TaskLineIcon from "remixicon-react/TaskLineIcon";
-import GalleryLineIcon from "remixicon-react/GalleryLineIcon";
-import Key2LineIcon from "remixicon-react/Key2LineIcon";
-import Notification3LineIcon from "remixicon-react/Notification3LineIcon";
-import ArchiveLineIcon from "remixicon-react/ArchiveLineIcon";
-import FileList3LineIcon from "remixicon-react/FileList3LineIcon";
-import Plug2LineIcon from "remixicon-react/Plug2LineIcon";
-import HeartPulseLineIcon from "remixicon-react/HeartPulseLineIcon";
-import Database2LineIcon from "remixicon-react/Database2LineIcon";
-import MailSettingsLineIcon from "remixicon-react/MailSettingsLineIcon";
-import ToolsLineIcon from "remixicon-react/ToolsLineIcon";
-import DeviceLineIcon from "remixicon-react/DeviceLineIcon";
-import AppsLineIcon from "remixicon-react/AppsLineIcon";
-import Tv2LineIcon from "remixicon-react/Tv2LineIcon";
+import { RiAppsLine, RiArchiveLine, RiDatabase2Line, RiDeviceLine, RiFileList3Line, RiGalleryLine, RiHeartPulseLine, RiKey2Line, RiMailSettingsLine, RiNotification3Line, RiPlug2Line, RiPulseLine, RiSettings3Line, RiShieldKeyholeLine, RiTaskLine, RiToolsLine, RiTv2Line } from "@remixicon/react";
 
 const SettingsConfig = lazy(() => import("./components/settings/settingsConfig"));
 const Tasks = lazy(() => import("./components/settings/Tasks"));
@@ -110,25 +94,25 @@ function ImportTabs() {
 }
 
 const settingsTabItems = [
-  { key: "tabGeneral", Icon: Settings3LineIcon, label: "General", group: "Core" },
-  { key: "tabSecurity", Icon: ShieldKeyholeLineIcon, label: <Trans i18nKey={"SETTINGS_PAGE.SECURITY"} />, group: "Core" },
-  { key: "tabKiosk", Icon: Tv2LineIcon, label: "Kiosk", group: "Core" },
-  { key: "tabLibraries", Icon: GalleryLineIcon, label: <Trans i18nKey={"SETTINGS_PAGE.LIBRARY_SETTINGS"} />, group: "Media" },
-  { key: "tabActivityMonitor", Icon: PulseLineIcon, label: <Trans i18nKey={"SETTINGS_PAGE.ACTIVITY_MONITOR"} defaults="Activity Monitor" />, group: "Media" },
-  { key: "tabJellyfinDevices", Icon: DeviceLineIcon, label: "Authorised Devices", group: "Media" },
-  { key: "tabJellyfinPlugins", Icon: AppsLineIcon, label: "Plugins", group: "Media" },
-  { key: "tabIntegrations", Icon: Plug2LineIcon, label: "Integrations", group: "Connections" },
-  { key: "tabServers", Icon: DeviceLineIcon, label: "Silo Servers", group: "Connections" },
-  { key: "tabKeys", Icon: Key2LineIcon, label: <Trans i18nKey={"SETTINGS_PAGE.API_KEY"} />, group: "Connections" },
-  { key: "tabWebhooks", Icon: Notification3LineIcon, label: <Trans i18nKey={"SETTINGS_PAGE.WEBHOOKS"} />, group: "Connections" },
-  { key: "tabNotifications", Icon: Notification3LineIcon, label: "Notifications", group: "Connections" },
-  { key: "tabNewsletter", Icon: MailSettingsLineIcon, label: "Newsletter", group: "Connections" },
-  { key: "tabTasks", Icon: TaskLineIcon, label: <Trans i18nKey={"SETTINGS_PAGE.TASKS"} />, group: "Operations" },
-  { key: "tabBackup", Icon: ArchiveLineIcon, label: <Trans i18nKey={"SETTINGS_PAGE.BACKUP"} />, group: "Operations" },
-  { key: "tabImports", Icon: Database2LineIcon, label: "Imports", group: "Operations" },
-  { key: "tabHealth", Icon: HeartPulseLineIcon, label: "Health", group: "Operations" },
-  { key: "tabRepair", Icon: ToolsLineIcon, label: "Repair", group: "Operations" },
-  { key: "tabLogs", Icon: FileList3LineIcon, label: <Trans i18nKey={"SETTINGS_PAGE.LOGS"} />, group: "Operations" },
+  { key: "tabGeneral", Icon: RiSettings3Line, label: "General", group: "Core" },
+  { key: "tabSecurity", Icon: RiShieldKeyholeLine, label: <Trans i18nKey={"SETTINGS_PAGE.SECURITY"} />, group: "Core" },
+  { key: "tabKiosk", Icon: RiTv2Line, label: "Kiosk", group: "Core" },
+  { key: "tabLibraries", Icon: RiGalleryLine, label: <Trans i18nKey={"SETTINGS_PAGE.LIBRARY_SETTINGS"} />, group: "Media" },
+  { key: "tabActivityMonitor", Icon: RiPulseLine, label: <Trans i18nKey={"SETTINGS_PAGE.ACTIVITY_MONITOR"} defaults="Activity Monitor" />, group: "Media" },
+  { key: "tabJellyfinDevices", Icon: RiDeviceLine, label: "Authorised Devices", group: "Media" },
+  { key: "tabJellyfinPlugins", Icon: RiAppsLine, label: "Plugins", group: "Media" },
+  { key: "tabIntegrations", Icon: RiPlug2Line, label: "Integrations", group: "Connections" },
+  { key: "tabServers", Icon: RiDeviceLine, label: "Silo Servers", group: "Connections" },
+  { key: "tabKeys", Icon: RiKey2Line, label: <Trans i18nKey={"SETTINGS_PAGE.API_KEY"} />, group: "Connections" },
+  { key: "tabWebhooks", Icon: RiNotification3Line, label: <Trans i18nKey={"SETTINGS_PAGE.WEBHOOKS"} />, group: "Connections" },
+  { key: "tabNotifications", Icon: RiNotification3Line, label: "Notifications", group: "Connections" },
+  { key: "tabNewsletter", Icon: RiMailSettingsLine, label: "Newsletter", group: "Connections" },
+  { key: "tabTasks", Icon: RiTaskLine, label: <Trans i18nKey={"SETTINGS_PAGE.TASKS"} />, group: "Operations" },
+  { key: "tabBackup", Icon: RiArchiveLine, label: <Trans i18nKey={"SETTINGS_PAGE.BACKUP"} />, group: "Operations" },
+  { key: "tabImports", Icon: RiDatabase2Line, label: "Imports", group: "Operations" },
+  { key: "tabHealth", Icon: RiHeartPulseLine, label: "Health", group: "Operations" },
+  { key: "tabRepair", Icon: RiToolsLine, label: "Repair", group: "Operations" },
+  { key: "tabLogs", Icon: RiFileList3Line, label: <Trans i18nKey={"SETTINGS_PAGE.LOGS"} />, group: "Operations" },
 ];
 
 const settingsTabs = settingsTabItems.map((item) => item.key);

@@ -2,9 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import DismissibleAlert from "./dismissible-alert";
-import Database2LineIcon from "remixicon-react/Database2LineIcon";
-import FileSearchLineIcon from "remixicon-react/FileSearchLineIcon";
-import UploadCloud2LineIcon from "remixicon-react/UploadCloud2LineIcon";
+import { RiDatabase2Line, RiFileSearchLine, RiUploadCloud2Line } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 
 function authHeader() {
@@ -165,14 +163,14 @@ export default function JellystatImport() {
 
       <section className="legacy-import-panel">
         <div className="legacy-import-upload">
-          <Database2LineIcon />
+          <RiDatabase2Line />
           <div>
             <span>Jellystat backup file</span>
             <strong>{uploadedBackup?.originalName || (result?.sourceFile ? String(result.sourceFile).split("/").pop() : "") || "No backup uploaded"}</strong>
             <small>{uploadedBackup ? `${formatSize(uploadedBackup.size)} · ready to import` : "Accepted format: Jellystat .json backup"}</small>
           </div>
           <label className="legacy-import-upload-button">
-            {busyAction === "upload" ? <Spinner className="tw:size-4" /> : <FileSearchLineIcon size={18} />}
+            {busyAction === "upload" ? <Spinner className="tw:size-4" /> : <RiFileSearchLine size={18} />}
             Upload and preview
             <input ref={fileInputRef} type="file" accept=".json,application/json" onChange={uploadAndPreview} disabled={Boolean(busyAction)} />
           </label>
@@ -180,7 +178,7 @@ export default function JellystatImport() {
 
         <div className="legacy-import-actions">
           <Button type="button" onClick={importBackup} disabled={!uploadedBackup?.uploadId || Boolean(busyAction)}>
-            {busyAction === "import" ? <Spinner className="tw:size-4" /> : <UploadCloud2LineIcon size={18} className="tw:size-[18px]" />}
+            {busyAction === "import" ? <Spinner className="tw:size-4" /> : <RiUploadCloud2Line size={18} className="tw:size-[18px]" />}
             Import uploaded history
           </Button>
         </div>
@@ -251,7 +249,7 @@ export default function JellystatImport() {
                 onClick={() => linkUser(user.UserId)}
                 disabled={!selectedUserMatch[user.UserId] || Boolean(busyAction)}
               >
-                {busyAction === `link-user-${user.UserId}` ? <Spinner className="tw:size-4" /> : <UploadCloud2LineIcon size={18} className="tw:size-[18px]" />}
+                {busyAction === `link-user-${user.UserId}` ? <Spinner className="tw:size-4" /> : <RiUploadCloud2Line size={18} className="tw:size-[18px]" />}
                 Link user
               </Button>
             </article>

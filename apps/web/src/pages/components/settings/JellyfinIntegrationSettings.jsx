@@ -5,8 +5,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
-import EyeFillIcon from "remixicon-react/EyeFillIcon";
-import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
+import { RiEyeFill, RiEyeOffFill } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 import Config from "../../../lib/config";
 import Loading from "../general/loading";
@@ -132,7 +131,7 @@ export default function JellyfinIntegrationSettings({ compact = false, firstRun 
                   autoComplete="off"
                 />
                 <Button variant="outline-primary" type="button" onClick={() => setKeyState(!showKey)}>
-                  {showKey ? <EyeFillIcon /> : <EyeOffFillIcon />}
+                  {showKey ? <RiEyeFill /> : <RiEyeOffFill />}
                 </Button>
               </InputGroup>
             </Col>

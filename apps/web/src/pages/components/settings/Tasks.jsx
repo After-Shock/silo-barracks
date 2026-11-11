@@ -3,8 +3,7 @@ import axios from "../../../lib/axios_instance";
 import { taskList } from "../../../lib/tasklist.jsx";
 import Task from "./Task";
 import socket from "../../../socket";
-import TaskLineIcon from "remixicon-react/TaskLineIcon";
-import LinksLineIcon from "remixicon-react/LinksLineIcon";
+import { RiLinksLine, RiTaskLine } from "@remixicon/react";
 import Config from '../../../lib/config';
 
 import "../../css/settings/settings.css";
@@ -129,15 +128,15 @@ export default function Tasks() {
         </div>
         <div className="tasks-summary">
           <span>
-            <TaskLineIcon size={18} />
+            <RiTaskLine size={18} />
             {visibleTasks.length} jobs
           </span>
           <span>
-            <TaskLineIcon size={18} />
+            <RiTaskLine size={18} />
             {runningCount} running
           </span>
           <span>
-            <LinksLineIcon size={18} />
+            <RiLinksLine size={18} />
             {taskWebhookCount}/3 task webhooks
           </span>
         </div>

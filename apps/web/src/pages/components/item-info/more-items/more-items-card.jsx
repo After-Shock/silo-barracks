@@ -2,13 +2,9 @@ import { useState } from "react";
 import { Blurhash } from "react-blurhash";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import ArchiveDrawerFillIcon from "remixicon-react/ArchiveDrawerFillIcon";
+import { RiArchiveDrawerFill, RiCheckboxMultipleBlankLine, RiFileMusicLine, RiFilmLine, RiTvLine } from "@remixicon/react";
 import "../../../css/lastplayed.css";
 import { Trans } from "react-i18next";
-import TvLineIcon from "remixicon-react/TvLineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import FileMusicLineIcon from "remixicon-react/FileMusicLineIcon";
-import CheckboxMultipleBlankLineIcon from "remixicon-react/CheckboxMultipleBlankLineIcon";
 import baseUrl from "../../../../lib/baseurl";
 
 function MoreItemCards(props) {
@@ -16,10 +12,10 @@ function MoreItemCards(props) {
   const [loaded, setLoaded] = useState(props.data.archived);
   const [fallback, setFallback] = useState(false);
 
-  const SeriesIcon = <TvLineIcon size={"50%"} />;
-  const MovieIcon = <FilmLineIcon size={"50%"} />;
-  const MusicIcon = <FileMusicLineIcon size={"50%"} />;
-  const MixedIcon = <CheckboxMultipleBlankLineIcon size={"50%"} />;
+  const SeriesIcon = <RiTvLine size={"50%"} />;
+  const MovieIcon = <RiFilmLine size={"50%"} />;
+  const MusicIcon = <RiFileMusicLine size={"50%"} />;
+  const MixedIcon = <RiCheckboxMultipleBlankLine size={"50%"} />;
 
   const currentLibraryDefaultIcon =
     props.data.Type === "Movie"
@@ -125,7 +121,7 @@ function MoreItemCards(props) {
                 />
               ) : null}
               <div className="d-flex flex-column justify-content-center align-items-center position-absolute">
-                <ArchiveDrawerFillIcon className="w-100 h-100 mb-2" />
+                <RiArchiveDrawerFill className="w-100 h-100 mb-2" />
                 <span>
                   <Trans i18nKey="ARCHIVED" />
                 </span>

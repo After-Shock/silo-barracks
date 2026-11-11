@@ -2,9 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import DismissibleAlert from "./dismissible-alert";
-import Database2LineIcon from "remixicon-react/Database2LineIcon";
-import FileSearchLineIcon from "remixicon-react/FileSearchLineIcon";
-import UploadCloud2LineIcon from "remixicon-react/UploadCloud2LineIcon";
+import { RiDatabase2Line, RiFileSearchLine, RiUploadCloud2Line } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 
 function authHeader() {
@@ -233,7 +231,7 @@ export default function TautulliImport() {
 
       <section className="legacy-import-panel">
         <div className="legacy-import-upload">
-          <Database2LineIcon />
+          <RiDatabase2Line />
           <div>
             <span>Tautulli backup file</span>
             <strong>{uploadedBackup?.originalName || (result?.sourceFile ? String(result.sourceFile).split("/").pop() : "") || "No backup uploaded"}</strong>
@@ -244,7 +242,7 @@ export default function TautulliImport() {
             </small>
           </div>
           <label className="legacy-import-upload-button">
-            {busyAction === "upload" ? <Spinner className="tw:size-4" /> : <FileSearchLineIcon size={18} />}
+            {busyAction === "upload" ? <Spinner className="tw:size-4" /> : <RiFileSearchLine size={18} />}
             Upload and preview
             <input ref={fileInputRef} type="file" accept=".db,.zip,.db.zip,application/zip" onChange={uploadAndPreview} disabled={Boolean(busyAction)} />
           </label>
@@ -252,7 +250,7 @@ export default function TautulliImport() {
 
         <div className="legacy-import-actions">
           <Button type="button" onClick={importBackup} disabled={!uploadedBackup?.uploadId || Boolean(busyAction)}>
-            {busyAction === "import" ? <Spinner className="tw:size-4" /> : <UploadCloud2LineIcon size={18} className="tw:size-[18px]" />}
+            {busyAction === "import" ? <Spinner className="tw:size-4" /> : <RiUploadCloud2Line size={18} className="tw:size-[18px]" />}
             Import uploaded history
           </Button>
         </div>
@@ -330,7 +328,7 @@ export default function TautulliImport() {
                 onClick={() => linkUser(user.UserId)}
                 disabled={!selectedUserMatch[user.UserId] || Boolean(busyAction)}
               >
-                {busyAction === `link-user-${user.UserId}` ? <Spinner className="tw:size-4" /> : <UploadCloud2LineIcon size={18} className="tw:size-[18px]" />}
+                {busyAction === `link-user-${user.UserId}` ? <Spinner className="tw:size-4" /> : <RiUploadCloud2Line size={18} className="tw:size-[18px]" />}
                 Link user
               </Button>
             </article>
@@ -384,7 +382,7 @@ export default function TautulliImport() {
                 disabled={!selectedGroup}
               />
               <Button type="submit" variant="outline" disabled={!selectedGroup || mediaSearch.trim().length < 2 || Boolean(busyAction)}>
-                {busyAction === "search" ? <Spinner className="tw:size-4" /> : <FileSearchLineIcon size={18} className="tw:size-[18px]" />}
+                {busyAction === "search" ? <Spinner className="tw:size-4" /> : <RiFileSearchLine size={18} className="tw:size-[18px]" />}
                 Search
               </Button>
             </form>
@@ -405,7 +403,7 @@ export default function TautulliImport() {
             </div>
 
             <Button type="button" onClick={linkSelectedGroup} disabled={!selectedGroup || !selectedTarget || Boolean(busyAction)}>
-              {busyAction === "link" ? <Spinner className="tw:size-4" /> : <UploadCloud2LineIcon size={18} className="tw:size-[18px]" />}
+              {busyAction === "link" ? <Spinner className="tw:size-4" /> : <RiUploadCloud2Line size={18} className="tw:size-[18px]" />}
               Link selected media
             </Button>
           </div>

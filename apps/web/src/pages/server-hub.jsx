@@ -1,7 +1,6 @@
 import { lazy } from "react";
 import { Link } from "react-router-dom";
-import ServerLineIcon from "remixicon-react/ServerLineIcon";
-import RadarLineIcon from "remixicon-react/RadarLineIcon";
+import { RiRadarLine, RiServerLine } from "@remixicon/react";
 import PageTabs from "./components/general/PageTabs";
 import { serverHubReachableIds, serverHubTabIds } from "../lib/hub-tabs";
 import useHubFlags from "./components/general/use-hub-flags";
@@ -10,8 +9,8 @@ const ServerManagement = lazy(() => import("./server-management"));
 const AutomationHealth = lazy(() => import("./automation-health"));
 
 const TABS = [
-  { id: "jobs", label: "Server Jobs", icon: ServerLineIcon, render: () => <ServerManagement /> },
-  { id: "automation", label: "Automation Health", icon: RadarLineIcon, render: () => <AutomationHealth /> },
+  { id: "jobs", label: "Server Jobs", icon: RiServerLine, render: () => <ServerManagement /> },
+  { id: "automation", label: "Automation Health", icon: RiRadarLine, render: () => <AutomationHealth /> },
 ];
 
 export default function ServerHub() {

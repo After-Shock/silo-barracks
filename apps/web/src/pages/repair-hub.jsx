@@ -1,17 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Alert, Button, Spinner } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import AlertLineIcon from "remixicon-react/AlertLineIcon";
-import ArrowRightLineIcon from "remixicon-react/ArrowRightLineIcon";
-import CheckboxCircleLineIcon from "remixicon-react/CheckboxCircleLineIcon";
-import Database2LineIcon from "remixicon-react/Database2LineIcon";
-import ErrorWarningLineIcon from "remixicon-react/ErrorWarningLineIcon";
-import FileSearchLineIcon from "remixicon-react/FileSearchLineIcon";
-import HammerLineIcon from "remixicon-react/HammerLineIcon";
-import ImageLineIcon from "remixicon-react/ImageLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import TimeLineIcon from "remixicon-react/TimeLineIcon";
-import Tv2LineIcon from "remixicon-react/Tv2LineIcon";
+import { RiAlertLine, RiArrowRightLine, RiCheckboxCircleLine, RiDatabase2Line, RiErrorWarningLine, RiFileSearchLine, RiHammerLine, RiImageLine, RiRefreshLine, RiTimeLine, RiTv2Line } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import "./css/repair-hub.css";
 
@@ -70,7 +60,7 @@ function SampleList({ title, items, emptyText }) {
               <strong>{item.Name}</strong>
               <span>{itemMeta(item)}</span>
             </div>
-            <ArrowRightLineIcon size={17} />
+            <RiArrowRightLine size={17} />
           </Link>
         ))}
         {!items.length ? <div className="repair-empty">{emptyText}</div> : null}
@@ -122,7 +112,7 @@ export default function RepairHub() {
   const queue = [
     {
       key: "unmatched",
-      icon: Database2LineIcon,
+      icon: RiDatabase2Line,
       title: "Unmatched imported history",
       count: counts.unmatchedImports,
       detail: `Last seen ${formatDate(summary?.activityLinks?.unmatchedLastSeen)}`,
@@ -132,7 +122,7 @@ export default function RepairHub() {
     },
     {
       key: "posters",
-      icon: ImageLineIcon,
+      icon: RiImageLine,
       title: "Missing posters",
       count: counts.missingPosters,
       detail: "Items without primary artwork",
@@ -142,7 +132,7 @@ export default function RepairHub() {
     },
     {
       key: "series",
-      icon: Tv2LineIcon,
+      icon: RiTv2Line,
       title: "Empty series",
       count: counts.emptySeries,
       detail: "Shows with no active episodes",
@@ -152,7 +142,7 @@ export default function RepairHub() {
     },
     {
       key: "activity",
-      icon: FileSearchLineIcon,
+      icon: RiFileSearchLine,
       title: "Orphaned activity",
       count: counts.orphanedActivity,
       detail: `Last seen ${formatDate(summary?.activityLinks?.orphanedLastSeen)}`,
@@ -171,7 +161,7 @@ export default function RepairHub() {
           <p>Artwork gaps, imported-history fixes, empty shows, orphaned activity, and recent task failures in one place.</p>
         </div>
         <Button type="button" onClick={loadRepairHub} disabled={loading}>
-          {loading ? <Spinner size="sm" animation="border" /> : <RefreshLineIcon size={17} />}
+          {loading ? <Spinner size="sm" animation="border" /> : <RiRefreshLine size={17} />}
           Refresh
         </Button>
       </header>
@@ -180,15 +170,15 @@ export default function RepairHub() {
 
       <section className="repair-overview">
         <RepairMetric
-          icon={totalIssues ? ErrorWarningLineIcon : CheckboxCircleLineIcon}
+          icon={totalIssues ? RiErrorWarningLine : RiCheckboxCircleLine}
           label="Repair queue"
           value={totalIssues}
           detail={totalIssues ? "Items need attention" : "Nothing obvious to repair"}
           tone={totalIssues ? "danger" : "ok"}
         />
-        <RepairMetric icon={ImageLineIcon} label="Artwork issues" value={Number(counts.missingPosters || 0) + Number(counts.missingLogos || 0)} detail="Posters and logos" tone="warning" />
-        <RepairMetric icon={TimeLineIcon} label="Runtime gaps" value={counts.missingRuntime} detail="Items with no runtime" tone="neutral" />
-        <RepairMetric icon={AlertLineIcon} label="Task failures" value={counts.taskFailures} detail="Recent failed logs" tone={counts.taskFailures ? "danger" : "ok"} />
+        <RepairMetric icon={RiImageLine} label="Artwork issues" value={Number(counts.missingPosters || 0) + Number(counts.missingLogos || 0)} detail="Posters and logos" tone="warning" />
+        <RepairMetric icon={RiTimeLine} label="Runtime gaps" value={counts.missingRuntime} detail="Items with no runtime" tone="neutral" />
+        <RepairMetric icon={RiAlertLine} label="Task failures" value={counts.taskFailures} detail="Recent failed logs" tone={counts.taskFailures ? "danger" : "ok"} />
       </section>
 
       <section className="repair-queue">
@@ -202,7 +192,7 @@ export default function RepairHub() {
             </div>
             <Link to={item.action}>
               {item.actionLabel}
-              <ArrowRightLineIcon size={16} />
+              <RiArrowRightLine size={16} />
             </Link>
           </article>
         ))}
@@ -217,7 +207,7 @@ export default function RepairHub() {
           <div className="repair-unmatched-grid">
             {unmatched.map((item) => (
               <article key={`${item.SeriesName}-${item.NowPlayingItemName}-${item.MediaType}`}>
-                <Database2LineIcon size={18} />
+                <RiDatabase2Line size={18} />
                 <div>
                   <strong>{item.SeriesName ? `${item.SeriesName} - ${item.NowPlayingItemName}` : item.NowPlayingItemName}</strong>
                   <span>{item.MediaType} · {formatNumber(item.PlayCount)} plays</span>
@@ -244,7 +234,7 @@ export default function RepairHub() {
         <div className="repair-task-list">
           {(samples.taskFailures || []).map((task) => (
             <article key={`${task.Id}-${task.TimeRun}`}>
-              <HammerLineIcon size={18} />
+              <RiHammerLine size={18} />
               <div>
                 <strong>{task.Name || task.Id}</strong>
                 <span>{task.Result || "Failed"}</span>

@@ -4,7 +4,7 @@ import Config from "../../../lib/config";
 import ItemStatComponent from "./ItemStatComponent";
 
 
-import AccountCircleFillIcon from "remixicon-react/AccountCircleFillIcon";
+import { RiAccountCircleFill } from "@remixicon/react";
 import { Trans } from "react-i18next";
 
 function MostActiveUsers(props) {
@@ -84,7 +84,7 @@ function MostActiveUsers(props) {
   };
 
   return (
-    <ItemStatComponent icon={loaded ? <UserImage/> : <AccountCircleFillIcon size="100%" />}  data={data} heading={<Trans i18nKey="STAT_CARDS.MOST_ACTIVE_USERS" />} units={<Trans i18nKey="UNITS.PLAYS" />}/>
+    <ItemStatComponent icon={loaded ? <UserImage/> : <RiAccountCircleFill size="100%" />}  data={data} heading={<Trans i18nKey="STAT_CARDS.MOST_ACTIVE_USERS" />} units={<Trans i18nKey="UNITS.PLAYS" />}/>
   );
 }
 

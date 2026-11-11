@@ -1,11 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Alert, Button, Form, Spinner, Tab, Tabs } from "react-bootstrap";
-import ArticleLineIcon from "remixicon-react/ArticleLineIcon";
-import ExternalLinkLineIcon from "remixicon-react/ExternalLinkLineIcon";
-import MailCheckLineIcon from "remixicon-react/MailCheckLineIcon";
-import MailSettingsLineIcon from "remixicon-react/MailSettingsLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import SendPlaneLineIcon from "remixicon-react/SendPlaneLineIcon";
+import { RiArticleLine, RiExternalLinkLine, RiMailCheckLine, RiMailSettingsLine, RiRefreshLine, RiSendPlaneLine } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 import "../../css/settings/settings.css";
 
@@ -224,7 +219,7 @@ export default function NewsletterSettings() {
           <p>Generate a Barracks digest with recently added media, weekly watch stats, active viewers, and repair status.</p>
         </div>
         <Button type="button" variant="outline-primary" onClick={generatePreview} disabled={Boolean(busyAction)}>
-          {busyAction === "preview" ? <Spinner size="sm" animation="border" /> : <RefreshLineIcon size={17} />}
+          {busyAction === "preview" ? <Spinner size="sm" animation="border" /> : <RiRefreshLine size={17} />}
           Generate preview
         </Button>
       </header>
@@ -241,7 +236,7 @@ export default function NewsletterSettings() {
             <Form className="newsletter-form" onSubmit={saveSettings}>
               <section className="newsletter-panel">
                 <div className="newsletter-panel-title">
-                  <MailSettingsLineIcon size={19} />
+                  <RiMailSettingsLine size={19} />
                   <h3>SMTP Options</h3>
                 </div>
                 <div className="newsletter-form-grid">
@@ -276,7 +271,7 @@ export default function NewsletterSettings() {
 
               <section className="newsletter-panel">
                 <div className="newsletter-panel-title">
-                  <ArticleLineIcon size={19} />
+                  <RiArticleLine size={19} />
                   <h3>Newsletter</h3>
                 </div>
                 <div className="newsletter-form-grid">
@@ -311,15 +306,15 @@ export default function NewsletterSettings() {
                 </div>
                 <div className="newsletter-actions">
                   <Button type="submit" disabled={Boolean(busyAction)}>
-                    {busyAction === "save" ? <Spinner size="sm" animation="border" /> : <MailCheckLineIcon size={17} />}
+                    {busyAction === "save" ? <Spinner size="sm" animation="border" /> : <RiMailCheckLine size={17} />}
                     Save settings
                   </Button>
                   <Button type="button" variant="outline-primary" onClick={sendTest} disabled={!testRecipient || Boolean(busyAction)}>
-                    {busyAction === "test" ? <Spinner size="sm" animation="border" /> : <SendPlaneLineIcon size={17} />}
+                    {busyAction === "test" ? <Spinner size="sm" animation="border" /> : <RiSendPlaneLine size={17} />}
                     Send test
                   </Button>
                   <Button type="button" variant="primary" onClick={sendNewsletter} disabled={!recipientCount || Boolean(busyAction)}>
-                    {busyAction === "send" ? <Spinner size="sm" animation="border" /> : <SendPlaneLineIcon size={17} />}
+                    {busyAction === "send" ? <Spinner size="sm" animation="border" /> : <RiSendPlaneLine size={17} />}
                     Send newsletter
                   </Button>
                 </div>
@@ -328,7 +323,7 @@ export default function NewsletterSettings() {
 
             <section className="newsletter-panel newsletter-history-panel">
               <div className="newsletter-panel-title">
-                <MailCheckLineIcon size={19} />
+                <RiMailCheckLine size={19} />
                 <h3>Send History</h3>
               </div>
               <div className="newsletter-history">
@@ -349,16 +344,16 @@ export default function NewsletterSettings() {
           <section className="newsletter-panel newsletter-preview-panel">
             <div className="newsletter-panel-title">
               <div>
-                <ArticleLineIcon size={19} />
+                <RiArticleLine size={19} />
                 <h3>Preview</h3>
               </div>
               <div className="newsletter-preview-actions">
                 <Button type="button" variant="outline-primary" size="sm" onClick={generatePreview} disabled={Boolean(busyAction)}>
-                  {busyAction === "preview" ? <Spinner size="sm" animation="border" /> : <RefreshLineIcon size={15} />}
+                  {busyAction === "preview" ? <Spinner size="sm" animation="border" /> : <RiRefreshLine size={15} />}
                   Refresh
                 </Button>
                 <Button type="button" variant="outline-primary" size="sm" onClick={openPreviewTab} disabled={!previewHtml}>
-                  <ExternalLinkLineIcon size={15} />
+                  <RiExternalLinkLine size={15} />
                   Open in tab
                 </Button>
               </div>

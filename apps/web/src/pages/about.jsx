@@ -2,23 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "../lib/axios_instance";
 
 import "./css/about.css";
-import ArchiveLineIcon from "remixicon-react/ArchiveLineIcon";
-import ArrowDownSLineIcon from "remixicon-react/ArrowDownSLineIcon";
-import CheckLineIcon from "remixicon-react/CheckLineIcon";
-import Database2LineIcon from "remixicon-react/Database2LineIcon";
-import DownloadCloud2LineIcon from "remixicon-react/DownloadCloud2LineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import GitBranchLineIcon from "remixicon-react/GitBranchLineIcon";
-import GithubFillIcon from "remixicon-react/GithubFillIcon";
-import HeartPulseLineIcon from "remixicon-react/HeartPulseLineIcon";
-import LayoutGridLineIcon from "remixicon-react/LayoutGridLineIcon";
-import PulseLineIcon from "remixicon-react/PulseLineIcon";
-import PriceTag3LineIcon from "remixicon-react/PriceTag3LineIcon";
-import RadarLineIcon from "remixicon-react/RadarLineIcon";
-import Settings3LineIcon from "remixicon-react/Settings3LineIcon";
-import ShieldCheckLineIcon from "remixicon-react/ShieldCheckLineIcon";
-import TaskLineIcon from "remixicon-react/TaskLineIcon";
-import TimerFlashLineIcon from "remixicon-react/TimerFlashLineIcon";
+import { RiArchiveLine, RiArrowDownSLine, RiCheckLine, RiDatabase2Line, RiDownloadCloud2Line, RiFilmLine, RiGitBranchLine, RiGithubFill, RiHeartPulseLine, RiLayoutGridLine, RiPriceTag3Line, RiPulseLine, RiRadarLine, RiSettings3Line, RiShieldCheckLine, RiTaskLine, RiTimerFlashLine } from "@remixicon/react";
 
 function stripMarkdown(value) {
   return String(value || "")
@@ -200,52 +184,52 @@ export default function SettingsAbout() {
 
               <div className="about-feature-grid" aria-label="Silo Barracks capabilities">
                 <article>
-                  <PulseLineIcon />
+                  <RiPulseLine />
                   <strong>Live status</strong>
                   <span>See active streams, playback method, viewer, client, internal or remote IP, bitrate, transcode progress, and session history.</span>
                 </article>
                 <article>
-                  <FilmLineIcon />
+                  <RiFilmLine />
                   <strong>Library visibility</strong>
                   <span>Track recent additions, library totals, missing artwork, item details, user activity, watch trends, and media quality signals.</span>
                 </article>
                 <article>
-                  <TaskLineIcon />
+                  <RiTaskLine />
                   <strong>Operations</strong>
                   <span>Run syncs, backups, imports, health checks, notification tests, repairs, logs, and background maintenance tasks.</span>
                 </article>
                 <article>
-                  <Database2LineIcon />
+                  <RiDatabase2Line />
                   <strong>Integrations</strong>
                   <span>Connect Seerr, download clients, Sonarr/Radarr/Lidarr, Tdarr, Bazarr, Prowlarr, Tautulli, Jellystat, webhooks, and newsletters.</span>
                 </article>
                 <article>
-                  <TaskLineIcon />
+                  <RiTaskLine />
                   <strong>Requests</strong>
                   <span>Review pending approvals, per-user queues, availability, issue reports, request trends, and Seerr search results.</span>
                 </article>
                 <article>
-                  <DownloadCloud2LineIcon />
+                  <RiDownloadCloud2Line />
                   <strong>Downloads</strong>
                   <span>Monitor torrent and usenet clients with queue state, progress, speeds, ETA, stalled items, and failed jobs.</span>
                 </article>
                 <article>
-                  <TimerFlashLineIcon />
+                  <RiTimerFlashLine />
                   <strong>Active transcodes</strong>
                   <span>Track Tdarr processing, queued items, history, thumbnails, source-to-target conversion, savings, and live percentages.</span>
                 </article>
                 <article>
-                  <RadarLineIcon />
+                  <RiRadarLine />
                   <strong>Automation health</strong>
                   <span>Check Bazarr subtitle gaps, subtitle grabs, Prowlarr indexer health, failed indexers, and connected app sync status.</span>
                 </article>
                 <article>
-                  <LayoutGridLineIcon />
+                  <RiLayoutGridLine />
                   <strong>Custom layouts</strong>
                   <span>Collapse the sidebar, reorder navigation, hide tabs, resize Home widgets, and save browser-specific dashboard layouts.</span>
                 </article>
                 <article>
-                  <Settings3LineIcon />
+                  <RiSettings3Line />
                   <strong>Admin tools</strong>
                   <span>Manage settings, devices, integrations, API keys, webhooks, backups, imports, repair tasks, and application logs.</span>
                 </article>
@@ -319,7 +303,7 @@ export default function SettingsAbout() {
                   >
                     <strong>{selectedRelease?.version || "No releases"}</strong>
                     {selectedRelease?.date ? <em>{formatReleaseDate(selectedRelease.date)}</em> : null}
-                    <ArrowDownSLineIcon aria-hidden="true" size={16} />
+                    <RiArrowDownSLine aria-hidden="true" size={16} />
                   </button>
                   {releaseMenuOpen ? (
                     <div className="about-release-menu" role="listbox" aria-label="Release versions">
@@ -340,7 +324,7 @@ export default function SettingsAbout() {
                           >
                             <strong>{release.version}</strong>
                             <em>{formatReleaseDate(release.date)}</em>
-                            {selected ? <CheckLineIcon aria-hidden="true" size={16} /> : null}
+                            {selected ? <RiCheckLine aria-hidden="true" size={16} /> : null}
                           </button>
                         );
                       })}
@@ -355,7 +339,7 @@ export default function SettingsAbout() {
                 <article className="about-release-card">
                   <header>
                     <div>
-                      <PriceTag3LineIcon />
+                      <RiPriceTag3Line />
                       <strong>{selectedRelease.version}</strong>
                       {selectedRelease.prerelease ? <span>Pre-release</span> : null}
                     </div>
@@ -388,14 +372,14 @@ export default function SettingsAbout() {
             <dl>
               <div>
                 <dt>
-                  <GitBranchLineIcon />
+                  <RiGitBranchLine />
                   Version
                 </dt>
                 <dd>{data.current_version}</dd>
               </div>
               <div className={data.update_available ? "is-update" : ""}>
                 <dt>
-                  <HeartPulseLineIcon />
+                  <RiHeartPulseLine />
                   Updates
                 </dt>
                 <dd>
@@ -406,14 +390,14 @@ export default function SettingsAbout() {
               </div>
               <div>
                 <dt>
-                  <FilmLineIcon />
+                  <RiFilmLine />
                   Media source
                 </dt>
                 <dd>Jellyfin</dd>
               </div>
               <div>
                 <dt>
-                  <ShieldCheckLineIcon />
+                  <RiShieldCheckLine />
                   License
                 </dt>
                 <dd>GPL-3.0</dd>
@@ -424,15 +408,15 @@ export default function SettingsAbout() {
           <section className="about-links">
             <h2>Links</h2>
             <a href="https://github.com/Nerdy-Technician/JellyGlance" target="_blank" rel="noreferrer">
-              <GithubFillIcon />
+              <RiGithubFill />
               Source code
             </a>
             <a href="https://github.com/Nerdy-Technician/JellyGlance/pkgs/container/jellyglance" target="_blank" rel="noreferrer">
-              <ArchiveLineIcon />
+              <RiArchiveLine />
               Container image
             </a>
             <a href="https://github.com/Nerdy-Technician" target="_blank" rel="noreferrer">
-              <GithubFillIcon />
+              <RiGithubFill />
               Maintainer profile
             </a>
           </section>

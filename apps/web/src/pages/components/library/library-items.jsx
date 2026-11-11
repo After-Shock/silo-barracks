@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "../../../lib/axios_instance";
 import { FormControl, FormSelect, Button } from "react-bootstrap";
-import SortAscIcon from "remixicon-react/SortAscIcon";
-import SortDescIcon from "remixicon-react/SortDescIcon";
+import { RiSortAsc, RiSortDesc } from "@remixicon/react";
 
 import MoreItemCards from "../item-info/more-items/more-items-card";
 
@@ -221,7 +220,7 @@ function LibraryItems(props) {
             </FormSelect>
 
             <Button className="my-md-3 rounded-0 rounded-end" onClick={() => setSortDirection(!sortAsc)}>
-              {sortAsc ? <SortAscIcon /> : <SortDescIcon />}
+              {sortAsc ? <RiSortAsc /> : <RiSortDesc />}
             </Button>
           </div>
           <FormControl

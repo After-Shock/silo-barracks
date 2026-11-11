@@ -5,7 +5,7 @@ import Config from "../../../lib/config";
 import ItemStatComponent from "./ItemStatComponent";
 import { Trans } from "react-i18next";
 
-import BarChartGroupedLineIcon from "remixicon-react/BarChartGroupedLineIcon";
+import { RiBarChartGroupedLine } from "@remixicon/react";
 
 function PlaybackMethodStats(props) {
   const translations = {
@@ -13,7 +13,7 @@ function PlaybackMethodStats(props) {
     Transcode: <Trans i18nKey="TRANSCODE" />,
     DirectStream: <Trans i18nKey="DIRECT_STREAM" />
   };
-  const chartIcon = <BarChartGroupedLineIcon size={"100%"} />;
+  const chartIcon = <RiBarChartGroupedLine size={"100%"} />;
 
   const [data, setData] = useState();
   const [days, setDays] = useState(30);

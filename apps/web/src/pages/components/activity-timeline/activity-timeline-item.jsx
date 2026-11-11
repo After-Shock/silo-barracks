@@ -14,8 +14,7 @@ import "../../css/timeline/activity-timeline.css";
 
 import { useMediaQuery, useTheme } from "@mui/material";
 import dayjs from "dayjs";
-import TvLineIcon from "remixicon-react/TvLineIcon.js";
-import FilmLineIcon from "remixicon-react/FilmLineIcon.js";
+import { RiFilmLine, RiTvLine } from "@remixicon/react";
 import { MEDIA_TYPES } from "./helpers";
 import { Link } from "react-router-dom";
 import { Trans } from "react-i18next";
@@ -46,8 +45,8 @@ function formatEntryDates(FirstActivityDate, LastActivityDate, MediaType) {
 }
 const DefaultImage = (props) => {
   const { MediaType } = props;
-  const SeriesIcon = <TvLineIcon size={"50%"} color="var(--barracks-text-inset)" />;
-  const MovieIcon = <FilmLineIcon size={"50%"} color="var(--barracks-text-inset)" />;
+  const SeriesIcon = <RiTvLine size={"50%"} color="var(--barracks-text-inset)" />;
+  const MovieIcon = <RiFilmLine size={"50%"} color="var(--barracks-text-inset)" />;
   return (
     <div className="default_library_image default_library_image_hover d-flex justify-content-center align-items-center">
       {MediaType === MEDIA_TYPES.Shows ? SeriesIcon : MovieIcon}

@@ -1,11 +1,4 @@
-import CheckLineIcon from "remixicon-react/CheckLineIcon";
-import AdminLineIcon from "remixicon-react/AdminLineIcon";
-import ServerLineIcon from "remixicon-react/ServerLineIcon";
-import PlugLineIcon from "remixicon-react/PlugLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import DashboardLineIcon from "remixicon-react/DashboardLineIcon";
-import Database2LineIcon from "remixicon-react/Database2LineIcon";
-import Key2LineIcon from "remixicon-react/Key2LineIcon";
+import { RiAdminLine, RiCheckLine, RiDashboardLine, RiDatabase2Line, RiKey2Line, RiPlugLine, RiRefreshLine, RiServerLine } from "@remixicon/react";
 import logo from "../../../../public/brand/barracks-mark.svg";
 import AuthArtworkBackground from "../AuthArtworkBackground";
 
@@ -14,32 +7,32 @@ const steps = [
     id: 1,
     title: "Silo Server",
     hint: "Connect analytics",
-    icon: ServerLineIcon,
+    icon: RiServerLine,
     logo,
   },
   {
     id: 2,
     title: "Admin access",
     hint: "Local login or OIDC",
-    icon: AdminLineIcon,
+    icon: RiAdminLine,
   },
   {
     id: 3,
     title: "Integrations",
     hint: "Arr, Seerr, downloads",
-    icon: PlugLineIcon,
+    icon: RiPlugLine,
   },
   {
     id: 4,
     title: "History import",
     hint: "Tautulli backup",
-    icon: Database2LineIcon,
+    icon: RiDatabase2Line,
   },
   {
     id: 5,
     title: "First sync",
     hint: "Build dashboard data",
-    icon: RefreshLineIcon,
+    icon: RiRefreshLine,
   },
 ];
 
@@ -47,17 +40,17 @@ const features = [
   {
     title: "Playback intelligence",
     text: "See active Silo viewers and turn observed playback into user insights.",
-    icon: DashboardLineIcon,
+    icon: RiDashboardLine,
   },
   {
     title: "Local data store",
     text: "Keep the analytics cache close to your stack with PostgreSQL.",
-    icon: Database2LineIcon,
+    icon: RiDatabase2Line,
   },
   {
     title: "API-key sync",
     text: "Connect once, validate the server, then start the first sync.",
-    icon: Key2LineIcon,
+    icon: RiKey2Line,
   },
 ];
 
@@ -101,7 +94,7 @@ export default function SetupShell({ step, eyebrow, title, description, children
               const isActive = item.id === step;
               const isDone = item.id < step;
 
-              const stepGraphic = item.logo && !isDone ? <img src={item.logo} alt="" /> : isDone ? <CheckLineIcon /> : <Icon />;
+              const stepGraphic = item.logo && !isDone ? <img src={item.logo} alt="" /> : isDone ? <RiCheckLine /> : <Icon />;
 
               return (
                 <div className={`setup-step ${isActive ? "is-active" : ""} ${isDone ? "is-done" : ""}`} key={item.id}>
@@ -135,7 +128,7 @@ export default function SetupShell({ step, eyebrow, title, description, children
               const Icon = item.icon;
               const isActive = item.id === step;
               const isDone = item.id < step;
-              const stepGraphic = item.logo && !isDone ? <img src={item.logo} alt="" /> : isDone ? <CheckLineIcon /> : <Icon />;
+              const stepGraphic = item.logo && !isDone ? <img src={item.logo} alt="" /> : isDone ? <RiCheckLine /> : <Icon />;
               return (
                 <span className={`setup-mobile-step ${isActive ? "is-active" : ""} ${isDone ? "is-done" : ""}`} key={item.id}>
                   {stepGraphic}

@@ -7,13 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
-import ArrowDownSLineIcon from "remixicon-react/ArrowDownSLineIcon";
-import ArrowUpSLineIcon from "remixicon-react/ArrowUpSLineIcon";
-import DragMove2LineIcon from "remixicon-react/DragMove2LineIcon";
-import EyeLineIcon from "remixicon-react/EyeLineIcon";
-import EyeOffLineIcon from "remixicon-react/EyeOffLineIcon";
-import ExternalLinkLineIcon from "remixicon-react/ExternalLinkLineIcon";
-import LockLineIcon from "remixicon-react/LockLineIcon";
+import { RiArrowDownSLine, RiArrowUpSLine, RiDragMove2Line, RiExternalLinkLine, RiEyeLine, RiEyeOffLine, RiLockLine } from "@remixicon/react";
 
 import "../../css/settings/settings.css";
 import { Trans } from "react-i18next";
@@ -106,7 +100,7 @@ function NavigationOrderSettings() {
       <div className="nav-order-locked" aria-label="Locked navigation items">
         {lockedItems.map((item) => (
           <span key={item.link || "home"}>
-            <LockLineIcon size={14} />
+            <RiLockLine size={14} />
             {getNavLabel(item)}
           </span>
         ))}
@@ -139,7 +133,7 @@ function NavigationOrderSettings() {
               onDragEnd={() => setDraggedLink("")}
             >
               <span className="nav-order-drag" aria-hidden="true">
-                <DragMove2LineIcon size={18} />
+                <RiDragMove2Line size={18} />
               </span>
               <span className="nav-order-icon">{item.icon}</span>
               <strong>{label}</strong>
@@ -151,14 +145,14 @@ function NavigationOrderSettings() {
                 aria-label={isHidden ? `Show ${label} in navbar` : `Hide ${label} from navbar`}
                 title={isHidden ? "Show tab" : "Hide tab"}
               >
-                {isHidden ? <EyeOffLineIcon size={18} /> : <EyeLineIcon size={18} />}
+                {isHidden ? <RiEyeOffLine size={18} /> : <RiEyeLine size={18} />}
               </button>
               <div className="nav-order-actions">
                 <button type="button" onClick={() => moveLink(item.link, -1)} disabled={index === 0} aria-label={`Move ${label} up`}>
-                  <ArrowUpSLineIcon size={18} />
+                  <RiArrowUpSLine size={18} />
                 </button>
                 <button type="button" onClick={() => moveLink(item.link, 1)} disabled={index === reorderableItems.length - 1} aria-label={`Move ${label} down`}>
-                  <ArrowDownSLineIcon size={18} />
+                  <RiArrowDownSLine size={18} />
                 </button>
               </div>
             </div>
@@ -342,7 +336,7 @@ export default function SettingsConfig() {
               <h3>Core preferences</h3>
               <p>Set server access, display behaviour, theme, language, and navigation layout.</p>
             </div>
-            <ExternalLinkLineIcon />
+            <RiExternalLinkLine />
           </div>
           <div className="general-form-section">
             <h4>Server access</h4>

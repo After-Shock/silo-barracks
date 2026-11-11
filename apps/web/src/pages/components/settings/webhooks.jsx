@@ -1,21 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "../../../lib/axios_instance";
 import { Alert, Button, Form, Spinner } from "react-bootstrap";
-import InformationLineIcon from "remixicon-react/InformationLineIcon";
-import LinksLineIcon from "remixicon-react/LinksLineIcon";
-import Notification3LineIcon from "remixicon-react/Notification3LineIcon";
-import PlayCircleLineIcon from "remixicon-react/PlayCircleLineIcon";
-import StopCircleLineIcon from "remixicon-react/StopCircleLineIcon";
-import Movie2LineIcon from "remixicon-react/Movie2LineIcon";
-import TaskLineIcon from "remixicon-react/TaskLineIcon";
-import CalendarEventLineIcon from "remixicon-react/CalendarEventLineIcon";
-import DownloadCloud2LineIcon from "remixicon-react/DownloadCloud2LineIcon";
-import HeartPulseLineIcon from "remixicon-react/HeartPulseLineIcon";
-import UserAddLineIcon from "remixicon-react/UserAddLineIcon";
-import CheckboxCircleLineIcon from "remixicon-react/CheckboxCircleLineIcon";
-import ErrorWarningLineIcon from "remixicon-react/ErrorWarningLineIcon";
-import Edit2LineIcon from "remixicon-react/Edit2LineIcon";
-import DeleteBinLineIcon from "remixicon-react/DeleteBinLineIcon";
+import { RiCalendarEventLine, RiCheckboxCircleLine, RiDeleteBinLine, RiDownloadCloud2Line, RiEdit2Line, RiErrorWarningLine, RiHeartPulseLine, RiInformationLine, RiLinksLine, RiMovie2Line, RiNotification3Line, RiPlayCircleLine, RiStopCircleLine, RiTaskLine, RiUserAddLine } from "@remixicon/react";
 import { Tooltip } from "@mui/material";
 import { Trans } from "react-i18next";
 import Loading from "../general/loading";
@@ -45,91 +31,91 @@ const eventCards = [
     id: "playback_started",
     title: "Playback started",
     text: "When a Jellyfin user starts watching.",
-    Icon: PlayCircleLineIcon,
+    Icon: RiPlayCircleLine,
   },
   {
     id: "playback_ended",
     title: "Playback ended",
     text: "When a Jellyfin user finishes playback.",
-    Icon: StopCircleLineIcon,
+    Icon: RiStopCircleLine,
   },
   {
     id: "media_recently_added",
     title: "New media synced",
     text: "When recently added media is pulled in.",
-    Icon: Movie2LineIcon,
+    Icon: RiMovie2Line,
   },
   {
     id: "task_started",
     title: "Task started",
     text: "When a Barracks job begins.",
-    Icon: TaskLineIcon,
+    Icon: RiTaskLine,
   },
   {
     id: "task_completed",
     title: "Task completed",
     text: "When a Barracks job completes.",
-    Icon: CheckboxCircleLineIcon,
+    Icon: RiCheckboxCircleLine,
   },
   {
     id: "task_failed",
     title: "Task failed",
     text: "When a job fails or is stopped.",
-    Icon: ErrorWarningLineIcon,
+    Icon: RiErrorWarningLine,
   },
   {
     id: "calendar_refreshed",
     title: "Calendar refreshed",
     text: "When Arr release data is pulled into Calendar.",
-    Icon: CalendarEventLineIcon,
+    Icon: RiCalendarEventLine,
   },
   {
     id: "download_queue_refreshed",
     title: "Downloads refreshed",
     text: "When download clients are polled.",
-    Icon: DownloadCloud2LineIcon,
+    Icon: RiDownloadCloud2Line,
   },
   {
     id: "download_added",
     title: "Download added",
     text: "When a magnet, torrent URL, or torrent file is queued.",
-    Icon: DownloadCloud2LineIcon,
+    Icon: RiDownloadCloud2Line,
   },
   {
     id: "download_completed",
     title: "Download completed",
     text: "When a download finishes.",
-    Icon: CheckboxCircleLineIcon,
+    Icon: RiCheckboxCircleLine,
   },
   {
     id: "download_failed",
     title: "Download failed",
     text: "When a download client reports a failed item.",
-    Icon: ErrorWarningLineIcon,
+    Icon: RiErrorWarningLine,
   },
   {
     id: "invite_created",
     title: "Invite created",
     text: "When a Wizarr invite link is created.",
-    Icon: UserAddLineIcon,
+    Icon: RiUserAddLine,
   },
   {
     id: "invite_deleted",
     title: "Invite deleted",
     text: "When a Wizarr invite link is removed.",
-    Icon: DeleteBinLineIcon,
+    Icon: RiDeleteBinLine,
   },
   {
     id: "invite_links_refreshed",
     title: "Invites refreshed",
     text: "When Wizarr invite state is synced.",
-    Icon: LinksLineIcon,
+    Icon: RiLinksLine,
   },
   {
     id: "integration_health_warning",
     title: "Integration health warning",
     text: "When a connected client test fails.",
-    Icon: HeartPulseLineIcon,
+    Icon: RiHeartPulseLine,
   },
 ];
 
@@ -488,7 +474,7 @@ export default function WebhooksSettings() {
           <h1>
             Webhook Configuration{" "}
             <Tooltip title={<Trans i18nKey={"SETTINGS_PAGE.WEBHOOKS_TOOLTIP"} />}>
-              <InformationLineIcon size={20} />
+              <RiInformationLine size={20} />
             </Tooltip>
           </h1>
           <p>Add one or many webhook destinations, then tick exactly which Barracks events should trigger each one.</p>
@@ -516,7 +502,7 @@ export default function WebhooksSettings() {
         <Form onSubmit={handleFormSubmit} className="settings-form webhook-builder">
           <div className="webhook-builder-header">
             <div>
-              <Notification3LineIcon size={22} />
+              <RiNotification3Line size={22} />
               <strong>{currentWebhook.groupKey ? "Edit webhook destination" : "Add webhook destination"}</strong>
             </div>
             {currentWebhook.groupKey ? (
@@ -569,7 +555,7 @@ export default function WebhooksSettings() {
 
           <div className="webhook-event-picker">
             <div className="webhook-event-picker-title">
-              <LinksLineIcon size={19} />
+              <RiLinksLine size={19} />
               <strong>Trigger this webhook for</strong>
             </div>
             <div className="webhook-event-check-grid">
@@ -607,7 +593,7 @@ export default function WebhooksSettings() {
           {currentWebhook.events.some((event) => taskEventIds.includes(event)) ? (
             <div className="webhook-task-picker">
               <div className="webhook-event-picker-title">
-                <TaskLineIcon size={19} />
+                <RiTaskLine size={19} />
                 <strong>Optional task filter</strong>
               </div>
               <p>Leave as all tasks, or choose specific Barracks jobs for task started/completed/failed events.</p>
@@ -689,11 +675,11 @@ export default function WebhooksSettings() {
                   {testingId === group.groupKey ? <Spinner size="sm" animation="border" /> : "Test"}
                 </Button>
                 <Button variant="outline-primary" onClick={() => editWebhookGroup(group)}>
-                  <Edit2LineIcon size={16} />
+                  <RiEdit2Line size={16} />
                   Edit
                 </Button>
                 <Button variant="outline-secondary" onClick={() => deleteWebhookGroup(group)} disabled={saving}>
-                  <DeleteBinLineIcon size={16} />
+                  <RiDeleteBinLine size={16} />
                   Delete
                 </Button>
               </div>
@@ -702,7 +688,7 @@ export default function WebhooksSettings() {
 
           {groupedWebhooks.length === 0 ? (
             <div className="webhook-empty-state">
-              <LinksLineIcon size={28} />
+              <RiLinksLine size={28} />
               <strong>No webhooks yet</strong>
               <span>Add a destination above, tick the events, and Barracks will notify it automatically.</span>
             </div>

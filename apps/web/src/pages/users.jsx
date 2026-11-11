@@ -3,19 +3,7 @@ import axios from "../lib/axios_instance";
 import Config from "../lib/config";
 import { Link } from "react-router-dom";
 import CryptoJS from "crypto-js";
-import AccountCircleFillIcon from "remixicon-react/AccountCircleFillIcon";
-import CheckFillIcon from "remixicon-react/CheckFillIcon";
-import CloseFillIcon from "remixicon-react/CloseFillIcon";
-import EyeLineIcon from "remixicon-react/EyeLineIcon";
-import EyeOffLineIcon from "remixicon-react/EyeOffLineIcon";
-import SearchLineIcon from "remixicon-react/SearchLineIcon";
-import DeleteBinLineIcon from "remixicon-react/DeleteBinLineIcon";
-import LockPasswordLineIcon from "remixicon-react/LockPasswordLineIcon";
-import ShieldUserLineIcon from "remixicon-react/ShieldUserLineIcon";
-import PriceTag3LineIcon from "remixicon-react/PriceTag3LineIcon";
-import UserAddLineIcon from "remixicon-react/UserAddLineIcon";
-import UserSettingsLineIcon from "remixicon-react/UserSettingsLineIcon";
-import ShieldKeyholeLineIcon from "remixicon-react/ShieldKeyholeLineIcon";
+import { RiAccountCircleFill, RiCheckFill, RiCloseFill, RiDeleteBinLine, RiEyeLine, RiEyeOffLine, RiLockPasswordLine, RiPriceTag3Line, RiSearchLine, RiShieldKeyholeLine, RiShieldUserLine, RiUserAddLine, RiUserSettingsLine } from "@remixicon/react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -72,7 +60,7 @@ function userImage(user, size = 48) {
 
   return (
     <span className="users-avatar users-avatar-empty" style={{ width: size, height: size }}>
-      <AccountCircleFillIcon size={size} />
+      <RiAccountCircleFill size={size} />
     </span>
   );
 }
@@ -544,7 +532,7 @@ export default function Users() {
           disabled={savingUserId === user.UserId}
           title={user.Tracked ? "Hide user" : "Unhide user"}
         >
-          {savingUserId === user.UserId ? <Spinner className="tw:size-4" /> : user.Tracked ? <EyeLineIcon size={20} /> : <EyeOffLineIcon size={20} />}
+          {savingUserId === user.UserId ? <Spinner className="tw:size-4" /> : user.Tracked ? <RiEyeLine size={20} /> : <RiEyeOffLine size={20} />}
         </Button>
       );
     }
@@ -559,7 +547,7 @@ export default function Users() {
             aria-label={`Reset password for ${user.UserName}`}
             onClick={() => setResetTarget(user.IsPrimaryLocal ? { primary: true, username: user.UserName } : user.LocalUser)}
           >
-            <LockPasswordLineIcon size={17} />
+            <RiLockPasswordLine size={17} />
           </Button>
           {!user.IsPrimaryLocal ? (
             <Button
@@ -570,7 +558,7 @@ export default function Users() {
               aria-label={`Delete ${user.UserName}`}
               onClick={() => setDeleteTarget(user.LocalUser)}
             >
-              <DeleteBinLineIcon size={17} />
+              <RiDeleteBinLine size={17} />
             </Button>
           ) : null}
         </div>
@@ -589,7 +577,7 @@ export default function Users() {
       <section className="users-hero">
         <div className="users-title-block">
           <div className="users-title-icon">
-            <UserSettingsLineIcon size={26} />
+            <RiUserSettingsLine size={26} />
           </div>
           <div>
             <p className="users-eyebrow">Access control</p>
@@ -599,11 +587,11 @@ export default function Users() {
         </div>
         <div className="users-header-actions">
           <Button type="button" className="users-primary-action" onClick={() => setShowUsersManager(true)}>
-            <UserAddLineIcon size={17} />
+            <RiUserAddLine size={17} />
             Add Users
           </Button>
           <Button type="button" className="users-primary-action" onClick={() => setShowRolesManager(true)}>
-            <PriceTag3LineIcon size={17} />
+            <RiPriceTag3Line size={17} />
             Roles
           </Button>
         </div>
@@ -613,29 +601,29 @@ export default function Users() {
         <Alert variant={alert.variant === "danger" ? "destructive" : alert.variant === "success" ? "success" : "default"} className="users-alert">
           <AlertDescription>{alert.message}</AlertDescription>
           <button type="button" className="users-alert-close" aria-label="Close alert" onClick={() => setAlert(null)}>
-            <CloseFillIcon size={16} />
+            <RiCloseFill size={16} />
           </button>
         </Alert>
       )}
 
       <section className="users-stat-grid">
         <div className="users-stat-card">
-          <ShieldUserLineIcon />
+          <RiShieldUserLine />
           <span>{config.IS_SILO ? 'Silo' : 'Media server'}</span>
           <strong>{jellyfinRows.length}</strong>
         </div>
         <div className="users-stat-card">
-          <CheckFillIcon />
+          <RiCheckFill />
           <span>Tracked</span>
           <strong>{trackedCount}</strong>
         </div>
         <div className="users-stat-card">
-          <UserSettingsLineIcon />
+          <RiUserSettingsLine />
           <span>Local</span>
           <strong>{localAccountCount}</strong>
         </div>
         <div className="users-stat-card">
-          <ShieldKeyholeLineIcon />
+          <RiShieldKeyholeLine />
           <span>OIDC</span>
           <strong>{oidcAccountCount}</strong>
         </div>
@@ -658,7 +646,7 @@ export default function Users() {
                 </button>
               </div>
               <div className="users-search">
-                <SearchLineIcon size={17} />
+                <RiSearchLine size={17} />
                 <Input type="text" placeholder="Search users, media, clients" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} />
               </div>
               <NativeSelect value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}>
@@ -786,7 +774,7 @@ export default function Users() {
               <p>Role access is saved to the backend and checked on protected API routes.</p>
             </div>
             <Button type="button" className="users-primary-action" onClick={() => setShowRolesManager(true)}>
-              <PriceTag3LineIcon size={17} />
+              <RiPriceTag3Line size={17} />
               Roles
             </Button>
           </div>
@@ -840,7 +828,7 @@ export default function Users() {
               <span>{(access.localUsers?.length || 0) + (access.primaryLocalUser ? 1 : 0)} accounts</span>
             </div>
             <Button type="button" className="users-primary-action" onClick={() => setShowAddUser(true)}>
-              <UserAddLineIcon size={17} />
+              <RiUserAddLine size={17} />
               Add User
             </Button>
           </div>
@@ -902,7 +890,7 @@ export default function Users() {
               <span>{access.roles.length} roles</span>
             </div>
             <Button type="button" className="users-primary-action" onClick={() => setShowAddRole(true)}>
-              <PriceTag3LineIcon size={17} />
+              <RiPriceTag3Line size={17} />
               Add New Role
             </Button>
           </div>
@@ -921,7 +909,7 @@ export default function Users() {
             <div className="role-preview-grid">
               {PERMISSION_DEFINITIONS.map((permission) => (
                 <span key={permission.key} className={previewPermissions[permission.key] ? "is-allowed" : "is-denied"}>
-                  {previewPermissions[permission.key] ? <CheckFillIcon size={14} /> : <CloseFillIcon size={14} />}
+                  {previewPermissions[permission.key] ? <RiCheckFill size={14} /> : <RiCloseFill size={14} />}
                   {permission.label}
                 </span>
               ))}
@@ -936,7 +924,7 @@ export default function Users() {
                     <Badge className={`users-role-badge ${roleClass(role)}`}>{role}</Badge>
                     {!["Owner", "Admin", "Manager", "Viewer", "Disabled"].includes(role) && (
                       <button type="button" onClick={() => removeRole(role)} aria-label={`Remove ${role}`}>
-                        <CloseFillIcon size={14} />
+                        <RiCloseFill size={14} />
                       </button>
                     )}
                   </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Blurhash } from "react-blurhash";
-import ArchiveDrawerFillIcon from "remixicon-react/ArchiveDrawerFillIcon";
+import { RiArchiveDrawerFill } from "@remixicon/react";
 
 import "../../css/lastplayed.css";
 import { Trans } from "react-i18next";
@@ -63,7 +63,7 @@ function LastWatchedCard(props) {
                 />
               ) : null}
               <div className="d-flex flex-column justify-content-center align-items-center position-absolute">
-                <ArchiveDrawerFillIcon className="w-100 h-100 mb-2" />
+                <RiArchiveDrawerFill className="w-100 h-100 mb-2" />
                 <span>
                   <Trans i18nKey="ARCHIVED" />
                 </span>

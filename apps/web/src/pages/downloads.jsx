@@ -1,11 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import AddLineIcon from "remixicon-react/AddLineIcon";
-import CloseLineIcon from "remixicon-react/CloseLineIcon";
-import DownloadCloud2FillIcon from "remixicon-react/DownloadCloud2FillIcon";
-import FileUploadLineIcon from "remixicon-react/FileUploadLineIcon";
-import PauseLineIcon from "remixicon-react/PauseLineIcon";
-import PlayLineIcon from "remixicon-react/PlayLineIcon";
-import TimerFlashLineIcon from "remixicon-react/TimerFlashLineIcon";
+import { RiAddLine, RiCloseLine, RiDownloadCloud2Fill, RiFileUploadLine, RiPauseLine, RiPlayLine, RiTimerFlashLine } from "@remixicon/react";
 import { useTranslation } from "react-i18next";
 import axios from "../lib/axios_instance";
 import { loadSavedIntegrations } from "../lib/integrations-storage";
@@ -186,16 +180,16 @@ export default function Downloads() {
           <input value={torrentValue} onChange={(event) => setTorrentValue(event.target.value)} placeholder="magnet:?xt=... or https://example/torrent.torrent" />
         </label>
         <label className="download-file-button">
-          <FileUploadLineIcon size={16} />
+          <RiFileUploadLine size={16} />
           <span>{torrentFile ? torrentFile.name : "Torrent File"}</span>
           <input ref={fileInputRef} type="file" accept=".torrent,application/x-bittorrent" onChange={(event) => setTorrentFile(event.target.files?.[0] || null)} />
         </label>
         <button type="button" className="download-add-button" onClick={addTorrent} disabled={isSubmitting || !usableClients.length}>
-          <AddLineIcon size={18} />
+          <RiAddLine size={18} />
           {isSubmitting ? "Adding..." : "Add Torrent"}
         </button>
         <button type="button" className="download-add-button" onClick={runDownloadSync}>
-          <TimerFlashLineIcon size={18} />
+          <RiTimerFlashLine size={18} />
           Sync Now
         </button>
       </section>
@@ -217,7 +211,7 @@ export default function Downloads() {
                 <div className="download-row-main">
                   <div className="download-title-group">
                     <span className="download-row-client-icon">
-                      {clientIcon(clientByName.get(normalizeName(download.client))) || <DownloadCloud2FillIcon size={18} />}
+                      {clientIcon(clientByName.get(normalizeName(download.client))) || <RiDownloadCloud2Fill size={18} />}
                     </span>
                     <div>
                       <strong>{download.name}</strong>
@@ -229,10 +223,10 @@ export default function Downloads() {
                   <div className="download-row-actions">
                     <small>{download.progress}%</small>
                     <button type="button" aria-label="Pause or resume">
-                      {download.progress >= 100 ? <PauseLineIcon size={17} /> : <PlayLineIcon size={17} />}
+                      {download.progress >= 100 ? <RiPauseLine size={17} /> : <RiPlayLine size={17} />}
                     </button>
                     <button type="button" className="is-danger" aria-label="Remove download" onClick={() => removeDownload(download.id)}>
-                      <CloseLineIcon size={17} />
+                      <RiCloseLine size={17} />
                     </button>
                   </div>
                 </div>
@@ -244,7 +238,7 @@ export default function Downloads() {
                   <span>Down {download.down}</span>
                   <span>Up {download.up}</span>
                   <span>
-                    <TimerFlashLineIcon size={13} />
+                    <RiTimerFlashLine size={13} />
                     {download.progress >= 100 ? "Complete" : "Active"}
                   </span>
                 </div>
@@ -262,7 +256,7 @@ export default function Downloads() {
               const count = downloads.filter((download) => download.client === client.name).length;
               return (
                 <div className="download-client-row" key={client.instanceId}>
-                  <span className="download-client-icon">{clientIcon(client) || <DownloadCloud2FillIcon size={20} />}</span>
+                  <span className="download-client-icon">{clientIcon(client) || <RiDownloadCloud2Fill size={20} />}</span>
                   <div>
                     <strong>{client.name}</strong>
                     <span>

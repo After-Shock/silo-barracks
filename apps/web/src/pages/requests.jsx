@@ -1,16 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import ChatCheckFillIcon from "remixicon-react/ChatCheckFillIcon";
-import CheckboxCircleLineIcon from "remixicon-react/CheckboxCircleLineIcon";
-import CloseCircleLineIcon from "remixicon-react/CloseCircleLineIcon";
-import ErrorWarningLineIcon from "remixicon-react/ErrorWarningLineIcon";
-import ExternalLinkLineIcon from "remixicon-react/ExternalLinkLineIcon";
-import Edit2LineIcon from "remixicon-react/Edit2LineIcon";
-import FileList3LineIcon from "remixicon-react/FileList3LineIcon";
-import GridLineIcon from "remixicon-react/GridLineIcon";
-import AccountCircleFillIcon from "remixicon-react/AccountCircleFillIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import SearchLineIcon from "remixicon-react/SearchLineIcon";
+import { RiAccountCircleFill, RiChatCheckFill, RiCheckboxCircleLine, RiCloseCircleLine, RiEdit2Line, RiErrorWarningLine, RiExternalLinkLine, RiFileList3Line, RiGridLine, RiRefreshLine, RiSearchLine } from "@remixicon/react";
 import { Modal } from "react-bootstrap";
 import axios from "../lib/axios_instance";
 import "./css/integrations.css";
@@ -191,7 +181,7 @@ function RequesterIdentity({ request, compact = false }) {
         ) : (
           <span>{initials}</span>
         )}
-        <AccountCircleFillIcon />
+        <RiAccountCircleFill />
       </span>
       <span>
         <small>{compact ? "Requested by" : "Requester"}</small>
@@ -248,7 +238,7 @@ function RequestPoster({ request, large = false }) {
     );
   }
 
-  return String(request.status).toLowerCase() === "error" ? <ErrorWarningLineIcon /> : <ChatCheckFillIcon />;
+  return String(request.status).toLowerCase() === "error" ? <RiErrorWarningLine /> : <RiChatCheckFill />;
 }
 
 export default function Requests() {
@@ -758,15 +748,15 @@ export default function Requests() {
           </div>
           <div className="requests-view-toggle" role="group" aria-label="Request queue view">
             <button type="button" className={queueView === "cards" ? "is-active" : ""} aria-pressed={queueView === "cards"} onClick={() => setQueueView("cards")} title="Card view" aria-label="Card view">
-              <GridLineIcon size={18} />
+              <RiGridLine size={18} />
             </button>
             <button type="button" className={queueView === "list" ? "is-active" : ""} aria-pressed={queueView === "list"} onClick={() => setQueueView("list")} title="List view" aria-label="List view">
-              <FileList3LineIcon size={18} />
+              <RiFileList3Line size={18} />
             </button>
           </div>
         </div>
         <label className="requests-media-search">
-          <SearchLineIcon size={18} />
+          <RiSearchLine size={18} />
           <input
             type="search"
             value={mediaSearch}
@@ -826,7 +816,7 @@ export default function Requests() {
                   </div>
                   <div className="requests-discovery-actions">
                     <button type="button" disabled={requestDisabled} onClick={(event) => openMediaResultDetail(result, event)}>
-                      <ChatCheckFillIcon size={16} />
+                      <RiChatCheckFill size={16} />
                       {requestLabel}
                     </button>
                     {result.openUrl ? (
@@ -838,7 +828,7 @@ export default function Requests() {
                           window.open(result.openUrl, "_blank", "noopener,noreferrer");
                         }}
                       >
-                        <ExternalLinkLineIcon size={16} />
+                        <RiExternalLinkLine size={16} />
                       </button>
                     ) : null}
                   </div>
@@ -902,30 +892,30 @@ export default function Requests() {
                 {canManageRequests && request.status === "Pending" ? (
                   <>
                     <button type="button" title="Approve" disabled={Boolean(busyAction)} onClick={(event) => runRequestAction(request, "approve", event)}>
-                      <CheckboxCircleLineIcon size={16} />
+                      <RiCheckboxCircleLine size={16} />
                       <span>Approve</span>
                     </button>
                     <button type="button" title="Decline" disabled={Boolean(busyAction)} onClick={(event) => runRequestAction(request, "decline", event)}>
-                      <CloseCircleLineIcon size={16} />
+                      <RiCloseCircleLine size={16} />
                       <span>Decline</span>
                     </button>
                   </>
                 ) : null}
                 {canManageRequests && request.requestId && request.status === "Failed" ? (
                   <button type="button" title="Retry" disabled={Boolean(busyAction)} onClick={(event) => runRequestAction(request, "retry", event)}>
-                    <RefreshLineIcon size={16} />
+                    <RiRefreshLine size={16} />
                     <span>Retry</span>
                   </button>
                 ) : null}
                 {canManageRequests && request.requestId ? (
                   <button type="button" title="Edit routing" disabled={Boolean(busyAction)} onClick={(event) => openRequestEditor(request, event)}>
-                    <Edit2LineIcon size={16} />
+                    <RiEdit2Line size={16} />
                     <span>Edit</span>
                   </button>
                 ) : null}
                 {request.openUrl ? (
                   <button type="button" title={`Open in ${request.source}`} onClick={(event) => openSeerrRequest(request, event)}>
-                    <ExternalLinkLineIcon size={16} />
+                    <RiExternalLinkLine size={16} />
                     <span>Open</span>
                   </button>
                 ) : null}
@@ -936,7 +926,7 @@ export default function Requests() {
 
         {!loading && !loadError && !visibleRequests.length ? (
           <div className="requests-empty-state">
-            <ChatCheckFillIcon size={30} />
+            <RiChatCheckFill size={30} />
             <strong>{t("OPERATIONAL_STATES.REQUESTS_EMPTY")}</strong>
             <span>{data.requests?.length ? t("OPERATIONAL_STATES.REQUESTS_EMPTY_FILTER_HINT") : t("OPERATIONAL_STATES.REQUESTS_EMPTY_SETUP_HINT")}</span>
           </div>
@@ -948,7 +938,7 @@ export default function Requests() {
           <>
             <Modal.Body>
               <button type="button" className="requests-modal-close" aria-label="Close" onClick={() => { setSelectedRequest(null); setEditingRequestId(""); }}>
-                <CloseCircleLineIcon size={22} />
+                <RiCloseCircleLine size={22} />
               </button>
               <div className="requests-detail">
                 <div className="requests-detail-art">
@@ -1012,18 +1002,18 @@ export default function Requests() {
                     {!selectedRequest.isSearchResult && canManageRequests && selectedRequest.status === "Pending" ? (
                       <>
                         <button type="button" disabled={Boolean(busyAction)} onClick={(event) => runRequestAction(selectedRequest, "approve", event)}>
-                          <CheckboxCircleLineIcon size={17} />
+                          <RiCheckboxCircleLine size={17} />
                           Approve
                         </button>
                         <button type="button" disabled={Boolean(busyAction)} onClick={(event) => runRequestAction(selectedRequest, "decline", event)}>
-                          <CloseCircleLineIcon size={17} />
+                          <RiCloseCircleLine size={17} />
                           Decline
                         </button>
                       </>
                     ) : null}
                     {!selectedRequest.isSearchResult && canManageRequests && selectedRequest.requestId ? (
                       <button type="button" disabled={Boolean(busyAction)} onClick={(event) => openRequestEditor(selectedRequest, event)}>
-                        <Edit2LineIcon size={17} />
+                        <RiEdit2Line size={17} />
                         {editingRequestId === selectedRequest.id ? "Hide edit" : "Edit request"}
                       </button>
                     ) : null}
@@ -1147,7 +1137,7 @@ export default function Requests() {
                             (selectedRequest.mediaType === "tv" && selectedRequest.seasons?.length && !(selectedSeasons[selectedRequest.id] || []).length);
                           return (
                             <button type="button" disabled={requestDisabled} onClick={() => requestMedia(selectedRequest)}>
-                              <ChatCheckFillIcon size={17} />
+                              <RiChatCheckFill size={17} />
                               {isAlreadyAvailable ? "Available" : isAlreadyRequested ? "Already requested" : "Request this"}
                             </button>
                           );
@@ -1262,7 +1252,7 @@ export default function Requests() {
                         {selectedRequest.cast.map((person) => (
                           <article key={person.id || `${person.name}-${person.character}`}>
                             <span className="requests-cast-photo">
-                              {person.imageUrl ? <img src={person.imageUrl} alt="" loading="lazy" /> : <AccountCircleFillIcon size={18} />}
+                              {person.imageUrl ? <img src={person.imageUrl} alt="" loading="lazy" /> : <RiAccountCircleFill size={18} />}
                             </span>
                             <span>
                               <b>{person.name}</b>

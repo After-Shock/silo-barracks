@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Alert, Button, Form, Spinner } from "react-bootstrap";
-import Notification3LineIcon from "remixicon-react/Notification3LineIcon";
-import Save3LineIcon from "remixicon-react/Save3LineIcon";
+import { RiNotification3Line, RiSave3Line } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 import Config from "../../../lib/config";
 import { defaultNotificationSettings, normalizeNotificationSettings, storeNotificationSettings } from "../../../lib/notification-settings";
@@ -85,7 +84,7 @@ export default function NotificationSettings() {
 
       <section className="notification-panel">
         <div className="notification-panel-title">
-          <Notification3LineIcon size={20} />
+          <RiNotification3Line size={20} />
           <h3>Toast Behaviour</h3>
         </div>
         <div className="notification-mode-grid">
@@ -138,7 +137,7 @@ export default function NotificationSettings() {
 
       <div className="notification-actions">
         <Button type="submit" disabled={saving}>
-          {saving ? <Spinner size="sm" animation="border" /> : <Save3LineIcon size={17} />}
+          {saving ? <Spinner size="sm" animation="border" /> : <RiSave3Line size={17} />}
           Save notifications
         </Button>
       </div>

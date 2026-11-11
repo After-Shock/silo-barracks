@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-import AddCircleFillIcon from 'remixicon-react/AddCircleFillIcon';
-import IndeterminateCircleFillIcon from 'remixicon-react/IndeterminateCircleFillIcon';
+import { RiAddCircleFill, RiIndeterminateCircleFill } from "@remixicon/react";
 
 
 
@@ -77,7 +76,7 @@ function formatDurationTime(seconds) {
             aria-expanded={open}
             onClick={() => {if(data.Log !== null && data.Log.length>0){setOpen(!open);}}}
             >
-              {!open ? <AddCircleFillIcon opacity={data.Log !== null && data.Log.length>0 ?1 : 0} cursor={data.Log !== null && data.Log.length>1 ? "pointer":"default"}/> : <IndeterminateCircleFillIcon />}
+              {!open ? <RiAddCircleFill opacity={data.Log !== null && data.Log.length>0 ?1 : 0} cursor={data.Log !== null && data.Log.length>1 ? "pointer":"default"}/> : <RiIndeterminateCircleFill />}
           </Button>
         </TableCell>
         <TableCell>{data.Name}</TableCell>

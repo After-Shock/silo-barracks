@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import Plug2LineIcon from "remixicon-react/Plug2LineIcon";
-import Database2LineIcon from "remixicon-react/Database2LineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
+import { RiDatabase2Line, RiPlug2Line, RiRefreshLine } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import Config from "../lib/config";
 import baseUrl from "../lib/baseurl";
@@ -94,15 +92,15 @@ export default function FirstRunExtras() {
       <div className="setup-extras">
         <nav className="setup-extra-tabs" aria-label="First-run setup areas">
           <button type="button" className={activePanel === "integrations" ? "is-active" : ""} onClick={() => setActivePanel("integrations")}>
-            <Plug2LineIcon size={18} />
+            <RiPlug2Line size={18} />
             Integrations
           </button>
           {!isSilo && <button type="button" className={activePanel === "imports" ? "is-active" : ""} onClick={() => setActivePanel("imports")}>
-            <Database2LineIcon size={18} />
+            <RiDatabase2Line size={18} />
             History Import
           </button>}
           <button type="button" className={activePanel === "sync" ? "is-active" : ""} onClick={() => setActivePanel("sync")}>
-            <RefreshLineIcon size={18} />
+            <RiRefreshLine size={18} />
             First Sync
           </button>
         </nav>
@@ -138,7 +136,7 @@ export default function FirstRunExtras() {
           ) : null}
           {activePanel === "sync" ? (
             <section className="setup-sync-panel">
-              <RefreshLineIcon />
+              <RiRefreshLine />
               <div>
                 <h3>Ready to start Silo Barracks</h3>
                 <p>

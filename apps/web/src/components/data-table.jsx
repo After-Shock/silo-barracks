@@ -7,18 +7,7 @@
 import * as React from "react";
 import { flexRender } from "@tanstack/react-table";
 
-import ArrowDownLineIcon from "remixicon-react/ArrowDownLineIcon";
-import ArrowLeftSLineIcon from "remixicon-react/ArrowLeftSLineIcon";
-import ArrowRightSLineIcon from "remixicon-react/ArrowRightSLineIcon";
-import ArrowUpLineIcon from "remixicon-react/ArrowUpLineIcon";
-import CloseLineIcon from "remixicon-react/CloseLineIcon";
-import EyeOffLineIcon from "remixicon-react/EyeOffLineIcon";
-import FilterLineIcon from "remixicon-react/FilterLineIcon";
-import More2FillIcon from "remixicon-react/More2FillIcon";
-import SkipBackLineIcon from "remixicon-react/SkipBackLineIcon";
-import SkipForwardLineIcon from "remixicon-react/SkipForwardLineIcon";
-import SortAscIcon from "remixicon-react/SortAscIcon";
-import SortDescIcon from "remixicon-react/SortDescIcon";
+import { RiArrowDownLine, RiArrowLeftSLine, RiArrowRightSLine, RiArrowUpLine, RiCloseLine, RiEyeOffLine, RiFilterLine, RiMore2Fill, RiSkipBackLine, RiSkipForwardLine, RiSortAsc, RiSortDesc } from "@remixicon/react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,16 +25,6 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { defaultDataTableLocalization, fill, getPageItems, headerLabel, isEmptyFilterValue } from "@/components/data-table-utils";
-
-export {
-  EXPAND_COLUMN_ID,
-  SELECT_COLUMN_ID,
-  createExpandColumn,
-  createSelectColumn,
-  dataTableFilterFns,
-  defaultDataTableLocalization,
-  useDataTable,
-} from "@/components/data-table-utils";
 
 /* ------------------------------------------------------------------ */
 /* Filters                                                             */
@@ -89,7 +68,7 @@ function TextFilter({ column, localization, label }) {
       {value !== "" && (
         <Button type="button" variant="ghost" size="icon-sm" aria-label={localization.clearFilter}
           onClick={() => { setValue(""); column.setFilterValue(undefined); }}>
-          <CloseLineIcon />
+          <RiCloseLine />
         </Button>
       )}
     </div>
@@ -112,7 +91,7 @@ function RangeFilter({ column, localization, label }) {
       <Input type="number" value={range[1]} placeholder={localization.max} aria-label={`${label} ${localization.max}`} className="tw:text-sm" onChange={(event) => update(1, event.target.value)} />
       <Button type="button" variant="ghost" size="icon-sm" aria-label={localization.clearFilter} disabled={isEmptyFilterValue(range)}
         onClick={() => { setRange(["", ""]); column.setFilterValue(undefined); }}>
-        <CloseLineIcon />
+        <RiCloseLine />
       </Button>
     </div>
   );
@@ -178,7 +157,7 @@ function ColumnActionsMenu({ column, table, localization, onOpenFilter }) {
         <TooltipTrigger asChild>
           <DropdownMenuTrigger asChild>
             <Button type="button" variant="ghost" size="icon-xs" className="data-table-column-actions tw:rounded-full tw:opacity-30 tw:hover:opacity-100 tw:data-[state=open]:opacity-100" aria-label={localization.columnActions}>
-              <More2FillIcon />
+              <RiMore2Fill />
             </Button>
           </DropdownMenuTrigger>
         </TooltipTrigger>
@@ -188,13 +167,13 @@ function ColumnActionsMenu({ column, table, localization, onOpenFilter }) {
         {canSort && (
           <>
             <DropdownMenuItem disabled={!sorted} onSelect={() => column.clearSorting()}>
-              <CloseLineIcon /> {localization.clearSort}
+              <RiCloseLine /> {localization.clearSort}
             </DropdownMenuItem>
             <DropdownMenuItem disabled={sorted === "asc"} onSelect={() => column.toggleSorting(false)}>
-              <SortAscIcon /> {fill(localization.sortByColumnAsc, label)}
+              <RiSortAsc /> {fill(localization.sortByColumnAsc, label)}
             </DropdownMenuItem>
             <DropdownMenuItem disabled={sorted === "desc"} onSelect={() => column.toggleSorting(true)}>
-              <SortDescIcon /> {fill(localization.sortByColumnDesc, label)}
+              <RiSortDesc /> {fill(localization.sortByColumnDesc, label)}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
@@ -202,17 +181,17 @@ function ColumnActionsMenu({ column, table, localization, onOpenFilter }) {
         {canFilter && (
           <>
             <DropdownMenuItem disabled={!filtered} onSelect={() => column.setFilterValue(undefined)}>
-              <CloseLineIcon /> {localization.clearFilter}
+              <RiCloseLine /> {localization.clearFilter}
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => onOpenFilter(column.id)}>
-              <FilterLineIcon /> {fill(localization.filterByColumn, label)}
+              <RiFilterLine /> {fill(localization.filterByColumn, label)}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
         )}
         {column.getCanHide() && (
           <DropdownMenuItem onSelect={() => column.toggleVisibility(false)}>
-            <EyeOffLineIcon /> {fill(localization.hideColumn, label)}
+            <RiEyeOffLine /> {fill(localization.hideColumn, label)}
           </DropdownMenuItem>
         )}
         <DropdownMenuItem onSelect={() => table.toggleAllColumnsVisible(true)}>
@@ -251,7 +230,7 @@ function DataTableHeadContent({ header, table, localization, filterOpen, setFilt
                 >
                   <span className="tw:truncate">{rendered}</span>
                   <span className={cn("data-table-sort-icon tw:inline-flex tw:size-3.5 tw:shrink-0 tw:[&_svg]:size-3.5", !sorted && "tw:opacity-0 tw:group-hover/head:opacity-40")}>
-                    {sorted === "asc" ? <ArrowUpLineIcon /> : <ArrowDownLineIcon />}
+                    {sorted === "asc" ? <RiArrowUpLine /> : <RiArrowDownLine />}
                   </span>
                 </button>
               </TooltipTrigger>
@@ -276,7 +255,7 @@ function DataTableHeadContent({ header, table, localization, filterOpen, setFilt
               aria-pressed={filtered}
               onClick={() => setFilterOpen(filterOpen ? null : column.id)}
             >
-              <FilterLineIcon />
+              <RiFilterLine />
             </Button>
           )}
           {enableColumnActions && (
@@ -361,11 +340,11 @@ export function DataTablePagination({ table, localization = defaultDataTableLoca
       )}
       {showFirstLastButtons && (
         <Button type="button" variant="outline" size="sm" className={itemClass} aria-label={localization.goToFirstPage} disabled={page <= 1} onClick={() => table.firstPage()}>
-          <SkipBackLineIcon />
+          <RiSkipBackLine />
         </Button>
       )}
       <Button type="button" variant="outline" size="sm" className={itemClass} aria-label={localization.goToPreviousPage} disabled={!table.getCanPreviousPage()} onClick={() => table.previousPage()}>
-        <ArrowLeftSLineIcon />
+        <RiArrowLeftSLine />
       </Button>
       {getPageItems(page, pageCount).map((item) =>
         typeof item === "number" ? (
@@ -387,11 +366,11 @@ export function DataTablePagination({ table, localization = defaultDataTableLoca
         )
       )}
       <Button type="button" variant="outline" size="sm" className={itemClass} aria-label={localization.goToNextPage} disabled={!table.getCanNextPage()} onClick={() => table.nextPage()}>
-        <ArrowRightSLineIcon />
+        <RiArrowRightSLine />
       </Button>
       {showFirstLastButtons && (
         <Button type="button" variant="outline" size="sm" className={itemClass} aria-label={localization.goToLastPage} disabled={page >= pageCount} onClick={() => table.lastPage()}>
-          <SkipForwardLineIcon />
+          <RiSkipForwardLine />
         </Button>
       )}
     </nav>

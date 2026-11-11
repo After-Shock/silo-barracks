@@ -4,7 +4,7 @@ import { Blurhash } from "react-blurhash";
 import { Link } from "react-router-dom";
 import Card from "react-bootstrap/Card";
 import Tooltip from "@mui/material/Tooltip";
-import ArchiveDrawerFillIcon from "remixicon-react/ArchiveDrawerFillIcon";
+import { RiArchiveDrawerFill } from "@remixicon/react";
 import "../../css/items/item-stat-component.css";
 import "../../css/statCard.css";
 
@@ -102,7 +102,7 @@ function ItemStatComponent(props) {
                 />
               ) : (
                 <div className="stat-card-archived">
-                  <ArchiveDrawerFillIcon />
+                  <RiArchiveDrawerFill />
                   <span>Archived</span>
                 </div>
               )}

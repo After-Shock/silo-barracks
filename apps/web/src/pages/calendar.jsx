@@ -1,12 +1,5 @@
 import { Link } from "react-router-dom";
-import CalendarEventFillIcon from "remixicon-react/CalendarEventFillIcon";
-import ArrowLeftSLineIcon from "remixicon-react/ArrowLeftSLineIcon";
-import ArrowRightSLineIcon from "remixicon-react/ArrowRightSLineIcon";
-import CloseLineIcon from "remixicon-react/CloseLineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import Settings3LineIcon from "remixicon-react/Settings3LineIcon";
-import TvLineIcon from "remixicon-react/TvLineIcon";
+import { RiArrowLeftSLine, RiArrowRightSLine, RiCalendarEventFill, RiCloseLine, RiFilmLine, RiRefreshLine, RiSettings3Line, RiTvLine } from "@remixicon/react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "../lib/axios_instance";
@@ -87,7 +80,7 @@ function ReleaseArtwork({ release, size = 18 }) {
   if (release?.posterUrl) {
     return <img src={release.posterUrl} alt="" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.style.display = "none"; }} />;
   }
-  return release?.type === "tv" ? <TvLineIcon size={size} /> : <FilmLineIcon size={size} />;
+  return release?.type === "tv" ? <RiTvLine size={size} /> : <RiFilmLine size={size} />;
 }
 
 function releaseAccentClass(release) {
@@ -198,20 +191,20 @@ export default function Calendar() {
 
       <section className="calendar-toolbar">
         <button type="button" onClick={() => setVisibleMonth(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() - 1, 1))}>
-          <ArrowLeftSLineIcon size={18} />
+          <RiArrowLeftSLine size={18} />
         </button>
         <button type="button" className="calendar-month-button" onClick={() => setVisibleMonth(new Date())}>
           {monthLabel(visibleMonth)}
         </button>
         <button type="button" onClick={() => setVisibleMonth(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 1))}>
-          <ArrowRightSLineIcon size={18} />
+          <RiArrowRightSLine size={18} />
         </button>
         <button type="button" onClick={runCalendarSync} disabled={syncing}>
-          <RefreshLineIcon size={18} />
+          <RiRefreshLine size={18} />
           {syncing ? "Syncing" : "Sync Now"}
         </button>
         <Link to="/settings">
-          <Settings3LineIcon size={18} />
+          <RiSettings3Line size={18} />
           Integrations
         </Link>
       </section>
@@ -247,7 +240,7 @@ export default function Calendar() {
         <div className="calendar-month-panel">
           <div className="calendar-panel-heading">
             <h2>
-              <CalendarEventFillIcon size={20} />
+              <RiCalendarEventFill size={20} />
               {monthLabel(visibleMonth)}
             </h2>
             <span>{filteredReleases.length} planned</span>
@@ -292,7 +285,7 @@ export default function Calendar() {
             </div>
           ) : (
             <div className="calendar-empty-state">
-              <CalendarEventFillIcon />
+              <RiCalendarEventFill />
               <strong>{t("OPERATIONAL_STATES.CALENDAR_EMPTY")}</strong>
               <span>
                 {activeSourceFilter === "all"
@@ -308,7 +301,7 @@ export default function Calendar() {
         <div className={`calendar-preview-backdrop ${releaseAccentClass(selectedRelease)}`} role="presentation" onClick={() => setSelectedRelease(null)}>
           <article className={`calendar-preview-modal ${releaseAccentClass(selectedRelease)}`} role="dialog" aria-modal="true" aria-label={selectedRelease.title} onClick={(event) => event.stopPropagation()}>
             <button type="button" className="calendar-preview-close" aria-label="Close preview" onClick={() => setSelectedRelease(null)}>
-              <CloseLineIcon size={22} />
+              <RiCloseLine size={22} />
             </button>
             <div className="calendar-preview-art">
               <ReleaseArtwork release={selectedRelease} size={86} />
@@ -341,7 +334,7 @@ export default function Calendar() {
         <div className="calendar-preview-backdrop calendar-day-modal-backdrop" role="presentation" onClick={() => setSelectedDay(null)}>
           <article className="calendar-day-modal" role="dialog" aria-modal="true" aria-label={`Releases for ${formatDate(selectedDay)}`} onClick={(event) => event.stopPropagation()}>
             <button type="button" className="calendar-preview-close" aria-label="Close day" onClick={() => setSelectedDay(null)}>
-              <CloseLineIcon size={22} />
+              <RiCloseLine size={22} />
             </button>
             <div className="calendar-day-modal-header">
               <span>Release day</span>

@@ -1,16 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import ArrowRightLineIcon from "remixicon-react/ArrowRightLineIcon";
-import CpuLineIcon from "remixicon-react/CpuLineIcon";
-import HistoryLineIcon from "remixicon-react/HistoryLineIcon";
-import ListCheck2Icon from "remixicon-react/ListCheck2Icon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
+import { RiArrowRightLine, RiCpuLine, RiHistoryLine, RiListCheck2, RiRefreshLine } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import "./css/active-transcodes.css";
 
 const tabs = [
-  { key: "active", label: "Active", Icon: CpuLineIcon },
-  { key: "queued", label: "Queued", Icon: ListCheck2Icon },
-  { key: "history", label: "History", Icon: HistoryLineIcon },
+  { key: "active", label: "Active", Icon: RiCpuLine },
+  { key: "queued", label: "Queued", Icon: RiListCheck2 },
+  { key: "history", label: "History", Icon: RiHistoryLine },
 ];
 const TRANSCODES_CACHE_KEY = "silo_barracks_tdarr_transcodes_cache_v2";
 const TRANSCODES_CACHE_MAX_AGE_MS = 2 * 60 * 1000;
@@ -88,7 +84,7 @@ function JobCard({ job, kind }) {
           <strong>{job.from || "Source"}</strong>
           {job.to ? (
             <>
-              <ArrowRightLineIcon size={18} />
+              <RiArrowRightLine size={18} />
               <strong>{job.to}</strong>
             </>
           ) : null}
@@ -193,7 +189,7 @@ export default function ActiveTranscodes() {
           <span>{lastUpdated ? `Last updated ${new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(new Date(lastUpdated))}` : "Monitor active workers, queued files, and finished transcode history."}</span>
         </div>
         <button type="button" onClick={() => loadTranscodes({ force: true })} disabled={loading}>
-          <RefreshLineIcon size={18} />
+          <RiRefreshLine size={18} />
           {loading ? "Refreshing" : "Refresh"}
         </button>
       </header>
@@ -202,27 +198,27 @@ export default function ActiveTranscodes() {
 
       <section className="transcode-summary-grid">
         <article>
-          <CpuLineIcon />
+          <RiCpuLine />
           <strong>{formatNumber(activeCount)}</strong>
           <span>Active</span>
         </article>
         <article>
-          <ListCheck2Icon />
+          <RiListCheck2 />
           <strong>{formatNumber(queueCount)}</strong>
           <span>Queue</span>
         </article>
         <article>
-          <HistoryLineIcon />
+          <RiHistoryLine />
           <strong>{formatNumber(processedCount)}</strong>
           <span>Processed</span>
         </article>
         <article>
-          <HistoryLineIcon />
+          <RiHistoryLine />
           <strong>{formatNumber(erroredCount)}</strong>
           <span>Errored</span>
         </article>
         <article>
-          <CpuLineIcon />
+          <RiCpuLine />
           <strong>{savedSize || "0 B"}</strong>
           <span>Saved</span>
         </article>

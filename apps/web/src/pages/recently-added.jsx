@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import ArrowLeftSLineIcon from "remixicon-react/ArrowLeftSLineIcon";
-import ArrowRightSLineIcon from "remixicon-react/ArrowRightSLineIcon";
-import FolderOpenLineIcon from "remixicon-react/FolderOpenLineIcon";
-import SearchLineIcon from "remixicon-react/SearchLineIcon";
+import { RiArrowLeftSLine, RiArrowRightSLine, RiFolderOpenLine, RiSearchLine } from "@remixicon/react";
 
 import axios from "../lib/axios_instance";
 import ErrorBoundary from "./components/general/ErrorBoundary";
@@ -232,7 +229,7 @@ export default function RecentlyAddedPage() {
 
       <div className="recently-added-controls" aria-label="Recently added filters">
         <label className="recently-added-search">
-          <SearchLineIcon size={18} />
+          <RiSearchLine size={18} />
           <input
             type="search"
             value={searchQuery}
@@ -299,7 +296,7 @@ export default function RecentlyAddedPage() {
       <div className="recently-added-shelves">
         {filteredShelves.length === 0 && !error ? (
           <div className="recently-added-empty">
-            <FolderOpenLineIcon size={34} />
+            <RiFolderOpenLine size={34} />
             <span>No recently added media matches the current filters.</span>
           </div>
         ) : null}
@@ -309,7 +306,7 @@ export default function RecentlyAddedPage() {
             <div className="recent-library-shelf-header">
               <div className="recent-library-shelf-title">
                 <div className="recent-library-shelf-icon" aria-hidden="true">
-                  <FolderOpenLineIcon size={22} />
+                  <RiFolderOpenLine size={22} />
                 </div>
                 <div>
                   <h2>{shelf.name}</h2>
@@ -325,7 +322,7 @@ export default function RecentlyAddedPage() {
                   disabled={shelf.items.length <= 10}
                   onClick={() => scrollShelf(shelf.id, -1)}
                 >
-                  <ArrowLeftSLineIcon size={21} />
+                  <RiArrowLeftSLine size={21} />
                 </button>
                 <button
                   type="button"
@@ -333,7 +330,7 @@ export default function RecentlyAddedPage() {
                   disabled={shelf.items.length <= 10}
                   onClick={() => scrollShelf(shelf.id, 1)}
                 >
-                  <ArrowRightSLineIcon size={21} />
+                  <RiArrowRightSLine size={21} />
                 </button>
               </div>
             </div>

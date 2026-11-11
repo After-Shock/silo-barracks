@@ -9,12 +9,7 @@ import Modal from "react-bootstrap/Modal";
 import FormControl from "react-bootstrap/FormControl";
 import axios from "../../../lib/axios_instance";
 
-import AccountCircleFillIcon from "remixicon-react/AccountCircleFillIcon";
-import PlayFillIcon from "remixicon-react/PlayFillIcon";
-import PauseFillIcon from "remixicon-react/PauseFillIcon";
-import ChatSmile2LineIcon from "remixicon-react/ChatSmile2LineIcon";
-import ArrowDownSLineIcon from "remixicon-react/ArrowDownSLineIcon";
-import StopCircleLineIcon from "remixicon-react/StopCircleLineIcon";
+import { RiAccountCircleFill, RiArrowDownSLine, RiChatSmile2Line, RiPauseFill, RiPlayFill, RiStopCircleLine } from "@remixicon/react";
 
 import { PlatformIcon } from "../../../lib/platform-icons";
 import Tooltip from "@mui/material/Tooltip";
@@ -405,7 +400,7 @@ function SessionCard(props) {
                     alt=""
                   />
                 ) : (
-                  <AccountCircleFillIcon aria-hidden="true" />
+                  <RiAccountCircleFill aria-hidden="true" />
                 )}
                 <strong>{session.UserName}{session.ProfileName ? ` · ${session.ProfileName}` : ""}</strong>
               </div>
@@ -451,8 +446,8 @@ function SessionCard(props) {
             {controlCapabilities?.available && controlCapabilities?.allowed && <>
               <div className="session-popout-actions">
                 {playState.IsPaused
-                  ? controlActions.has("resume") && <button type="button" className="session-command" disabled={Boolean(controlPending)} onClick={() => runControl("resume")}><PlayFillIcon size={17} />Resume</button>
-                  : controlActions.has("pause") && <button type="button" className="session-command" disabled={Boolean(controlPending)} onClick={() => runControl("pause")}><PauseFillIcon size={17} />Pause</button>}
+                  ? controlActions.has("resume") && <button type="button" className="session-command" disabled={Boolean(controlPending)} onClick={() => runControl("resume")}><RiPlayFill size={17} />Resume</button>
+                  : controlActions.has("pause") && <button type="button" className="session-command" disabled={Boolean(controlPending)} onClick={() => runControl("pause")}><RiPauseFill size={17} />Pause</button>}
                 {controlActions.has("message") && <button
                   type="button"
                   className="session-command is-message"
@@ -464,11 +459,11 @@ function SessionCard(props) {
                     setMessageOpen(true);
                   }}
                 >
-                  <ChatSmile2LineIcon size={17} />
+                  <RiChatSmile2Line size={17} />
                   Message
                 </button>}
-                {controlActions.has("stop") && <button type="button" className="session-command is-stop" disabled={Boolean(controlPending)} onClick={() => runControl("stop")}><StopCircleLineIcon size={17} />Stop playback</button>}
-                {controlActions.has("terminate") && <button type="button" className="session-command is-stop" disabled={Boolean(controlPending)} onClick={() => runControl("terminate")}><StopCircleLineIcon size={17} />Terminate</button>}
+                {controlActions.has("stop") && <button type="button" className="session-command is-stop" disabled={Boolean(controlPending)} onClick={() => runControl("stop")}><RiStopCircleLine size={17} />Stop playback</button>}
+                {controlActions.has("terminate") && <button type="button" className="session-command is-stop" disabled={Boolean(controlPending)} onClick={() => runControl("terminate")}><RiStopCircleLine size={17} />Terminate</button>}
               </div>
             </>}
           </section>}
@@ -494,7 +489,7 @@ function SessionCard(props) {
                 <strong>{selectedMessageTemplate.label}</strong>
                 <small>{selectedMessageTemplate.group}</small>
               </span>
-              <ArrowDownSLineIcon size={20} />
+              <RiArrowDownSLine size={20} />
             </button>
             {templateMenuOpen ? (
               <div className="session-message-menu" role="listbox">
@@ -568,7 +563,7 @@ function SessionCard(props) {
             disabled={Boolean(controlPending) || !messageText.trim()}
             onClick={() => runControl("message", messageText)}
           >
-            <ChatSmile2LineIcon size={17} />
+            <RiChatSmile2Line size={17} />
             {controlPending === "message" ? "Sending…" : "Send message"}
           </button>
         </Modal.Footer>
@@ -768,7 +763,7 @@ function SessionCard(props) {
         <Col className="session-card-now-playing">
           {/* Player convention: a paused stream shows play, a playing stream shows pause. */}
           <span className="session-play-state" role="img" aria-label={props.data.session.PlayState.IsPaused ? "Paused" : "Playing"}>
-            {props.data.session.PlayState.IsPaused ? <PlayFillIcon /> : <PauseFillIcon />}
+            {props.data.session.PlayState.IsPaused ? <RiPlayFill /> : <RiPauseFill />}
           </span>
           <div className="session-title-copy">
             <Card.Text className="session-title">
@@ -803,7 +798,7 @@ function SessionCard(props) {
               alt=""
             />
           ) : (
-            <AccountCircleFillIcon className="session-card-user-image" />
+            <RiAccountCircleFill className="session-card-user-image" />
           )}
         </Col>
       </Row>
