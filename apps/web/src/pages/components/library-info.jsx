@@ -11,7 +11,6 @@ import LibraryActivity from "./library/library-activity";
 import LibraryItems from "./library/library-items";
 import ErrorBoundary from "./general/ErrorBoundary";
 
-import { Tabs, Tab, Button, ButtonGroup } from "react-bootstrap";
 import { Trans } from "react-i18next";
 import LibraryOptions from "./library/library-options";
 import GlobalStats from "./general/globalStats";
@@ -98,28 +97,29 @@ function LibraryInfo() {
         <div className="library-detail-title">
           <span>{libraryType}</span>
           <h1>{data.Name}</h1>
-          <ButtonGroup className="library-detail-tabs">
+          <div className="library-detail-tabs" role="tablist" aria-label="Library views">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
-                <Button
+                <button
                   key={tab.key}
-                  onClick={() => setTab(tab.key)}
-                  active={effectiveActiveTab === tab.key}
-                  variant="outline-primary"
                   type="button"
+                  role="tab"
+                  aria-selected={effectiveActiveTab === tab.key}
+                  className={effectiveActiveTab === tab.key ? "active" : undefined}
+                  onClick={() => setTab(tab.key)}
                 >
                   <Icon size={16} />
                   {tab.label}
-                </Button>
+                </button>
               );
             })}
-          </ButtonGroup>
+          </div>
         </div>
       </section>
 
-      <Tabs defaultActiveKey={effectiveActiveTab} activeKey={effectiveActiveTab} variant="pills" className="hide-tab-titles">
-        <Tab eventKey="tabOverview" title="Overview" className="bg-transparent">
+      <div className="library-detail-tab-content">
+        {effectiveActiveTab === "tabOverview" && (
           <div className="library-detail-overview">
             {isSilo ? <section className="library-native-summary">
               <div className="library-native-heading"><span>Silo API v2</span><h2>Library summary</h2>
@@ -138,17 +138,13 @@ function LibraryInfo() {
             {!data.archived && <ErrorBoundary><RecentlyAdded LibraryId={LibraryId} /></ErrorBoundary>}
             {!isSilo ? <LibraryLastWatched LibraryId={LibraryId} /> : null}
           </div>
-        </Tab>
-        <Tab eventKey="tabItems" title="Items" className="bg-transparent">
-          <LibraryItems LibraryId={LibraryId} />
-        </Tab>
-        <Tab eventKey="tabActivity" title="Activity" className="bg-transparent">
-          <LibraryActivity LibraryId={LibraryId} />
-        </Tab>
-        {!isSilo ? <Tab eventKey="tabOptions" title="Options" className="bg-transparent">
+        )}
+        {effectiveActiveTab === "tabItems" && <LibraryItems LibraryId={LibraryId} />}
+        {effectiveActiveTab === "tabActivity" && <LibraryActivity LibraryId={LibraryId} />}
+        {!isSilo && effectiveActiveTab === "tabOptions" && (
           <LibraryOptions LibraryId={LibraryId} isArchived={data.archived} />
-        </Tab> : null}
-      </Tabs>
+        )}
+      </div>
     </div>
   );
 }
