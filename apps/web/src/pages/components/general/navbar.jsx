@@ -186,7 +186,10 @@ function isNavItemActive(item, location) {
   );
 }
 
-export default function Navbar() {
+// All navbar state, data loading, and handlers. Kept as one hook so upstream
+// JellyGlance logic changes to the navbar still apply here; the markup below
+// is Barracks-owned.
+function useNavbarState() {
   const [showAccount, setShowAccount] = useState(false);
   const [config, setConfig] = useState(() => getCachedConfig());
   const [customAvatar, setCustomAvatar] = useState(() => localStorage.getItem("silo_barracks_account_avatar") || "");
@@ -709,6 +712,74 @@ export default function Navbar() {
     if (link === "requests") return requestBadgeCount;
     return 0;
   };
+
+  return {
+    showAccount,
+    setShowAccount,
+    isMobileNavOpen,
+    setIsMobileNavOpen,
+    isThemeMenuOpen,
+    setIsThemeMenuOpen,
+    isNavCollapsed,
+    setIsNavCollapsed,
+    avatarSrc,
+    visibleNavData,
+    location,
+    getNavBadgeCount,
+    accountName,
+    accountRole,
+    profilePath,
+    canUploadAvatar,
+    handleLogout,
+    activeStreamCount,
+    activeDownloadCount,
+    activeTranscodeCount,
+    requestBadgeCount,
+    handleAvatarUpload,
+    openWhatsNew,
+    fontWeightPreference,
+    handleFontWeightPreference,
+    customTheme,
+    activeThemePreset,
+    handleThemeChange,
+    handleThemePreset,
+    handleThemeReset,
+  };
+}
+
+export default function Navbar() {
+  const {
+    showAccount,
+    setShowAccount,
+    isMobileNavOpen,
+    setIsMobileNavOpen,
+    isThemeMenuOpen,
+    setIsThemeMenuOpen,
+    isNavCollapsed,
+    setIsNavCollapsed,
+    avatarSrc,
+    visibleNavData,
+    location,
+    getNavBadgeCount,
+    accountName,
+    accountRole,
+    profilePath,
+    canUploadAvatar,
+    handleLogout,
+    activeStreamCount,
+    activeDownloadCount,
+    activeTranscodeCount,
+    requestBadgeCount,
+    handleAvatarUpload,
+    openWhatsNew,
+    fontWeightPreference,
+    handleFontWeightPreference,
+    customTheme,
+    activeThemePreset,
+    handleThemeChange,
+    handleThemePreset,
+    handleThemeReset,
+  } = useNavbarState();
 
   return (
     <>
