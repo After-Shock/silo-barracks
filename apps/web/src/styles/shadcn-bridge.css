@@ -117,6 +117,9 @@
   --color-border-raised: var(--barracks-border-raised);
   --color-border-strong: var(--barracks-border-strong);
   --color-scrim: var(--barracks-scrim);
+  --color-accent-secondary: var(--barracks-accent-secondary);
+  --color-border-overlay: var(--barracks-border-overlay);
+  --color-inverse: var(--barracks-text-inverse);
   --shadow-barracks: var(--barracks-shadow);
 
   --radius-sm: calc(var(--radius) - 4px);

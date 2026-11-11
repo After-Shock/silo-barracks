@@ -101,6 +101,11 @@ Each phase is a separate PR, shippable on its own, deployed to barracks.sullyfli
   - `cn()` now uses `extendTailwindMerge({ prefix: "tw" })`; without it conflicting `tw:` overrides were not merged.
   - Visual harness: `apps/web/dev-harness/` (git-excluded) mounts the real Navbar with seeded localStorage; Playwright shots + behaviour checks. Headless Chrome CLI clamps to ≥500px width, so use Playwright for phone sizes.
   - Still to do in Phase 1: react-toastify → sonner (separate PR).
+- **Phase 1b done 2026-11-11 (branch `feat/shadcn-sonner`, stacked on 1a):**
+  - `src/lib/toast.js` = **react-toastify-compatible adapter** over sonner (`info/success/warning/error`, `update(id,{render,type,autoClose})`, `isActive`, `dismiss`, options `toastId/autoClose/onClose/hideProgressBar`). Call sites only changed their import, so upstream toast logic in `App.jsx` still applies. **Import toasts from `lib/toast`, never from `sonner` directly.**
+  - `components/ui/sonner.jsx` = Barracks `Toaster` + `BarracksToast` (custom render, unstyled sonner). Not the shadcn registry item (it depends on `next-themes`).
+  - Matched the toasts as users actually saw them (react-toastify v11 had silently dropped `bodyClassName`): 320px, 68px, 13px gap, 10px radius, 38px status circle, 3px countdown bar that pauses on hover. Changes: the app font in bold (as the old CSS intended), and status icons use theme tokens instead of Toastify's hard-coded colors. With a *top* position, newest is nearest the edge (sonner has no option for this).
+  - react-toastify removed from dependencies.
 
 ### Phase 2 — Dashboards & charts (highest visual payoff)
 - Follow the **dataviz skill** for all charts/tiles: one stat-tile/KPI component, consistent axes/tooltips/legend, palette validated against every preset's `--barracks-chart-*` (add a test using `contrastRatio`).

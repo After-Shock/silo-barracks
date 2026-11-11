@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
     envDir: "../api",
 
     optimizeDeps: {
-      include: ["react", "react-dom", "react-router-dom", "axios", "react-toastify"],
+      include: ["react", "react-dom", "react-router-dom", "axios", "sonner"],
       esbuildOptions: {
         loader: {
           ".js": "jsx",
@@ -77,7 +77,7 @@ export default defineConfig(({ mode }) => {
             if (
               id.includes("/axios/") ||
               id.includes("/dayjs/") ||
-              id.includes("/react-toastify/") ||
+              id.includes("/sonner/") ||
               id.includes("/socket.io-client/") ||
               id.includes("/bootstrap/") ||
               id.includes("/react-bootstrap/") ||

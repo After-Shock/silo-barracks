@@ -5,8 +5,8 @@ import { Routes, Route } from "react-router-dom";
 import axios from "./lib/axios_instance";
 
 import socket from "./socket";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "./lib/toast";
+import { Toaster } from "@/components/ui/sonner";
 
 import Config from "./lib/config";
 import { applyFontWeightPreference } from "./lib/appearance";
@@ -314,17 +314,7 @@ function App() {
             </Routes>
           </main>
         </div>
-        <ToastContainer
-          theme="dark"
-          position={notificationSettings.position}
-          limit={5}
-          pauseOnFocusLoss={false}
-          hideProgressBar={false}
-          className="barracks-toast-container"
-          toastClassName="barracks-toast"
-          bodyClassName="barracks-toast-body"
-          progressClassName="barracks-toast-progress"
-        />
+        <Toaster position={notificationSettings.position} />
         <WhatsNewModal enabled={!kioskMode} />
       </div>
     );
