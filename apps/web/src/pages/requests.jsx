@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiAccountCircleFill, RiChatCheckFill, RiCheckboxCircleLine, RiCloseCircleLine, RiEdit2Line, RiErrorWarningLine, RiExternalLinkLine, RiFileList3Line, RiGridLine, RiRefreshLine, RiSearchLine } from "@remixicon/react";
-import { Modal } from "react-bootstrap";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import axios from "../lib/axios_instance";
 import "./css/integrations.css";
 import "./css/requests.css";
@@ -933,10 +933,20 @@ export default function Requests() {
         ) : null}
       </section>
 
-      <Modal show={Boolean(selectedRequest)} onHide={() => { setSelectedRequest(null); setEditingRequestId(""); }} centered size="xl" contentClassName="requests-modal">
-        {selectedRequest ? (
-          <>
-            <Modal.Body>
+      <Dialog
+        open={Boolean(selectedRequest)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedRequest(null);
+            setEditingRequestId("");
+          }
+        }}
+      >
+        <DialogContent className="requests-modal tw:max-w-[1140px] tw:sm:max-w-[1140px]" showCloseButton={false}>
+          <DialogTitle className="tw:sr-only">Request details</DialogTitle>
+          <DialogDescription className="tw:sr-only">Request details and destination options</DialogDescription>
+          {selectedRequest ? (
+            <div className="requests-modal-body">
               <button type="button" className="requests-modal-close" aria-label="Close" onClick={() => { setSelectedRequest(null); setEditingRequestId(""); }}>
                 <RiCloseCircleLine size={22} />
               </button>
@@ -1306,10 +1316,10 @@ export default function Requests() {
                   ) : null}
                 </div>
               </div>
-            </Modal.Body>
-          </>
-        ) : null}
-      </Modal>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
