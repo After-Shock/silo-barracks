@@ -4,9 +4,9 @@ import Config from "../lib/config";
 import baseUrl from "../lib/baseurl";
 import CryptoJS from "crypto-js";
 import "./css/setup.css";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import { InputGroup } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import EyeFillIcon from "remixicon-react/EyeFillIcon";
 import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
@@ -268,7 +268,7 @@ function Login() {
           <strong className="silo-wordmark">Silo Barracks</strong>
         </div>
 
-        <Form onSubmit={handleFormSubmit} className="setup-form login-form">
+        <form onSubmit={handleFormSubmit} className="setup-form login-form">
           {canQuickConnect ? (
             <div className="setup-auth-summary quick-connect-intro">
               <strong>Jellyfin Quick Connect</strong>
@@ -293,25 +293,25 @@ function Login() {
             </div>
           ) : (
             <>
-              <Form.Group className="inputbox">
-                <Form.Label>
+              <div className="inputbox">
+                <Label htmlFor="JS_USERNAME" className="setup-field-label">
                   <Trans i18nKey={"USERNAME"} />
-                </Form.Label>
-                <Form.Control
+                </Label>
+                <Input
                   id="JS_USERNAME"
                   name="JS_USERNAME"
                   value={formValues.JS_USERNAME || ""}
                   onChange={handleFormChange}
                   placeholder=" "
                 />
-              </Form.Group>
+              </div>
 
-              <Form.Group className="inputbox">
-                <Form.Label>
+              <div className="inputbox">
+                <Label htmlFor="JS_PASSWORD" className="setup-field-label">
                   <Trans i18nKey={"PASSWORD"} />
-                </Form.Label>
-                <InputGroup>
-                  <Form.Control
+                </Label>
+                <div className="setup-input-group">
+                  <Input
                     id="JS_PASSWORD"
                     name="JS_PASSWORD"
                     value={formValues.JS_PASSWORD || ""}
@@ -322,8 +322,8 @@ function Login() {
                   <Button className="login-show-password" type="button" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <EyeFillIcon /> : <EyeOffFillIcon />}
                   </Button>
-                </InputGroup>
-              </Form.Group>
+                </div>
+              </div>
             </>
           )}
 
@@ -353,7 +353,7 @@ function Login() {
                   : submitButtonText}
             </Button>
           )}
-        </Form>
+        </form>
       </div>
     </section>
   );
