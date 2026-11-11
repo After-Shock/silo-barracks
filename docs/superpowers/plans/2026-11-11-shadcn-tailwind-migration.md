@@ -91,6 +91,16 @@ Each phase is a separate PR, shippable on its own, deployed to barracks.sullyfli
 - Rebuild `navbar.jsx` (1060 lines + 1.9k CSS) on shadcn **Sidebar** (collapsible, mobile `Sheet`), preserving `nav-order.js` customization and hub tabs. Shared `PageHeader`.
 - Swap react-toastify → sonner (thin `toast` adapter so call sites change mechanically).
 - Delete `navbar.css` when done. Every page now sits in the new shell.
+- **Phase 1a done 2026-11-11 (branch `feat/shadcn-sidebar`, stacked on Phase 0):**
+  - Navbar logic moved into `useNavbarState()` (same file, separate commit, pixel-identical).
+  - react-bootstrap removed from the navbar: `OverlayTrigger/Tooltip` → shadcn `Tooltip`, account `Modal` → `Dialog`, `Button` → `Button`, `Navbar/Nav` → plain `<nav>`/`<Link>` with the same classes. Nav renders pixel-identical in desktop, collapsed, Synth, mobile, and mobile menu shots; tooltip and dialog match closely.
+  - **Not using shadcn `Sidebar` (decision).** Its layout model (provider wrapper, fixed panel + gap div, 768px `useIsMobile`, cookie state) conflicts with the existing tuned shell (fixed rail + `--jg-sidebar-width` padding, 900px *and* coarse-pointer mobile query, pre-paint `jg-nav-collapsed`). Keeping "current look" means keeping that layout; revisit only if the look is allowed to change.
+  - shadcn defaults restyled globally to Barracks: tooltip = inset surface, dialog = raised surface / 28px radius / `--barracks-scrim` backdrop (was Bootstrap's 50% black, slightly darker now).
+  - **z-index:** shadcn uses `z-50`; the app uses Bootstrap layers (navbar 1030, mobile topbar 1049). Dialog overlay/content now `1050/1055`, tooltip `1080`. Every future overlay component (popover, dropdown, sheet, select) must be bumped the same way when added.
+  - New `tw:compact:` variant = the app's mobile query (`max-width:900px` or coarse pointer). Use it instead of `sm:`/`md:` for anything that must agree with the nav's mobile switch.
+  - `cn()` now uses `extendTailwindMerge({ prefix: "tw" })`; without it conflicting `tw:` overrides were not merged.
+  - Visual harness: `apps/web/dev-harness/` (git-excluded) mounts the real Navbar with seeded localStorage; Playwright shots + behaviour checks. Headless Chrome CLI clamps to ≥500px width, so use Playwright for phone sizes.
+  - Still to do in Phase 1: react-toastify → sonner (separate PR).
 
 ### Phase 2 — Dashboards & charts (highest visual payoff)
 - Follow the **dataviz skill** for all charts/tiles: one stat-tile/KPI component, consistent axes/tooltips/legend, palette validated against every preset's `--barracks-chart-*` (add a test using `contrastRatio`).

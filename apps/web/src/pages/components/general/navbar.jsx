@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState, useLayoutEffect } from "react";
-import { Button, Modal, Nav, Navbar as BootstrapNavbar, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link, useLocation } from "react-router-dom";
 import axios from "../../../lib/axios_instance";
 import { navData } from "../../../lib/navdata";
@@ -187,7 +189,7 @@ function isNavItemActive(item, location) {
 }
 
 // All navbar state, data loading, and handlers. Kept as one hook so upstream
-// JellyGlance logic changes to the navbar still apply here; the markup below
+// logic changes to the navbar still apply here; the markup below
 // is Barracks-owned.
 function useNavbarState() {
   const [showAccount, setShowAccount] = useState(false);
@@ -747,6 +749,9 @@ function useNavbarState() {
   };
 }
 
+const PROFILE_SECONDARY_BUTTON =
+  "tw:min-h-[34px] tw:w-full tw:border tw:border-border-strong tw:bg-secondary tw:px-2.5 tw:py-1.5 tw:text-[13px] tw:font-black tw:text-secondary-foreground tw:no-underline tw:hover:border-border-inset tw:hover:bg-surface-inset tw:hover:text-inset-foreground";
+
 export default function Navbar() {
   const {
     showAccount,
@@ -782,7 +787,7 @@ export default function Navbar() {
   } = useNavbarState();
 
   return (
-    <>
+    <TooltipProvider delayDuration={150}>
       <div className="mobile-app-topbar">
         <button
           className="mobile-app-menu"
@@ -865,16 +870,20 @@ export default function Navbar() {
         </nav>
       </div>
 
-      <BootstrapNavbar variant="dark" className={`desktop-navigation d-flex flex-column py-0 text-center sticky-top ${isNavCollapsed ? "is-collapsed" : ""}`} id="primary-navigation">
+      <nav
+        id="primary-navigation"
+        aria-label="Primary navigation"
+        className={`desktop-navigation d-flex flex-column py-0 text-center sticky-top ${isNavCollapsed ? "is-collapsed" : ""} navbar navbar-expand navbar-dark`}
+      >
       <div className="sticky-top py-md-3">
         <div className="navbar-brand-row">
-          <BootstrapNavbar.Brand as={Link} to={"/"} className="d-none d-md-inline">
+          <Link to="/" className="d-none d-md-inline navbar-brand">
           <img src={logo_dark} className="navbar-brand-icon px-2" alt="" />
           <strong className="silo-wordmark">Silo Barracks</strong>
-        </BootstrapNavbar.Brand>
+        </Link>
         </div>
 
-        <Nav className="flex-row flex-md-column w-100">
+        <div className="flex-row flex-md-column w-100 navbar-nav">
           <div className="navbar-links-scroll">
           {visibleNavData.map((item) => {
             const isActive = isNavItemActive(item, location);
@@ -890,21 +899,14 @@ export default function Navbar() {
                 : 0;
             const navLabel = item.label || (typeof item.text === "string" ? item.text : "");
             return (
-              <OverlayTrigger
-                key={item.id}
-                placement="right"
-                overlay={
-                  <Tooltip id={`nav-tooltip-${item.id}`} className="barracks-nav-tooltip">
-                    {navLabel}
-                  </Tooltip>
-                }
-              >
-                <Nav.Link
-                  as={Link}
-                  className={`navitem${isActive ? " active" : ""} p-2`} // add the "active" class if the link is active
+              <Tooltip key={item.id}>
+                <TooltipTrigger asChild>
+                <Link
+                  className={`navitem${isActive ? " active" : ""} p-2 nav-link`}
                   to={item.link}
                   onClick={() => setIsMobileNavOpen(false)}
                   aria-label={navLabel}
+                  aria-current={isActive ? "page" : undefined}
                 >
                   {item.icon}
                   {badgeCount > 0 ? <span className="nav-icon-badge">{badgeCount}</span> : null}
@@ -931,8 +933,10 @@ export default function Navbar() {
                       </span>
                     ) : null}
                   </span>
-                </Nav.Link>
-              </OverlayTrigger>
+                </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right">{navLabel}</TooltipContent>
+              </Tooltip>
             );
           })}
           <button
@@ -970,16 +974,26 @@ export default function Navbar() {
               <VersionCard />
             </div>
           </div>
-        </Nav>
+        </div>
       </div>
 
-      </BootstrapNavbar>
+      </nav>
 
-      <Modal show={showAccount} onHide={() => setShowAccount(false)} centered dialogClassName="profile-modal">
-        <Modal.Header closeButton>
-          <Modal.Title>Account</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+      <Dialog open={showAccount} onOpenChange={setShowAccount}>
+        <DialogContent
+          className="profile-modal tw:grid-rows-[auto_minmax(0,1fr)_auto] tw:gap-0 tw:p-0 tw:w-[min(calc(100vw-48px),420px)] tw:max-w-none tw:sm:max-w-none tw:max-h-[calc(100dvh-2rem)] tw:overflow-hidden tw:compact:w-[min(calc(100vw-18px),692px)] tw:compact:max-h-[calc(100dvh-16px)] tw:compact:rounded-[18px]"
+          closeClassName="tw:top-3 tw:right-3.5 tw:[&_svg:not([class*=size-])]:size-5"
+          onOpenAutoFocus={(event) => {
+            // Focus the dialog itself (no ring) instead of the first control (the file input).
+            event.preventDefault();
+            event.target?.focus?.();
+          }}
+        >
+          <DialogHeader className="tw:gap-0 tw:border-b tw:border-border tw:px-3.5 tw:pt-2.5 tw:pb-2 tw:text-left tw:sm:text-left tw:compact:min-h-11 tw:compact:py-2.5">
+            <DialogTitle className="tw:m-0 tw:text-[15px] tw:leading-normal tw:font-black tw:compact:text-base">Account</DialogTitle>
+            <DialogDescription className="tw:sr-only">Account, font weight, and theme settings for this browser.</DialogDescription>
+          </DialogHeader>
+          <div className="tw:overflow-y-auto tw:px-3.5 tw:pt-2 tw:pb-3 tw:compact:py-3">
           <div className="profile-modal-identity">
             <div className="profile-modal-avatar">
               {avatarSrc ? <img src={avatarSrc} alt="" onError={(event) => (event.currentTarget.style.display = "none")} /> : <AccountCircleLineIcon />}
@@ -1111,21 +1125,24 @@ export default function Navbar() {
               ))}
             </div>
           </section>
-        </Modal.Body>
-        <Modal.Footer>
-          <div className="profile-modal-secondary-actions">
-            <Button as={Link} to={profilePath} variant="outline-secondary" onClick={() => setShowAccount(false)}>
-              View profile
-            </Button>
-            <Button variant="outline-secondary" onClick={() => setShowAccount(false)}>
-              Close
-            </Button>
           </div>
-          <Button className="profile-logout-button" onClick={handleLogout}>
-            Log out
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
+          <DialogFooter className="tw:grid tw:grid-cols-1 tw:gap-2 tw:border-t tw:border-border tw:px-3.5 tw:pt-2.5 tw:pb-3 tw:sm:grid tw:sm:justify-stretch tw:compact:grid-cols-2 tw:compact:pb-[calc(env(safe-area-inset-bottom,0px)+10px)]">
+            <div className="profile-modal-secondary-actions">
+              <Button asChild variant="secondary" className={PROFILE_SECONDARY_BUTTON}>
+                <Link to={profilePath} onClick={() => setShowAccount(false)}>
+                  View profile
+                </Link>
+              </Button>
+              <Button variant="secondary" className={PROFILE_SECONDARY_BUTTON} onClick={() => setShowAccount(false)}>
+                Close
+              </Button>
+            </div>
+            <Button className="profile-logout-button tw:min-h-[34px] tw:w-full tw:text-[13px] tw:font-black" onClick={handleLogout}>
+              Log out
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </TooltipProvider>
   );
 }
