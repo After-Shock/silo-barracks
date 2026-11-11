@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Row, Col, Card } from "react-bootstrap";
 
 function LibraryStatComponent(props) {
   if (props.data.length === 0) {
@@ -19,45 +18,45 @@ function LibraryStatComponent(props) {
   };
 
   return (
-    <Card className="stat-card rounded-3" style={cardStyle}>
+    <div className="stat-card rounded-3" style={cardStyle}>
       <div style={cardBgStyle} className="rounded-3">
-        <Row className="row-max-witdh rounded-2 no-gutters">
-          <Col className="d-none d-lg-block stat-card-banner px-0">
+        <div className="stat-card-row">
+          <div className="stat-card-banner">
             <div className="stat-card-icon">{props.icon}</div>
-          </Col>
+          </div>
 
-          <Col className="w-100">
-            <Card.Body className="w-100">
-              <Card.Header className="d-flex justify-content-between border-0 p-0 bg-transparent stat-header">
+          <div className="stat-card-main w-100">
+            <div className="w-100">
+              <div className="d-flex justify-content-between border-0 p-0 bg-transparent stat-header">
                 <div>
-                  <Card.Subtitle className="stat-items">{props.heading}</Card.Subtitle>
+                  <div className="stat-items">{props.heading}</div>
                 </div>
                 <div>
-                  <Card.Subtitle className="stat-items fw-lighter text-end">{props.units}</Card.Subtitle>
+                  <div className="stat-items fw-lighter text-end">{props.units}</div>
                 </div>
-              </Card.Header>
+              </div>
               {props.data &&
                 props.data.slice(0, 5).map((item, index) => (
                   <div className="d-flex justify-content-between  stat-items" key={item.Id || index}>
                     <div className="d-flex justify-content-between">
-                      <Card.Text className="stat-item-index m-0">{index + 1}</Card.Text>
+                      <div className="stat-item-index m-0">{index + 1}</div>
                       <Link to={`/libraries/${item.Id}`}>
-                        <Card.Text>{item.Name}</Card.Text>
+                        <div>{item.Name}</div>
                       </Link>
                     </div>
 
-                    <Card.Text className="stat-item-count">
+                    <div className="stat-item-count">
                       {item.CollectionType === "tvshows"
                         ? item.Library_Count + " / " + item.Season_Count + " / " + item.Episode_Count
                         : item.Library_Count}
-                    </Card.Text>
+                    </div>
                   </div>
                 ))}
-            </Card.Body>
-          </Col>
-        </Row>
+            </div>
+          </div>
+        </div>
       </div>
-    </Card>
+    </div>
   );
 }
 
