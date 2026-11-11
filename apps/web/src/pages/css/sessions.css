@@ -280,15 +280,6 @@
   grid-column: 2 / 3;
 }
 
-.card-text > a {
-  text-decoration: none !important;
-  color: var(--barracks-text-raised) !important;
-}
-
-.card-text a:hover {
-  color: var(--barracks-text-raised) !important;
-}
-
 .ellipse {
   display: -webkit-box;
   -webkit-box-orient: vertical;

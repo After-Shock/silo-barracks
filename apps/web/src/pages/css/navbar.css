@@ -592,21 +592,6 @@
   background: transparent !important;
 }
 
-.navbar-version-row .version .card-body {
-  padding: 8px 10px 10px;
-  color: var(--barracks-text-interactive);
-  font-size: 12px;
-  text-align: center;
-}
-.navbar-toggler > .collapsed
-{
-  right: 0;
-}
-/* .navbar-toggler-icon
-{
-  width: 100% !important;
-} */
-
 .navitem {
   position: relative;
   color: var(--barracks-text-nav) !important;
@@ -817,16 +802,6 @@
   }
 }
 
-.modal-backdrop {
-  position: fixed !important;
-  inset: 0 !important;
-}
-
-@media (min-width: 901px) and (hover: hover) {
-  body.modal-open .desktop-navigation {
-    z-index: 1000;
-  }
-}
 
 @media (max-width: 900px), (hover: none) and (pointer: coarse) {
   .navbar {
@@ -989,10 +964,6 @@
 
 .navbar-version-row {
   min-width: 0;
-}
-
-.navbar-version-row .version .card-body {
-  padding: 7px 8px 8px;
 }
 
 /* Barracks-only navigation rules (profile modal, tooltips, interaction states). */

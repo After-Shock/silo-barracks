@@ -6,7 +6,9 @@ import App from "./App.jsx";
 
 import "./pages/css/variables.css";
 import "./index.css";
-import "bootstrap/dist/css/bootstrap.min.css";
+// Trimmed Bootstrap (PurgeCSS over bootstrap.min.css, ~57KB vs 280KB) —
+// legacy markup still relies on Bootstrap utility and component classes.
+import "./styles/bootstrap-trimmed.css";
 import "./pages/css/framework-theme.css";
 import "./pages/css/width_breakpoint_css.css";
 import "./pages/css/radius_breakpoint_css.css";
