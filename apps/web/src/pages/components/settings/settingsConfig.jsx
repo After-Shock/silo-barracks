@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "../../../lib/axios_instance";
 import Config from "../../../lib/config";
 import Loading from "../general/loading";
-import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
-import Alert from "react-bootstrap/Alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import ArrowDownSLineIcon from "remixicon-react/ArrowDownSLineIcon";
 import ArrowUpSLineIcon from "remixicon-react/ArrowUpSLineIcon";
 import DragMove2LineIcon from "remixicon-react/DragMove2LineIcon";
@@ -98,7 +98,7 @@ function NavigationOrderSettings() {
           <h2 id="nav-order-heading">Navbar order</h2>
           <p>Drag the unlocked items into the order you want. Home, Settings, and About stay fixed.</p>
         </div>
-        <Button type="button" variant="outline-secondary" onClick={handleReset}>
+        <Button type="button" variant="secondary" onClick={handleReset}>
           Reset
         </Button>
       </div>
@@ -336,7 +336,7 @@ export default function SettingsConfig() {
   return (
     <div className="general-settings-page">
       <div className="general-settings-content">
-        <Form onSubmit={handleFormSubmitExternal} className="settings-form general-settings-card is-single-form">
+        <form onSubmit={handleFormSubmitExternal} className="settings-form general-settings-card is-single-form">
           <div className="general-settings-card-head">
             <div>
               <h3>Core preferences</h3>
@@ -346,83 +346,83 @@ export default function SettingsConfig() {
           </div>
           <div className="general-form-section">
             <h4>Server access</h4>
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>
+            <div className="mb-3 row">
+              <Label htmlFor="ExternalUrl" className="col">
                 <Trans i18nKey={"SETTINGS_PAGE.EXTERNAL_URL"} />
-              </Form.Label>
-              <Col sm="10">
-                <Form.Control id="ExternalUrl" name="ExternalUrl" value={externalUrl} onChange={handleFormChangeExternal} placeholder="https://barracks.example.com" />
-              </Col>
-            </Form.Group>
+              </Label>
+              <div className="col-sm-10">
+                <Input id="ExternalUrl" name="ExternalUrl" value={externalUrl} onChange={handleFormChangeExternal} placeholder="https://barracks.example.com" />
+              </div>
+            </div>
           </div>
 
           {isSubmittedExternal !== "" ? (
-            <Alert bg="dark" data-bs-theme="dark" variant={isSubmittedExternal === "Failed" ? "danger" : "success"}>
-              {submissionMessageExternal}
+            <Alert variant={isSubmittedExternal === "Failed" ? "destructive" : "success"} className="tw:mb-4">
+              <AlertDescription>{submissionMessageExternal}</AlertDescription>
             </Alert>
           ) : null}
           <div className="general-form-section">
             <h4>Display preferences</h4>
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>
+            <div className="mb-3 row">
+              <Label htmlFor="general-hour-format" className="col">
                 <Trans i18nKey={"SETTINGS_PAGE.HOUR_FORMAT"} />
-              </Form.Label>
-              <Col sm="10">
-                <Form.Select value={twelve_hr ? "12" : "24"} onChange={(event) => toggle12Hr(event.target.value === "12")}>
-                  <option value="24">
+              </Label>
+              <div className="col-sm-10">
+                <NativeSelect id="general-hour-format" value={twelve_hr ? "12" : "24"} onChange={(event) => toggle12Hr(event.target.value === "12")}>
+                  <NativeSelectOption value="24">
                     <Trans i18nKey={"SETTINGS_PAGE.HOUR_FORMAT_24"} />
-                  </option>
-                  <option value="12">
+                  </NativeSelectOption>
+                  <NativeSelectOption value="12">
                     <Trans i18nKey={"SETTINGS_PAGE.HOUR_FORMAT_12"} />
-                  </option>
-                </Form.Select>
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>
+                  </NativeSelectOption>
+                </NativeSelect>
+              </div>
+            </div>
+            <div className="mb-3 row">
+              <Label htmlFor="general-language" className="col">
                 <Trans i18nKey={"SETTINGS_PAGE.LANGUAGE"} />
-              </Form.Label>
-              <Col sm="10">
-                <Form.Select value={selectedLanguage} onChange={updateLanguage}>
+              </Label>
+              <div className="col-sm-10">
+                <NativeSelect id="general-language" value={selectedLanguage} onChange={updateLanguage}>
                   {languages
                     .slice()
                     .sort((a, b) => a.description.localeCompare(b.description))
                     .map((language) => (
-                      <option value={language.id} key={language.id}>
+                      <NativeSelectOption value={language.id} key={language.id}>
                         {language.description}
-                      </option>
+                      </NativeSelectOption>
                     ))}
-                </Form.Select>
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row} className="mb-0">
-              <Form.Label column>Font weight</Form.Label>
-              <Col sm="10">
-                <Form.Select value={fontWeight} onChange={(event) => updateFontWeight(event.target.value)}>
+                </NativeSelect>
+              </div>
+            </div>
+            <div className="mb-0 row">
+              <Label htmlFor="general-font-weight" className="col">Font weight</Label>
+              <div className="col-sm-10">
+                <NativeSelect id="general-font-weight" value={fontWeight} onChange={(event) => updateFontWeight(event.target.value)}>
                   {FONT_WEIGHT_OPTIONS.map((option) => (
-                    <option key={option.id} value={option.id}>
+                    <NativeSelectOption key={option.id} value={option.id}>
                       {option.label}
-                    </option>
+                    </NativeSelectOption>
                   ))}
-                </Form.Select>
-              </Col>
-            </Form.Group>
+                </NativeSelect>
+              </div>
+            </div>
           </div>
           <div className="general-form-section">
             <h4>Theme preset</h4>
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>Theme</Form.Label>
-              <Col sm="10">
-                <Form.Select value={selectedThemeName} onChange={(event) => updateThemePreset(event.target.value)}>
-                  <option value="custom">Custom</option>
+            <div className="mb-3 row">
+              <Label htmlFor="general-theme-preset" className="col">Theme</Label>
+              <div className="col-sm-10">
+                <NativeSelect id="general-theme-preset" value={selectedThemeName} onChange={(event) => updateThemePreset(event.target.value)}>
+                  <NativeSelectOption value="custom">Custom</NativeSelectOption>
                   {THEME_PRESETS.map((preset) => (
-                    <option key={preset.name} value={preset.name}>
+                    <NativeSelectOption key={preset.name} value={preset.name}>
                       {preset.name}
-                    </option>
+                    </NativeSelectOption>
                   ))}
-                </Form.Select>
-              </Col>
-            </Form.Group>
+                </NativeSelect>
+              </div>
+            </div>
             <div className="general-theme-selected">
               <div>
                 <span className="general-theme-swatches" aria-hidden="true">
@@ -459,11 +459,11 @@ export default function SettingsConfig() {
             </div>
           </div>
           <div className="general-settings-actions">
-            <Button variant="outline-success" type="submit">
+            <Button variant="secondary" type="submit">
               <Trans i18nKey={"SETTINGS_PAGE.UPDATE"} />
             </Button>
             <Button
-              variant="outline-secondary"
+              variant="secondary"
               type="button"
               onClick={restoreTheme}
               disabled={JSON.stringify(theme) === JSON.stringify(DEFAULT_THEME) && JSON.stringify(themeDraft) === JSON.stringify(DEFAULT_THEME)}
@@ -472,7 +472,7 @@ export default function SettingsConfig() {
             </Button>
             {hasThemeChanges ? <span className="general-settings-pending">Theme preview not applied</span> : null}
           </div>
-        </Form>
+        </form>
 
         <NavigationOrderSettings />
       </div>

@@ -1,4 +1,4 @@
-import { Tabs, Tab } from "react-bootstrap";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { lazy, Suspense, useEffect, useState } from "react";
 import Config from "../lib/config";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -65,6 +65,47 @@ function SettingsPane({ children }) {
     <ErrorBoundary>
       <Suspense fallback={<Loading />}>{children}</Suspense>
     </ErrorBoundary>
+  );
+}
+
+// Bootstrap `.nav-pills .nav-link` metrics; colours come from the page CSS.
+const PILL_TRIGGER_CLASS =
+  "tw:h-auto tw:flex-none tw:rounded-[0.375rem] tw:border-0 tw:bg-transparent tw:px-4 tw:py-2 tw:text-[length:inherit] tw:font-[inherit] tw:group-data-[variant=default]/tabs-list:data-[state=active]:shadow-none";
+
+const importTabs = [
+  { value: "jellystat", label: "Jellystat", Component: JellystatImport },
+  { value: "tautulli", label: "Tautulli", Component: TautulliImport },
+];
+
+// Panes mount on first visit and then stay mounted (hidden) so an import in progress keeps its state.
+function ImportTabs() {
+  const [activeImport, setActiveImport] = useState("jellystat");
+  const [visitedImports, setVisitedImports] = useState(() => new Set(["jellystat"]));
+
+  function selectImport(value) {
+    setActiveImport(value);
+    setVisitedImports((current) => (current.has(value) ? current : new Set(current).add(value)));
+  }
+
+  return (
+    <Tabs value={activeImport} onValueChange={selectImport} className="tw:gap-0">
+      <TabsList className="settings-import-tabs tw:group-data-[orientation=horizontal]/tabs:h-auto">
+        {importTabs.map(({ value, label }) => (
+          <TabsTrigger key={value} value={value} className={PILL_TRIGGER_CLASS}>
+            {label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      {importTabs.map(({ value, Component }) =>
+        visitedImports.has(value) ? (
+          <TabsContent key={value} value={value} forceMount hidden={activeImport !== value} className="settings-import-pane">
+            <SettingsPane>
+              <Component />
+            </SettingsPane>
+          </TabsContent>
+        ) : null
+      )}
+    </Tabs>
   );
 }
 
@@ -387,20 +428,7 @@ export default function Settings() {
           </SettingsPane>
         );
       case "tabImports":
-        return (
-          <Tabs defaultActiveKey="jellystat" variant="pills" className="settings-import-tabs" transition={false} mountOnEnter>
-            <Tab eventKey="jellystat" title="Jellystat" className="settings-import-pane">
-              <SettingsPane>
-                <JellystatImport />
-              </SettingsPane>
-            </Tab>
-            <Tab eventKey="tautulli" title="Tautulli" className="settings-import-pane">
-              <SettingsPane>
-                <TautulliImport />
-              </SettingsPane>
-            </Tab>
-          </Tabs>
-        );
+        return <ImportTabs />;
       case "tabHealth":
         return (
           <SettingsPane>
