@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Alert, Button, Spinner } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import DismissibleAlert from "./dismissible-alert";
 import Database2LineIcon from "remixicon-react/Database2LineIcon";
 import FileSearchLineIcon from "remixicon-react/FileSearchLineIcon";
 import UploadCloud2LineIcon from "remixicon-react/UploadCloud2LineIcon";
@@ -224,9 +226,9 @@ export default function TautulliImport() {
       </header>
 
       {message ? (
-        <Alert variant={message.type} onClose={() => setMessage(null)} dismissible>
+        <DismissibleAlert type={message.type} onClose={() => setMessage(null)}>
           {message.text}
-        </Alert>
+        </DismissibleAlert>
       ) : null}
 
       <section className="legacy-import-panel">
@@ -242,15 +244,15 @@ export default function TautulliImport() {
             </small>
           </div>
           <label className="legacy-import-upload-button">
-            {busyAction === "upload" ? <Spinner size="sm" animation="border" /> : <FileSearchLineIcon size={18} />}
+            {busyAction === "upload" ? <Spinner className="tw:size-4" /> : <FileSearchLineIcon size={18} />}
             Upload and preview
             <input ref={fileInputRef} type="file" accept=".db,.zip,.db.zip,application/zip" onChange={uploadAndPreview} disabled={Boolean(busyAction)} />
           </label>
         </div>
 
         <div className="legacy-import-actions">
-          <Button type="button" variant="primary" onClick={importBackup} disabled={!uploadedBackup?.uploadId || Boolean(busyAction)}>
-            {busyAction === "import" ? <Spinner size="sm" animation="border" /> : <UploadCloud2LineIcon size={18} />}
+          <Button type="button" onClick={importBackup} disabled={!uploadedBackup?.uploadId || Boolean(busyAction)}>
+            {busyAction === "import" ? <Spinner className="tw:size-4" /> : <UploadCloud2LineIcon size={18} className="tw:size-[18px]" />}
             Import uploaded history
           </Button>
         </div>
@@ -297,7 +299,7 @@ export default function TautulliImport() {
             <h3>Unmatched Tautulli Users</h3>
             <p>Map legacy Tautulli users to Jellyfin users so imported plays land on the right profile.</p>
           </div>
-          <Button type="button" variant="outline-primary" onClick={loadUnmatchedUsers} disabled={Boolean(busyAction)}>
+          <Button type="button" variant="outline" onClick={loadUnmatchedUsers} disabled={Boolean(busyAction)}>
             Refresh
           </Button>
         </div>
@@ -324,11 +326,11 @@ export default function TautulliImport() {
               </select>
               <Button
                 type="button"
-                variant="primary"
+               
                 onClick={() => linkUser(user.UserId)}
                 disabled={!selectedUserMatch[user.UserId] || Boolean(busyAction)}
               >
-                {busyAction === `link-user-${user.UserId}` ? <Spinner size="sm" animation="border" /> : <UploadCloud2LineIcon size={18} />}
+                {busyAction === `link-user-${user.UserId}` ? <Spinner className="tw:size-4" /> : <UploadCloud2LineIcon size={18} className="tw:size-[18px]" />}
                 Link user
               </Button>
             </article>
@@ -345,7 +347,7 @@ export default function TautulliImport() {
             <h3>Unmatched Tautulli Media</h3>
             <p>Link imported rows that still point at legacy Tautulli IDs to the matching Jellyfin media.</p>
           </div>
-          <Button type="button" variant="outline-primary" onClick={loadUnmatched} disabled={Boolean(busyAction)}>
+          <Button type="button" variant="outline" onClick={loadUnmatched} disabled={Boolean(busyAction)}>
             Refresh
           </Button>
         </div>
@@ -381,8 +383,8 @@ export default function TautulliImport() {
                 placeholder="Search Jellyfin media..."
                 disabled={!selectedGroup}
               />
-              <Button type="submit" variant="outline-primary" disabled={!selectedGroup || mediaSearch.trim().length < 2 || Boolean(busyAction)}>
-                {busyAction === "search" ? <Spinner size="sm" animation="border" /> : <FileSearchLineIcon size={18} />}
+              <Button type="submit" variant="outline" disabled={!selectedGroup || mediaSearch.trim().length < 2 || Boolean(busyAction)}>
+                {busyAction === "search" ? <Spinner className="tw:size-4" /> : <FileSearchLineIcon size={18} className="tw:size-[18px]" />}
                 Search
               </Button>
             </form>
@@ -402,8 +404,8 @@ export default function TautulliImport() {
               {selectedGroup && !mediaResults.length ? <div className="legacy-import-empty">Search for the Jellyfin item to link this group.</div> : null}
             </div>
 
-            <Button type="button" variant="primary" onClick={linkSelectedGroup} disabled={!selectedGroup || !selectedTarget || Boolean(busyAction)}>
-              {busyAction === "link" ? <Spinner size="sm" animation="border" /> : <UploadCloud2LineIcon size={18} />}
+            <Button type="button" onClick={linkSelectedGroup} disabled={!selectedGroup || !selectedTarget || Boolean(busyAction)}>
+              {busyAction === "link" ? <Spinner className="tw:size-4" /> : <UploadCloud2LineIcon size={18} className="tw:size-[18px]" />}
               Link selected media
             </Button>
           </div>

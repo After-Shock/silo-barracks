@@ -72,17 +72,17 @@
   gap: 8px;
 }
 
-.backup-hero-actions .btn,
+.backup-hero-actions [data-slot="button"],
 .backup-upload-button,
-.backup-file-actions .btn {
+.backup-file-actions [data-slot="button"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   min-height: 32px;
-  border-radius: 8px !important;
+  border-radius: 8px;
   font-size: 12px;
-  font-weight: 760 !important;
+  font-weight: 760;
 }
 
 .backup-upload-button {
@@ -265,9 +265,9 @@
   gap: 6px;
 }
 
-.backup-file-actions .btn {
+.backup-file-actions [data-slot="button"] {
   min-height: 30px;
-  padding: 0 8px !important;
+  padding: 0 8px;
   font-size: 11px;
 }
 

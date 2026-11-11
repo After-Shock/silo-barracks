@@ -1,16 +1,9 @@
 import React, { useEffect } from "react";
 import axios from "../../../lib/axios_instance";
-import {ButtonGroup, Button } from 'react-bootstrap';
-
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
-import Box from '@mui/material/Box';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 import AddCircleFillIcon from 'remixicon-react/AddCircleFillIcon';
 import IndeterminateCircleFillIcon from 'remixicon-react/IndeterminateCircleFillIcon';
@@ -74,28 +67,32 @@ function formatDurationTime(seconds) {
 
   return (
     <React.Fragment>
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+      <TableRow className="settings-logs-row">
         <TableCell>
-          <IconButton
+          <Button
+            variant="ghost"
+            size="icon"
+            className="settings-logs-expand"
             aria-label="expand row"
-            size="small"
+            aria-expanded={open}
             onClick={() => {if(data.Log !== null && data.Log.length>0){setOpen(!open);}}}
             >
               {!open ? <AddCircleFillIcon opacity={data.Log !== null && data.Log.length>0 ?1 : 0} cursor={data.Log !== null && data.Log.length>1 ? "pointer":"default"}/> : <IndeterminateCircleFillIcon />}
-          </IconButton>
+          </Button>
         </TableCell>
         <TableCell>{data.Name}</TableCell>
         <TableCell>{data.Type}</TableCell>
         <TableCell>{Intl.DateTimeFormat('en-UK', options).format(new Date(data.TimeRun))}</TableCell>
         <TableCell>{formatDurationTime(data.Duration)}</TableCell>
         <TableCell>{data.ExecutionType}</TableCell>
-        <TableCell><div className={`badge ${ data.Result.toLowerCase() ==='success' ? 'text-bg-success' : data.Result.toLowerCase() ==='running' ? 'text-bg-warning' : 'text-bg-danger '} rounded-pill text-uppercase`} >{data.Result}</div></TableCell>
+        <TableCell><Badge variant="destructive" className={`settings-logs-result ${ data.Result.toLowerCase() ==='success' ? 'is-success' : data.Result.toLowerCase() ==='running' ? 'is-running' : 'is-failed'}`} >{data.Result}</Badge></TableCell>
 
       </TableRow>
-      <TableRow>
+      <TableRow className="settings-logs-detail-row">
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
+          <Collapsible open={open}>
+            <CollapsibleContent className="settings-logs-collapse">
+            <div className="settings-logs-detail">
 
               <Table aria-label="sub-activity" className='rounded-2'>
 
@@ -105,8 +102,9 @@ function formatDurationTime(seconds) {
                     </TableRow>
                 </TableBody>
               </Table>
-            </Box>
-          </Collapse>
+            </div>
+            </CollapsibleContent>
+          </Collapsible>
         </TableCell>
       </TableRow>
     </React.Fragment>
@@ -163,19 +161,19 @@ const handlePreviousPageClick = () => {
         <div className="settings-logs-page">
           <h1 className="my-2"><Trans i18nKey={"SETTINGS_PAGE.LOGS"}/></h1>
 
-            <TableContainer className='settings-logs-table rounded-2'>
+            <div className='settings-logs-table rounded-2'>
                     <Table aria-label="collapsible table" >
-                      <TableHead>
+                      <TableHeader>
                         <TableRow>
-                        <TableCell/>
-                          <TableCell><Trans i18nKey={"SETTINGS_PAGE.NAME"}/></TableCell>
-                          <TableCell><Trans i18nKey={"TYPE"}/></TableCell>
-                          <TableCell><Trans i18nKey={"DATE"}/></TableCell>
-                          <TableCell><Trans i18nKey={"SETTINGS_PAGE.DURATION"}/></TableCell>
-                          <TableCell><Trans i18nKey={"SETTINGS_PAGE.EXECUTION_TYPE"}/></TableCell>
-                          <TableCell><Trans i18nKey={"SETTINGS_PAGE.RESULTS"}/></TableCell>
+                        <TableHead/>
+                          <TableHead><Trans i18nKey={"SETTINGS_PAGE.NAME"}/></TableHead>
+                          <TableHead><Trans i18nKey={"TYPE"}/></TableHead>
+                          <TableHead><Trans i18nKey={"DATE"}/></TableHead>
+                          <TableHead><Trans i18nKey={"SETTINGS_PAGE.DURATION"}/></TableHead>
+                          <TableHead><Trans i18nKey={"SETTINGS_PAGE.EXECUTION_TYPE"}/></TableHead>
+                          <TableHead><Trans i18nKey={"SETTINGS_PAGE.RESULTS"}/></TableHead>
                         </TableRow>
-                      </TableHead>
+                      </TableHeader>
                       <TableBody>
                         {sortedLogs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                           .map((log,index) => (
@@ -186,13 +184,13 @@ const handlePreviousPageClick = () => {
                             
                       </TableBody>
                     </Table>
-            </TableContainer>
+            </div>
 
             <div className='d-flex justify-content-end my-2'>
               
 
 
-                <ButtonGroup className="pagination-buttons">
+                <div role="group" className="pagination-buttons tw:inline-flex">
                     <Button className="page-btn" onClick={()=>setPage(0)} disabled={page === 0}>
                     <Trans i18nKey={"TABLE_NAV_BUTTONS.FIRST"}/>
                     </Button>
@@ -210,7 +208,7 @@ const handlePreviousPageClick = () => {
                     <Button className="page-btn" onClick={()=>setPage(Math.ceil(data.length / rowsPerPage) - 1)} disabled={page >= Math.ceil(data.length / rowsPerPage) - 1}>
                     <Trans i18nKey={"TABLE_NAV_BUTTONS.LAST"}/>
                     </Button>
-                </ButtonGroup>
+                </div>
             </div>       
         </div>
       );

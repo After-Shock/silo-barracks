@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "../../../lib/axios_instance";
-import Button from "react-bootstrap/Button";
-import Alert from "react-bootstrap/Alert";
+import { Button } from "@/components/ui/button";
+import DismissibleAlert from "./dismissible-alert";
 import ServerLineIcon from "remixicon-react/ServerLineIcon";
 import PlayCircleLineIcon from "remixicon-react/PlayCircleLineIcon";
 import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
@@ -99,16 +99,16 @@ export default function ServerManagement() {
           <h1>Jellyfin Jobs</h1>
           <span>Run Jellyfin scheduled jobs such as library scans, metadata refreshes, subtitle jobs, and plugin maintenance.</span>
         </div>
-        <Button type="button" variant="outline-light" onClick={loadStatus} disabled={loading}>
-          <RefreshLineIcon size={17} />
+        <Button type="button" variant="secondary" onClick={loadStatus} disabled={loading}>
+          <RefreshLineIcon size={17} className="tw:size-[17px]" />
           Refresh
         </Button>
       </div>
 
       {message ? (
-        <Alert variant={message.type} onClose={() => setMessage(null)} dismissible>
+        <DismissibleAlert type={message.type} onClose={() => setMessage(null)}>
           {message.text}
-        </Alert>
+        </DismissibleAlert>
       ) : null}
 
       <section className="server-management-grid">
@@ -167,11 +167,11 @@ export default function ServerManagement() {
                 <em>{formatTaskState(task)}</em>
                 <Button
                   type="button"
-                  variant="outline-primary"
+                  variant="outline"
                   onClick={() => runAction("runJellyfinTask", { taskId: task.id })}
                   disabled={Boolean(busyAction) || task.state === "Running"}
                 >
-                  <PlayCircleLineIcon size={17} />
+                  <PlayCircleLineIcon size={17} className="tw:size-[17px]" />
                   Run
                 </Button>
               </div>

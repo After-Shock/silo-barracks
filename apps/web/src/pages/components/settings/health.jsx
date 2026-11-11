@@ -6,7 +6,8 @@ import HeartPulseLineIcon from "remixicon-react/HeartPulseLineIcon";
 import HistoryLineIcon from "remixicon-react/HistoryLineIcon";
 import Notification3LineIcon from "remixicon-react/Notification3LineIcon";
 import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import { Button, Spinner } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import "../../css/settings/settings.css";
 
 function headers() {
@@ -71,7 +72,7 @@ export default function HealthSettings() {
           <p>Backend reachability, task state, webhook deliveries, backup freshness, and admin changes.</p>
         </div>
         <Button type="button" onClick={loadHealth} disabled={loading}>
-          {loading ? <Spinner size="sm" animation="border" /> : <RefreshLineIcon size={17} />}
+          {loading ? <Spinner className="tw:size-4" /> : <RefreshLineIcon size={17} className="tw:size-[17px]" />}
           Refresh
         </Button>
       </header>
