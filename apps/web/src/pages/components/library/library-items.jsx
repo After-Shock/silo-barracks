@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "../../../lib/axios_instance";
-import { FormControl, FormSelect, Button } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
 import { RiSortAsc, RiSortDesc } from "@remixicon/react";
 
 import MoreItemCards from "../item-info/more-items/more-items-card";
@@ -184,10 +184,10 @@ function LibraryItems(props) {
 
         <div className="d-flex flex-column flex-md-row">
           {!config.IS_SILO && <div className="d-flex flex-row w-md-75">
-            <FormSelect
+            <select
               value={showArchived}
               onChange={(e) => setArchivedFilter(e.target.value)}
-              className="my-md-3 w-100 rounded"
+              className="form-select my-md-3 w-100 rounded"
             >
               <option value="all">
                 <Trans i18nKey="ALL" />
@@ -198,12 +198,12 @@ function LibraryItems(props) {
               <option value="false">
                 <Trans i18nKey="NOT_ARCHIVED" />
               </option>
-            </FormSelect>
+            </select>
           </div>}
           <div className="d-flex flex-row w-100  mt-2 mt-md-0">
-            <FormSelect
+            <select
               onChange={(e) => sortOrderLogic(e.target.value)}
-              className="ms-md-3 my-md-3 w-100 rounded-0 rounded-start"
+              className="form-select ms-md-3 my-md-3 w-100 rounded-0 rounded-start"
               value={effectiveSortOrder}
             >
               <option value="Title">
@@ -217,18 +217,18 @@ function LibraryItems(props) {
                 <option value="WatchTime"><Trans i18nKey="WATCH_TIME" /></option>
                 <option value="Size"><Trans i18nKey="SETTINGS_PAGE.SIZE" /></option>
               </> : null}
-            </FormSelect>
+            </select>
 
             <Button className="my-md-3 rounded-0 rounded-end" onClick={() => setSortDirection(!sortAsc)}>
               {sortAsc ? <RiSortAsc /> : <RiSortDesc />}
             </Button>
           </div>
-          <FormControl
+          <input
             type="text"
             placeholder={i18next.t("SEARCH")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="ms-md-3 mt-2 mb-2 my-md-3 w-sm-100 w-md-75"
+            className="form-control ms-md-3 mt-2 mb-2 my-md-3 w-sm-100 w-md-75"
           />
         </div>
       </div>
