@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import Alert from "react-bootstrap/Alert";
-import Button from "react-bootstrap/Button";
-import Col from "react-bootstrap/Col";
-import Form from "react-bootstrap/Form";
-import InputGroup from "react-bootstrap/InputGroup";
-import Row from "react-bootstrap/Row";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { RiEyeFill, RiEyeOffFill } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 import Config from "../../../lib/config";
 import Loading from "../general/loading";
+
+// Keep the remixicon size props; the Button primitive would otherwise force 1rem icons.
+const BUTTON_ICON_NATURAL_SIZE = "tw:[&_svg:not([class*=size-])]:size-auto";
 
 export default function JellyfinIntegrationSettings({ compact = false, firstRun = false }) {
   const [config, setConfig] = useState(null);
@@ -98,16 +99,16 @@ export default function JellyfinIntegrationSettings({ compact = false, firstRun 
             <span>Connected server</span>
             <strong>{config.hostUrl}</strong>
           </div>
-          <Button variant="outline-success" type="button" onClick={() => setIsEditingConnection(true)}>
+          <Button variant="outline" type="button" onClick={() => setIsEditingConnection(true)}>
             Replace connection
           </Button>
         </div>
       ) : (
-        <Form onSubmit={handleFormSubmit} className="settings-form integration-settings-form">
-          <Form.Group as={Row} className="mb-3">
-            <Form.Label column>{config?.IS_SILO ? "Silo Server URL" : config?.IS_JELLYFIN ? "Jellyfin URL" : "Emby URL"}</Form.Label>
-            <Col sm="10">
-              <Form.Control
+        <form onSubmit={handleFormSubmit} className="settings-form integration-settings-form">
+          <div className="mb-3 row">
+            <Label htmlFor="JF_HOST" className="col">{config?.IS_SILO ? "Silo Server URL" : config?.IS_JELLYFIN ? "Jellyfin URL" : "Emby URL"}</Label>
+            <div className="col">
+              <Input
                 id="JF_HOST"
                 name="JF_HOST"
                 value={formValues.JF_HOST || ""}
@@ -115,14 +116,14 @@ export default function JellyfinIntegrationSettings({ compact = false, firstRun 
                 placeholder="http://127.0.0.1:8096 or https://media.example.com"
                 autoComplete="off"
               />
-            </Col>
-          </Form.Group>
+            </div>
+          </div>
 
-          <Form.Group as={Row} className="mb-3">
-            <Form.Label column>API Key</Form.Label>
-            <Col sm="10">
-              <InputGroup>
-                <Form.Control
+          <div className="mb-3 row">
+            <Label htmlFor="JF_API_KEY" className="col">API Key</Label>
+            <div className="col">
+              <div className="settings-input-group">
+                <Input
                   id="JF_API_KEY"
                   name="JF_API_KEY"
                   value={formValues.JF_API_KEY || ""}
@@ -130,30 +131,30 @@ export default function JellyfinIntegrationSettings({ compact = false, firstRun 
                   type={showKey ? "text" : "password"}
                   autoComplete="off"
                 />
-                <Button variant="outline-primary" type="button" onClick={() => setKeyState(!showKey)}>
+                <Button variant="outline" type="button" className={BUTTON_ICON_NATURAL_SIZE} onClick={() => setKeyState(!showKey)} aria-label={showKey ? "Hide API key" : "Show API key"}>
                   {showKey ? <RiEyeFill /> : <RiEyeOffFill />}
                 </Button>
-              </InputGroup>
-            </Col>
-          </Form.Group>
+              </div>
+            </div>
+          </div>
 
           {isSubmitted !== "" ? (
-            <Alert bg="dark" data-bs-theme="dark" variant={isSubmitted === "Failed" ? "danger" : "success"}>
-              {submissionMessage}
+            <Alert variant={isSubmitted === "Failed" ? "destructive" : "success"} className="tw:mb-4">
+              <AlertDescription>{submissionMessage}</AlertDescription>
             </Alert>
           ) : null}
 
           <div className="d-flex flex-column flex-md-row justify-content-end align-items-md-center gap-2">
             {firstRun && hasSavedConnection ? (
-              <Button variant="outline-secondary" type="button" onClick={() => setIsEditingConnection(false)}>
+              <Button variant="secondary" type="button" onClick={() => setIsEditingConnection(false)}>
                 Cancel
               </Button>
             ) : null}
-            <Button variant="outline-success" type="submit">
+            <Button type="submit">
               Update
             </Button>
           </div>
-        </Form>
+        </form>
       )}
     </section>
   );

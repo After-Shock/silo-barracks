@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "../../../lib/axios_instance";
-import { Alert, Button, Form, Spinner } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
+import DismissibleAlert from "./dismissible-alert";
 import { RiAddLine, RiClipboardLine, RiDeleteBinLine, RiKey2Line } from "@remixicon/react";
 
 import "../../css/settings/apiKeys.css";
@@ -101,7 +105,7 @@ export default function ApiKeys() {
   if (loading) {
     return (
       <div className="api-keys-page">
-        <Spinner animation="border" />
+        <Spinner className="tw:size-10" />
       </div>
     );
   }
@@ -121,21 +125,21 @@ export default function ApiKeys() {
       </div>
 
       {message && (
-        <Alert variant={message.variant} onClose={() => setMessage(null)} dismissible>
+        <DismissibleAlert type={message.variant} onClose={() => setMessage(null)}>
           {message.text}
-        </Alert>
+        </DismissibleAlert>
       )}
 
-      <Form className="api-key-create" onSubmit={addKey}>
+      <form className="api-key-create" onSubmit={addKey}>
         <div>
-          <Form.Label>Key name</Form.Label>
-          <Form.Control value={name} onChange={(event) => setName(event.target.value)} placeholder="Automation, Grafana, Home Assistant..." />
+          <Label htmlFor="api-key-name">Key name</Label>
+          <Input id="api-key-name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Automation, Grafana, Home Assistant..." />
         </div>
         <Button type="submit" disabled={saving}>
-          {saving ? <Spinner animation="border" size="sm" /> : <RiAddLine size={18} />}
+          {saving ? <Spinner className="tw:size-4" /> : <RiAddLine size={18} />}
           Add Key
         </Button>
-      </Form>
+      </form>
 
       {sortedKeys.length ? (
         <div className="api-key-list">
@@ -149,10 +153,10 @@ export default function ApiKeys() {
                 <code>{maskKey(apiKey.key)}</code>
               </div>
               <div className="api-key-actions">
-                <Button variant="outline-primary" onClick={() => copyKey(apiKey.key)} title="Copy key">
+                <Button variant="outline" onClick={() => copyKey(apiKey.key)} title="Copy key">
                   <RiClipboardLine size={17} />
                 </Button>
-                <Button variant="outline-danger" onClick={() => deleteKey(apiKey.key)} title="Delete key">
+                <Button variant="destructive" onClick={() => deleteKey(apiKey.key)} title="Delete key">
                   <RiDeleteBinLine size={17} />
                 </Button>
               </div>

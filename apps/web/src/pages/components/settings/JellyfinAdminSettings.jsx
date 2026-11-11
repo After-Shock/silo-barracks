@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import Alert from "react-bootstrap/Alert";
-import Button from "react-bootstrap/Button";
+import { Button } from "@/components/ui/button";
+import DismissibleAlert from "./dismissible-alert";
 import axios from "../../../lib/axios_instance";
 import { RiAppsLine, RiDeviceLine, RiPlug2Line, RiRefreshLine } from "@remixicon/react";
 import { PlatformIcon } from "../../../lib/platform-icons.jsx";
@@ -75,16 +75,16 @@ export default function JellyfinAdminSettings({ view = "devices" }) {
               : "Review client devices returned by your Jellyfin server."}
           </span>
         </div>
-        <Button type="button" variant="outline-light" onClick={loadJellyfinAdmin} disabled={loading}>
+        <Button type="button" variant="outline" onClick={loadJellyfinAdmin} disabled={loading}>
           <RiRefreshLine size={17} />
           Refresh
         </Button>
       </div>
 
       {message ? (
-        <Alert variant={message.type} onClose={() => setMessage(null)} dismissible>
+        <DismissibleAlert type={message.type} onClose={() => setMessage(null)}>
           {message.text}
-        </Alert>
+        </DismissibleAlert>
       ) : null}
 
       {!isPluginsView ? (

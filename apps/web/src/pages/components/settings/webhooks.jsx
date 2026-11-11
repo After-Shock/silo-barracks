@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "../../../lib/axios_instance";
-import { Alert, Button, Form, Spinner } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
+import { Spinner } from "@/components/ui/spinner";
+import DismissibleAlert from "./dismissible-alert";
 import { RiCalendarEventLine, RiCheckboxCircleLine, RiDeleteBinLine, RiDownloadCloud2Line, RiEdit2Line, RiErrorWarningLine, RiHeartPulseLine, RiInformationLine, RiLinksLine, RiMovie2Line, RiNotification3Line, RiPlayCircleLine, RiStopCircleLine, RiTaskLine, RiUserAddLine } from "@remixicon/react";
 import { Tooltip } from "@mui/material";
 import { Trans } from "react-i18next";
@@ -489,24 +494,24 @@ export default function WebhooksSettings() {
 
       <ErrorBoundary>
         {error && (
-          <Alert variant="danger" onClose={() => setError(null)} dismissible>
+          <DismissibleAlert type="danger" onClose={() => setError(null)}>
             {error}
-          </Alert>
+          </DismissibleAlert>
         )}
         {success && (
-          <Alert variant="success" onClose={() => setSuccess(false)} dismissible>
+          <DismissibleAlert type="success" onClose={() => setSuccess(false)}>
             {success}
-          </Alert>
+          </DismissibleAlert>
         )}
 
-        <Form onSubmit={handleFormSubmit} className="settings-form webhook-builder">
+        <form onSubmit={handleFormSubmit} className="settings-form webhook-builder">
           <div className="webhook-builder-header">
             <div>
               <RiNotification3Line size={22} />
               <strong>{currentWebhook.groupKey ? "Edit webhook destination" : "Add webhook destination"}</strong>
             </div>
             {currentWebhook.groupKey ? (
-              <Button type="button" variant="outline-secondary" onClick={resetForm}>
+              <Button type="button" variant="secondary" onClick={resetForm}>
                 New webhook
               </Button>
             ) : null}
@@ -521,26 +526,27 @@ export default function WebhooksSettings() {
           </div>
 
           <div className="webhook-form-grid">
-            <Form.Group>
-              <Form.Label>Webhook Name</Form.Label>
-              <Form.Control type="text" name="name" value={currentWebhook.name} onChange={handleInputChange} placeholder="Discord alerts" required />
-            </Form.Group>
+            <div>
+              <Label htmlFor="webhook-name">Webhook Name</Label>
+              <Input id="webhook-name" type="text" name="name" value={currentWebhook.name} onChange={handleInputChange} placeholder="Discord alerts" required />
+            </div>
 
-            <Form.Group>
-              <Form.Label>Webhook Type</Form.Label>
-              <Form.Select name="webhook_type" value={currentWebhook.webhook_type} onChange={handleInputChange}>
+            <div>
+              <Label htmlFor="webhook-type">Webhook Type</Label>
+              <NativeSelect id="webhook-type" name="webhook_type" value={currentWebhook.webhook_type} onChange={handleInputChange}>
                 {Object.entries(webhookTypeMeta).map(([value, meta]) => (
                   <option key={value} value={value}>
                     {meta.label}
                   </option>
                 ))}
-              </Form.Select>
-            </Form.Group>
+              </NativeSelect>
+            </div>
           </div>
 
-          <Form.Group>
-            <Form.Label>Webhook URL</Form.Label>
-            <Form.Control
+          <div>
+            <Label htmlFor="webhook-url">Webhook URL</Label>
+            <Input
+              id="webhook-url"
               type="text"
               name="url"
               value={currentWebhook.url}
@@ -549,9 +555,9 @@ export default function WebhooksSettings() {
               required
             />
             {currentWebhook.webhook_type === "gotify" ? (
-              <small className="text-secondary d-block mt-2">Use the Gotify message endpoint with an app token.</small>
+              <small className="form-text">Use the Gotify message endpoint with an app token.</small>
             ) : null}
-          </Form.Group>
+          </div>
 
           <div className="webhook-event-picker">
             <div className="webhook-event-picker-title">
@@ -624,18 +630,22 @@ export default function WebhooksSettings() {
           ) : null}
 
           <div className="webhook-builder-actions">
-            <Form.Check
-              type="switch"
-              id="webhook-enabled"
-              label="Enable webhook"
-              checked={currentWebhook.enabled}
-              onChange={() => setCurrentWebhook((prev) => ({ ...prev, enabled: !prev.enabled }))}
-            />
-            <Button variant="primary" type="submit" disabled={saving}>
-              {saving ? <Spinner size="sm" animation="border" /> : currentWebhook.groupKey ? "Save Changes" : "Add Webhook"}
+            <label className="form-check form-switch">
+              <input
+                id="webhook-enabled"
+                type="checkbox"
+                role="switch"
+                className="form-check-input"
+                checked={currentWebhook.enabled}
+                onChange={() => setCurrentWebhook((prev) => ({ ...prev, enabled: !prev.enabled }))}
+              />
+              <span>Enable webhook</span>
+            </label>
+            <Button type="submit" disabled={saving}>
+              {saving ? <Spinner className="tw:size-4" /> : currentWebhook.groupKey ? "Save Changes" : "Add Webhook"}
             </Button>
           </div>
-        </Form>
+        </form>
 
         <div className="webhook-destination-grid">
           {groupedWebhooks.map((group) => (
@@ -671,14 +681,14 @@ export default function WebhooksSettings() {
               ) : null}
 
               <div className="webhook-destination-actions">
-                <Button variant="outline-secondary" onClick={() => handleTest(group)} disabled={testingId === group.groupKey}>
-                  {testingId === group.groupKey ? <Spinner size="sm" animation="border" /> : "Test"}
+                <Button variant="secondary" onClick={() => handleTest(group)} disabled={testingId === group.groupKey}>
+                  {testingId === group.groupKey ? <Spinner className="tw:size-4" /> : "Test"}
                 </Button>
-                <Button variant="outline-primary" onClick={() => editWebhookGroup(group)}>
+                <Button variant="outline" onClick={() => editWebhookGroup(group)}>
                   <RiEdit2Line size={16} />
                   Edit
                 </Button>
-                <Button variant="outline-secondary" onClick={() => deleteWebhookGroup(group)} disabled={saving}>
+                <Button variant="secondary" onClick={() => deleteWebhookGroup(group)} disabled={saving}>
                   <RiDeleteBinLine size={16} />
                   Delete
                 </Button>

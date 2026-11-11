@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "../../../lib/axios_instance";
-import { Row, Col, Form, Button, Alert } from "react-bootstrap";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Trans, useTranslation } from "react-i18next";
 import Loading from "../general/loading";
 
@@ -85,16 +88,17 @@ export default function ActivityMonitorSettings() {
         </small>
       </div>
         
-      <Form onSubmit={handleSubmit} className="settings-form">
-        <Form.Group as={Row} className="mb-3">
-          <Form.Label column className="">
+      <form onSubmit={handleSubmit} className="settings-form">
+        <div className="mb-3 row">
+          <Label htmlFor="active-sessions-interval" className="col">
             <Trans
               i18nKey={"SETTINGS_PAGE.ACTIVE_SESSIONS_INTERVAL"}
               defaults="Active Sessions Interval (ms)"
             />
-          </Form.Label>
-          <Col sm="10">
-            <Form.Control
+          </Label>
+          <div className="col">
+            <Input
+              id="active-sessions-interval"
               type="number"
               name="activeSessionsInterval"
               value={settings.activeSessionsInterval}
@@ -105,24 +109,25 @@ export default function ActivityMonitorSettings() {
               required
               autoComplete="off"
             />
-            <Form.Text className="text-muted">
+            <small className="form-text">
               <Trans
                 i18nKey={"SETTINGS_PAGE.ACTIVE_SESSIONS_HELP"}
                 defaults="How often to check when users are watching content (recommended: 1000ms)"
               />
-            </Form.Text>
-          </Col>
-        </Form.Group>
+            </small>
+          </div>
+        </div>
 
-        <Form.Group as={Row} className="mb-3">
-          <Form.Label column className="">
+        <div className="mb-3 row">
+          <Label htmlFor="idle-interval" className="col">
             <Trans
               i18nKey={"SETTINGS_PAGE.IDLE_INTERVAL"}
               defaults="Idle Interval (ms)"
             />
-          </Form.Label>
-          <Col sm="10">
-            <Form.Control
+          </Label>
+          <div className="col">
+            <Input
+              id="idle-interval"
               type="number"
               name="idleInterval"
               value={settings.idleInterval}
@@ -133,44 +138,38 @@ export default function ActivityMonitorSettings() {
               required
               autoComplete="off"
             />
-            <Form.Text className="text-muted">
+            <small className="form-text">
               <Trans
                 i18nKey={"SETTINGS_PAGE.IDLE_HELP"}
                 defaults="How often to check when no active sessions (recommended: 5000ms)"
               />
-            </Form.Text>
-          </Col>
-        </Form.Group>
+            </small>
+          </div>
+        </div>
 
         {settings.activeSessionsInterval > settings.idleInterval && (
-          <Alert bg="dark" data-bs-theme="dark" variant="warning" className="mb-3">
-            <Trans
-              i18nKey={"SETTINGS_PAGE.INTERVAL_WARNING"}
-              defaults="Active sessions interval should not be greater than idle interval"
-            />
+          <Alert className="tw:mb-4">
+            <AlertDescription>
+              <Trans
+                i18nKey={"SETTINGS_PAGE.INTERVAL_WARNING"}
+                defaults="Active sessions interval should not be greater than idle interval"
+              />
+            </AlertDescription>
           </Alert>
         )}
 
         {isSubmitted !== "" ? (
-          isSubmitted === "Failed" ? (
-            <Alert bg="dark" data-bs-theme="dark" variant="danger">
-              {submissionMessage}
-            </Alert>
-          ) : (
-            <Alert bg="dark" data-bs-theme="dark" variant="success">
-              {submissionMessage}
-            </Alert>
-          )
-        ) : (
-          <></>
-        )}
+          <Alert variant={isSubmitted === "Failed" ? "destructive" : "success"}>
+            <AlertDescription>{submissionMessage}</AlertDescription>
+          </Alert>
+        ) : null}
 
         <div className="d-flex flex-column flex-md-row justify-content-end align-items-md-center">
-          <Button variant="outline-success" type="submit">
+          <Button type="submit">
             <Trans i18nKey={"SETTINGS_PAGE.UPDATE"} />
           </Button>
         </div>
-      </Form>
+      </form>
     </div>
   );
 }

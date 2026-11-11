@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { Alert, Button, Form, Spinner } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
+import { Spinner } from "@/components/ui/spinner";
+import DismissibleAlert from "./dismissible-alert";
 import { RiNotification3Line, RiSave3Line } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 import Config from "../../../lib/config";
@@ -61,13 +66,13 @@ export default function NotificationSettings() {
   if (loading) {
     return (
       <div className="notification-settings notification-settings-loading">
-        <Spinner animation="border" />
+        <Spinner className="tw:size-10" />
       </div>
     );
   }
 
   return (
-    <Form className="notification-settings" onSubmit={saveSettings}>
+    <form className="notification-settings settings-form" onSubmit={saveSettings}>
       <header className="settings-section-header">
         <div>
           <span>In-app alerts</span>
@@ -77,9 +82,9 @@ export default function NotificationSettings() {
       </header>
 
       {message ? (
-        <Alert variant={message.type} onClose={() => setMessage(null)} dismissible>
+        <DismissibleAlert type={message.type} onClose={() => setMessage(null)}>
           {message.text}
-        </Alert>
+        </DismissibleAlert>
       ) : null}
 
       <section className="notification-panel">
@@ -104,43 +109,51 @@ export default function NotificationSettings() {
 
       <section className="notification-panel">
         <div className="notification-field-grid">
-          <Form.Group>
-            <Form.Label>Screen position</Form.Label>
-            <Form.Select value={settings.position} onChange={(event) => updateSetting("position", event.target.value)}>
+          <div>
+            <Label htmlFor="notification-position">Screen position</Label>
+            <NativeSelect
+              id="notification-position"
+              value={settings.position}
+              onChange={(event) => updateSetting("position", event.target.value)}
+            >
               <option value="bottom-right">Bottom right</option>
               <option value="bottom-center">Bottom center</option>
               <option value="top-right">Top right</option>
               <option value="top-center">Top center</option>
-            </Form.Select>
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Display duration</Form.Label>
-            <Form.Control
+            </NativeSelect>
+          </div>
+          <div>
+            <Label htmlFor="notification-duration">Display duration</Label>
+            <Input
+              id="notification-duration"
               type="number"
               min="3"
               max="30"
               value={settings.durationSeconds}
               onChange={(event) => updateSetting("durationSeconds", Number(event.target.value))}
             />
-            <Form.Text>Seconds before a toast closes.</Form.Text>
-          </Form.Group>
+            <small className="form-text">Seconds before a toast closes.</small>
+          </div>
         </div>
-        <Form.Check
-          type="switch"
-          id="manual-task-notifications"
-          className="notification-switch"
-          label="Always show manually triggered task notifications"
-          checked={settings.manualTaskToasts}
-          onChange={(event) => updateSetting("manualTaskToasts", event.target.checked)}
-        />
+        <label className="form-check form-switch notification-switch">
+          <input
+            id="manual-task-notifications"
+            type="checkbox"
+            role="switch"
+            className="form-check-input"
+            checked={settings.manualTaskToasts}
+            onChange={(event) => updateSetting("manualTaskToasts", event.target.checked)}
+          />
+          <span>Always show manually triggered task notifications</span>
+        </label>
       </section>
 
       <div className="notification-actions">
         <Button type="submit" disabled={saving}>
-          {saving ? <Spinner size="sm" animation="border" /> : <RiSave3Line size={17} />}
+          {saving ? <Spinner className="tw:size-4" /> : <RiSave3Line size={17} />}
           Save notifications
         </Button>
       </div>
-    </Form>
+    </form>
   );
 }

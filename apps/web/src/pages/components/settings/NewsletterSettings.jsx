@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Alert, Button, Form, Spinner, Tab, Tabs } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
+import { Spinner } from "@/components/ui/spinner";
+import { Textarea } from "@/components/ui/textarea";
+import DismissibleAlert from "./dismissible-alert";
 import { RiArticleLine, RiExternalLinkLine, RiMailCheckLine, RiMailSettingsLine, RiRefreshLine, RiSendPlaneLine } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 import "../../css/settings/settings.css";
@@ -205,7 +211,7 @@ export default function NewsletterSettings() {
   if (loading) {
     return (
       <div className="newsletter-settings newsletter-loading">
-        <Spinner animation="border" />
+        <Spinner className="tw:size-10" />
       </div>
     );
   }
@@ -218,54 +224,87 @@ export default function NewsletterSettings() {
           <h2>Newsletter Generator</h2>
           <p>Generate a Barracks digest with recently added media, weekly watch stats, active viewers, and repair status.</p>
         </div>
-        <Button type="button" variant="outline-primary" onClick={generatePreview} disabled={Boolean(busyAction)}>
-          {busyAction === "preview" ? <Spinner size="sm" animation="border" /> : <RiRefreshLine size={17} />}
+        <Button type="button" variant="outline" onClick={generatePreview} disabled={Boolean(busyAction)}>
+          {busyAction === "preview" ? <Spinner className="tw:size-4" /> : <RiRefreshLine size={17} />}
           Generate preview
         </Button>
       </header>
 
       {message ? (
-        <Alert variant={message.type} onClose={() => setMessage(null)} dismissible>
+        <DismissibleAlert type={message.type} onClose={() => setMessage(null)}>
           {message.text}
-        </Alert>
+        </DismissibleAlert>
       ) : null}
 
-      <Tabs activeKey={activeTab} onSelect={(key) => setActiveTab(key || "settings")} variant="pills" className="newsletter-tabs" transition={false}>
-        <Tab eventKey="settings" title="Settings" className="newsletter-tab-pane">
+      <nav className="nav nav-pills newsletter-tabs" role="tablist" aria-label="Newsletter views">
+        <div className="nav-item">
+          <button type="button" role="tab" aria-selected={activeTab === "settings"} className={`nav-link ${activeTab === "settings" ? "active" : ""}`.trim()} onClick={() => setActiveTab("settings")}>
+            Settings
+          </button>
+        </div>
+        <div className="nav-item">
+          <button type="button" role="tab" aria-selected={activeTab === "preview"} className={`nav-link ${activeTab === "preview" ? "active" : ""}`.trim()} onClick={() => setActiveTab("preview")}>
+            Newsletter Preview
+          </button>
+        </div>
+      </nav>
+      {activeTab === "settings" ? (
+      <div role="tabpanel" className="newsletter-tab-pane">
           <div className="newsletter-settings-grid">
-            <Form className="newsletter-form" onSubmit={saveSettings}>
+            <form className="newsletter-form" onSubmit={saveSettings}>
               <section className="newsletter-panel">
                 <div className="newsletter-panel-title">
                   <RiMailSettingsLine size={19} />
                   <h3>SMTP Options</h3>
                 </div>
                 <div className="newsletter-form-grid">
-                  <Form.Group>
-                    <Form.Label>SMTP host</Form.Label>
-                    <Form.Control value={settings.smtp.host} onChange={(event) => updateSmtp("host", event.target.value)} placeholder="smtp.example.com" />
-                  </Form.Group>
-                  <Form.Group>
-                    <Form.Label>Port</Form.Label>
-                    <Form.Control type="number" min="1" value={settings.smtp.port} onChange={(event) => updateSmtp("port", Number(event.target.value))} />
-                  </Form.Group>
-                  <Form.Group>
-                    <Form.Label>Username</Form.Label>
-                    <Form.Control value={settings.smtp.username} onChange={(event) => updateSmtp("username", event.target.value)} autoComplete="username" />
-                  </Form.Group>
-                  <Form.Group>
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control
+                  <div>
+                    <Label htmlFor="newsletter-smtp-host">SMTP host</Label>
+                    <Input id="newsletter-smtp-host" value={settings.smtp.host} onChange={(event) => updateSmtp("host", event.target.value)} placeholder="smtp.example.com" />
+                  </div>
+                  <div>
+                    <Label htmlFor="newsletter-smtp-port">Port</Label>
+                    <Input id="newsletter-smtp-port" type="number" min="1" value={settings.smtp.port} onChange={(event) => updateSmtp("port", Number(event.target.value))} />
+                  </div>
+                  <div>
+                    <Label htmlFor="newsletter-smtp-username">Username</Label>
+                    <Input id="newsletter-smtp-username" value={settings.smtp.username} onChange={(event) => updateSmtp("username", event.target.value)} autoComplete="username" />
+                  </div>
+                  <div>
+                    <Label htmlFor="newsletter-smtp-password">Password</Label>
+                    <Input
+                      id="newsletter-smtp-password"
                       type="password"
                       value={settings.smtp.password}
                       onChange={(event) => updateSmtp("password", event.target.value)}
                       placeholder={settings.smtp.hasPassword ? "Stored password unchanged" : "SMTP password"}
                       autoComplete="new-password"
                     />
-                  </Form.Group>
+                  </div>
                 </div>
                 <div className="newsletter-toggle-row">
-                  <Form.Check type="switch" id="newsletter-secure" label="Use implicit TLS" checked={settings.smtp.secure} onChange={(event) => updateSmtp("secure", event.target.checked)} />
-                  <Form.Check type="switch" id="newsletter-tls-verify" label="Verify TLS certificates" checked={settings.smtp.rejectUnauthorized} onChange={(event) => updateSmtp("rejectUnauthorized", event.target.checked)} />
+                  <label className="form-check form-switch">
+                    <input
+                      id="newsletter-secure"
+                      type="checkbox"
+                      role="switch"
+                      className="form-check-input"
+                      checked={settings.smtp.secure}
+                      onChange={(event) => updateSmtp("secure", event.target.checked)}
+                    />
+                    <span>Use implicit TLS</span>
+                  </label>
+                  <label className="form-check form-switch">
+                    <input
+                      id="newsletter-tls-verify"
+                      type="checkbox"
+                      role="switch"
+                      className="form-check-input"
+                      checked={settings.smtp.rejectUnauthorized}
+                      onChange={(event) => updateSmtp("rejectUnauthorized", event.target.checked)}
+                    />
+                    <span>Verify TLS certificates</span>
+                  </label>
                 </div>
               </section>
 
@@ -275,51 +314,61 @@ export default function NewsletterSettings() {
                   <h3>Newsletter</h3>
                 </div>
                 <div className="newsletter-form-grid">
-                  <Form.Group>
-                    <Form.Label>Sender name</Form.Label>
-                    <Form.Control value={settings.senderName} onChange={(event) => updateField("senderName", event.target.value)} />
-                  </Form.Group>
-                  <Form.Group>
-                    <Form.Label>Sender email</Form.Label>
-                    <Form.Control type="email" value={settings.senderEmail} onChange={(event) => updateField("senderEmail", event.target.value)} placeholder="barracks@example.com" />
-                  </Form.Group>
-                  <Form.Group>
-                    <Form.Label>Frequency</Form.Label>
-                    <Form.Select value={settings.frequency} onChange={(event) => updateField("frequency", event.target.value)}>
+                  <div>
+                    <Label htmlFor="newsletter-sender-name">Sender name</Label>
+                    <Input id="newsletter-sender-name" value={settings.senderName} onChange={(event) => updateField("senderName", event.target.value)} />
+                  </div>
+                  <div>
+                    <Label htmlFor="newsletter-sender-email">Sender email</Label>
+                    <Input id="newsletter-sender-email" type="email" value={settings.senderEmail} onChange={(event) => updateField("senderEmail", event.target.value)} placeholder="barracks@example.com" />
+                  </div>
+                  <div>
+                    <Label htmlFor="newsletter-frequency">Frequency</Label>
+                    <NativeSelect id="newsletter-frequency" value={settings.frequency} onChange={(event) => updateField("frequency", event.target.value)}>
                       <option value="manual">Manual only</option>
                       <option value="weekly">Weekly</option>
                       <option value="monthly">Monthly</option>
-                    </Form.Select>
-                  </Form.Group>
-                  <Form.Group>
-                    <Form.Label>Test recipient</Form.Label>
-                    <Form.Control type="email" value={testRecipient} onChange={(event) => setTestRecipient(event.target.value)} placeholder="you@example.com" />
-                  </Form.Group>
+                    </NativeSelect>
+                  </div>
+                  <div>
+                    <Label htmlFor="newsletter-test-recipient">Test recipient</Label>
+                    <Input id="newsletter-test-recipient" type="email" value={testRecipient} onChange={(event) => setTestRecipient(event.target.value)} placeholder="you@example.com" />
+                  </div>
                 </div>
-                <Form.Group className="newsletter-recipient-box">
-                  <Form.Label>Recipients</Form.Label>
-                  <Form.Control as="textarea" rows={5} value={recipientText} onChange={(event) => setRecipientText(event.target.value)} placeholder={"one@example.com\nfamily@example.com"} />
-                  <Form.Text>{recipientCount} recipient{recipientCount === 1 ? "" : "s"} configured.</Form.Text>
-                </Form.Group>
+                <div className="newsletter-recipient-box">
+                  <Label htmlFor="newsletter-recipients">Recipients</Label>
+                  <Textarea id="newsletter-recipients" rows={5} value={recipientText} onChange={(event) => setRecipientText(event.target.value)} placeholder={"one@example.com\nfamily@example.com"} />
+                  <small className="form-text">{recipientCount} recipient{recipientCount === 1 ? "" : "s"} configured.</small>
+                </div>
                 <div className="newsletter-toggle-row">
-                  <Form.Check type="switch" id="newsletter-enabled" label="Enable newsletter config" checked={settings.enabled} onChange={(event) => updateField("enabled", event.target.checked)} />
+                  <label className="form-check form-switch">
+                    <input
+                      id="newsletter-enabled"
+                      type="checkbox"
+                      role="switch"
+                      className="form-check-input"
+                      checked={settings.enabled}
+                      onChange={(event) => updateField("enabled", event.target.checked)}
+                    />
+                    <span>Enable newsletter config</span>
+                  </label>
                 </div>
                 <div className="newsletter-actions">
                   <Button type="submit" disabled={Boolean(busyAction)}>
-                    {busyAction === "save" ? <Spinner size="sm" animation="border" /> : <RiMailCheckLine size={17} />}
+                    {busyAction === "save" ? <Spinner className="tw:size-4" /> : <RiMailCheckLine size={17} />}
                     Save settings
                   </Button>
-                  <Button type="button" variant="outline-primary" onClick={sendTest} disabled={!testRecipient || Boolean(busyAction)}>
-                    {busyAction === "test" ? <Spinner size="sm" animation="border" /> : <RiSendPlaneLine size={17} />}
+                  <Button type="button" variant="outline" onClick={sendTest} disabled={!testRecipient || Boolean(busyAction)}>
+                    {busyAction === "test" ? <Spinner className="tw:size-4" /> : <RiSendPlaneLine size={17} />}
                     Send test
                   </Button>
-                  <Button type="button" variant="primary" onClick={sendNewsletter} disabled={!recipientCount || Boolean(busyAction)}>
-                    {busyAction === "send" ? <Spinner size="sm" animation="border" /> : <RiSendPlaneLine size={17} />}
+                  <Button type="button" onClick={sendNewsletter} disabled={!recipientCount || Boolean(busyAction)}>
+                    {busyAction === "send" ? <Spinner className="tw:size-4" /> : <RiSendPlaneLine size={17} />}
                     Send newsletter
                   </Button>
                 </div>
               </section>
-            </Form>
+            </form>
 
             <section className="newsletter-panel newsletter-history-panel">
               <div className="newsletter-panel-title">
@@ -338,9 +387,10 @@ export default function NewsletterSettings() {
               </div>
             </section>
           </div>
-        </Tab>
-
-        <Tab eventKey="preview" title="Newsletter Preview" className="newsletter-tab-pane">
+      </div>
+      ) : null}
+      {activeTab === "preview" ? (
+      <div role="tabpanel" className="newsletter-tab-pane">
           <section className="newsletter-panel newsletter-preview-panel">
             <div className="newsletter-panel-title">
               <div>
@@ -348,11 +398,11 @@ export default function NewsletterSettings() {
                 <h3>Preview</h3>
               </div>
               <div className="newsletter-preview-actions">
-                <Button type="button" variant="outline-primary" size="sm" onClick={generatePreview} disabled={Boolean(busyAction)}>
-                  {busyAction === "preview" ? <Spinner size="sm" animation="border" /> : <RiRefreshLine size={15} />}
+                <Button type="button" variant="outline" onClick={generatePreview} disabled={Boolean(busyAction)}>
+                  {busyAction === "preview" ? <Spinner className="tw:size-4" /> : <RiRefreshLine size={15} />}
                   Refresh
                 </Button>
-                <Button type="button" variant="outline-primary" size="sm" onClick={openPreviewTab} disabled={!previewHtml}>
+                <Button type="button" variant="outline" onClick={openPreviewTab} disabled={!previewHtml}>
                   <RiExternalLinkLine size={15} />
                   Open in tab
                 </Button>
@@ -366,8 +416,8 @@ export default function NewsletterSettings() {
               {previewHtml ? <iframe title="Newsletter preview" srcDoc={previewHtml} /> : <div className="newsletter-empty">Generate a preview to see the newsletter.</div>}
             </div>
           </section>
-        </Tab>
-      </Tabs>
+      </div>
+      ) : null}
     </div>
   );
 }
