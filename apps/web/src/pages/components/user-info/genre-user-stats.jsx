@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Row, Col } from "react-bootstrap";
 import GenreStatCard from "../statCards/genre-stat-card.jsx";
 import { Trans } from "react-i18next";
 import "../../css/genres.css";
@@ -61,14 +60,14 @@ function GenreUserStats(props) {
         <Trans i18nKey="GENRES" />
       </h1>
       <div className="genre-container d-flex flex-row justify-content-between">
-        <Row className="w-100 pb-5">
-          <Col className="p-0 auto">
+        <div className="genre-stats-row">
+          <div>
             <GenreStatCard data={data} dataKey="duration" />
-          </Col>
-          <Col className="p-0 auto">
+          </div>
+          <div>
             <GenreStatCard data={data} dataKey="plays" />
-          </Col>
-        </Row>
+          </div>
+        </div>
       </div>
     </div>
   );

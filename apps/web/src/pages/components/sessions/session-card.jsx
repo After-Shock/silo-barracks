@@ -1,12 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Card from "react-bootstrap/Card";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Container from "react-bootstrap/Container";
-import Modal from "react-bootstrap/Modal";
-import FormControl from "react-bootstrap/FormControl";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import axios from "../../../lib/axios_instance";
 
 import { RiAccountCircleFill, RiArrowDownSLine, RiChatSmile2Line, RiPauseFill, RiPlayFill, RiStopCircleLine } from "@remixicon/react";
@@ -317,7 +312,7 @@ function SessionCard(props) {
   const controlActions = new Set(controlCapabilities?.actions || []);
 
   return (
-    <Card
+    <div
       className="session-card"
       style={cardStyle}
       role="button"
@@ -338,14 +333,21 @@ function SessionCard(props) {
         />}
       </div>
       <IpInfoModal show={ipModalVisible} onHide={() => setIPModalVisible(false)} ipAddress={ipAddressLookup} />
-      <Modal
-        show={sessionModalVisible}
-        onHide={() => setSessionModalVisible(false)}
-        centered
-        size="lg"
-        dialogClassName="session-popout-modal"
+      <Dialog
+        open={sessionModalVisible}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSessionModalVisible(false);
+          }
+        }}
       >
-        <Modal.Body>
+        <DialogContent
+          className="session-popout-modal tw:max-w-[min(940px,calc(100vw-28px))] tw:sm:max-w-[min(940px,calc(100vw-28px))]"
+          showCloseButton={false}
+        >
+          <DialogTitle className="tw:sr-only">Session details</DialogTitle>
+          <DialogDescription className="tw:sr-only">Playback session details and controls</DialogDescription>
+          <div className="session-popout-body">
           <button
             type="button"
             className="session-popout-close"
@@ -467,13 +469,22 @@ function SessionCard(props) {
               </div>
             </>}
           </section>}
-        </Modal.Body>
-      </Modal>
-      <Modal show={messageOpen} onHide={closeMessage} centered contentClassName="session-message-modal">
-        <Modal.Header closeButton>
-          <Modal.Title>Message {session.UserName}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={messageOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeMessage();
+          }
+        }}
+      >
+        <DialogContent className="session-message-modal tw:overflow-visible tw:max-w-[540px] tw:sm:max-w-[540px]" showCloseButton={false}>
+          <DialogTitle className="tw:sr-only">Message {session.UserName}</DialogTitle>
+          <DialogDescription className="tw:sr-only">Send an on-screen message to this player</DialogDescription>
+          <div className="session-message-body">
+          <h2 className="session-message-title">Message {session.UserName}</h2>
           <p className="session-message-hint">Choose a template from the menu, then edit before sending. It shows as an on-screen notice on their Silo client.</p>
           <div className={`session-message-picker${templateMenuOpen ? " is-open" : ""}`}>
             <span className="session-message-select-label">Message template</span>
@@ -539,8 +550,7 @@ function SessionCard(props) {
               <small>Fills into the message as {formatMessageTime(messageWhen, twelveHour)}</small>
             </label>
           ) : null}
-          <FormControl
-            as="textarea"
+          <textarea
             rows={3}
             maxLength={2048}
             value={messageText}
@@ -552,8 +562,8 @@ function SessionCard(props) {
             placeholder="Keep it short — this pops up over playback."
           />
           {controlNotice?.type === "error" && messageOpen ? <p role="alert" className="session-action-error">{controlNotice.text}</p> : null}
-        </Modal.Body>
-        <Modal.Footer>
+          </div>
+          <div className="session-message-footer">
           <button type="button" className="session-command is-ghost" onClick={closeMessage}>
             Cancel
           </button>
@@ -566,13 +576,13 @@ function SessionCard(props) {
             <RiChatSmile2Line size={17} />
             {controlPending === "message" ? "Sending…" : "Send message"}
           </button>
-        </Modal.Footer>
-      </Modal>
+          </div>
+        </DialogContent>
+      </Dialog>
       <div style={cardBgStyle} className="session-card-main rounded-top">
-        <Row className="h-100 p-0 m-0">
-          <Col className="session-card-banner-image">
-            <Card.Img
-              variant="top"
+        <div className="h-100 p-0 m-0">
+          <div className="session-card-banner-image">
+            <img
               className={
                 props.data.session.NowPlayingItem.Type === "Audio"
                   ? "stat-card-image-audio rounded-0 rounded-start"
@@ -585,12 +595,12 @@ function SessionCard(props) {
               loading="lazy"
               decoding="async"
             />
-          </Col>
-          <Col className="w-100 h-100 m-0 px-0">
-            <Card.Body className="session-card-body w-100 h-100">
-              <Container className="h-100 d-flex flex-column justify-content-between g-0">
-                <Row className="d-flex justify-content-start session-details">
-                  <Col className="session-details-list">
+          </div>
+          <div className="w-100 h-100 m-0 px-0">
+            <div className="session-card-body w-100 h-100">
+              <div className="h-100 d-flex flex-column justify-content-between g-0">
+                <div className="d-flex justify-content-start session-details">
+                  <div className="session-details-list">
                     <SessionCardDetailRow label={<Trans i18nKey="ACTIVITY_TABLE.DEVICE" />} className="session-details-row-short">
                         <Tooltip title={props.data.session.DeviceName}>
                           <span
@@ -729,26 +739,26 @@ function SessionCard(props) {
                     <SessionCardDetailRow label="ETA" className="session-details-row-eta">
                       <span>{eta || <Trans i18nKey="ERROR_MESSAGES.N/A" />}</span>
                     </SessionCardDetailRow>
-                  </Col>
-                </Row>
+                  </div>
+                </div>
 
-                <Row className="p-0 m-0">
-                  <Col>
-                    <Card.Text className="session-timecode text-end">
+                <div className="p-0 m-0">
+                  <div>
+                    <div className="session-timecode text-end">
                       <Tooltip title={eta ? `Ends at ${eta}` : "End time unavailable"}>
                         <span className="session-timecode-value">{timecode}</span>
                       </Tooltip>
                       <span className="session-timecode-eta">{eta ? `Ends ${eta}` : <Trans i18nKey="ERROR_MESSAGES.N/A" />}</span>
-                    </Card.Text>
-                  </Col>
-                </Row>
-              </Container>
-            </Card.Body>
-          </Col>
-        </Row>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <Row>
-        <Col>
+      <div>
+        <div>
           <div className="progress-bar">
             <div
               className="progress-custom"
@@ -757,32 +767,32 @@ function SessionCard(props) {
               }}
             ></div>
           </div>
-        </Col>
-      </Row>
-      <Row className="session-card-meta p-0 m-0">
-        <Col className="session-card-now-playing">
+        </div>
+      </div>
+      <div className="session-card-meta p-0 m-0">
+        <div className="session-card-now-playing">
           {/* Player convention: a paused stream shows play, a playing stream shows pause. */}
           <span className="session-play-state" role="img" aria-label={props.data.session.PlayState.IsPaused ? "Paused" : "Playing"}>
             {props.data.session.PlayState.IsPaused ? <RiPlayFill /> : <RiPauseFill />}
           </span>
           <div className="session-title-copy">
-            <Card.Text className="session-title">
+            <div className="session-title">
               <LocalLink to={`/libraries/item/${props.data.session.NowPlayingItem.Id}`} target="_blank" className="item-name">
                 {props.data.session.NowPlayingItem.Type === "Episode" && props.data.session.NowPlayingItem.SeriesName
                   ? props.data.session.NowPlayingItem.SeriesName
                   : props.data.session.NowPlayingItem.Name}
               </LocalLink>
-            </Card.Text>
-            <Card.Text className="session-subtitle">
+            </div>
+            <div className="session-subtitle">
               {props.data.session.NowPlayingItem.Type === "Episode"
                 ? `${props.data.session.NowPlayingItem.Name} · S${props.data.session.NowPlayingItem.ParentIndexNumber} E${props.data.session.NowPlayingItem.IndexNumber}`
                 : props.data.session.NowPlayingItem.Type === "Audio" && props.data.session.NowPlayingItem.Artists?.length > 0
                   ? props.data.session.NowPlayingItem.Artists[0]
                   : props.data.session.NowPlayingItem.SeriesName || props.data.session.NowPlayingItem.Type}
-            </Card.Text>
+            </div>
           </div>
-        </Col>
-        <Col className="session-card-user">
+        </div>
+        <div className="session-card-user">
           <Tooltip title={props.data.session.UserName}>
             <LocalLink to={`/users/${props.data.session.UserId}`} className="item-name session-user-name">
               {props.data.session.UserName}
@@ -800,9 +810,9 @@ function SessionCard(props) {
           ) : (
             <RiAccountCircleFill className="session-card-user-image" />
           )}
-        </Col>
-      </Row>
-    </Card>
+        </div>
+      </div>
+    </div>
   );
 }
 

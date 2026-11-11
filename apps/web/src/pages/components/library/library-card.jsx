@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "../../css/library/library-card.css";
 
-import Card from 'react-bootstrap/Card';
-
 import { RiCheckboxMultipleBlankLine, RiFileMusicLine, RiFilmLine, RiTvLine } from "@remixicon/react";
 import { Trans } from "react-i18next";
 import i18next from "i18next";
@@ -221,12 +219,11 @@ function LibraryCard(props) {
   }
   
   return (
-    <Card className={`lib-card ${props.showName === false ? "is-library-name-hidden" : ""}`.trim()}>
+    <div className={`lib-card ${props.showName === false ? "is-library-name-hidden" : ""}`.trim()}>
       <Link to={`/libraries/${props.data.Id}`} className="library-card-link">
         <div className="library-card-image">
           {imageLoaded ? (
-            <Card.Img
-              variant="top"
+            <img
               className="library-card-banner library-card-banner-hover"
               src={libraryImageSrc.includes("/proxy/") ? `${libraryImageSrc}&fillWidth=560&quality=55` : libraryImageSrc}
               loading="lazy"
@@ -247,7 +244,7 @@ function LibraryCard(props) {
         </div>
       </Link>
 
-      <Card.Body className="library-card-details">
+      <div className="library-card-details">
         <div className="library-card-actions">
           <button className="library-scan-button" type="button" onClick={props.onScan} disabled={props.scanDisabled || props.scanning}>
             {props.scanIcon}
@@ -302,8 +299,8 @@ function LibraryCard(props) {
               : i18next.t("ERROR_MESSAGES.NEVER")}
           </small>
         </div>
-      </Card.Body>
-    </Card>
+      </div>
+    </div>
   );
 }
 
