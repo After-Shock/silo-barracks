@@ -292,7 +292,7 @@
 
 .item-action-link,
 .item-reference-link,
-.item-tabs-row .btn {
+.item-tab-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -307,7 +307,7 @@
 }
 
 .item-action-link.is-primary,
-.item-tabs-row .btn.active {
+.item-tab-pill.active {
   border-color: var(--barracks-action);
   background: var(--barracks-action);
   color: var(--barracks-action-text);
@@ -358,18 +358,26 @@
   margin: 16px 0 12px;
 }
 
-.item-tabs-row .btn {
+.item-tab-pill {
   color: var(--barracks-text-inset);
 }
 
-.item-tabs-row .btn:hover {
+.item-tab-pill:hover {
   border-color: var(--barracks-border-strong);
   background: var(--barracks-surface-interactive);
   color: var(--barracks-text-interactive);
 }
 
-.hide-tab-titles {
-  display: none !important;
+.item-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.item-option-row > div {
+  min-width: 0;
 }
 
 .item-detail-page .global-stats-container,

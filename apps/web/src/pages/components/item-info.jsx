@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import axios from "../../lib/axios_instance";
 import { useParams, Link } from "react-router-dom";
 import { Blurhash } from "react-blurhash";
-import { Tabs, Tab, Button } from "react-bootstrap";
 
 import { RiArchiveDrawerFill, RiArrowLeftSLine, RiCheckboxMultipleBlankLine, RiExternalLinkFill, RiFileMusicLine, RiFilmLine, RiInformationLine, RiPlayFill, RiTvLine } from "@remixicon/react";
 
@@ -349,38 +348,56 @@ function ItemInfo() {
         </div>
       </section>
 
-      <div className="item-tabs-row">
-        <Button onClick={() => setActiveTab("tabOverview")} active={activeTab === "tabOverview"} variant="outline-primary" type="button">
+      <div className="item-tabs-row" role="tablist" aria-label="Item views">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "tabOverview"}
+          className={`item-tab-pill ${activeTab === "tabOverview" ? "active" : ""}`.trim()}
+          onClick={() => setActiveTab("tabOverview")}
+        >
           <RiPlayFill size={16} />
           <Trans i18nKey="TAB_CONTROLS.OVERVIEW" />
-        </Button>
-        <Button onClick={() => setActiveTab("tabActivity")} active={activeTab === "tabActivity"} variant="outline-primary" type="button">
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "tabActivity"}
+          className={`item-tab-pill ${activeTab === "tabActivity" ? "active" : ""}`.trim()}
+          onClick={() => setActiveTab("tabActivity")}
+        >
           <RiInformationLine size={16} />
           <Trans i18nKey="TAB_CONTROLS.ACTIVITY" />
-        </Button>
+        </button>
         {data.archived && (
-          <Button onClick={() => setActiveTab("tabOptions")} active={activeTab === "tabOptions"} variant="outline-primary" type="button">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "tabOptions"}
+            className={`item-tab-pill ${activeTab === "tabOptions" ? "active" : ""}`.trim()}
+            onClick={() => setActiveTab("tabOptions")}
+          >
             <RiArchiveDrawerFill size={16} />
             <Trans i18nKey="TAB_CONTROLS.OPTIONS" />
-          </Button>
+          </button>
         )}
       </div>
 
-      <Tabs defaultActiveKey="tabOverview" activeKey={activeTab} variant="pills" className="hide-tab-titles">
-        <Tab eventKey="tabOverview" title="Overview" className="bg-transparent">
-          {!config?.IS_SILO ? <GlobalStats id={Id} param={"itemid"} endpoint={"getGlobalItemStats"} title={<Trans i18nKey="GLOBAL_STATS.ITEM_STATS" />} />
-            : <p className="activity-notice">Playback totals are retention-managed by Silo. Open Activity for the complete cursor-paged attempts for this exact catalog item.</p>}
-          {["Series", "Season"].includes(data && data.Type) ? <MoreItems data={data} /> : <></>}
-        </Tab>
-        <Tab eventKey="tabActivity" title="Activity" className="bg-transparent">
+      <div className="item-tab-content">
+        {activeTab === "tabOverview" && (
+          <div>
+            {!config?.IS_SILO ? <GlobalStats id={Id} param={"itemid"} endpoint={"getGlobalItemStats"} title={<Trans i18nKey="GLOBAL_STATS.ITEM_STATS" />} />
+              : <p className="activity-notice">Playback totals are retention-managed by Silo. Open Activity for the complete cursor-paged attempts for this exact catalog item.</p>}
+            {["Series", "Season"].includes(data && data.Type) ? <MoreItems data={data} /> : <></>}
+          </div>
+        )}
+        {activeTab === "tabActivity" && (
           <ErrorBoundary>
             <ItemActivity itemid={Id} />
           </ErrorBoundary>
-        </Tab>
-        <Tab eventKey="tabOptions" title="Options" className="bg-transparent">
-          <ItemOptions itemid={Id} />
-        </Tab>
-      </Tabs>
+        )}
+        {activeTab === "tabOptions" && <ItemOptions itemid={Id} />}
+      </div>
     </div>
   );
 }
