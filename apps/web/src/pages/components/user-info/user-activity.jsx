@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "../../../lib/axios_instance";
 import ActivityTable from "../activity/activity-table";
 import { Trans } from "react-i18next";
-import { Button, FormControl, FormSelect, Modal } from "react-bootstrap";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import "../../css/width_breakpoint_css.css";
 import "../../css/radius_breakpoint_css.css";
 import "../../css/users/user-activity.css";
@@ -206,22 +207,30 @@ function LegacyUserActivity({ initialConfig, ...props }) {
 
   return (
     <div className="Activity">
-      <Modal show={showLibraryFilters} onHide={() => setShowLibraryFilters(false)}>
-        <Modal.Header>
-          <Modal.Title>
+      <Dialog
+        open={showLibraryFilters}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowLibraryFilters(false);
+          }
+        }}
+      >
+        <DialogContent showCloseButton={false}>
+          <DialogTitle>
             <Trans i18nKey="MENU_TABS.LIBRARIES" />
-          </Modal.Title>
-        </Modal.Header>
-        <LibraryFilterModal libraries={libraries} selectedLibraries={libraryFilters} onSelectionChange={handleLibraryFilter} />
-        <Modal.Footer>
-          <Button variant="outline-primary" onClick={toggleSelectAll}>
-            <Trans i18nKey="ACTIVITY_TABLE.TOGGLE_SELECT_ALL" />
-          </Button>
-          <Button variant="outline-primary" onClick={() => setShowLibraryFilters(false)}>
-            <Trans i18nKey="CLOSE" />
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          </DialogTitle>
+          <DialogDescription className="tw:sr-only">Choose which libraries appear in this activity view</DialogDescription>
+          <LibraryFilterModal libraries={libraries} selectedLibraries={libraryFilters} onSelectionChange={handleLibraryFilter} />
+          <DialogFooter>
+            <Button variant="outline" onClick={toggleSelectAll}>
+              <Trans i18nKey="ACTIVITY_TABLE.TOGGLE_SELECT_ALL" />
+            </Button>
+            <Button variant="outline" onClick={() => setShowLibraryFilters(false)}>
+              <Trans i18nKey="CLOSE" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <div className="d-md-flex justify-content-between">
         <h1 className="my-3">
           <Trans i18nKey="ITEM_ACTIVITY" />
@@ -236,13 +245,13 @@ function LegacyUserActivity({ initialConfig, ...props }) {
             <div className="d-flex flex-col rounded-0 rounded-start  align-items-center px-2 bg-primary-1">
               <Trans i18nKey="TYPE" />
             </div>
-            <FormSelect
+            <select
               onChange={(event) => {
                 setStreamTypeFilter(event.target.value);
                 setTypeFilterParam(event.target.value);
               }}
               value={streamTypeFilter}
-              className="w-md-75 rounded-0 rounded-end"
+              className="form-select w-md-75 rounded-0 rounded-end"
             >
               <option value="All">
                 <Trans i18nKey="ALL" />
@@ -256,32 +265,32 @@ function LegacyUserActivity({ initialConfig, ...props }) {
               <option value="DirectStream">
                 <Trans i18nKey="DIRECT_STREAM" />
               </option>
-            </FormSelect>
+            </select>
           </div>
 
           <div className="d-flex flex-row w-100 ms-md-3 w-sm-100 w-md-75  ms-md-3" style={{ whiteSpace: "nowrap" }}>
             <div className="d-flex flex-col rounded-0 rounded-start  align-items-center px-2 bg-primary-1 my-md-3">
               <Trans i18nKey="UNITS.ITEMS" />
             </div>
-            <FormSelect
+            <select
               onChange={(event) => {
                 setItemLimit(event.target.value);
               }}
               value={itemCount}
-              className="my-md-3 w-md-75 rounded-0 rounded-end"
+              className="form-select my-md-3 w-md-75 rounded-0 rounded-end"
             >
               <option value="10">10</option>
               <option value="25">25</option>
               <option value="50">50</option>
               <option value="100">100</option>
-            </FormSelect>
+            </select>
           </div>
-          <FormControl
+          <input
             type="text"
             placeholder={i18next.t("SEARCH")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="ms-md-3 my-3 w-sm-100 w-md-75"
+            className="form-control ms-md-3 my-3 w-sm-100 w-md-75"
           />
         </div>
       </div>
