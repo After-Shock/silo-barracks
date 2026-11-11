@@ -7,7 +7,6 @@ import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import Typography from "@mui/material/Typography";
-import Card from "react-bootstrap/Card";
 import baseUrl from "../../../lib/baseurl";
 
 import "../../css/timeline/activity-timeline.css";
@@ -96,8 +95,7 @@ export default function ActivityTimelineItem(props) {
         <div className="activity-card">
           <Link to={`/libraries/item/${NowPlayingItemId}`}>
             {!useDefaultImage ? (
-              <Card.Img
-                variant="top"
+              <img
                 className="activity-card-img"
                 src={
                   baseUrl +

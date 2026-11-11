@@ -8,7 +8,8 @@ import Config from "../lib/config";
 import ActivityTable from "./components/activity/activity-table";
 import Loading from "./components/general/loading";
 import { Trans } from "react-i18next";
-import { Button, FormControl, FormSelect, Modal } from "react-bootstrap";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import i18next from "i18next";
 import LibraryFilterModal from "./components/library/library-filter-modal";
 import socket from "../socket";
@@ -332,22 +333,23 @@ function LegacyActivity({ initialConfig }) {
   return (
     <div className="Activity" data-theme-screen="activity">
       {activityError ? <p className="activity-notice is-error" role="alert">{activityError}</p> : null}
-      <Modal show={showLibraryFilters} onHide={() => setShowLibraryFilters(false)}>
-        <Modal.Header>
-          <Modal.Title>
+      <Dialog open={showLibraryFilters} onOpenChange={(open) => { if (!open) { setShowLibraryFilters(false); } }}>
+        <DialogContent showCloseButton={false}>
+          <DialogTitle>
             <Trans i18nKey="MENU_TABS.LIBRARIES" />
-          </Modal.Title>
-        </Modal.Header>
-        <LibraryFilterModal libraries={libraries} selectedLibraries={libraryFilters} onSelectionChange={handleLibraryFilter} />
-        <Modal.Footer>
-          <Button variant="outline-primary" onClick={toggleSelectAll}>
-            <Trans i18nKey="ACTIVITY_TABLE.TOGGLE_SELECT_ALL" />
-          </Button>
-          <Button variant="outline-primary" onClick={() => setShowLibraryFilters(false)}>
-            <Trans i18nKey="CLOSE" />
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          </DialogTitle>
+          <DialogDescription className="tw:sr-only">Choose which libraries appear in this activity view</DialogDescription>
+          <LibraryFilterModal libraries={libraries} selectedLibraries={libraryFilters} onSelectionChange={handleLibraryFilter} />
+          <DialogFooter>
+            <Button variant="outline" onClick={toggleSelectAll}>
+              <Trans i18nKey="ACTIVITY_TABLE.TOGGLE_SELECT_ALL" />
+            </Button>
+            <Button variant="outline" onClick={() => setShowLibraryFilters(false)}>
+              <Trans i18nKey="CLOSE" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <header className="activity-page-header">
         <div>
           <p>Playback log</p>
@@ -361,14 +363,14 @@ function LegacyActivity({ initialConfig }) {
         <div className="activity-controls">
           {config?.IS_SILO && historyServers.length > 1 && <label className="activity-control-field">
             <span>Silo server</span>
-            <FormSelect value={historyServerId} onChange={(event) => {
+            <select value={historyServerId} onChange={(event) => {
               setHistoryServerId(event.target.value);
               setCurrentPage(1);
             }}>
               {historyServers.map(server => (
                 <option key={server.id} value={server.id}>{server.name}{server.isPrimary || server.state === "connected" ? "" : " (unavailable)"}</option>
               ))}
-            </FormSelect>
+            </select>
           </label>}
           {!config?.IS_SILO && <Button onClick={() => setShowLibraryFilters(true)} className="activity-control-button">
             <Trans i18nKey="MENU_TABS.LIBRARIES" />
@@ -378,7 +380,7 @@ function LegacyActivity({ initialConfig }) {
             <span>
               <Trans i18nKey="TYPE" />
             </span>
-            <FormSelect
+            <select
               onChange={(event) => {
                 setTypeFilter(event.target.value);
               }}
@@ -396,14 +398,14 @@ function LegacyActivity({ initialConfig }) {
               <option value="DirectStream">
                 <Trans i18nKey="DIRECT_STREAM" />
               </option>
-            </FormSelect>
+            </select>
           </label>}
 
           <label className="activity-control-field is-compact">
             <span>
               <Trans i18nKey="UNITS.ITEMS" />
             </span>
-            <FormSelect
+            <select
               onChange={(event) => {
                 setItemLimit(event.target.value);
               }}
@@ -413,9 +415,9 @@ function LegacyActivity({ initialConfig }) {
               <option value="25">25</option>
               <option value="50">50</option>
               <option value="100">100</option>
-            </FormSelect>
+            </select>
           </label>
-          {!config?.IS_SILO && <FormControl
+          {!config?.IS_SILO && <input
             type="text"
             placeholder={i18next.t("SEARCH")}
             value={searchQuery}

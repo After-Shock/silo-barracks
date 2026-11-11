@@ -3,7 +3,8 @@ import { Trans } from "react-i18next";
 import i18next from "i18next";
 import ActivityTimelineComponent from "./components/activity-timeline/activity-timeline";
 
-import { Button, FormSelect, Modal } from "react-bootstrap";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import axios from "../lib/axios_instance.jsx";
 import Config from "../lib/config.jsx";
 import Loading from "./components/general/loading";
@@ -195,17 +196,17 @@ function ActivityTimeline(props) {
                   <div className="d-flex flex-col rounded-0 rounded-start  align-items-center px-2 bg-primary-1">
                     <Trans i18nKey="USER" />
                   </div>
-                  <FormSelect
+                  <select
                     onChange={(e) => handleUserSelection(e.target.value)}
                     value={selectedUser}
-                    className="w-sm-75 rounded-0 rounded-end"
+                    className="form-select w-sm-75 rounded-0 rounded-end"
                   >
                     {users.map((user) => (
                       <option key={user.UserId} value={user.UserId}>
                         {user.UserName}
                       </option>
                     ))}
-                  </FormSelect>
+                  </select>
                 </>
               )}
             </div>
@@ -218,32 +219,34 @@ function ActivityTimeline(props) {
               <Trans i18nKey="MENU_TABS.LIBRARIES" />
             </Button>
 
-            <Modal
-              show={showLibraryFilters}
-              onHide={() => setShowLibraryFilters(false)}
+            <Dialog
+              open={showLibraryFilters}
+              onOpenChange={(open) => {
+                if (!open) {
+                  setShowLibraryFilters(false);
+                }
+              }}
             >
-              <Modal.Header>
-                <Modal.Title>
+              <DialogContent showCloseButton={false}>
+                <DialogTitle>
                   <Trans i18nKey="MENU_TABS.LIBRARIES" />
-                </Modal.Title>
-              </Modal.Header>
-              <LibraryFilterModal
-                libraries={libraries}
-                selectedLibraries={selectedLibraries}
-                onSelectionChange={handleLibraryFilter}
-              />
-              <Modal.Footer>
-                <Button variant="outline-primary" onClick={toggleSelectAll}>
-                  <Trans i18nKey="ACTIVITY_TABLE.TOGGLE_SELECT_ALL" />
-                </Button>
-                <Button
-                  variant="outline-primary"
-                  onClick={() => setShowLibraryFilters(false)}
-                >
-                  <Trans i18nKey="CLOSE" />
-                </Button>
-              </Modal.Footer>
-            </Modal>
+                </DialogTitle>
+                <DialogDescription className="tw:sr-only">Choose which libraries appear in this timeline view</DialogDescription>
+                <LibraryFilterModal
+                  libraries={libraries}
+                  selectedLibraries={selectedLibraries}
+                  onSelectionChange={handleLibraryFilter}
+                />
+                <DialogFooter>
+                  <Button variant="outline" onClick={toggleSelectAll}>
+                    <Trans i18nKey="ACTIVITY_TABLE.TOGGLE_SELECT_ALL" />
+                  </Button>
+                  <Button variant="outline" onClick={() => setShowLibraryFilters(false)}>
+                    <Trans i18nKey="CLOSE" />
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>}
         </div>
       </div>
