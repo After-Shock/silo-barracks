@@ -1,7 +1,8 @@
 import axios from "../../../lib/axios_instance";
 import i18next from "i18next";
 import { useState } from "react";
-import { Modal } from "react-bootstrap";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Trans } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -82,55 +83,55 @@ function LibraryOptions(props) {
                 <strong>{option.description}</strong>
                 <span>{option.withActivity ? "Removes cached items and linked activity data for this library." : "Removes cached library item data only."}</span>
               </div>
-              <button
-                className="btn btn-danger"
+              <Button
+                variant="destructive"
                 onClick={() => {
                   setSelectedOption(option);
                   setShow(true);
                 }}
               >
                 <Trans i18nKey="ITEM_INFO.PURGE" />
-              </button>
+              </Button>
             </article>
           ))}
       </div>
 
-      <Modal
-        show={show}
-        onHide={() => {
-          setShow(false);
+      <Dialog
+        open={show}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShow(false);
+          }
         }}
       >
-        <Modal.Header closeButton>
-          <Modal.Title>
+        <DialogContent showCloseButton={false}>
+          <DialogTitle>
             <Trans i18nKey="ITEM_INFO.CONFIRM_ACTION" />
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+          </DialogTitle>
+          <DialogDescription className="tw:sr-only">Confirm this cache purge before it runs</DialogDescription>
           <p>
             {i18next.t("ITEM_INFO.CONFIRM_ACTION_MESSAGE") +
               (selectedOption.withActivity ? ` ${i18next.t("ITEM_INFO.CONFIRM_ACTION_MESSAGE_2")}?` : "?")}
           </p>
-        </Modal.Body>
-        <Modal.Footer>
-          <button
-            className="btn btn-danger"
-            onClick={() => {
-              execPurge(selectedOption.url, selectedOption.withActivity);
-            }}
-          >
-            <Trans i18nKey="ITEM_INFO.PURGE" />
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              setShow(false);
-            }}
-          >
-            <Trans i18nKey="CLOSE" />
-          </button>
-        </Modal.Footer>
-      </Modal>
+          <DialogFooter>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                execPurge(selectedOption.url, selectedOption.withActivity);
+              }}
+            >
+              <Trans i18nKey="ITEM_INFO.PURGE" />
+            </Button>
+            <Button
+              onClick={() => {
+                setShow(false);
+              }}
+            >
+              <Trans i18nKey="CLOSE" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

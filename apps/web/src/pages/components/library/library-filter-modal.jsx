@@ -5,7 +5,6 @@ import { useState } from "react";
 // import i18next from "i18next";
 
 import Loading from "../general/loading";
-import { Form } from "react-bootstrap";
 
 function LibraryFilterModal(props) {
   if (!props || !props.libraries) {
@@ -22,19 +21,21 @@ function LibraryFilterModal(props) {
 
   return (
     <div className="library-filter-modal px-5 py-2">
-      <Form>
+      <div>
         {props.libraries.map((library) => (
-          <Form.Check
-            key={library.Id}
-            type="checkbox"
-            id={library.Id}
-            label={library.Name}
-            value={library.Id}
-            onChange={handleLibrarySelection}
-            checked={props.selectedLibraries.includes(library.Id)}
-          />
+          <label className="form-check" key={library.Id}>
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id={library.Id}
+              value={library.Id}
+              onChange={handleLibrarySelection}
+              checked={props.selectedLibraries.includes(library.Id)}
+            />
+            <span>{library.Name}</span>
+          </label>
         ))}
-      </Form>
+      </div>
     </div>
   );
 }
