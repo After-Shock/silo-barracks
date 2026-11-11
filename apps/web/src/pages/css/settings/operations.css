@@ -11,7 +11,7 @@
   background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent);
 }
 
-.settings-import-tabs .nav-link {
+.settings-import-tabs [data-slot="tabs-trigger"] {
   min-height: 38px;
   border-radius: 10px !important;
   color: var(--barracks-text-raised) !important;
@@ -19,7 +19,7 @@
   font-weight: 900;
 }
 
-.settings-import-tabs .nav-link.active {
+.settings-import-tabs [data-slot="tabs-trigger"][data-state="active"] {
   background: var(--barracks-action) !important;
   color: var(--barracks-action-text) !important;
 }
@@ -58,12 +58,12 @@
   box-shadow: 0 12px 30px color-mix(in srgb, var(--barracks-surface-inset) 18%, transparent);
 }
 
-.settings-import-tabs .nav-link {
+.settings-import-tabs [data-slot="tabs-trigger"] {
   border-radius: 8px !important;
   font-weight: 680 !important;
 }
 
-.settings-import-tabs .nav-link.active {
+.settings-import-tabs [data-slot="tabs-trigger"][data-state="active"] {
   background: var(--barracks-action) !important;
   color: var(--barracks-action-text) !important;
 }
