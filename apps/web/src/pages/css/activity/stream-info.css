@@ -1,28 +1,32 @@
 @import '../variables.css';
 
-.stream-info-modal {
-  max-width: min(680px, calc(100vw - 24px));
-}
-
-.stream-info-modal .modal-content {
-  overflow: hidden;
+.stream-info-modal[data-slot="dialog-content"] {
+  gap: 0;
+  width: min(680px, calc(100vw - 24px));
+  max-width: none;
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
   border: 1px solid var(--barracks-border-overlay);
   border-radius: 8px;
+  padding: 0;
   background: var(--barracks-overlay);
   color: var(--barracks-text-overlay);
   box-shadow: var(--barracks-shadow);
 }
 
-.stream-info-modal .modal-header,
-.stream-info-modal .modal-footer {
+.stream-info-modal-header,
+.stream-info-modal-footer {
   border-color: var(--barracks-border-overlay);
 }
 
-.stream-info-modal .modal-header {
+.stream-info-modal-header {
+  border-bottom: 1px solid var(--barracks-border-overlay);
   padding: 14px;
+  text-align: left;
 }
 
-.stream-info-modal .modal-title {
+.stream-info-modal-title {
+  margin: 0;
   color: var(--barracks-text-overlay);
   font-size: clamp(18px, 2vw, 25px);
   font-weight: 760;
@@ -30,11 +34,12 @@
   letter-spacing: 0;
 }
 
-.stream-info-modal .modal-footer {
+.stream-info-modal-footer {
+  border-top: 1px solid var(--barracks-border-overlay);
   padding: 12px 14px;
 }
 
-.stream-info-modal .modal-footer .btn {
+.stream-info-modal-footer [data-slot="button"] {
   min-height: 36px;
   border-radius: 8px;
 }
