@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react";
 
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts";
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 import ErrorBoundary from "../general/ErrorBoundary.jsx";
 
 import "../../css/genres.css";
 import { Trans } from "react-i18next";
 import i18next from "i18next";
-import { getChartTheme, subscribeThemeTokens } from "../../../lib/theme-chart";
 
 function GenreStatCard(props) {
   const [maxRange, setMaxRange] = useState(100);
   const [data, setData] = useState(props.data);
-  const [chartTheme, setChartTheme] = useState(() => getChartTheme());
-
-  useEffect(() => subscribeThemeTokens(typeof window === "undefined" ? undefined : window, (tokens) => setChartTheme(getChartTheme(tokens))), []);
-
   useEffect(() => {
     const maxDuration = props.data.reduce((max, item) => {
       return Math.max(max, parseFloat((props.dataKey == "duration" ? item.duration : item.plays) || 0));
@@ -36,21 +32,7 @@ function GenreStatCard(props) {
     setData(sorted);
   }, [props.data, props.dataKey]);
 
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="radial-tooltip">
-          <p className="tooltip-header">{payload[0].payload.genre}</p>
-          <p>
-            {props.dataKey == "duration"
-              ? formatTotalWatchTime(payload[0].value)
-              : `${payload[0].value} ${i18next.t("UNITS.PLAYS")}`}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
+  const chartConfig = { [props.dataKey]: { label: props.dataKey == "duration" ? i18next.t("SETTINGS_PAGE.DURATION") : i18next.t("TOTAL_PLAYS"), color: "var(--chart-1)" } };
 
   function formatTotalWatchTime(seconds) {
     const hours = Math.floor(seconds / 3600);
@@ -84,21 +66,39 @@ function GenreStatCard(props) {
         <Trans i18nKey={props.dataKey == "duration" ? "SETTINGS_PAGE.DURATION" : "TOTAL_PLAYS"} />
       </h1>
       <ErrorBoundary>
-        <ResponsiveContainer width="100%" height="100%">
+        <ChartContainer config={chartConfig} className="tw:aspect-auto tw:h-full tw:w-full">
           <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
-            <PolarGrid gridType="circle" stroke={chartTheme.grid} />
-            <PolarAngleAxis dataKey="genre" stroke="var(--barracks-text-muted-raised)" />
-            <PolarRadiusAxis domain={[0, maxRange]} tick={false} axisLine={false} stroke={chartTheme.grid} />
+            <PolarGrid gridType="circle" stroke="var(--border)" />
+            <PolarAngleAxis dataKey="genre" tick={{ fill: "var(--barracks-text-muted-raised)", fontSize: 12 }} />
+            <PolarRadiusAxis domain={[0, maxRange]} tick={false} axisLine={false} />
             <Radar
-              name="Duration"
+              name={chartConfig[props.dataKey].label}
               dataKey={props.dataKey}
-              stroke={chartTheme.series[0]}
-              fill={chartTheme.series[1]}
-              fillOpacity={0.6}
+              stroke="var(--chart-1)"
+              strokeWidth={2}
+              fill="var(--chart-1)"
+              fillOpacity={0.1}
+              dot={false}
+              activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--card)" }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <ChartTooltip
+              cursor={false}
+              content={
+                <ChartTooltipContent
+                  labelFormatter={(_, payload) => payload?.[0]?.payload?.genre}
+                  formatter={(value) => (
+                    <div className="tw:flex tw:items-center tw:gap-2">
+                      <span aria-hidden="true" className="tw:h-0.5 tw:w-3 tw:shrink-0 tw:rounded-full tw:bg-chart-1" />
+                      <span className="tw:font-semibold tw:tabular-nums tw:text-foreground">
+                        {props.dataKey == "duration" ? formatTotalWatchTime(value) : `${value} ${i18next.t("UNITS.PLAYS")}`}
+                      </span>
+                    </div>
+                  )}
+                />
+              }
+            />
           </RadarChart>
-        </ResponsiveContainer>
+        </ChartContainer>
       </ErrorBoundary>
     </div>
   );
