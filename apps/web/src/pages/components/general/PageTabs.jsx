@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { Suspense, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { resolveHubTabs } from "../../../lib/hub-tabs";
+import { hubTabIds, resolveHubTabs } from "../../../lib/hub-tabs";
 import Loading from "./loading";
 import "./css/page-tabs.css";
 
@@ -28,7 +28,7 @@ export function readAuth() {
 export default function PageTabs({ title, tabs, visible, reachable, empty = null }) {
   const [params, setParams] = useSearchParams();
   const tabRefs = useRef({});
-  const { active: activeId, shown } = resolveHubTabs({ visible, reachable, requested: params.get("tab") });
+  const { active: activeId, shown } = resolveHubTabs({ ...hubTabIds(tabs, visible, reachable), requested: params.get("tab") });
   const active = tabs.find((tab) => tab.id === activeId);
   if (!active) return empty;
   const shownTabs = tabs.filter((tab) => shown.includes(tab.id));
