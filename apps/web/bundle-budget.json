@@ -1,0 +1,9 @@
+{
+  "entryChunkMaxBytes": 560027,
+  "tolerancePercent": 20,
+  "notes": "Entry chunk uncompressed size budget. Run npm run bundle:budget:update -w @jellyglance/web after intentional bundle growth.",
+  "measuredAt": "2026-11-12T01:21:52.379Z",
+  "entryChunks": {
+    "index-OXSJdDiE.js": 560027
+  }
+}

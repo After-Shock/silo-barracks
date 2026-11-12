@@ -1,30 +1,29 @@
 import { useEffect, useState } from "react";
-import { Button, Modal } from "react-bootstrap";
-import MagicLineIcon from "remixicon-react/MagicLineIcon";
-import UploadCloud2LineIcon from "remixicon-react/UploadCloud2LineIcon";
-import PaletteLineIcon from "remixicon-react/PaletteLineIcon";
-import SpeedLineIcon from "remixicon-react/SpeedLineIcon";
-import Movie2LineIcon from "remixicon-react/Movie2LineIcon";
-import MailLineIcon from "remixicon-react/MailLineIcon";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { RiChatCheckLine, RiGroupLine, RiMagicLine, RiMailLine, RiMovie2Line, RiPaletteLine, RiRocketLine, RiShieldCheckLine, RiSpeedLine, RiUploadCloud2Line } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
-import { APP_VERSION_STORAGE_KEY, OPEN_WHATS_NEW_EVENT } from "../../../lib/events";
+import { APP_VERSION_STORAGE_KEY, OPEN_WHATS_NEW_EVENT, WHATS_NEW_DISMISSED_EVENT, WHATS_NEW_SEEN_VERSION_KEY } from "../../../lib/events";
 import releaseNotes from "../../../whats-new.json";
-
-const SEEN_VERSION_KEY = "silo_barracks_whats_new_seen_version";
+import { findReleaseNotes, formatDisplayVersion, isBetaVersion } from "../../../lib/release-channel";
 
 const iconMap = {
-  magic: MagicLineIcon,
-  movie: Movie2LineIcon,
-  palette: PaletteLineIcon,
-  speed: SpeedLineIcon,
-  upload: UploadCloud2LineIcon,
-  mail: MailLineIcon,
+  magic: RiMagicLine,
+  movie: RiMovie2Line,
+  palette: RiPaletteLine,
+  speed: RiSpeedLine,
+  upload: RiUploadCloud2Line,
+  mail: RiMailLine,
+  shield: RiShieldCheckLine,
+  rocket: RiRocketLine,
+  chat: RiChatCheckLine,
+  users: RiGroupLine,
 };
 
 function getNotes(version) {
-  return releaseNotes[version] || [
+  return findReleaseNotes(releaseNotes, version) || [
     {
-      icon: MagicLineIcon,
+      icon: RiMagicLine,
       title: "Silo Barracks activity monitoring",
       body: "Native Silo sessions now power live activity and observed playback history. Built on the Barracks dashboard.",
     },
@@ -32,7 +31,7 @@ function getNotes(version) {
 }
 
 function resolveIcon(icon) {
-  return iconMap[icon] || MagicLineIcon;
+  return iconMap[icon] || RiMagicLine;
 }
 
 export default function WhatsNewModal({ enabled = true }) {
@@ -45,7 +44,7 @@ export default function WhatsNewModal({ enabled = true }) {
     const cachedVersion = localStorage.getItem(APP_VERSION_STORAGE_KEY);
     if (cachedVersion) {
       setVersion(cachedVersion);
-      if (localStorage.getItem(SEEN_VERSION_KEY) !== cachedVersion) {
+      if (localStorage.getItem(WHATS_NEW_SEEN_VERSION_KEY) !== cachedVersion) {
         setShow(true);
       }
       return;
@@ -60,7 +59,7 @@ export default function WhatsNewModal({ enabled = true }) {
         if (!nextVersion) return;
 
         setVersion(nextVersion);
-        if (localStorage.getItem(SEEN_VERSION_KEY) !== nextVersion) {
+        if (localStorage.getItem(WHATS_NEW_SEEN_VERSION_KEY) !== nextVersion) {
           setShow(true);
         }
       })
@@ -95,25 +94,40 @@ export default function WhatsNewModal({ enabled = true }) {
 
   function closeModal() {
     if (version) {
-      localStorage.setItem(SEEN_VERSION_KEY, version);
+      localStorage.setItem(WHATS_NEW_SEEN_VERSION_KEY, version);
     }
     setShow(false);
+    window.dispatchEvent(new Event(WHATS_NEW_DISMISSED_EVENT));
   }
 
   const notes = getNotes(version);
 
   return (
-    <Modal show={show} onHide={closeModal} centered dialogClassName="whats-new-modal">
-      <Modal.Body>
+    <Dialog
+      open={show}
+      onOpenChange={(open) => {
+        if (!open) {
+          closeModal();
+        }
+      }}
+    >
+      <DialogContent
+        className="whats-new-modal tw:max-w-[min(920px,calc(100vw-28px))] tw:sm:max-w-[min(920px,calc(100vw-28px))]"
+        showCloseButton={false}
+      >
+        <DialogTitle className="tw:sr-only">What&apos;s new</DialogTitle>
+        <DialogDescription className="tw:sr-only">The newest Silo Barracks changes</DialogDescription>
+        <div className="whats-new-body">
         <button type="button" className="whats-new-close" onClick={closeModal} aria-label="Close what's new">
           ×
         </button>
         <div className="whats-new-hero">
           <span>
-            <MagicLineIcon size={17} />
-            What&apos;s new
+            <RiMagicLine size={17} />
+            What&apos;s new{isBetaVersion(version) ? " (beta)" : ""}
           </span>
-          <h2>Silo Barracks {version}</h2>
+          {isBetaVersion(version) ? <em className="release-channel-badge">Beta channel</em> : null}
+          <h2>Barracks {formatDisplayVersion(version)}</h2>
           <p>A quick look at the newest bits before you dive back in.</p>
         </div>
         <div className="whats-new-list">
@@ -135,7 +149,8 @@ export default function WhatsNewModal({ enabled = true }) {
             Got it
           </Button>
         </div>
-      </Modal.Body>
-    </Modal>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

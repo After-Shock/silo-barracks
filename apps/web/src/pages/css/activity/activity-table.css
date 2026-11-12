@@ -1,34 +1,112 @@
 @import "../variables.css";
 
-.activity-mrt-paper {
+.activity-data-table {
+  border: 1px solid var(--barracks-border-raised);
+  border-radius: 8px;
+  background: var(--barracks-surface-raised);
+  box-shadow: var(--barracks-shadow);
   color: var(--barracks-text-raised);
+  font-size: 13px;
 }
 
-.activity-mrt-paper .MuiTable-root {
-  min-width: 1120px;
+.activity-data-table table {
+  /* min-width does not apply to tables; keep the old 1120px floor with width. */
+  width: max(100%, 1120px);
+  font-size: 13px;
 }
 
-.activity-mrt-paper .MuiTableHead-root .MuiTableRow-root {
-  background: transparent;
-}
-
-.activity-mrt-paper .MuiTableHead-root .MuiButtonBase-root,
-.activity-mrt-paper .MuiTableHead-root .MuiSvgIcon-root {
-  color: var(--barracks-text-inset) !important;
-}
-
-.activity-mrt-paper .MuiTableHead-root .Mui-active,
-.activity-mrt-paper .MuiTableSortLabel-icon {
-  color: var(--barracks-text-inset) !important;
-}
-
-.activity-mrt-paper .MuiTableBody-root .MuiTableRow-root {
-  background: transparent;
-}
-
-.activity-mrt-paper .MuiToolbar-root {
-  border-color: var(--barracks-border-inset);
+.activity-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 63.5px;
+  border-bottom: 1px solid var(--barracks-border-inset);
+  padding: 10px 5px 10px 7px;
+  background: var(--barracks-surface-inset);
   color: var(--barracks-text-inset);
+}
+
+.activity-table-selection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.activity-table-selection h5 {
+  margin: 0;
+}
+
+.activity-data-table-head {
+  height: auto;
+  border-bottom: 1px solid var(--barracks-border-raised);
+  padding: 9.75px 14px 7.8px;
+  background: transparent;
+  color: var(--barracks-text-muted-raised);
+  font-size: 11px;
+  font-weight: 680;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.activity-data-table-head :is(button, svg) {
+  color: var(--barracks-text-inset);
+}
+
+.activity-data-table-head .data-table-sort-button {
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.activity-data-table-cell {
+  border-bottom: 1px solid var(--barracks-border-raised);
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 560;
+  line-height: 1.35;
+  white-space: normal;
+}
+
+.activity-data-table tbody tr:last-child .activity-data-table-cell {
+  border-bottom: 0;
+}
+
+.activity-data-table tbody tr:hover .activity-data-table-cell {
+  border-bottom-color: var(--barracks-border-strong);
+  background-color: var(--barracks-surface-interactive);
+  color: var(--barracks-text-interactive);
+}
+
+.activity-data-table :is(.activity-data-table-cell, .activity-data-table-head) .data-table-checkbox {
+  width: 16px;
+  height: 16px;
+  border-color: currentColor;
+  opacity: 0.72;
+}
+
+.activity-data-table-head .data-table-checkbox {
+  color: var(--barracks-text-inset);
+}
+
+.activity-data-table :is(.activity-data-table-cell, .activity-data-table-head) .data-table-checkbox:is(:hover, [data-state="checked"]),
+.activity-data-table tbody tr:hover .activity-data-table-cell .data-table-checkbox {
+  opacity: 1;
+}
+
+.activity-data-table .data-table-expand-button {
+  color: inherit;
+}
+
+.activity-data-table .data-table-expand-button svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* Cell content follows the row's text color (raised, or interactive on hover). */
+.activity-data-table-cell :is(a:not(.activity-method-pill):not(.activity-client-link), .activity-title-copy strong, .activity-title-copy small, .activity-device-cell, .activity-ip-cell, .activity-ip-link, .activity-date-cell, .activity-duration-cell, .activity-user-link, button, svg) {
+  color: inherit !important;
 }
 
 .activity-table-toolbar-title {
@@ -59,21 +137,24 @@
   font-weight: 700;
 }
 
-.activity-table-actions .MuiIconButton-root {
-  color: var(--barracks-text-inset) !important;
+.activity-table-actions .data-table-columns-button {
+  width: 34px;
+  height: 34px;
+  color: var(--barracks-text-inset);
 }
 
-.activity-table-actions .MuiIconButton-root:hover {
-  border-color: var(--barracks-action) !important;
-  background: var(--barracks-action) !important;
-  color: var(--barracks-action-text) !important;
+.activity-table-actions .data-table-columns-button svg {
+  width: 19.5px;
+  height: 19.5px;
 }
 
-.activity-mrt-paper .MuiTableHead-root .MuiCheckbox-root {
-  color: var(--barracks-text-inset) !important;
+.activity-table-actions .data-table-columns-button:is(:hover, [data-state="open"]) {
+  border-color: var(--barracks-action);
+  background: var(--barracks-action);
+  color: var(--barracks-action-text);
 }
 
-.activity-mrt-paper :where(a:not(.activity-client-link):not(.activity-method-pill)),
+.activity-data-table :where(a:not(.activity-client-link):not(.activity-method-pill)),
 .activity-table-link:not(.activity-client-link):not(.activity-method-pill) {
   color: inherit !important;
   text-decoration: none !important;
@@ -280,23 +361,8 @@
   font-weight: 650;
 }
 
-.activity-mrt-paper + .MuiBox-root,
-.activity-table-shell > div > .MuiBox-root {
+.activity-table-pagination {
   padding-top: 10px;
-}
-
-.activity-mrt-paper + .MuiBox-root .MuiPaginationItem-root,
-.activity-table-shell .MuiPaginationItem-root {
-  border-color: var(--barracks-border-strong) !important;
-  color: var(--barracks-text-interactive) !important;
-  background: var(--barracks-surface-interactive) !important;
-}
-
-.activity-mrt-paper + .MuiBox-root .Mui-selected,
-.activity-table-shell .MuiPaginationItem-root.Mui-selected {
-  border-color: var(--barracks-action) !important;
-  color: var(--barracks-action-text) !important;
-  background: var(--barracks-action) !important;
 }
 
 .activity-table {
@@ -404,17 +470,9 @@
 .activity-completion.is-complete { color: var(--barracks-state-success); }
 .activity-completion.is-incomplete { color: var(--barracks-state-warning); }
 
-.activity-delete-modal .modal-header {
-  color: var(--barracks-text-overlay);
-  border-bottom: none !important;
-}
-
-.activity-delete-modal .modal-footer {
-  border-top: none !important;
-}
-
-.activity-delete-modal .modal-content {
-  background-color: var(--barracks-overlay) !important;
+.activity-delete-modal {
+  border-color: var(--barracks-border-overlay);
+  background-color: var(--barracks-overlay);
   color: var(--barracks-text-overlay);
 }
 

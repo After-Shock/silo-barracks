@@ -280,15 +280,6 @@
   grid-column: 2 / 3;
 }
 
-.card-text > a {
-  text-decoration: none !important;
-  color: var(--barracks-text-raised) !important;
-}
-
-.card-text a:hover {
-  color: var(--barracks-text-raised) !important;
-}
-
 .ellipse {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -445,19 +436,16 @@
 }
 
 .session-popout-modal {
-  --bs-modal-width: min(940px, calc(100vw - 28px));
-}
-
-.session-popout-modal .modal-content {
   overflow: hidden;
-  border: 1px solid var(--barracks-border-subtle);
-  border-radius: 18px;
-  background: var(--barracks-surface-raised);
+  border: 1px solid var(--barracks-border-subtle) !important;
+  border-radius: 18px !important;
+  background: var(--barracks-surface-raised) !important;
   color: var(--barracks-text-raised);
-  box-shadow: 0 30px 90px var(--barracks-scrim);
+  box-shadow: 0 30px 90px var(--barracks-scrim) !important;
+  padding: 0 !important;
 }
 
-.session-popout-modal .modal-body {
+.session-popout-body {
   position: relative;
   padding: 0;
 }
@@ -1172,25 +1160,24 @@
 
 .session-message-modal {
   overflow: visible;
-  border: 1px solid var(--barracks-border-raised);
-  border-radius: 16px;
+  border: 1px solid var(--barracks-border-raised) !important;
+  border-radius: 16px !important;
   background:
     linear-gradient(145deg, rgba(var(--barracks-action-rgb), 0.16), var(--barracks-surface-inset)),
-    var(--barracks-surface-inset);
+    var(--barracks-surface-inset) !important;
   color: var(--barracks-text-raised);
+  padding: 0 !important;
 }
 
-.session-message-modal .modal-body {
+.session-message-body {
   overflow: visible;
+  padding: 20px;
 }
 
-.session-message-modal .modal-header,
-.session-message-modal .modal-footer {
-  border-color: var(--barracks-border-raised);
-}
-
-.session-message-modal .btn-close {
-  filter: invert(1);
+.session-message-title {
+  margin: 0 0 10px;
+  font-size: 1.15rem;
+  font-weight: 750;
 }
 
 .session-message-hint {
@@ -1365,12 +1352,14 @@
   background: var(--barracks-surface-inset);
 }
 
-.session-message-modal .modal-footer {
+.session-message-footer {
   display: flex;
   gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--barracks-border-raised);
 }
 
-.session-message-modal .modal-footer .session-command {
+.session-message-footer .session-command {
   flex: 1;
 }
 

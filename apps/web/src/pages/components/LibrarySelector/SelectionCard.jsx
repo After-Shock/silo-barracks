@@ -2,37 +2,20 @@ import { useState } from "react";
 import axios from "../../../lib/axios_instance";
 import "../../css/library/library-card.css";
 
-import { Form, Card, Row, Col } from "react-bootstrap";
-
-import TvLineIcon from "remixicon-react/TvLineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import FileMusicLineIcon from "remixicon-react/FileMusicLineIcon";
-import CheckboxMultipleBlankLineIcon from "remixicon-react/CheckboxMultipleBlankLineIcon";
 import { Trans } from "react-i18next";
 import baseUrl from "../../../lib/baseurl";
+import { libraryTypeMeta } from "../../../lib/library-types";
 
 function SelectionCard(props) {
   const [imageLoaded, setImageLoaded] = useState(true);
   const [checked, setChecked] = useState(props.data.Tracked);
-  const SeriesIcon = <TvLineIcon size={"50%"} color="var(--barracks-text-overlay)" />;
-  const MovieIcon = <FilmLineIcon size={"50%"} color="var(--barracks-text-overlay)" />;
-  const MusicIcon = <FileMusicLineIcon size={"50%"} color="var(--barracks-text-overlay)" />;
-  const MixedIcon = <CheckboxMultipleBlankLineIcon size={"50%"} color="var(--barracks-text-overlay)" />;
   const token = localStorage.getItem("token");
-
-  const libraryType =
-    props.data.CollectionType === "tvshows" ? (
-      <Trans i18nKey="SERIES" />
-    ) : props.data.CollectionType === "movies" ? (
-      <Trans i18nKey="MOVIES" />
-    ) : props.data.CollectionType === "music" ? (
-      <Trans i18nKey="MUSIC" />
-    ) : (
-      "Mixed"
-    );
+  const libraryMeta = libraryTypeMeta(props.data.CollectionType);
+  const TypeIcon = libraryMeta.icon;
+  const libraryType = libraryMeta.name;
   const default_image = (
     <div className="default_library_image-inv d-flex justify-content-center align-items-center">
-      {props.data.CollectionType === "tvshows" ? SeriesIcon : props.data.CollectionType === "movies" ? MovieIcon : props.data.CollectionType === "music" ? MusicIcon : MixedIcon}{" "}
+      <TypeIcon size={"50%"} color="white" />{" "}
     </div>
   );
 
@@ -59,11 +42,10 @@ function SelectionCard(props) {
   };
 
   return (
-    <Card className={`bg-transparent lib-card selector-library-card rounded-3 ${checked ? "is-tracked" : "is-untracked"}`}>
+    <div className={`bg-transparent lib-card selector-library-card rounded-3 ${checked ? "is-tracked" : "is-untracked"}`}>
       <div className="library-card-image selector-library-image">
         {imageLoaded ? (
-          <Card.Img
-            variant="top"
+          <img
             className="library-card-banner default_library_image"
             src={baseUrl + "/proxy/Items/Images/Primary?id=" + props.data.Id + "&fillWidth=520&quality=48"}
             loading="lazy"
@@ -76,33 +58,40 @@ function SelectionCard(props) {
         <div className="selector-library-overlay" />
       </div>
 
-      <Card.Body className="library-card-details-inv rounded-bottom">
-        <Row className="space-between-end card-row">
-          <Col className="card-label">
+      <div className="library-card-details-inv">
+        <div className="space-between-end card-row">
+          <div className="col card-label">
             <Trans i18nKey={"LIBRARY_CARD.LIBRARY"} />
-          </Col>
-          <Col className="text-end">{props.data.Name}</Col>
-        </Row>
+          </div>
+          <div className="col text-end">{props.data.Name}</div>
+        </div>
 
-        <Row className="space-between-end card-row">
-          <Col className="card-label">
+        <div className="space-between-end card-row">
+          <div className="col card-label">
             <Trans i18nKey={"TYPE"} />
-          </Col>
-          <Col className="text-end">{libraryType}</Col>
-        </Row>
+          </div>
+          <div className="col text-end">{libraryType}</div>
+        </div>
 
-        <Row className="space-between-end card-row">
-          <Col className="card-label">
+        <div className="space-between-end card-row">
+          <div className="col card-label">
             <Trans i18nKey={"LIBRARY_CARD.TRACKED"} />
-          </Col>
-          <Col className="text-end">
-            <Form>
-              <Form.Check type="switch" checked={checked} onChange={handleChange} />
-            </Form>
-          </Col>
-        </Row>
-      </Card.Body>
-    </Card>
+          </div>
+          <div className="col text-end">
+            <form className="form">
+              <label className="form-check form-switch">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={checked}
+                  onChange={handleChange}
+                />
+              </label>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

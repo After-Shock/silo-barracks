@@ -433,7 +433,8 @@
   padding-left: 0;
 }
 
-.settings-form .form-label {
+.settings-form .form-label,
+.settings-form [data-slot="label"] {
   margin: 0;
   padding: 0 !important;
   color: var(--barracks-text-raised);
@@ -457,7 +458,9 @@
 
 .settings-form .form-control,
 .settings-form .form-select,
-.settings-form .input-group > .form-control {
+.settings-form .input-group > .form-control,
+.settings-form [data-slot="input"],
+.settings-form [data-slot="native-select"] {
   border: 1px solid color-mix(in srgb, var(--barracks-text-raised) 11%, transparent) !important;
   border-radius: 11px !important;
   background: color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent) !important;
@@ -469,7 +472,25 @@
   max-width: none;
 }
 
-.settings-form .input-group > .btn {
+/* Input + trailing icon button (replaces Bootstrap .input-group). */
+.settings-input-group {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.settings-input-group > [data-slot="input"] {
+  flex: 1 1 auto;
+  width: 1%;
+  min-width: 0;
+}
+
+.settings-input-group > [data-slot="button"] {
+  margin-left: -1px;
+}
+
+.settings-form .input-group > .btn,
+.settings-form .settings-input-group > [data-slot="button"] {
   width: 48px;
   flex: 0 0 48px;
   border-radius: 0 11px 11px 0 !important;
@@ -477,13 +498,17 @@
 
 .settings-form .form-control:focus-visible,
 .settings-form .form-select:focus-visible,
-.settings-form .input-group > .form-control:focus-visible {
+.settings-form .input-group > .form-control:focus-visible,
+.settings-form [data-slot="input"]:focus-visible,
+.settings-form [data-slot="native-select"]:focus-visible {
   outline: 2px solid var(--barracks-focus) !important;
   box-shadow: 0 0 0 3px var(--barracks-focus-light), 0 0 0 4px var(--barracks-focus-dark) !important;
 }
 
 .settings-form .input-group > .btn,
+.settings-form .settings-input-group > [data-slot="button"],
 .settings .btn-primary,
+.settings [data-slot="button"][data-variant="default"],
 .settings .submit {
   border: 0 !important;
   border-radius: 11px !important;
@@ -917,7 +942,7 @@
   gap: 8px;
 }
 
-.kiosk-settings-actions .btn {
+.kiosk-settings-actions [data-slot="button"] {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -1208,13 +1233,16 @@
   }
 
   .settings-form .form-label,
+.settings-form [data-slot="label"],
 .form-row label {
     font-size: 13px;
   }
 
   .settings-form .form-control,
 .settings-form .form-select,
-.settings-form .input-group > .form-control {
+.settings-form .input-group > .form-control,
+.settings-form [data-slot="input"],
+.settings-form [data-slot="native-select"] {
     min-height: 40px;
     font-size: 14px;
   }
@@ -1314,6 +1342,7 @@
   }
 
   .settings-form .form-label,
+.settings-form [data-slot="label"],
 .form-row label {
     color: var(--barracks-text-raised);
     font-size: 12px;
@@ -1322,12 +1351,15 @@
 
   .settings-form .form-control,
 .settings-form .form-select,
-.settings-form .input-group > .form-control {
+.settings-form .input-group > .form-control,
+.settings-form [data-slot="input"],
+.settings-form [data-slot="native-select"] {
     min-height: 44px;
     font-size: 16px;
   }
 
   .settings .btn,
+.settings [data-slot="button"]:not([data-variant="ghost"]),
 .settings-form button[type="submit"],
 .settings-form .dropdown-toggle {
     min-height: 44px;
@@ -1335,7 +1367,8 @@
     justify-content: center;
   }
 
-  .settings-form .input-group > .btn {
+  .settings-form .input-group > .btn,
+  .settings-form .settings-input-group > [data-slot="button"] {
     width: 48px;
     flex-basis: 48px;
   }
@@ -1451,7 +1484,11 @@
 .settings-form .form-select,
 .settings-form .input-group > .form-control,
 .settings-form .input-group > .btn,
+.settings-form [data-slot="input"],
+.settings-form [data-slot="native-select"],
+.settings-form .settings-input-group > [data-slot="button"],
 .settings .btn-primary,
+.settings [data-slot="button"][data-variant="default"],
 .settings .submit,
 .settings-form .btn-outline-success[type="submit"],
 .settings-form button[type="submit"] {
@@ -1470,7 +1507,9 @@
 
 .settings > .nav-pills .nav-link.active,
 .settings-form .input-group > .btn,
+.settings-form .settings-input-group > [data-slot="button"],
 .settings .btn-primary,
+.settings [data-slot="button"][data-variant="default"],
 .settings .submit,
 .settings-form .btn-group .btn.active,
 .settings-form .btn-group .btn-check:checked + .btn {
@@ -1547,7 +1586,7 @@
   font-weight: 560;
 }
 
-.jellyfin-admin-header .btn {
+.jellyfin-admin-header [data-slot="button"] {
   display: inline-flex;
   gap: 7px;
   align-items: center;
@@ -1853,7 +1892,7 @@
     justify-content: stretch;
   }
 
-  .general-settings-actions .btn {
+  .general-settings-actions [data-slot="button"] {
     width: 100%;
   }
 

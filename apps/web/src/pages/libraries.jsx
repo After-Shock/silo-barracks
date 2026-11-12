@@ -5,14 +5,11 @@ import Config from "../lib/config";
 import "./css/library/libraries.css";
 import Loading from "./components/general/loading";
 import LibraryCard from "./components/library/library-card";
+import StorageByLibrary from "./components/library/storage-by-library";
+import DiskForecastCard from "./components/library/disk-forecast-card";
 import ErrorBoundary from "./components/general/ErrorBoundary";
-import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
-import EyeFillIcon from "remixicon-react/EyeFillIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import GridLineIcon from "remixicon-react/GridLineIcon";
-import FileList3LineIcon from "remixicon-react/FileList3LineIcon";
-import SearchLineIcon from "remixicon-react/SearchLineIcon";
-import { Tooltip } from "react-bootstrap";
+import { RiEyeFill, RiEyeOffFill, RiFileList3Line, RiGridLine, RiRefreshLine, RiSearchLine } from "@remixicon/react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Trans } from "react-i18next";
 import i18next from "i18next";
 
@@ -116,6 +113,7 @@ function Libraries() {
   const showLibraryCardNames = config?.settings?.ShowLibraryCardNames !== false;
 
   return (
+    <TooltipProvider delayDuration={150}>
     <div className="libraries" data-theme-screen="libraries">
       <div className="libraries-header">
         <div>
@@ -131,27 +129,36 @@ function Libraries() {
         </div>
         {data.filter((library) => library.archived === true).length > 0 &&
           (showArchived ? (
-            <Tooltip title={i18next.t("HIDE_ARCHIVED_LIBRARIES")} className="tooltip-icon-button">
-              <button className="libraries-archive-button" onClick={() => setShowArchived(!showArchived)}>
-                <EyeFillIcon />
-                <span>Hide archived</span>
-              </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="libraries-archive-button" onClick={() => setShowArchived(!showArchived)}>
+                  <RiEyeFill />
+                  <span>Hide archived</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{i18next.t("HIDE_ARCHIVED_LIBRARIES")}</TooltipContent>
             </Tooltip>
           ) : (
-            <Tooltip title={i18next.t("SHOW_ARCHIVED_LIBRARIES")} className="tooltip-icon-button">
-              <button className="libraries-archive-button" onClick={() => setShowArchived(!showArchived)}>
-                <EyeOffFillIcon />
-                <span>Show archived ({archivedCount})</span>
-              </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="libraries-archive-button" onClick={() => setShowArchived(!showArchived)}>
+                  <RiEyeOffFill />
+                  <span>Show archived ({archivedCount})</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{i18next.t("SHOW_ARCHIVED_LIBRARIES")}</TooltipContent>
             </Tooltip>
           ))}
       </div>
+
+      {config?.token ? <StorageByLibrary token={config.token} /> : null}
+      {config?.token ? <DiskForecastCard token={config.token} /> : null}
 
       {scanMessage ? <div className={`libraries-scan-message is-${scanMessage.type}`}>{scanMessage.text}</div> : null}
 
       <div className="libraries-toolbar">
         <label className="libraries-search" htmlFor="libraries-search">
-          <SearchLineIcon size={18} />
+          <RiSearchLine size={18} />
           <input
             id="libraries-search"
             type="search"
@@ -162,11 +169,11 @@ function Libraries() {
         </label>
         <div className="libraries-view-toggle" aria-label="Library view">
           <button type="button" className={viewMode === "grid" ? "is-active" : ""} onClick={() => updateViewMode("grid")} title="Grid view">
-            <GridLineIcon size={18} />
+            <RiGridLine size={18} />
             <span>Grid</span>
           </button>
           <button type="button" className={viewMode === "list" ? "is-active" : ""} onClick={() => updateViewMode("list")} title="List view">
-            <FileList3LineIcon size={18} />
+            <RiFileList3Line size={18} />
             <span>List</span>
           </button>
         </div>
@@ -186,7 +193,7 @@ function Libraries() {
               onScan={() => scanLibrary(item)}
               scanning={scanningLibraryId === item.Id}
               scanDisabled={Boolean(scanningLibraryId)}
-              scanIcon={<RefreshLineIcon size={17} />}
+              scanIcon={<RiRefreshLine size={17} />}
               showName={showLibraryCardNames}
               viewMode={viewMode}
             />
@@ -194,6 +201,7 @@ function Libraries() {
         ))}
       </div>
     </div>
+    </TooltipProvider>
   );
 }
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import axios from "../lib/axios_instance";
 
@@ -8,11 +9,21 @@ import Config from "../lib/config";
 import ActivityTable from "./components/activity/activity-table";
 import Loading from "./components/general/loading";
 import { Trans } from "react-i18next";
-import { Button, FormControl, FormSelect, Modal } from "react-bootstrap";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import i18next from "i18next";
 import LibraryFilterModal from "./components/library/library-filter-modal";
 import socket from "../socket";
 import SiloActivity from "./silo-activity";
+
+function readActivityPreference(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value == null ? fallback : JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
 
 function LegacyActivity({ initialConfig }) {
   const [data, setData] = useState();
@@ -22,9 +33,10 @@ function LegacyActivity({ initialConfig }) {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
   const [itemCount, setItemCount] = useState(parseInt(localStorage.getItem("PREF_ACTIVITY_ItemCount") ?? "10"));
   const [libraryFilters, setLibraryFilters] = useState(
-    localStorage.getItem("PREF_ACTIVITY_libraryFilters") != undefined
-      ? JSON.parse(localStorage.getItem("PREF_ACTIVITY_libraryFilters"))
-      : []
+    () => {
+      const stored = readActivityPreference("PREF_ACTIVITY_libraryFilters", []);
+      return Array.isArray(stored) ? stored : [];
+    }
   );
   const [libraries, setLibraries] = useState([]);
   const [showLibraryFilters, setShowLibraryFilters] = useState(false);
@@ -243,14 +255,24 @@ function LegacyActivity({ initialConfig }) {
             "Content-Type": "application/json",
           },
         })
-        .then((data) => {
-          setData(data.data);
+        .then((response) => {
+          const payload = response.data;
+          setData(
+            Array.isArray(payload)
+              ? { results: payload, pages: 1 }
+              : {
+                  ...payload,
+                  results: Array.isArray(payload?.results) ? payload.results : [],
+                  pages: payload?.pages || 1,
+                }
+          );
           setHistoryError("");
           setIsBusy(false);
         })
         .catch((error) => {
           console.log(error);
           setHistoryError(i18next.t("ACTIVITY_STATES.HISTORY_ERROR"));
+          setData({ results: [], pages: 1 });
           setIsBusy(false);
         });
     };
@@ -304,6 +326,9 @@ function LegacyActivity({ initialConfig }) {
     return <div aria-busy="true"><Loading /></div>;
   }
 
+  // The API only returns the signed-in user's own plays unless they can see every user.
+  const showingOwnActivity = data?.scope === "self";
+
   if (!data && historyError) {
     return (
       <div className="Activity" data-theme-screen="activity">
@@ -332,43 +357,47 @@ function LegacyActivity({ initialConfig }) {
   return (
     <div className="Activity" data-theme-screen="activity">
       {activityError ? <p className="activity-notice is-error" role="alert">{activityError}</p> : null}
-      <Modal show={showLibraryFilters} onHide={() => setShowLibraryFilters(false)}>
-        <Modal.Header>
-          <Modal.Title>
+      <Dialog open={showLibraryFilters} onOpenChange={(open) => { if (!open) { setShowLibraryFilters(false); } }}>
+        <DialogContent showCloseButton={false}>
+          <DialogTitle>
             <Trans i18nKey="MENU_TABS.LIBRARIES" />
-          </Modal.Title>
-        </Modal.Header>
-        <LibraryFilterModal libraries={libraries} selectedLibraries={libraryFilters} onSelectionChange={handleLibraryFilter} />
-        <Modal.Footer>
-          <Button variant="outline-primary" onClick={toggleSelectAll}>
-            <Trans i18nKey="ACTIVITY_TABLE.TOGGLE_SELECT_ALL" />
-          </Button>
-          <Button variant="outline-primary" onClick={() => setShowLibraryFilters(false)}>
-            <Trans i18nKey="CLOSE" />
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          </DialogTitle>
+          <DialogDescription className="tw:sr-only">Choose which libraries appear in this activity view</DialogDescription>
+          <LibraryFilterModal libraries={libraries} selectedLibraries={libraryFilters} onSelectionChange={handleLibraryFilter} />
+          <DialogFooter>
+            <Button variant="outline" onClick={toggleSelectAll}>
+              <Trans i18nKey="ACTIVITY_TABLE.TOGGLE_SELECT_ALL" />
+            </Button>
+            <Button variant="outline" onClick={() => setShowLibraryFilters(false)}>
+              <Trans i18nKey="CLOSE" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <header className="activity-page-header">
         <div>
           <p>Playback log</p>
           <h1>
             <Trans i18nKey="MENU_TABS.ACTIVITY" />
           </h1>
-          <span>Review watch history, playback method, device, and session details.</span>
+          <span>
+            {showingOwnActivity ? "Showing your activity only. " : ""}Review watch history, playback method, device, and session details.{" "}
+            <Link to="/timeline">Open Timeline view</Link>.
+          </span>
         </div>
 
         {config?.IS_SILO && <p className="activity-notice" role="status">History is read directly from Silo retention, newest first. Barracks does not duplicate or delete these records.</p>}
         <div className="activity-controls">
           {config?.IS_SILO && historyServers.length > 1 && <label className="activity-control-field">
             <span>Silo server</span>
-            <FormSelect value={historyServerId} onChange={(event) => {
+            <select value={historyServerId} onChange={(event) => {
               setHistoryServerId(event.target.value);
               setCurrentPage(1);
             }}>
               {historyServers.map(server => (
                 <option key={server.id} value={server.id}>{server.name}{server.isPrimary || server.state === "connected" ? "" : " (unavailable)"}</option>
               ))}
-            </FormSelect>
+            </select>
           </label>}
           {!config?.IS_SILO && <Button onClick={() => setShowLibraryFilters(true)} className="activity-control-button">
             <Trans i18nKey="MENU_TABS.LIBRARIES" />
@@ -378,7 +407,7 @@ function LegacyActivity({ initialConfig }) {
             <span>
               <Trans i18nKey="TYPE" />
             </span>
-            <FormSelect
+            <select
               onChange={(event) => {
                 setTypeFilter(event.target.value);
               }}
@@ -396,14 +425,14 @@ function LegacyActivity({ initialConfig }) {
               <option value="DirectStream">
                 <Trans i18nKey="DIRECT_STREAM" />
               </option>
-            </FormSelect>
+            </select>
           </label>}
 
           <label className="activity-control-field is-compact">
             <span>
               <Trans i18nKey="UNITS.ITEMS" />
             </span>
-            <FormSelect
+            <select
               onChange={(event) => {
                 setItemLimit(event.target.value);
               }}
@@ -413,9 +442,9 @@ function LegacyActivity({ initialConfig }) {
               <option value="25">25</option>
               <option value="50">50</option>
               <option value="100">100</option>
-            </FormSelect>
+            </select>
           </label>
-          {!config?.IS_SILO && <FormControl
+          {!config?.IS_SILO && <input
             type="text"
             placeholder={i18next.t("SEARCH")}
             value={searchQuery}

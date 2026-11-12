@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
-import Button from "react-bootstrap/Button";
-import Plug2LineIcon from "remixicon-react/Plug2LineIcon";
-import Database2LineIcon from "remixicon-react/Database2LineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
+import { Button } from "@/components/ui/button";
+import { RiDatabase2Line, RiPlug2Line, RiRefreshLine } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import Config from "../lib/config";
 import baseUrl from "../lib/baseurl";
@@ -10,6 +8,7 @@ import { FIRST_RUN_EXTRAS_KEY } from "../lib/first-run";
 import Integrations from "./integrations";
 import JellystatImport from "./components/settings/JellystatImport";
 import TautulliImport from "./components/settings/TautulliImport";
+import { ImportSourceLabel } from "../lib/import-source-logos";
 import SetupShell from "./components/setup/SetupShell";
 import "./css/settings/settings.css";
 
@@ -72,13 +71,29 @@ export default function FirstRunExtras() {
     }
   }
 
+  const actionRow = (
+    <div className="setup-button-row setup-extra-actions">
+      {activePanel !== "integrations" ? (
+        <Button type="button" className="setup-secondary-button" onClick={goBack} disabled={busy}>
+          Back
+        </Button>
+      ) : null}
+      <Button type="button" className="setup-secondary-button" onClick={() => setActivePanel("sync")} disabled={busy}>
+        Skip to sync
+      </Button>
+      <Button type="button" className="setup-button" onClick={goNext} disabled={busy}>
+        {busy ? "Starting sync..." : activePanel === "sync" ? "Start first sync" : "Continue"}
+      </Button>
+    </div>
+  );
+
   return (
     <SetupShell
       step={currentStep}
-      eyebrow={activePanel === "integrations" ? "Media stack" : activePanel === "imports" ? "Legacy history" : "Build dashboard"}
+      eyebrow={activePanel === "integrations" ? "" : activePanel === "imports" ? "Legacy history" : "Build dashboard"}
       title={
         activePanel === "integrations"
-          ? "Configure integrations"
+          ? ""
           : activePanel === "imports"
             ? "Import old watch history"
             : "Start the first sync"
@@ -90,19 +105,20 @@ export default function FirstRunExtras() {
             ? "Import Jellystat or Tautulli history and match legacy users before the initial Jellyfin sync fills the rest of the dashboard."
             : "Barracks will sync native Silo users and libraries, refresh dashboard statistics, and keep recording observed playback."
       }
+      minimal
     >
       <div className="setup-extras">
         <nav className="setup-extra-tabs" aria-label="First-run setup areas">
           <button type="button" className={activePanel === "integrations" ? "is-active" : ""} onClick={() => setActivePanel("integrations")}>
-            <Plug2LineIcon size={18} />
+            <RiPlug2Line size={18} />
             Integrations
           </button>
           {!isSilo && <button type="button" className={activePanel === "imports" ? "is-active" : ""} onClick={() => setActivePanel("imports")}>
-            <Database2LineIcon size={18} />
+            <RiDatabase2Line size={18} />
             History Import
           </button>}
           <button type="button" className={activePanel === "sync" ? "is-active" : ""} onClick={() => setActivePanel("sync")}>
-            <RefreshLineIcon size={18} />
+            <RiRefreshLine size={18} />
             First Sync
           </button>
         </nav>
@@ -110,7 +126,7 @@ export default function FirstRunExtras() {
         {message ? <div className="setup-connection-status is-error">{message}</div> : null}
 
         <div className="setup-extra-panel">
-          {activePanel === "integrations" ? <Integrations embedded firstRun /> : null}
+          {activePanel === "integrations" ? <Integrations embedded firstRun actions={actionRow} /> : null}
           {activePanel === "imports" ? (
             <>
               <div className="setup-import-note">
@@ -123,22 +139,22 @@ export default function FirstRunExtras() {
                   className={activeImportSource === "jellystat" ? "is-active" : ""}
                   onClick={() => setActiveImportSource("jellystat")}
                 >
-                  Jellystat
+                  <ImportSourceLabel source="jellystat" label="Jellystat" />
                 </button>
                 <button
                   type="button"
                   className={activeImportSource === "tautulli" ? "is-active" : ""}
                   onClick={() => setActiveImportSource("tautulli")}
                 >
-                  Tautulli
+                  <ImportSourceLabel source="tautulli" label="Tautulli" />
                 </button>
               </div>
-              {activeImportSource === "jellystat" ? <JellystatImport /> : <TautulliImport />}
+              {activeImportSource === "jellystat" ? <JellystatImport compact /> : <TautulliImport compact />}
             </>
           ) : null}
           {activePanel === "sync" ? (
             <section className="setup-sync-panel">
-              <RefreshLineIcon />
+              <RiRefreshLine />
               <div>
                 <h3>Ready to start Silo Barracks</h3>
                 <p>
@@ -156,19 +172,7 @@ export default function FirstRunExtras() {
           ) : null}
         </div>
 
-        <div className="setup-button-row setup-extra-actions">
-          {activePanel !== "integrations" ? (
-            <Button type="button" className="setup-secondary-button" onClick={goBack} disabled={busy}>
-              Back
-            </Button>
-          ) : null}
-          <Button type="button" className="setup-secondary-button" onClick={() => setActivePanel("sync")} disabled={busy}>
-            Skip to sync
-          </Button>
-          <Button type="button" className="setup-button" onClick={goNext} disabled={busy}>
-            {busy ? "Starting sync..." : activePanel === "sync" ? "Start first sync" : "Continue"}
-          </Button>
-        </div>
+        {activePanel !== "integrations" ? actionRow : null}
       </div>
     </SetupShell>
   );

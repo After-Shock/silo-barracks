@@ -496,10 +496,9 @@
   background: var(--barracks-surface-raised);
 }
 
-.activity-filters-popover .popover-body {
+.activity-filters-popover-body {
   display: grid;
   gap: 8px;
-  padding: 10px;
 }
 
 @media (max-width: 1100px) {

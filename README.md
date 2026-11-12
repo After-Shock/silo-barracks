@@ -4,7 +4,8 @@ Silo Barracks is a dashboard for active **Silo Server** viewers and observed pla
 history. It keeps JellyGlance's React dashboard and PostgreSQL analytics, with a
 native Silo API adapter.
 
-Based on JellyGlance `v1.2.3-beta.3` (`b474638`). The initial Silo contract reference
+Based on JellyGlance `v1.4.3-beta.1` (`b665b25`), feature-merged from the
+`v1.2.3-beta.3` (`b474638`) fork point. The initial Silo contract reference
 is `After-Shock/silo-server` commit `2dedf3ff26e488dce37d5ef81d7cdce2d9ec80e5`.
 
 ## Run locally with Docker

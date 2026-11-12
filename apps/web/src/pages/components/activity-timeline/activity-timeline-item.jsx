@@ -7,15 +7,12 @@ import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import Typography from "@mui/material/Typography";
-import Card from "react-bootstrap/Card";
 import baseUrl from "../../../lib/baseurl";
 
 import "../../css/timeline/activity-timeline.css";
 
-import { useMediaQuery, useTheme } from "@mui/material";
 import dayjs from "dayjs";
-import TvLineIcon from "remixicon-react/TvLineIcon.js";
-import FilmLineIcon from "remixicon-react/FilmLineIcon.js";
+import { RiFilmLine, RiTvLine } from "@remixicon/react";
 import { MEDIA_TYPES } from "./helpers";
 import { Link } from "react-router-dom";
 import { Trans } from "react-i18next";
@@ -46,8 +43,8 @@ function formatEntryDates(FirstActivityDate, LastActivityDate, MediaType) {
 }
 const DefaultImage = (props) => {
   const { MediaType } = props;
-  const SeriesIcon = <TvLineIcon size={"50%"} color="var(--barracks-text-inset)" />;
-  const MovieIcon = <FilmLineIcon size={"50%"} color="var(--barracks-text-inset)" />;
+  const SeriesIcon = <RiTvLine size={"50%"} color="var(--barracks-text-inset)" />;
+  const MovieIcon = <RiFilmLine size={"50%"} color="var(--barracks-text-inset)" />;
   return (
     <div className="default_library_image default_library_image_hover d-flex justify-content-center align-items-center">
       {MediaType === MEDIA_TYPES.Shows ? SeriesIcon : MovieIcon}
@@ -85,10 +82,8 @@ const TimeLineTextContent = (props) => {
 };
 
 export default function ActivityTimelineItem(props) {
-  const { NowPlayingItemId } = props;
+  const { NowPlayingItemId, shouldRenderVertically, eager } = props;
   const [useDefaultImage, setUseDefaultImage] = useState(false);
-  const theme = useTheme();
-  const shouldRenderVertically = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <TimelineItem>
@@ -97,15 +92,16 @@ export default function ActivityTimelineItem(props) {
         <div className="activity-card">
           <Link to={`/libraries/item/${NowPlayingItemId}`}>
             {!useDefaultImage ? (
-              <Card.Img
-                variant="top"
+              <img
                 className="activity-card-img"
                 src={
                   baseUrl +
                   "/proxy/Items/Images/Primary?id=" +
                   NowPlayingItemId +
-                  "&fillWidth=800&quality=50"
+                  "&fillWidth=240&quality=55"
                 }
+                loading={eager ? "eager" : "lazy"}
+                decoding="async"
                 onError={() => setUseDefaultImage(true)}
               />
             ) : (

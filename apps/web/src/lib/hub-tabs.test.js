@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { usersHubTabIds, serverHubTabIds, serverHubReachableIds, showServerNav, resolveHubTabs } from './hub-tabs.js';
+import { usersHubTabIds, serverHubTabIds, serverHubReachableIds, showServerNav, resolveHubTabs, hubTabIds } from './hub-tabs.js';
 
 test('users hub always has Users; Invites only with Wizarr', () => {
   assert.deepEqual(usersHubTabIds({ wizarr: false }), ['users']);
@@ -28,4 +28,13 @@ test('server jobs are never reachable on Silo', () => {
   assert.deepEqual(serverHubReachableIds({ isAdmin: true, isSilo: true }), ['automation']);
   assert.deepEqual(serverHubReachableIds({ isAdmin: true, isSilo: false }), ['jobs', 'automation']);
   assert.deepEqual(resolveHubTabs({ visible: [], reachable: serverHubReachableIds({ isAdmin: true, isSilo: true }), requested: 'jobs' }), { active: null, shown: [] });
+});
+
+test('PageTabs accepts upstream hubs that pass only tabs (statistics hub)', () => {
+  const tabs = [{ id: 'overview' }, { id: 'wrapped' }, { id: 'hidden', visible: false }];
+  assert.deepEqual(hubTabIds(tabs), { visible: ['overview', 'wrapped'], reachable: ['overview', 'wrapped'] });
+  assert.deepEqual(resolveHubTabs({ ...hubTabIds(tabs), requested: 'wrapped' }), { active: 'wrapped', shown: ['overview', 'wrapped'] });
+  assert.deepEqual(resolveHubTabs({ ...hubTabIds(tabs), requested: null }).active, 'overview');
+  // Explicit fork lists still win.
+  assert.deepEqual(hubTabIds(tabs, ['wrapped'], ['wrapped', 'hidden']), { visible: ['wrapped'], reachable: ['wrapped', 'hidden'] });
 });

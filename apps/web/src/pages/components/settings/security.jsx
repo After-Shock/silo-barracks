@@ -1,16 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "../../../lib/axios_instance";
-import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
-import Alert from "react-bootstrap/Alert";
-import Spinner from "react-bootstrap/Spinner";
-import EyeFillIcon from "remixicon-react/EyeFillIcon";
-import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
-import LoginCircleLineIcon from "remixicon-react/LoginCircleLineIcon";
-import ShieldKeyholeLineIcon from "remixicon-react/ShieldKeyholeLineIcon";
-import UserSettingsLineIcon from "remixicon-react/UserSettingsLineIcon";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { Spinner } from "@/components/ui/spinner";
+import { RiEyeFill, RiEyeOffFill, RiLoginCircleLine, RiShieldKeyholeLine, RiUserSettingsLine } from "@remixicon/react";
 import { Link } from "react-router-dom";
 
 import Config from "../../../lib/config";
@@ -21,31 +17,46 @@ import {
 } from "../../../lib/privacy-settings";
 
 import "../../css/settings/settings.css";
-import { InputGroup } from "react-bootstrap";
+
+// Keep the remixicon size props; the Button primitive would otherwise force 1rem icons.
+const BUTTON_ICON_NATURAL_SIZE = "tw:[&_svg:not([class*=size-])]:size-auto";
+
+import { useTranslation } from "react-i18next";
+
+const OIDC = "SETTINGS_PAGE.OIDC";
+const OIDC_ROLES = ["Owner", "Admin", "Manager", "Viewer", "Household", "Disabled"];
+
+function roleMappingToText(mapping) {
+  if (!mapping || typeof mapping !== "object") return typeof mapping === "string" ? mapping : "";
+  return Object.entries(mapping)
+    .map(([group, role]) => `${group}=${role}`)
+    .join("\n");
+}
 
 const authModes = [
   {
     id: "quick-connect",
     title: "Jellyfin Login / Quick Connect",
     text: "Use Jellyfin Quick Connect for account access.",
-    Icon: LoginCircleLineIcon,
+    Icon: RiLoginCircleLine,
   },
   {
     id: "oidc",
     title: "OIDC / Authentik",
     text: "Use an external identity provider.",
-    Icon: ShieldKeyholeLineIcon,
+    Icon: RiShieldKeyholeLine,
   },
   {
     id: "local",
     title: "Local",
     text: "Use a Silo Barracks username and password.",
-    Icon: UserSettingsLineIcon,
+    Icon: RiUserSettingsLine,
   },
 ];
 
 export default function SecuritySettings() {
   const [isSilo, setIsSilo] = useState(true);
+  const { t } = useTranslation();
   const [authMode, setAuthMode] = useState("quick-connect");
   const [showOidcSecret, setShowOidcSecret] = useState(false);
   const [oidcValues, setOidcValues] = useState({});
@@ -69,8 +80,15 @@ export default function SecuritySettings() {
         setOidcValues({
           issuerUrl: nextAuth.issuerUrl || "",
           clientId: nextAuth.clientId || "",
-          clientSecret: nextAuth.clientSecret || "",
+          clientSecret: "",
           redirectUri: nextAuth.redirectUri || `${window.location.origin}/auth/oidc/callback`,
+          scopes: nextAuth.scopes || "openid profile email",
+          groupsClaim: nextAuth.groupsClaim || "groups",
+          roleMapping: roleMappingToText(nextAuth.roleMapping),
+          linkPolicy: nextAuth.linkPolicy || "verified_email",
+          autoProvision: Boolean(nextAuth.autoProvision),
+          defaultRole: nextAuth.defaultRole || "Viewer",
+          clearClientSecret: false,
         });
       } catch (error) {
         console.log(error);
@@ -132,7 +150,8 @@ export default function SecuritySettings() {
   }
 
   function handleOidcChange(event) {
-    setOidcValues({ ...oidcValues, [event.target.name]: event.target.value });
+    const { name, type, checked, value } = event.target;
+    setOidcValues({ ...oidcValues, [name]: type === "checkbox" ? checked : value });
   }
 
   function handleActiveSessionIpPrivacyChange(value) {
@@ -152,12 +171,12 @@ export default function SecuritySettings() {
         </div>
         <div className="security-current-stack" aria-label="Current security settings">
           <article>
-            <LoginCircleLineIcon size={18} />
+            <RiLoginCircleLine size={18} />
             <span>Authentication</span>
             <strong>{activeAuthMode.title}</strong>
           </article>
           <article>
-            <ShieldKeyholeLineIcon size={18} />
+            <RiShieldKeyholeLine size={18} />
             <span>IP Privacy</span>
             <strong>{activePrivacyMode.title}</strong>
           </article>
@@ -165,8 +184,8 @@ export default function SecuritySettings() {
       </header>
 
       {isSubmitted !== "" ? (
-        <Alert bg="dark" data-bs-theme="dark" variant={isSubmitted === "Failed" ? "danger" : "success"} className="security-status-alert">
-          {submissionMessage}
+        <Alert variant={isSubmitted === "Failed" ? "destructive" : "success"} className="security-status-alert tw:mb-4">
+          <AlertDescription>{submissionMessage}</AlertDescription>
         </Alert>
       ) : null}
 
@@ -187,7 +206,7 @@ export default function SecuritySettings() {
               className={`security-auth-card ${activeSessionIpPrivacy === id ? "is-active" : ""}`}
               onClick={() => handleActiveSessionIpPrivacyChange(id)}
             >
-              <ShieldKeyholeLineIcon size={22} />
+              <RiShieldKeyholeLine size={22} />
               <span>
                 <strong>{title}</strong>
                 <small>{text}</small>
@@ -197,7 +216,7 @@ export default function SecuritySettings() {
         </div>
       </section>
 
-      <Form onSubmit={handleAuthSubmit} className="settings-form security-auth-form">
+      <form onSubmit={handleAuthSubmit} className="settings-form security-auth-form">
         <div className="security-auth-header">
           <div>
             <h2>Authentication</h2>
@@ -235,50 +254,135 @@ export default function SecuritySettings() {
 
         {authMode === "oidc" && (
           <div className="security-auth-panel">
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>Issuer URL</Form.Label>
-              <Col>
-                <Form.Control
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-issuer-url" className="col">Issuer URL</Label>
+              <div className="col">
+                <Input
+                  id="oidc-issuer-url"
                   name="issuerUrl"
                   value={oidcValues.issuerUrl || ""}
                   onChange={handleOidcChange}
                   placeholder="https://auth.example.com/application/o/barracks/"
                   required={authMode === "oidc"}
                 />
-              </Col>
-            </Form.Group>
+              </div>
+            </div>
 
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>Client ID</Form.Label>
-              <Col>
-                <Form.Control name="clientId" value={oidcValues.clientId || ""} onChange={handleOidcChange} required={authMode === "oidc"} />
-              </Col>
-            </Form.Group>
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-client-id" className="col">Client ID</Label>
+              <div className="col">
+                <Input id="oidc-client-id" name="clientId" value={oidcValues.clientId || ""} onChange={handleOidcChange} required={authMode === "oidc"} />
+              </div>
+            </div>
 
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>Client Secret</Form.Label>
-              <Col>
-                <InputGroup>
-                  <Form.Control
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-client-secret" className="col">Client Secret</Label>
+              <div className="col">
+                <div className="settings-input-group">
+                  <Input
+                    id="oidc-client-secret"
                     name="clientSecret"
                     value={oidcValues.clientSecret || ""}
                     onChange={handleOidcChange}
+                    placeholder="Leave blank to keep the saved secret"
                     type={showOidcSecret ? "text" : "password"}
                     autoComplete="off"
                   />
-                  <Button variant="outline-primary" type="button" onClick={() => setShowOidcSecret(!showOidcSecret)}>
-                    {showOidcSecret ? <EyeFillIcon /> : <EyeOffFillIcon />}
+                  <Button variant="outline" type="button" className={BUTTON_ICON_NATURAL_SIZE} onClick={() => setShowOidcSecret(!showOidcSecret)} aria-label={showOidcSecret ? "Hide client secret" : "Show client secret"}>
+                    {showOidcSecret ? <RiEyeFill /> : <RiEyeOffFill />}
                   </Button>
-                </InputGroup>
-              </Col>
-            </Form.Group>
+                </div>
+              </div>
+            </div>
 
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>Redirect URI</Form.Label>
-              <Col>
-                <Form.Control name="redirectUri" value={oidcValues.redirectUri || ""} onChange={handleOidcChange} />
-              </Col>
-            </Form.Group>
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-redirect-uri" className="col">Redirect URI</Label>
+              <div className="col">
+                <Input id="oidc-redirect-uri" name="redirectUri" value={oidcValues.redirectUri || ""} onChange={handleOidcChange} />
+              </div>
+            </div>
+
+            <div className="mb-3 security-oidc-check">
+              <label>
+                <input
+                  type="checkbox"
+                  id="oidc-public-client"
+                  name="clearClientSecret"
+                  checked={Boolean(oidcValues.clearClientSecret)}
+                  onChange={handleOidcChange}
+                />
+                {t(`${OIDC}.PUBLIC_CLIENT`)}
+              </label>
+            </div>
+
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-scopes" className="col">{t(`${OIDC}.SCOPES`)}</Label>
+              <div className="col">
+                <Input id="oidc-scopes" name="scopes" value={oidcValues.scopes || ""} onChange={handleOidcChange} placeholder="openid profile email groups" />
+              </div>
+            </div>
+
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-groups-claim" className="col">{t(`${OIDC}.GROUPS_CLAIM`)}</Label>
+              <div className="col">
+                <Input id="oidc-groups-claim" name="groupsClaim" value={oidcValues.groupsClaim || ""} onChange={handleOidcChange} placeholder="groups" />
+              </div>
+            </div>
+
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-role-mapping" className="col">{t(`${OIDC}.ROLE_MAPPING`)}</Label>
+              <div className="col">
+                <textarea
+                  id="oidc-role-mapping"
+                  name="roleMapping"
+                  rows={3}
+                  value={oidcValues.roleMapping || ""}
+                  onChange={handleOidcChange}
+                  placeholder={"jellyglance-admins=Admin\njellyglance-users=Viewer"}
+                  className="tw:w-full tw:rounded-[8px] tw:border tw:border-border-strong tw:bg-surface-interactive tw:px-3 tw:py-1.5 tw:text-base tw:leading-normal tw:text-secondary-foreground tw:outline-none tw:disabled:pointer-events-none tw:disabled:cursor-not-allowed tw:disabled:opacity-65"
+                />
+                <small className="tw:block tw:mt-1 tw:text-muted-foreground">{t(`${OIDC}.ROLE_MAPPING_HINT`)}</small>
+              </div>
+            </div>
+
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-link-policy" className="col">{t(`${OIDC}.LINK_POLICY`)}</Label>
+              <div className="col">
+                <NativeSelect id="oidc-link-policy" name="linkPolicy" value={oidcValues.linkPolicy || "verified_email"} onChange={handleOidcChange}>
+                  <NativeSelectOption value="verified_email">{t(`${OIDC}.LINK_VERIFIED_EMAIL`)}</NativeSelectOption>
+                  <NativeSelectOption value="username">{t(`${OIDC}.LINK_USERNAME`)}</NativeSelectOption>
+                  <NativeSelectOption value="manual">{t(`${OIDC}.LINK_MANUAL`)}</NativeSelectOption>
+                </NativeSelect>
+                {oidcValues.linkPolicy === "username" ? <small className="tw:block tw:mt-1 tw:text-warning">{t(`${OIDC}.LINK_USERNAME_WARNING`)}</small> : null}
+              </div>
+            </div>
+
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-default-role" className="col">{t(`${OIDC}.DEFAULT_ROLE`)}</Label>
+              <div className="col">
+                <NativeSelect id="oidc-default-role" name="defaultRole" value={oidcValues.defaultRole || "Viewer"} onChange={handleOidcChange}>
+                  {OIDC_ROLES.map((role) => (
+                    <NativeSelectOption key={role} value={role}>
+                      {role}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
+              </div>
+            </div>
+
+            <div className="mb-3 security-oidc-check">
+              <label>
+                <input
+                  type="checkbox"
+                  id="oidc-auto-provision"
+                  name="autoProvision"
+                  checked={Boolean(oidcValues.autoProvision)}
+                  onChange={handleOidcChange}
+                />
+                {t(`${OIDC}.AUTO_PROVISION`)}
+              </label>
+              <small className="tw:block tw:mt-1 tw:text-muted-foreground">{t(`${OIDC}.BREAK_GLASS`)}</small>
+            </div>
           </div>
         )}
 
@@ -296,11 +400,11 @@ export default function SecuritySettings() {
         )}
 
         <div className="security-form-actions">
-          <Button variant="outline-success" type="submit" disabled={saving}>
-            {saving ? <Spinner animation="border" size="sm" /> : authMode === "oidc" ? "Test & Save" : "Save Authentication"}
+          <Button variant="secondary" type="submit" disabled={saving}>
+            {saving ? <Spinner className="tw:size-4" /> : authMode === "oidc" ? "Test & Save" : "Save Authentication"}
           </Button>
         </div>
-      </Form>
+      </form>
     </div>
   );
 }

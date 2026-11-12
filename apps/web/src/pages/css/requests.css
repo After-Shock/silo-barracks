@@ -1433,6 +1433,7 @@
 
 .requests-modal {
   overflow: hidden;
+  padding: 0 !important;
   border: 1px solid var(--barracks-border-inset) !important;
   border-radius: 8px !important;
   background: var(--barracks-surface-inset) !important;
@@ -1440,24 +1441,9 @@
   box-shadow: 0 32px 90px color-mix(in srgb, var(--barracks-surface-inset) 72%, transparent) !important;
 }
 
-.requests-modal .modal-header {
-  display: none;
-}
-
-.requests-modal .modal-title {
-  color: color-mix(in srgb, var(--barracks-text-raised) 82%, transparent);
-  font-size: 15px;
-  font-weight: 900;
-}
-
-.requests-modal .btn-close {
-  filter: invert(1);
-  opacity: 0.72;
-}
-
-.requests-modal .modal-body {
+.requests-modal-body {
   position: relative;
-  padding: 24px !important;
+  padding: 24px;
   background: var(--barracks-surface-inset);
 }
 

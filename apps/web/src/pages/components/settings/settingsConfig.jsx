@@ -1,26 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import axios from "../../../lib/axios_instance";
 import Config from "../../../lib/config";
 import Loading from "../general/loading";
-import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
-import Alert from "react-bootstrap/Alert";
-import ArrowDownSLineIcon from "remixicon-react/ArrowDownSLineIcon";
-import ArrowUpSLineIcon from "remixicon-react/ArrowUpSLineIcon";
-import DragMove2LineIcon from "remixicon-react/DragMove2LineIcon";
-import EyeLineIcon from "remixicon-react/EyeLineIcon";
-import EyeOffLineIcon from "remixicon-react/EyeOffLineIcon";
-import ExternalLinkLineIcon from "remixicon-react/ExternalLinkLineIcon";
-import LockLineIcon from "remixicon-react/LockLineIcon";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { NativeSelect, NativeSelectOptGroup, NativeSelectOption } from "@/components/ui/native-select";
+import { RiArrowDownSLine, RiArrowUpSLine, RiDragMove2Line, RiExternalLinkLine, RiEyeLine, RiEyeOffLine, RiLockLine, RiSearchLine } from "@remixicon/react";
 
 import "../../css/settings/settings.css";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
+import i18n from "i18next";
 import { FONT_WEIGHT_OPTIONS, getStoredFontWeight, saveFontWeightPreference } from "../../../lib/appearance";
-import { languages } from "../../../lib/languages";
+import { languages } from "../../../lib/languages.js";
 import { navData } from "../../../lib/navdata";
-import { DEFAULT_THEME, THEME_PRESETS, getStoredTheme, resetTheme, saveTheme } from "../../../lib/theme";
+import { isBlobboHidden, setBlobboHidden } from "../../../lib/blobbo-settings";
+import { BLOBBO_PREFS_EVENT, getPrefs, setPref } from "../../../lib/blobbo-prefs";
+import { BLOBBO_LOOKS, getLook, lookAssets, resolveLook } from "../../../lib/blobbo-looks";
+import { DEFAULT_THEME, THEME_GROUPS, THEME_PRESETS, filterThemePresets, findMatchingThemePreset, getStoredTheme, resetTheme, saveTheme, themeColorFields } from "../../../lib/theme";
 import {
   applyNavOrder,
   getStoredHiddenNavLinks,
@@ -33,12 +31,10 @@ import {
 } from "../../../lib/nav-order";
 
 function getNavLabel(item) {
+  if (item.i18nKey) return i18n.t(item.i18nKey);
   if (typeof item.text === "string") return item.text;
-  if (item.link === "") return "Home";
-  return item.link
-    .split("-")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
+  if (item.link === "") return i18n.t("MENU_TABS.HOME");
+  return item.label || item.link;
 }
 
 const THEME_COLOR_FIELDS = [
@@ -50,6 +46,7 @@ const THEME_COLOR_FIELDS = [
 const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 function NavigationOrderSettings() {
+  const { t } = useTranslation();
   const [navOrder, setNavOrder] = useState(() => getStoredNavOrder(navData));
   const [hiddenLinks, setHiddenLinks] = useState(() => getStoredHiddenNavLinks(navData));
   const [draggedLink, setDraggedLink] = useState("");
@@ -95,18 +92,18 @@ function NavigationOrderSettings() {
     <section className="settings-form nav-order-settings" aria-labelledby="nav-order-heading">
       <div className="nav-order-header">
         <div>
-          <h2 id="nav-order-heading">Navbar order</h2>
-          <p>Drag the unlocked items into the order you want. Home, Settings, and About stay fixed.</p>
+          <h2 id="nav-order-heading"><Trans i18nKey="SETTINGS_PAGE.NAVBAR_ORDER" /></h2>
+          <p><Trans i18nKey="SETTINGS_PAGE.NAVBAR_ORDER_INTRO" /></p>
         </div>
-        <Button type="button" variant="outline-secondary" onClick={handleReset}>
-          Reset
+        <Button type="button" variant="secondary" onClick={handleReset}>
+          <Trans i18nKey="SETTINGS_PAGE.RESET" />
         </Button>
       </div>
 
       <div className="nav-order-locked" aria-label="Locked navigation items">
         {lockedItems.map((item) => (
           <span key={item.link || "home"}>
-            <LockLineIcon size={14} />
+            <RiLockLine size={14} />
             {getNavLabel(item)}
           </span>
         ))}
@@ -115,7 +112,7 @@ function NavigationOrderSettings() {
       <div className="nav-order-list">
         {reorderableItems.map((item, index) => {
           const isHidden = hiddenLinks.includes(item.link);
-          const label = getNavLabel(item);
+          const label = item.i18nKey ? t(item.i18nKey) : getNavLabel(item);
 
           return (
             <div
@@ -139,7 +136,7 @@ function NavigationOrderSettings() {
               onDragEnd={() => setDraggedLink("")}
             >
               <span className="nav-order-drag" aria-hidden="true">
-                <DragMove2LineIcon size={18} />
+                <RiDragMove2Line size={18} />
               </span>
               <span className="nav-order-icon">{item.icon}</span>
               <strong>{label}</strong>
@@ -151,14 +148,14 @@ function NavigationOrderSettings() {
                 aria-label={isHidden ? `Show ${label} in navbar` : `Hide ${label} from navbar`}
                 title={isHidden ? "Show tab" : "Hide tab"}
               >
-                {isHidden ? <EyeOffLineIcon size={18} /> : <EyeLineIcon size={18} />}
+                {isHidden ? <RiEyeOffLine size={18} /> : <RiEyeLine size={18} />}
               </button>
               <div className="nav-order-actions">
                 <button type="button" onClick={() => moveLink(item.link, -1)} disabled={index === 0} aria-label={`Move ${label} up`}>
-                  <ArrowUpSLineIcon size={18} />
+                  <RiArrowUpSLine size={18} />
                 </button>
                 <button type="button" onClick={() => moveLink(item.link, 1)} disabled={index === reorderableItems.length - 1} aria-label={`Move ${label} down`}>
-                  <ArrowDownSLineIcon size={18} />
+                  <RiArrowDownSLine size={18} />
                 </button>
               </div>
             </div>
@@ -166,6 +163,113 @@ function NavigationOrderSettings() {
         })}
       </div>
     </section>
+  );
+}
+
+function ThemePicker({ value, onSelect }) {
+  const { t } = useTranslation();
+  const rootRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [group, setGroup] = useState("all");
+  const active = findMatchingThemePreset(value);
+  const presets = useMemo(() => filterThemePresets(query, group), [query, group]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    function handlePointer(event) {
+      if (!rootRef.current?.contains(event.target)) setOpen(false);
+    }
+    function handleKey(event) {
+      if (event.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", handlePointer);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handlePointer);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [open]);
+
+  return (
+    <div className={`general-theme-picker${open ? " is-open" : ""}`} ref={rootRef}>
+      <button
+        type="button"
+        className="general-theme-picker-toggle"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span className="general-theme-swatches" aria-hidden="true">
+          <i style={{ backgroundColor: value.primary }} />
+          <i style={{ backgroundColor: value.secondary }} />
+          <i style={{ backgroundColor: value.background }} />
+          <i style={{ backgroundColor: value.surface }} />
+        </span>
+        <span>
+          <strong>{active?.name || t("SETTINGS_PAGE.CUSTOM")}</strong>
+          <small>{active ? t(`SETTINGS_PAGE.THEME_GROUP_${active.group.toUpperCase()}`) : t("SETTINGS_PAGE.CUSTOM")}</small>
+        </span>
+        <em>{t("SETTINGS_PAGE.THEME_COUNT", { count: THEME_PRESETS.length })}</em>
+        <RiArrowDownSLine size={18} />
+      </button>
+      {open ? (
+        <div className="general-theme-picker-panel" role="listbox" aria-label={t("SETTINGS_PAGE.THEME_PRESET")}>
+          <label className="general-theme-picker-search">
+            <RiSearchLine size={16} />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={t("SETTINGS_PAGE.THEME_SEARCH")}
+              autoFocus
+            />
+          </label>
+          <div className="general-theme-picker-groups">
+            {THEME_GROUPS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={group === item.id ? "is-active" : ""}
+                onClick={() => setGroup(item.id)}
+              >
+                {t(`SETTINGS_PAGE.THEME_GROUP_${item.id.toUpperCase()}`)}
+              </button>
+            ))}
+          </div>
+          <div className="general-theme-picker-grid">
+            {presets.map((preset) => (
+              <button
+                key={preset.name}
+                type="button"
+                className={active?.name === preset.name ? "is-active" : ""}
+                role="option"
+                aria-selected={active?.name === preset.name}
+                onClick={() => {
+                  onSelect(themeColorFields(preset));
+                  setOpen(false);
+                }}
+              >
+                <span
+                  className="general-theme-picker-card"
+                  style={{
+                    "--preview-primary": preset.primary,
+                    "--preview-secondary": preset.secondary,
+                    "--preview-background": preset.background,
+                    "--preview-surface": preset.surface,
+                  }}
+                >
+                  <i />
+                  <i />
+                  <b>{preset.name}</b>
+                </span>
+              </button>
+            ))}
+            {!presets.length ? <p className="general-theme-picker-empty">{t("SETTINGS_PAGE.THEME_EMPTY")}</p> : null}
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -211,6 +315,7 @@ function ThemePresetPreview({ label, theme }) {
 }
 
 export default function SettingsConfig() {
+  const { t } = useTranslation();
   const [config, setConfig] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState(localStorage.getItem("i18nextLng") ?? "en-US");
   const [formValuesExternal, setFormValuesExternal] = useState({});
@@ -219,6 +324,18 @@ export default function SettingsConfig() {
   const [submissionMessage, setsubmissionMessage] = useState("");
   const [submissionMessageExternal, setsubmissionMessageExternal] = useState("");
   const [twelve_hr, set12hr] = useState(localStorage.getItem("12hr") === "true");
+  const [blobboHidden, setBlobboHiddenState] = useState(isBlobboHidden);
+  const updateBlobboHidden = (next) => {
+    setBlobboHidden(next);
+    setBlobboHiddenState(next);
+  };
+  const [blobboPrefs, setBlobboPrefs] = useState(getPrefs);
+  useEffect(() => {
+    const sync = () => setBlobboPrefs(getPrefs());
+    window.addEventListener(BLOBBO_PREFS_EVENT, sync);
+    return () => window.removeEventListener(BLOBBO_PREFS_EVENT, sync);
+  }, []);
+  const blobboLook = resolveLook(blobboPrefs);
   const [fontWeight, setFontWeight] = useState(() => getStoredFontWeight());
   const [theme, setTheme] = useState(() => getStoredTheme());
   const [themeDraft, setThemeDraft] = useState(() => getStoredTheme());
@@ -231,6 +348,15 @@ export default function SettingsConfig() {
   } else if (twelve_hr === null) {
     set12hr(Boolean(storage_12hr));
   }
+
+  useEffect(() => {
+    function handleThemeUpdated(event) {
+      if (!event.detail) return;
+      setTheme(event.detail);
+    }
+    window.addEventListener("silo-barracks-theme-updated", handleThemeUpdated);
+    return () => window.removeEventListener("silo-barracks-theme-updated", handleThemeUpdated);
+  }, []);
 
   useEffect(() => {
     Config.getConfig()
@@ -248,28 +374,33 @@ export default function SettingsConfig() {
 
   async function handleFormSubmitExternal(event) {
     event.preventDefault();
-    setTheme(saveTheme(themeDraft));
-
     setisSubmittedExternal("");
-    axios
-      .post("/api/setExternalUrl/", formValuesExternal, {
-        headers: {
-          Authorization: `Bearer ${config.token}`,
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        console.log("Config updated successfully:", response.data);
-        setisSubmittedExternal("Success");
-        setsubmissionMessageExternal("Successfully updated configuration");
-      })
-      .catch((error) => {
-        let errorMessage = error.response.data.errorMessage;
-        console.log("Error updating config:", errorMessage);
-        setisSubmittedExternal("Failed");
-        setsubmissionMessageExternal(`Error Updating Configuration: ${errorMessage}`);
-      });
-    Config.setConfig();
+
+    const ExternalUrl = typeof formValuesExternal.ExternalUrl === "string" ? formValuesExternal.ExternalUrl.trim() : "";
+
+    try {
+      const response = await axios.post(
+        "/api/setExternalUrl",
+        { ExternalUrl },
+        {
+          headers: {
+            Authorization: `Bearer ${config.token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Config updated successfully:", response.data);
+      setisSubmittedExternal("Success");
+      setsubmissionMessageExternal("Successfully updated configuration");
+      await Config.setConfig();
+    } catch (error) {
+      const data = error.response?.data;
+      const errorMessage =
+        (typeof data === "string" && data) || data?.errorMessage || data?.error || error.message || "Unknown error";
+      console.log("Error updating config:", errorMessage);
+      setisSubmittedExternal("Failed");
+      setsubmissionMessageExternal(`Error Updating Configuration: ${errorMessage}`);
+    }
   }
 
   function handleFormChangeExternal(event) {
@@ -280,6 +411,7 @@ export default function SettingsConfig() {
     const languageCode = event.target.value;
     setSelectedLanguage(languageCode);
     localStorage.setItem("i18nextLng", languageCode);
+    i18n.changeLanguage(languageCode);
   }
 
   if (loadSate === "Loading") {
@@ -299,11 +431,8 @@ export default function SettingsConfig() {
     setFontWeight(saveFontWeightPreference(nextFontWeight));
   }
 
-  function updateThemePreset(presetName) {
-    if (presetName === "custom") return;
-    const preset = THEME_PRESETS.find((item) => item.name === presetName);
-    if (!preset) return;
-    setThemeDraft(preset);
+  function updateThemePreset(nextTheme) {
+    setThemeDraft(themeColorFields(nextTheme));
   }
 
   function updateThemeDraftColor(key, value) {
@@ -314,115 +443,143 @@ export default function SettingsConfig() {
     }));
   }
 
+  function applyThemeGlobally() {
+    const colors = themeColorFields(themeDraft);
+    setTheme(saveTheme(colors));
+    setThemeDraft(colors);
+  }
+
+  function discardThemePreview() {
+    setThemeDraft(themeColorFields(theme));
+  }
+
   function restoreTheme() {
     const restoredTheme = resetTheme();
     setTheme(restoredTheme);
     setThemeDraft(restoredTheme);
   }
 
-  const activeThemePreset = THEME_PRESETS.find(
-    (preset) =>
-      themeDraft.primary === preset.primary &&
-      themeDraft.secondary === preset.secondary &&
-      themeDraft.background === preset.background &&
-      themeDraft.surface === preset.surface
-  );
+  const activeThemePreset = findMatchingThemePreset(themeDraft);
   const externalUrl = formValuesExternal.ExternalUrl || "";
-  const selectedThemeName = activeThemePreset?.name || "custom";
-  const previewTheme = activeThemePreset || themeDraft;
-  const previewThemeName = activeThemePreset?.name || "Custom";
-  const hasThemeChanges = JSON.stringify(themeDraft) !== JSON.stringify(theme);
+  const previewTheme = themeColorFields(activeThemePreset || themeDraft);
+  const previewThemeName = activeThemePreset?.name || t("SETTINGS_PAGE.CUSTOM");
+  const hasThemeChanges = JSON.stringify(themeColorFields(themeDraft)) !== JSON.stringify(themeColorFields(theme));
 
   return (
     <div className="general-settings-page">
       <div className="general-settings-content">
-        <Form onSubmit={handleFormSubmitExternal} className="settings-form general-settings-card is-single-form">
+        <form onSubmit={handleFormSubmitExternal} className="settings-form general-settings-card is-single-form">
           <div className="general-settings-card-head">
             <div>
-              <h3>Core preferences</h3>
-              <p>Set server access, display behaviour, theme, language, and navigation layout.</p>
+              <h3><Trans i18nKey="SETTINGS_PAGE.CORE_PREFERENCES" /></h3>
+              <p><Trans i18nKey="SETTINGS_PAGE.CORE_PREFERENCES_INTRO" /></p>
             </div>
-            <ExternalLinkLineIcon />
+            <RiExternalLinkLine />
           </div>
           <div className="general-form-section">
-            <h4>Server access</h4>
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>
+            <h4><Trans i18nKey="SETTINGS_PAGE.SERVER_ACCESS" /></h4>
+            <div className="mb-3 row">
+              <Label htmlFor="ExternalUrl" className="col">
                 <Trans i18nKey={"SETTINGS_PAGE.EXTERNAL_URL"} />
-              </Form.Label>
-              <Col sm="10">
-                <Form.Control id="ExternalUrl" name="ExternalUrl" value={externalUrl} onChange={handleFormChangeExternal} placeholder="https://barracks.example.com" />
-              </Col>
-            </Form.Group>
+              </Label>
+              <div className="col-sm-10">
+                <Input id="ExternalUrl" name="ExternalUrl" value={externalUrl} onChange={handleFormChangeExternal} placeholder="https://barracks.example.com" />
+              </div>
+            </div>
           </div>
 
           {isSubmittedExternal !== "" ? (
-            <Alert bg="dark" data-bs-theme="dark" variant={isSubmittedExternal === "Failed" ? "danger" : "success"}>
-              {submissionMessageExternal}
+            <Alert variant={isSubmittedExternal === "Failed" ? "destructive" : "success"} className="tw:mb-4">
+              <AlertDescription>{submissionMessageExternal}</AlertDescription>
             </Alert>
           ) : null}
           <div className="general-form-section">
-            <h4>Display preferences</h4>
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>
+            <h4><Trans i18nKey="SETTINGS_PAGE.DISPLAY_PREFERENCES" /></h4>
+            <div className="mb-3 row">
+              <Label htmlFor="general-hour-format" className="col">
                 <Trans i18nKey={"SETTINGS_PAGE.HOUR_FORMAT"} />
-              </Form.Label>
-              <Col sm="10">
-                <Form.Select value={twelve_hr ? "12" : "24"} onChange={(event) => toggle12Hr(event.target.value === "12")}>
-                  <option value="24">
+              </Label>
+              <div className="col-sm-10">
+                <NativeSelect id="general-hour-format" value={twelve_hr ? "12" : "24"} onChange={(event) => toggle12Hr(event.target.value === "12")}>
+                  <NativeSelectOption value="24">
                     <Trans i18nKey={"SETTINGS_PAGE.HOUR_FORMAT_24"} />
-                  </option>
-                  <option value="12">
+                  </NativeSelectOption>
+                  <NativeSelectOption value="12">
                     <Trans i18nKey={"SETTINGS_PAGE.HOUR_FORMAT_12"} />
-                  </option>
-                </Form.Select>
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>
+                  </NativeSelectOption>
+                </NativeSelect>
+              </div>
+            </div>
+            <div className="mb-3 row">
+              <Label htmlFor="general-language" className="col">
                 <Trans i18nKey={"SETTINGS_PAGE.LANGUAGE"} />
-              </Form.Label>
-              <Col sm="10">
-                <Form.Select value={selectedLanguage} onChange={updateLanguage}>
+              </Label>
+              <div className="col-sm-10">
+                <NativeSelect id="general-language" value={selectedLanguage} onChange={updateLanguage}>
                   {languages
                     .slice()
                     .sort((a, b) => a.description.localeCompare(b.description))
                     .map((language) => (
-                      <option value={language.id} key={language.id}>
+                      <NativeSelectOption value={language.id} key={language.id}>
                         {language.description}
-                      </option>
+                      </NativeSelectOption>
                     ))}
-                </Form.Select>
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row} className="mb-0">
-              <Form.Label column>Font weight</Form.Label>
-              <Col sm="10">
-                <Form.Select value={fontWeight} onChange={(event) => updateFontWeight(event.target.value)}>
+                </NativeSelect>
+              </div>
+            </div>
+            <div className="mb-0 row">
+              <Label htmlFor="general-font-weight" className="col">
+                <Trans i18nKey="SETTINGS_PAGE.FONT_WEIGHT" />
+              </Label>
+              <div className="col-sm-10">
+                <NativeSelect id="general-font-weight" value={fontWeight} onChange={(event) => updateFontWeight(event.target.value)}>
                   {FONT_WEIGHT_OPTIONS.map((option) => (
-                    <option key={option.id} value={option.id}>
+                    <NativeSelectOption key={option.id} value={option.id}>
                       {option.label}
-                    </option>
+                    </NativeSelectOption>
                   ))}
-                </Form.Select>
-              </Col>
-            </Form.Group>
+                </NativeSelect>
+              </div>
+            </div>
+
+            <div className="mb-0 row">
+              <Label htmlFor="blobbo-visibility" className="col">Blobbo helper</Label>
+              <div className="col-sm-10">
+                <NativeSelect id="blobbo-visibility" value={blobboHidden ? "hidden" : "shown"} onChange={(event) => updateBlobboHidden(event.target.value === "hidden")}>
+                  <NativeSelectOption value="shown">Show Blobbo (Shift+A to say hello)</NativeSelectOption>
+                  <NativeSelectOption value="hidden">Hide Blobbo</NativeSelectOption>
+                </NativeSelect>
+              </div>
+            </div>
+
+            <div className="mb-3 row">
+              <Label htmlFor="blobbo-look" className="col">Blobbo look</Label>
+              <div className="col-sm-10">
+                <div className="tw:flex tw:items-center tw:gap-3">
+                  <img src={lookAssets(blobboLook.id).thumb} alt="" width="48" height="48" />
+                  <NativeSelect id="blobbo-look" value={blobboPrefs.look || "auto"} onChange={(event) => setPref("look", event.target.value === "auto" ? null : event.target.value)}>
+                    <NativeSelectOption value="auto">Auto: dress for the season (today: {getLook(resolveLook({ ...blobboPrefs, look: null }).id).label})</NativeSelectOption>
+                    <NativeSelectOptGroup label="Seasonal">
+                      {BLOBBO_LOOKS.filter((l) => l.kind === "seasonal").map((l) => (
+                        <NativeSelectOption key={l.id} value={l.id}>{l.emoji} {l.label}</NativeSelectOption>
+                      ))}
+                    </NativeSelectOptGroup>
+                    <NativeSelectOptGroup label="Costumes">
+                      {BLOBBO_LOOKS.filter((l) => l.kind === "costume").map((l) => (
+                        <NativeSelectOption key={l.id} value={l.id}>{l.emoji} {l.label}</NativeSelectOption>
+                      ))}
+                    </NativeSelectOptGroup>
+                  </NativeSelect>
+                </div>
+                <small className="tw:mt-1 tw:block tw:text-muted-foreground">Pick a costume to keep it on. Choose Auto to let Blobbo follow the calendar again (Halloween, winter, Valentine&rsquo;s, summer, New Year and more).</small>
+              </div>
+            </div>
           </div>
+
           <div className="general-form-section">
-            <h4>Theme preset</h4>
-            <Form.Group as={Row} className="mb-3">
-              <Form.Label column>Theme</Form.Label>
-              <Col sm="10">
-                <Form.Select value={selectedThemeName} onChange={(event) => updateThemePreset(event.target.value)}>
-                  <option value="custom">Custom</option>
-                  {THEME_PRESETS.map((preset) => (
-                    <option key={preset.name} value={preset.name}>
-                      {preset.name}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Col>
-            </Form.Group>
+            <h4><Trans i18nKey="SETTINGS_PAGE.THEME_PRESET" /></h4>
+            <p className="general-theme-hint"><Trans i18nKey="SETTINGS_PAGE.THEME_HINT" /></p>
+            <ThemePicker value={previewTheme} onSelect={updateThemePreset} />
             <div className="general-theme-selected">
               <div>
                 <span className="general-theme-swatches" aria-hidden="true">
@@ -457,22 +614,30 @@ export default function SettingsConfig() {
               </div>
               <ThemePresetPreview label={previewThemeName} theme={previewTheme} />
             </div>
+            <div className="general-theme-actions">
+              <Button variant="default" type="button" onClick={applyThemeGlobally} disabled={!hasThemeChanges}>
+                <Trans i18nKey="SETTINGS_PAGE.APPLY_THEME" />
+              </Button>
+              <Button variant="outline" type="button" onClick={discardThemePreview} disabled={!hasThemeChanges}>
+                <Trans i18nKey="SETTINGS_PAGE.DISCARD_THEME" />
+              </Button>
+              <Button
+                variant="secondary"
+                type="button"
+                onClick={restoreTheme}
+                disabled={JSON.stringify(themeColorFields(theme)) === JSON.stringify(DEFAULT_THEME) && JSON.stringify(themeColorFields(themeDraft)) === JSON.stringify(DEFAULT_THEME)}
+              >
+                <Trans i18nKey="SETTINGS_PAGE.RESET_THEME" />
+              </Button>
+              {hasThemeChanges ? <span className="general-settings-pending"><Trans i18nKey="SETTINGS_PAGE.THEME_PREVIEW_PENDING" /></span> : null}
+            </div>
           </div>
           <div className="general-settings-actions">
-            <Button variant="outline-success" type="submit">
+            <Button variant="secondary" type="submit">
               <Trans i18nKey={"SETTINGS_PAGE.UPDATE"} />
             </Button>
-            <Button
-              variant="outline-secondary"
-              type="button"
-              onClick={restoreTheme}
-              disabled={JSON.stringify(theme) === JSON.stringify(DEFAULT_THEME) && JSON.stringify(themeDraft) === JSON.stringify(DEFAULT_THEME)}
-            >
-              Reset theme
-            </Button>
-            {hasThemeChanges ? <span className="general-settings-pending">Theme preview not applied</span> : null}
           </div>
-        </Form>
+        </form>
 
         <NavigationOrderSettings />
       </div>

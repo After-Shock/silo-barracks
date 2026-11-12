@@ -8,6 +8,8 @@ const API = require("../classes/api-loader");
 const { sendUpdate } = require("../ws");
 const { isNumber } = require("../utils/typeValidation");
 const WebhookManager = require("../classes/webhook-manager");
+const { matchRecentPlayback, playSessionIdOf, sessionMatchesWatchdog } = require("../utils/playback-sessions");
+const { createPlaybackNotifier } = require("../utils/playback-notify");
 
 const MINIMUM_SECONDS_TO_INCLUDE_PLAYBACK = process.env.MINIMUM_SECONDS_TO_INCLUDE_PLAYBACK
   ? Number(process.env.MINIMUM_SECONDS_TO_INCLUDE_PLAYBACK)
@@ -19,16 +21,41 @@ const NEW_WATCH_EVENT_THRESHOLD_HOURS = process.env.NEW_WATCH_EVENT_THRESHOLD_HO
 
 const webhookManager = new WebhookManager();
 
+function playbackStreamDetails(session, item) {
+  const streams = Array.isArray(item?.MediaStreams) && item.MediaStreams.length
+    ? item.MediaStreams
+    : Array.isArray(session.MediaStreams)
+      ? session.MediaStreams
+      : [];
+  const video = streams.find((stream) => stream?.Type === "Video") || null;
+  const audio = streams.find((stream) => stream?.Type === "Audio" && stream?.IsDefault) || streams.find((stream) => stream?.Type === "Audio") || null;
+  const transcode = session.TranscodingInfo || null;
+  return {
+    videoHeight: Number(video?.Height) || null,
+    videoCodec: video?.Codec || null,
+    videoRange: video?.VideoRangeType || video?.VideoRange || null,
+    audioCodec: audio?.Codec || null,
+    audioChannels: Number(audio?.Channels) || null,
+    transcodeReasons: Array.isArray(transcode?.TranscodeReasons) ? transcode.TranscodeReasons.slice(0, 3) : [],
+    transcodeVideoCodec: transcode?.VideoCodec || null,
+  };
+}
+
 function playbackWebhookData(session, ended = false) {
+  const item = session.NowPlayingItem;
+  const posterItemId = item?.SeriesId || item?.Id || session.NowPlayingItemId;
+  const episodeId = item?.SeriesId ? item.Id : session.EpisodeId;
   return {
     sessionInfo: {
+      sessionId: session.Id,
+      playSessionId: playSessionIdOf(session) || undefined,
       userId: session.UserId,
       deviceId: session.DeviceId,
       deviceName: session.DeviceName,
       clientName: session.Client,
       applicationVersion: session.ApplicationVersion,
-      playMethod: session.PlayMethod,
-      isPaused: Boolean(session.IsPaused),
+      playMethod: session.PlayMethod || session.PlayState?.PlayMethod,
+      isPaused: Boolean(session.IsPaused ?? session.PlayState?.IsPaused),
       playbackDuration: Number(session.PlaybackDuration || 0),
       startTime: session.ActivityDateInserted,
       endTime: ended ? new Date().toISOString() : undefined,
@@ -36,99 +63,95 @@ function playbackWebhookData(session, ended = false) {
     userData: {
       username: session.UserName,
       userId: session.UserId,
+      userImageTag: session.UserPrimaryImageTag,
     },
     mediaInfo: {
-      itemId: session.NowPlayingItemId,
-      episodeId: session.EpisodeId,
-      seasonId: session.SeasonId,
-      mediaType: session.EpisodeId ? "Episode" : "Movie",
-      mediaName: session.NowPlayingItemName,
-      seriesName: session.SeriesName,
-      playMethod: session.PlayMethod,
+      itemId: item?.Id || session.NowPlayingItemId,
+      posterItemId,
+      episodeId,
+      seasonId: item?.SeasonId || session.SeasonId,
+      seasonNumber: session.SeasonNumber ?? item?.ParentIndexNumber,
+      episodeNumber: session.EpisodeNumber ?? item?.IndexNumber,
+      mediaType: episodeId || item?.SeriesId ? "Episode" : "Movie",
+      mediaName: session.NowPlayingItemName || item?.Name,
+      seriesName: session.SeriesName || item?.SeriesName,
+      playMethod: session.PlayMethod || session.PlayState?.PlayMethod,
+      productionYear: item?.ProductionYear || null,
+      officialRating: item?.OfficialRating || null,
+      communityRating: Number(item?.CommunityRating) || null,
+      genres: Array.isArray(item?.Genres) ? item.Genres.slice(0, 3) : [],
+      overview: item?.Overview ? String(item.Overview).slice(0, 400) : null,
+      runTimeTicks: Number(item?.RunTimeTicks || session.RunTimeTicks) || null,
+      positionTicks: Number(session.PlayState?.PositionTicks) || null,
+      ...playbackStreamDetails(session, item),
     },
   };
 }
 
+function applyLiveSessionToWatchdog(wdData, sessionData) {
+  const mapped = jf_activity_watchdog_mapping(sessionData);
+  let changed = wdData.NowPlayingItemId !== mapped.NowPlayingItemId
+    || wdData.EpisodeId !== mapped.EpisodeId
+    || wdData.DeviceId !== mapped.DeviceId
+    || wdData.IsPaused != mapped.IsPaused
+    || wdData.NowPlayingItemName !== mapped.NowPlayingItemName
+    || wdData.Client !== mapped.Client;
+
+  if (!changed) return false;
+
+  wdData.DeviceId = mapped.DeviceId;
+  wdData.DeviceName = mapped.DeviceName;
+  wdData.Client = mapped.Client;
+  wdData.ApplicationVersion = mapped.ApplicationVersion;
+  wdData.NowPlayingItemId = mapped.NowPlayingItemId;
+  wdData.NowPlayingItemName = mapped.NowPlayingItemName;
+  wdData.EpisodeId = mapped.EpisodeId;
+  wdData.SeasonId = mapped.SeasonId;
+  wdData.SeriesName = mapped.SeriesName;
+  wdData.PlayMethod = mapped.PlayMethod;
+  wdData.UserPrimaryImageTag = mapped.UserPrimaryImageTag;
+  wdData.SeasonNumber = mapped.SeasonNumber;
+  wdData.EpisodeNumber = mapped.EpisodeNumber;
+  wdData.MediaStreams = mapped.MediaStreams;
+  wdData.TranscodingInfo = mapped.TranscodingInfo;
+  wdData.PlayState = mapped.PlayState;
+  wdData.OriginalContainer = mapped.OriginalContainer;
+  wdData.RemoteEndPoint = mapped.RemoteEndPoint;
+  wdData.ServerId = mapped.ServerId;
+
+  if (wdData.IsPaused != mapped.IsPaused) {
+    if (mapped.IsPaused == true) {
+      const startTime = dayjs(wdData.ActivityDateInserted);
+      const lastPausedDate = dayjs(sessionData.LastPausedDate, "YYYY-MM-DD HH:mm:ss.SSSZ");
+      wdData.PlaybackDuration = parseInt(wdData.PlaybackDuration) + lastPausedDate.diff(startTime, "seconds");
+      wdData.ActivityDateInserted = `${lastPausedDate.format("YYYY-MM-DD HH:mm:ss.SSSZ")}`;
+    } else {
+      wdData.ActivityDateInserted = dayjs().format("YYYY-MM-DD HH:mm:ss.SSSZ");
+    }
+  }
+  wdData.IsPaused = mapped.IsPaused;
+  return true;
+}
+
 async function getSessionsInWatchDog(SessionData, WatchdogData) {
-  const existingData = await WatchdogData.filter((wdData) => {
-    return SessionData.some((sessionData) => {
-      const NowPlayingItemId = sessionData.NowPlayingItem.SeriesId || sessionData.NowPlayingItem.Id;
-
-      const matchesEpisodeId =
-        sessionData.NowPlayingItem.SeriesId != undefined ? wdData.EpisodeId === sessionData.NowPlayingItem.Id : true;
-
-      const matchingSessionFound =
-        // wdData.Id === sessionData.Id &&
-        wdData.UserId === sessionData.UserId &&
-        wdData.DeviceId === sessionData.DeviceId &&
-        wdData.NowPlayingItemId === NowPlayingItemId &&
-        matchesEpisodeId;
-
-      if (matchingSessionFound && wdData.IsPaused != sessionData.PlayState.IsPaused) {
-        wdData.IsPaused = sessionData.PlayState.IsPaused;
-
-        //if the playstate was paused, calculate the difference in seconds and add to the playback duration
-        if (sessionData.PlayState.IsPaused == true) {
-          const startTime = dayjs(wdData.ActivityDateInserted);
-          const lastPausedDate = dayjs(sessionData.LastPausedDate, "YYYY-MM-DD HH:mm:ss.SSSZ");
-
-          const diffInSeconds = lastPausedDate.diff(startTime, "seconds");
-
-          wdData.PlaybackDuration = parseInt(wdData.PlaybackDuration) + diffInSeconds;
-
-          wdData.ActivityDateInserted = `${lastPausedDate.format("YYYY-MM-DD HH:mm:ss.SSSZ")}`;
-        } else {
-          wdData.ActivityDateInserted = dayjs().format("YYYY-MM-DD HH:mm:ss.SSSZ");
-        }
-        return true;
-      }
-
-      return false; // we return false if playstate didnt change to reduce db writes
-    });
+  return WatchdogData.filter((wdData) => {
+    const sessionData = SessionData.find((session) => sessionMatchesWatchdog(session, wdData));
+    if (!sessionData) return false;
+    return applyLiveSessionToWatchdog(wdData, sessionData);
   });
-  return existingData;
 }
 
 async function getSessionsNotInWatchDog(SessionData, WatchdogData) {
-  const newData = await SessionData.filter((sessionData) => {
+  return SessionData.filter((sessionData) => {
     if (WatchdogData.length === 0) return true;
-    return !WatchdogData.some((wdData) => {
-      const NowPlayingItemId = sessionData.NowPlayingItem.SeriesId || sessionData.NowPlayingItem.Id;
-
-      const matchesEpisodeId =
-        sessionData.NowPlayingItem.SeriesId != undefined ? wdData.EpisodeId === sessionData.NowPlayingItem.Id : true;
-
-      const matchingSessionFound =
-        // wdData.Id === sessionData.Id &&
-        wdData.UserId === sessionData.UserId &&
-        wdData.DeviceId === sessionData.DeviceId &&
-        wdData.NowPlayingItemId === NowPlayingItemId &&
-        matchesEpisodeId;
-
-      return matchingSessionFound;
-    });
+    return !WatchdogData.some((wdData) => sessionMatchesWatchdog(sessionData, wdData));
   }).map(jf_activity_watchdog_mapping);
-
-  return newData;
 }
 
 function getWatchDogNotInSessions(SessionData, WatchdogData) {
   const removedData = WatchdogData.filter((wdData) => {
     if (SessionData.length === 0) return true;
-    return !SessionData.some((sessionData) => {
-      const NowPlayingItemId = sessionData.NowPlayingItem.SeriesId || sessionData.NowPlayingItem.Id;
-
-      const matchesEpisodeId =
-        sessionData.NowPlayingItem.SeriesId != undefined ? wdData.EpisodeId === sessionData.NowPlayingItem.Id : true;
-
-      const noMatchingSessionFound =
-        // wdData.Id === sessionData.Id &&
-        wdData.UserId === sessionData.UserId &&
-        wdData.DeviceId === sessionData.DeviceId &&
-        wdData.NowPlayingItemId === NowPlayingItemId &&
-        matchesEpisodeId;
-      return noMatchingSessionFound;
-    });
+    return !SessionData.some((sessionData) => sessionMatchesWatchdog(sessionData, wdData));
   });
 
   //this is to update the playback duration for the removed items where it was playing before stopped as duration is only updated on pause
@@ -154,10 +177,79 @@ function getWatchDogNotInSessions(SessionData, WatchdogData) {
 
 let currentIntervalId = null;
 let lastHadActiveSessions = false;
+let emptySessionPolls = 0;
 let cachedPollingSettings = {
   activeSessionsInterval: 1000,
   idleInterval: 5000,
 };
+
+const playbackNotifier = createPlaybackNotifier({
+  firstStartStableMs: 2500,
+  itemChangeStableMs: 8000,
+  endGraceMs: Number(process.env.PLAYBACK_WEBHOOK_END_GRACE_MS) || 90_000,
+  pausedGraceMs: Number(process.env.PLAYBACK_WEBHOOK_PAUSED_GRACE_MS) || 30 * 60 * 1000,
+});
+
+async function recordFinishedPlayback(dataToRemove) {
+  const toDeleteIds = dataToRemove.map((row) => row.ActivityId);
+
+  //get data from jf_playback_activity within the last hour with progress of <=80% for current items in session
+  const ExistingRecords = await db
+    .query(`SELECT * FROM jf_recent_playback_activity(${NEW_WATCH_EVENT_THRESHOLD_HOURS})`)
+    .then((res) => {
+      if (res.rows && Array.isArray(res.rows) && res.rows.length > 0) {
+        return res.rows.filter(
+          (row) =>
+            dataToRemove.some((pbi) => pbi.NowPlayingItemId === row.NowPlayingItemId && pbi.EpisodeId === row.EpisodeId) &&
+            row.Progress <= 80.0,
+        );
+      }
+      return [];
+    })
+    .catch((err) => {
+      console.error("Error fetching existing records:", err);
+      return [];
+    });
+
+  //a playback picked up again within the threshold adds to its earlier row, unless that would run past the item's runtime.
+  //each earlier row takes at most one playback, and a stream that ran alongside it gets its own row.
+  const merges = matchRecentPlayback(dataToRemove, ExistingRecords, {
+    withinRuntime: (existing, playbackData) =>
+      existing.RunTimeTicks == undefined ||
+      !isNumber(existing.RunTimeTicks) ||
+      (Number(existing.PlaybackDuration) + Number(playbackData.PlaybackDuration)) * 10000000 <= Number(existing.RunTimeTicks),
+  });
+
+  const ExistingDataToUpdate = [];
+  let playbackToInsert = [];
+  for (const playbackData of dataToRemove) {
+    const existingrow = merges.get(playbackData);
+    if (existingrow) {
+      playbackData.Id = existingrow.Id;
+      playbackData.PlaybackDuration = Number(existingrow.PlaybackDuration) + Number(playbackData.PlaybackDuration);
+      playbackData.ActivityDateInserted = dayjs().format("YYYY-MM-DD HH:mm:ss.SSSZ");
+      ExistingDataToUpdate.push(playbackData);
+    } else {
+      playbackToInsert.push(playbackData);
+    }
+  }
+
+  //skip anything too short to count
+  playbackToInsert = playbackToInsert.filter((pb) => pb.PlaybackDuration >= MINIMUM_SECONDS_TO_INCLUDE_PLAYBACK);
+  const updates = ExistingDataToUpdate.filter((pb) => pb.PlaybackDuration >= MINIMUM_SECONDS_TO_INCLUDE_PLAYBACK);
+
+  if (toDeleteIds.length > 0) {
+    await db.deleteBulk("jf_activity_watchdog", toDeleteIds, "ActivityId");
+    console.log("Removed Data from WD Count: ", dataToRemove.length);
+  }
+  if (playbackToInsert.length > 0) {
+    await db.insertBulk("jf_playback_activity", playbackToInsert, columnsPlayback);
+    console.log("Activity inserted/updated Count: ", playbackToInsert.length);
+  }
+  if (updates.length > 0) {
+    await db.insertBulk("jf_playback_activity", updates, columnsPlayback);
+  }
+}
 
 async function ActivityMonitor(defaultInterval) {
   // console.log("Activity Monitor started with default interval: " + defaultInterval);
@@ -190,7 +282,9 @@ async function ActivityMonitor(defaultInterval) {
 
       const ExcludedUsers = config.settings?.ExcludedUsers || [];
       const apiSessionData = await API.getSessions();
-      const SessionData = apiSessionData.filter((row) => row.NowPlayingItem !== undefined && !ExcludedUsers.includes(row.UserId));
+      const SessionData = apiSessionData.filter(
+        (row) => row.NowPlayingItem !== undefined && row.UserId && !ExcludedUsers.includes(row.UserId),
+      );
       sendUpdate("sessions", apiSessionData);
 
       const hasActiveSessions = SessionData.length > 0;
@@ -210,37 +304,53 @@ async function ActivityMonitor(defaultInterval) {
           console.log(`[ActivityMonitor] Applying new ${hasActiveSessions ? "active" : "idle"} interval: ${currentInterval}ms`);
         }
 
-        // Clear current interval and restart with new timing
         if (currentIntervalId) {
           clearInterval(currentIntervalId);
         }
         currentIntervalId = setInterval(runMonitoring, currentInterval);
-        return; // Let the new interval handle the next execution
       }
 
-      /////get data from jf_activity_monitor
+      const { started: playbackStarted, ended: playbackEnded } = playbackNotifier.collect(SessionData);
+      if (playbackStarted.length > 0) {
+        await Promise.all(
+          playbackStarted.map((session) => webhookManager.triggerEventWebhooks("playback_started", playbackWebhookData(session))),
+        );
+      }
+      if (playbackEnded.length > 0) {
+        await Promise.all(
+          playbackEnded.map((session) => webhookManager.triggerEventWebhooks("playback_ended", playbackWebhookData(session, true))),
+        );
+      }
+      await webhookManager.flushQuietHoursDigest();
+
       const WatchdogData = await db.query("SELECT * FROM jf_activity_watchdog").then((res) => res.rows);
 
-      /////return if no necessary changes made to reduce resource consumption
       if (SessionData.length === 0 && WatchdogData.length === 0) {
+        emptySessionPolls = 0;
         return;
       }
-      // New Code
+
+      if (SessionData.length === 0 && WatchdogData.length > 0) {
+        emptySessionPolls += 1;
+        if (emptySessionPolls < 8) {
+          return;
+        }
+      } else {
+        emptySessionPolls = 0;
+      }
 
       const WatchdogDataToInsert = await getSessionsNotInWatchDog(SessionData, WatchdogData);
       const WatchdogDataToUpdate = await getSessionsInWatchDog(SessionData, WatchdogData);
       const dataToRemove = await getWatchDogNotInSessions(SessionData, WatchdogData);
 
-      /////////////////
-
-      //filter fix if table is empty
+      // Finished playbacks go first. A session that moves on to its next item keeps its
+      // Id, so its old row has to be closed before the new one can take that Id.
+      if (dataToRemove.length > 0) {
+        await recordFinishedPlayback(dataToRemove);
+      }
 
       if (WatchdogDataToInsert.length > 0) {
-        await Promise.all(WatchdogDataToInsert.map((session) => webhookManager.triggerEventWebhooks("playback_started", playbackWebhookData(session))));
-
-        //insert new rows where not existing items
-        // console.log("Inserted " + WatchdogDataToInsert.length + " wd playback records");
-        db.insertBulk("jf_activity_watchdog", WatchdogDataToInsert, jf_activity_watchdog_columns);
+        await db.insertBulk("jf_activity_watchdog", WatchdogDataToInsert, jf_activity_watchdog_columns);
         console.log("New Data Inserted: ", WatchdogDataToInsert.length);
       }
 
@@ -248,101 +358,6 @@ async function ActivityMonitor(defaultInterval) {
       if (WatchdogDataToUpdate.length > 0) {
         await db.insertBulk("jf_activity_watchdog", WatchdogDataToUpdate, jf_activity_watchdog_columns);
         console.log("Existing Data Updated: ", WatchdogDataToUpdate.length);
-      }
-
-      if (dataToRemove.length > 0) {
-        await Promise.all( dataToRemove.map((session) => webhookManager.triggerEventWebhooks("playback_ended", playbackWebhookData(session, true))));
-
-        const toDeleteIds = dataToRemove.map((row) => row.ActivityId);
-
-        //delete from db no longer in session data and insert into stats db
-        //Bulk delete from db thats no longer on api
-
-        let playbackToInsert = dataToRemove;
-
-        if (playbackToInsert.length == 0 && toDeleteIds.length == 0) {
-          return;
-        }
-
-        /////get data from jf_playback_activity within the last hour with progress of <=80% for current items in session
-
-        const ExistingRecords = await db
-          .query(`SELECT * FROM jf_recent_playback_activity(${NEW_WATCH_EVENT_THRESHOLD_HOURS})`)
-          .then((res) => {
-            if (res.rows && Array.isArray(res.rows) && res.rows.length > 0) {
-              return res.rows.filter(
-                (row) =>
-                  playbackToInsert.some(
-                    (pbi) => pbi.NowPlayingItemId === row.NowPlayingItemId && pbi.EpisodeId === row.EpisodeId,
-                  ) && row.Progress <= 80.0,
-              );
-            } else {
-              return [];
-            }
-          })
-          .catch((err) => {
-            console.error("Error fetching existing records:", err);
-          });
-        let ExistingDataToUpdate = [];
-
-        //for each item in playbackToInsert, check if it exists in the recent playback activity and update accordingly. insert new row if updating existing exceeds the runtime
-        if (playbackToInsert.length > 0 && ExistingRecords.length > 0) {
-          ExistingDataToUpdate = playbackToInsert.filter((playbackData) => {
-            const existingrow = ExistingRecords.find((existing) => {
-              let newDurationWithingRunTime = true;
-
-              if (existing.RunTimeTicks != undefined && isNumber(existing.RunTimeTicks)) {
-                newDurationWithingRunTime =
-                  (Number(existing.PlaybackDuration) + Number(playbackData.PlaybackDuration)) * 10000000 <=
-                  Number(existing.RunTimeTicks);
-              }
-              return (
-                existing.NowPlayingItemId === playbackData.NowPlayingItemId &&
-                existing.EpisodeId === playbackData.EpisodeId &&
-                existing.UserId === playbackData.UserId &&
-                newDurationWithingRunTime
-              );
-            });
-
-            if (existingrow) {
-              playbackData.Id = existingrow.Id;
-              playbackData.PlaybackDuration = Number(existingrow.PlaybackDuration) + Number(playbackData.PlaybackDuration);
-              playbackData.ActivityDateInserted = dayjs().format("YYYY-MM-DD HH:mm:ss.SSSZ");
-              return true;
-            }
-            return false;
-          });
-        }
-
-        //remove items from playbackToInsert that already exists in the recent playback activity so it doesnt duplicate or where PlaybackDuration===0
-        playbackToInsert = playbackToInsert.filter(
-          (pb) =>
-            pb.PlaybackDuration >= MINIMUM_SECONDS_TO_INCLUDE_PLAYBACK &&
-            !ExistingRecords.some(
-              (er) => er.NowPlayingItemId === pb.NowPlayingItemId && er.EpisodeId === pb.EpisodeId && er.UserId === pb.UserId,
-            ),
-        );
-
-        //remove items where PlaybackDuration===0
-
-        ExistingDataToUpdate = ExistingDataToUpdate.filter((pb) => pb.PlaybackDuration >= MINIMUM_SECONDS_TO_INCLUDE_PLAYBACK);
-
-        if (toDeleteIds.length > 0) {
-          await db.deleteBulk("jf_activity_watchdog", toDeleteIds, "ActivityId");
-          console.log("Removed Data from WD Count: ", dataToRemove.length);
-        }
-        if (playbackToInsert.length > 0) {
-          await db.insertBulk("jf_playback_activity", playbackToInsert, columnsPlayback);
-          console.log("Activity inserted/updated Count: ", playbackToInsert.length);
-          // console.log("Inserted " + playbackToInsert.length + " new playback records");
-        }
-
-        if (ExistingDataToUpdate.length > 0) {
-          await db.insertBulk("jf_playback_activity", ExistingDataToUpdate, columnsPlayback);
-          // console.log("Updated " + playbackToInsert.length + " playback records");
-        }
-
-        ///////////////////////////
       }
     } catch (error) {
       if (error?.code === "ECONNREFUSED") {

@@ -1,122 +1,129 @@
-
-
-import HomeFillIcon from 'remixicon-react/HomeFillIcon';
-import BarChartFillIcon from 'remixicon-react/BarChartFillIcon';
-import HistoryFillIcon from 'remixicon-react/HistoryFillIcon';
-import TimeFillIcon from 'remixicon-react/TimeFillIcon';
-import SettingsFillIcon from 'remixicon-react/SettingsFillIcon';
-import GalleryFillIcon from 'remixicon-react/GalleryFillIcon';
-import UserFillIcon from 'remixicon-react/UserFillIcon';
-import InformationFillIcon from 'remixicon-react/InformationFillIcon';
-import Movie2FillIcon from 'remixicon-react/Movie2FillIcon';
-import CalendarEventFillIcon from 'remixicon-react/CalendarEventFillIcon';
-import ChatCheckFillIcon from 'remixicon-react/ChatCheckFillIcon';
-import DownloadCloud2FillIcon from 'remixicon-react/DownloadCloud2FillIcon';
-import ServerFillIcon from 'remixicon-react/ServerFillIcon';
-import CpuFillIcon from 'remixicon-react/CpuFillIcon';
+import { RiBarChartFill, RiCalendarEventFill, RiChatCheckFill, RiCpuFill, RiDownloadCloud2Fill, RiGalleryFill, RiHistoryFill, RiHomeFill, RiInformationFill, RiMovie2Fill, RiServerFill, RiSettingsFill, RiTimeFill, RiUserFill, RiUserStarFill } from "@remixicon/react";
 import { Trans } from 'react-i18next';
 
 
 export const navData = [
     {
         id: 0,
-        icon: <HomeFillIcon/>,
+        icon: <RiHomeFill/>,
         text: <Trans i18nKey="MENU_TABS.HOME" />,
         label: "Home",
+        i18nKey: "MENU_TABS.HOME",
         link: ""
     },
     {
         id: 1,
-        icon: <Movie2FillIcon />,
-        text: "Recently Added",
+        icon: <RiMovie2Fill />,
+        text: <Trans i18nKey="MENU_TABS.RECENTLY_ADDED" />,
         label: "Recently Added",
+        i18nKey: "MENU_TABS.RECENTLY_ADDED",
         link: "recently-added"
     },
     {
         id: 2,
-        icon: <GalleryFillIcon />,
+        icon: <RiGalleryFill />,
         text: <Trans i18nKey="MENU_TABS.LIBRARIES" />,
         label: "Libraries",
+        i18nKey: "MENU_TABS.LIBRARIES",
         link: "libraries"
     },
     {
         id: 3,
-        icon: <UserFillIcon />,
+        icon: <RiUserFill />,
         text: <Trans i18nKey="MENU_TABS.USERS" />,
         label: "Users",
+        i18nKey: "MENU_TABS.USERS",
         link: "users"
     },
     {
         id: 4,
-        icon: <HistoryFillIcon />,
+        icon: <RiHistoryFill />,
         text: <Trans i18nKey="MENU_TABS.ACTIVITY" />,
         label: "Activity",
+        i18nKey: "MENU_TABS.ACTIVITY",
         link: "activity"
     },
     {
         id: 16,
-        icon: <TimeFillIcon />,
+        icon: <RiTimeFill />,
         text: <Trans i18nKey="MENU_TABS.TIMELINE" />,
         label: "Timeline",
+        i18nKey: "MENU_TABS.TIMELINE",
         link: "timeline"
     },
     {
         id: 5,
-        icon: <CalendarEventFillIcon />,
-        text: "Calendar",
+        icon: <RiCalendarEventFill />,
+        text: <Trans i18nKey="MENU_TABS.CALENDAR" />,
         label: "Calendar",
+        i18nKey: "MENU_TABS.CALENDAR",
         link: "calendar"
     },
     {
         id: 6,
-        icon: <ChatCheckFillIcon />,
-        text: "Requests",
+        icon: <RiChatCheckFill />,
+        text: <Trans i18nKey="MENU_TABS.REQUESTS" />,
         label: "Requests",
+        i18nKey: "MENU_TABS.REQUESTS",
         link: "requests"
     },
     {
         id: 7,
-        icon: <DownloadCloud2FillIcon />,
-        text: "Downloads",
+        icon: <RiDownloadCloud2Fill />,
+        text: <Trans i18nKey="MENU_TABS.DOWNLOADS" />,
         label: "Downloads",
+        i18nKey: "MENU_TABS.DOWNLOADS",
         link: "downloads"
     },
     {
         id: 8,
-        icon: <CpuFillIcon />,
-        text: "Active Transcodes",
+        icon: <RiCpuFill />,
+        text: <Trans i18nKey="MENU_TABS.ACTIVE_TRANSCODES" />,
         label: "Active Transcodes",
+        i18nKey: "MENU_TABS.ACTIVE_TRANSCODES",
         link: "active-transcodes"
     },
     {
         id: 11,
-        icon: <BarChartFillIcon />,
+        icon: <RiBarChartFill />,
         text: <Trans i18nKey="MENU_TABS.STATISTICS" />,
         label: "Statistics",
+        i18nKey: "MENU_TABS.STATISTICS",
         link: "statistics"
     },
 
     {
         id: 12,
-        icon: <ServerFillIcon />,
+        icon: <RiServerFill />,
         text: <Trans i18nKey="MENU_TABS.SERVER" />,
         label: "Server",
+        i18nKey: "MENU_TABS.SERVER",
         link: "server-management"
     },
     {
+        id: 17,
+        icon: <RiUserStarFill />,
+        text: <Trans i18nKey="MENU_TABS.MY_GLANCE" />,
+        label: "My Glance",
+        i18nKey: "MENU_TABS.MY_GLANCE",
+        link: "me"
+    },
+    {
         id: 13,
-        icon: <SettingsFillIcon />,
+        icon: <RiSettingsFill />,
         text: <Trans i18nKey="MENU_TABS.SETTINGS" />,
         label: "Settings",
+        i18nKey: "MENU_TABS.SETTINGS",
         link: "settings"
     }
     ,
 
     {
         id: 14,
-        icon: <InformationFillIcon />,
+        icon: <RiInformationFill />,
         text: <Trans i18nKey="MENU_TABS.ABOUT" />,
         label: "About",
+        i18nKey: "MENU_TABS.ABOUT",
         link: "about"
     }
 

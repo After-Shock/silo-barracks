@@ -3,10 +3,7 @@ import { Link } from "react-router-dom";
 
 import "../../../css/lastplayed.css";
 import { Trans } from "react-i18next";
-import TvLineIcon from "remixicon-react/TvLineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import FileMusicLineIcon from "remixicon-react/FileMusicLineIcon";
-import CheckboxMultipleBlankLineIcon from "remixicon-react/CheckboxMultipleBlankLineIcon";
+import { RiCheckboxMultipleBlankLine, RiFileMusicLine, RiFilmLine, RiTvLine } from "@remixicon/react";
 import baseUrl from "../../../../lib/baseurl";
 
 function RecentlyAddedCard(props) {
@@ -25,10 +22,10 @@ function RecentlyAddedCard(props) {
     hour12: twelve_hr,
   };
 
-  const SeriesIcon = <TvLineIcon size={"75%"} />;
-  const MovieIcon = <FilmLineIcon size={"75%"} />;
-  const MusicIcon = <FileMusicLineIcon size={"75%"} />;
-  const MixedIcon = <CheckboxMultipleBlankLineIcon size={"75%"} />;
+  const SeriesIcon = <RiTvLine size={"75%"} />;
+  const MovieIcon = <RiFilmLine size={"75%"} />;
+  const MusicIcon = <RiFileMusicLine size={"75%"} />;
+  const MixedIcon = <RiCheckboxMultipleBlankLine size={"75%"} />;
 
   const currentLibraryDefaultIcon =
     props.data.Type === "Movie"

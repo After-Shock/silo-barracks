@@ -48,6 +48,31 @@
   border-color: var(--barracks-border-strong) !important;
 }
 
+.stat-card-row {
+  display: flex;
+  width: 100%;
+  min-height: 150px;
+}
+
+.stat-card-banner {
+  flex: 1 1 0;
+  max-width: 100%;
+  padding: 0;
+}
+
+.stat-card-main {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+  padding: 16px;
+}
+
+@media (max-width: 991.98px) {
+  .stat-card-banner {
+    display: none;
+  }
+}
+
 .stat-card-overlay {
   display: grid;
   grid-template-columns: 86px minmax(0, 1fr);

@@ -7,36 +7,62 @@ const express = require("express");
 const compression = require("compression");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const knex = require("knex");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
+const { mountSwaggerUi } = require("./swagger-page");
 const sanitizeFilename = require("./utils/sanitizer");
 const { getBackupDir } = require("./utils/storage-paths");
 const { createAuthenticate } = require('./middleware/authenticate');
+const {
+  apiRateLimit,
+  assertPathInside,
+  authRateLimit,
+  fileRateLimit,
+  staticRateLimit,
+  taskRateLimit,
+} = require("./utils/security");
 
 // db
 const dbInstance = require("./db");
 const createdb = require("./create_database");
-const knexConfig = require("./migrations");
 
 // routes
 const authRouter = require("./routes/auth");
 const apiRouter = require("./routes/api");
+const commandCenterRouter = require("./routes/command-center");
 const proxyRouter = require("./routes/proxy");
+const { requireAdminSettings, isAdminSettingsPath } = require("./classes/route-guards");
 const { router: syncRouter } = require("./routes/sync");
 const statsRouter = require("./routes/stats");
 const backupRouter = require("./routes/backup");
+const { firstRunRestoreHandler, getFirstRunRestoreStatusHandler } = require("./routes/backup");
 const tautulliRouter = require("./routes/tautulli");
+const externalImportsRouter = require("./routes/external-imports");
+const serverTasksRouter = require("./routes/server-tasks");
 const jellystatRouter = require("./routes/jellystat");
 const logRouter = require("./routes/logging");
 const utilsRouter = require("./routes/utils");
 const webhooksRouter = require("./routes/webhooks");
+const cleanuparrInboundRouter = require("./routes/cleanuparr-inbound");
 const newsletterRouter = require("./routes/newsletter");
+const insightsRouter = require("./routes/insights");
+const opsCopilotRouter = require("./routes/ops-copilot");
+const incompleteSeasonsRouter = require("./routes/incomplete-seasons");
+const subtitleGapRouter = require("./routes/subtitle-gap");
+const alertsRouter = require("./routes/alerts");
+const webhookOutRouter = require("./routes/webhook-out");
+const { publicRouter: publicStatusRouter, adminRouter: publicStatusAdminRouter } = require("./routes/public-status");
+const thresholdAlerts = require("./classes/threshold-alerts");
 
 // tasks
 const ActivityMonitor = require("./tasks/ActivityMonitor");
 const TaskManager = require("./classes/task-manager-singleton");
 const TaskScheduler = require("./classes/task-scheduler-singleton");
+const { bootstrapFromEnv } = require("./classes/env-bootstrap");
+const { runLatestMigrations } = require("./classes/run-migrations");
+const { getWebhookCard } = require("./classes/discord-webhook-media");
+const { DEFAULT_ROLE_PERMISSIONS, getRolePermissions } = require("./classes/role-permissions");
+const { normalizeApiKeyScope } = require("./classes/api-key-scope");
 // const WebhookScheduler = require("./classes/webhook-scheduler");
 // const tasks = require("./tasks/tasks");
 
@@ -44,12 +70,12 @@ const TaskScheduler = require("./classes/task-scheduler-singleton");
 const { setupWebSocketServer } = require("./ws");
 const writeEnvVariables = require("./classes/env");
 const { buildEnvContent } = require("./classes/env");
+const { buildAppManifest } = require("./utils/app-manifest");
 
 process.env.POSTGRES_USER = process.env.POSTGRES_USER ?? "postgres";
 process.env.POSTGRES_ROLE = process.env.POSTGRES_ROLE ?? process.env.POSTGRES_USER;
 
 const app = express();
-const db = knex(knexConfig.development);
 
 const ensureSlashes = (url) => {
   if (!url.startsWith("/")) {
@@ -61,10 +87,11 @@ const ensureSlashes = (url) => {
   return url;
 };
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT || process.env.JS_PORT || 3000);
 const LISTEN_IP = process.env.JS_LISTEN_IP || "0.0.0.0";
 const JWT_SECRET = process.env.JWT_SECRET;
 const BASE_NAME = process.env.JS_BASE_URL ? ensureSlashes(process.env.JS_BASE_URL) : "";
+
 const DEFAULT_ALLOWED_ORIGINS = [
   `http://localhost:${PORT}`,
   `http://127.0.0.1:${PORT}`,
@@ -115,14 +142,6 @@ if (JWT_SECRET === undefined) {
   process.exit(1); // end the program with error status code
 }
 
-const DEFAULT_ROLE_PERMISSIONS = {
-  Owner: { dashboard: true, users: true, settings: true, apiKeys: true },
-  Admin: { dashboard: true, users: true, settings: true, apiKeys: true },
-  Manager: { dashboard: true, users: true, settings: false, apiKeys: false },
-  Viewer: { dashboard: true, users: false, settings: false, apiKeys: false },
-  Disabled: { dashboard: false, users: false, settings: false, apiKeys: false },
-};
-
 // middlewares
 app.set("trust proxy", 1);
 app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || "1mb" })); // middleware to parse JSON request bodies
@@ -160,50 +179,23 @@ app.use((req, res, next) => {
   next();
 });
 
-function createRateLimiter({ windowMs, max, message }) {
-  const hits = new Map();
-
-  return (req, res, next) => {
-    const key = req.ip || req.socket?.remoteAddress || "unknown";
-    const now = Date.now();
-    const current = hits.get(key) || { count: 0, resetAt: now + windowMs };
-
-    if (current.resetAt <= now) {
-      current.count = 0;
-      current.resetAt = now + windowMs;
-    }
-
-    current.count += 1;
-    hits.set(key, current);
-    res.setHeader("RateLimit-Limit", String(max));
-    res.setHeader("RateLimit-Remaining", String(Math.max(0, max - current.count)));
-    res.setHeader("RateLimit-Reset", String(Math.ceil(current.resetAt / 1000)));
-
-    if (current.count > max) {
-      res.status(429).json({ message });
-      return;
-    }
-
-    next();
-  };
-}
-
-const authRateLimit = createRateLimiter({
-  windowMs: 15 * 60 * 1000,
-  max: Number(process.env.AUTH_RATE_LIMIT_MAX || 60),
-  message: "Too many authentication requests. Try again later.",
-});
 function authRateLimitUnlessPublicStatus(req, res, next) {
   if (req.method === "GET" && req.path === "/isConfigured") {
     return next();
   }
   return authRateLimit(req, res, next);
 }
-const taskRateLimit = createRateLimiter({
-  windowMs: 60 * 1000,
-  max: Number(process.env.TASK_RATE_LIMIT_MAX || 20),
-  message: "Too many task requests. Try again shortly.",
-});
+
+function isSocketIoPath(pathnameOrUrl) {
+  try {
+    const pathname = String(pathnameOrUrl || "").includes("://")
+      ? new URL(pathnameOrUrl, "http://jellyglance.local").pathname
+      : String(pathnameOrUrl || "").split("?")[0];
+    return pathname === "/socket.io" || pathname.startsWith("/socket.io/");
+  } catch {
+    return false;
+  }
+}
 
 function typeInferenceMiddleware(req, res, next) {
   Object.keys(req.query).forEach((key) => {
@@ -310,19 +302,42 @@ function getTranslationFilePath(req) {
 
 //hacky middleware to handle basename changes for UI
 
+// Built JS/CSS chunks have content-hashed names and a full app load pulls ~200 of them,
+// so counting them against the static limit blanks the page after a couple of reloads.
+// Only files that exist in the build index are exempt; everything else is still limited.
+const HASHED_ASSET_REGEX = /\/assets\/[^/]+-[A-Za-z0-9_-]{8,}\.(js|css)$/;
+function isBuiltAsset(req) {
+  if (req.method !== "GET" && req.method !== "HEAD") return false;
+  const pathname = getRequestPathname(req);
+  if (!HASHED_ASSET_REGEX.test(pathname)) return false;
+  const filePath = getStaticAssetPath(req);
+  return Boolean(filePath && filePath.startsWith(path.join(root, "assets") + path.sep));
+}
+
+app.use((req, res, next) => (isBuiltAsset(req) ? next() : staticRateLimit(req, res, next)));
 app.use((req, res, next) => {
   if (BASE_NAME && BASE_NAME != "" && (req.url == "/" || req.url == "")) {
     return res.redirect(BASE_NAME);
   }
-  // Ignore requests containing 'socket.io'
-  if (req.url.includes("socket.io") || req.url.includes("swagger") || req.url.startsWith("/backup")) {
+  const pathname = getRequestPathname(req);
+  const isSwaggerAsset = pathname === "/swagger.json" || pathname === "/swagger-ui" || pathname.startsWith("/swagger-ui/");
+
+  // Keep socket, backup, webhook cards, and swagger-ui assets off the SPA static rewrite.
+  // /swagger is the SPA route that redirects to Settings → Swagger.
+  if (isSocketIoPath(req.url) || req.url.startsWith("/backup") || req.url.includes("webhook-cards") || isSwaggerAsset) {
+    if (isSwaggerAsset && BASE_NAME && req.url.startsWith(BASE_NAME) && req.url !== BASE_NAME) {
+      req.url = req.url.slice(BASE_NAME.length);
+    }
     return next();
   }
-
-  const pathname = getRequestPathname(req);
   if (pathname === "/env.js" || (BASE_NAME && pathname === `${BASE_NAME}/env.js`)) {
     res.set("Cache-Control", "no-store");
     return res.type("application/javascript").send(buildEnvContent());
+  }
+  if (pathname === "/app.webmanifest" || (BASE_NAME && pathname === `${BASE_NAME}/app.webmanifest`)) {
+    const requested = new URL(req.url, "http://localhost").searchParams.get("start");
+    res.set("Cache-Control", "no-store");
+    return res.type("application/manifest+json").send(JSON.stringify(buildAppManifest(requested === "/me" ? "/me" : "/", BASE_NAME)));
   }
 
   const translationFilePath = getTranslationFilePath(req);
@@ -358,6 +373,8 @@ const authenticationOptions = {
   findApiKeys: async () => dbInstance.query('SELECT api_keys FROM app_config where "ID"=1')
     .then(result => result.rows[0].api_keys),
   ownerPermissions: DEFAULT_ROLE_PERMISSIONS.Owner,
+  resolveApiKeyScope: (match) => normalizeApiKeyScope(match.scope, { fallback: 'full' }),
+  onApiKeyMatch: (match) => { touchApiKeyLastUsed(match.key); },
 };
 const authenticate = createAuthenticate(authenticationOptions);
 const authenticateFleet = createAuthenticate({
@@ -371,7 +388,7 @@ app.use("/proxy", (req, res, next) => {
   if (/^\/(Items|Users)\/Images\/(Primary|Backdrop)\/?$/i.test(req.path)) return proxyRouter(req, res, next);
   return next();
 });
-app.use("/proxy", authenticate, authorizeApiRoute, proxyRouter, () => {
+app.use("/proxy", apiRateLimit, authenticateProxyAsset, restrictApiKeyScope, authorizeProxyRoute, proxyRouter, () => {
   /*  #swagger.tags = ['Proxy']*/
 }); // mount the API router at /proxy
 let fleetRouter;
@@ -386,54 +403,75 @@ app.use("/api/startTask", taskRateLimit);
 app.use("/api/server-management/action", taskRateLimit);
 app.use("/sync", taskRateLimit);
 app.use("/backup/beginBackup", taskRateLimit);
-app.use("/api", authenticate, authorizeApiRoute, apiRouter, () => {
+app.post("/backup/first-run/restore", taskRateLimit, firstRunRestoreHandler);
+app.get("/backup/first-run/restore/status", getFirstRunRestoreStatusHandler);
+app.get("/webhook-cards/:id.jpg", fileRateLimit, (req, res) => {
+  const card = getWebhookCard(req.params.id);
+  if (!card) {
+    return res.status(404).type("text/plain").send("Not found");
+  }
+  res.setHeader("Content-Type", card.contentType || "image/jpeg");
+  res.setHeader("Cache-Control", "public, max-age=600");
+  return res.end(card.buffer);
+});
+app.use("/cleanuparr", apiRateLimit, cleanuparrInboundRouter);
+app.use("/api", apiRateLimit, authenticate, restrictApiKeyScope, authorizeApiRoute, commandCenterRouter, apiRouter, () => {
   /*  #swagger.tags = ['API']*/
 }); // mount the API router at /api, with JWT middleware
-app.use("/sync", authenticate, requirePermission("settings"), syncRouter, () => {
+app.use("/sync", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), syncRouter, () => {
   /*  #swagger.tags = ['Sync']*/
 }); // mount the API router at /sync, with JWT middleware
-app.use("/stats", authenticate, statsRouter, () => {
+app.use("/insights-data/library-health", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"));
+app.use("/insights-data/streams", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"));
+app.use("/insights-data", apiRateLimit, authenticate, restrictApiKeyScope, insightsRouter);
+app.use("/ops-copilot", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), opsCopilotRouter);
+app.use("/incomplete-seasons", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), incompleteSeasonsRouter);
+app.use("/subtitle-gap", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), subtitleGapRouter);
+app.use("/alerts-data", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), alertsRouter);
+app.use("/webhook-out-data", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), webhookOutRouter);
+app.use("/status-data/admin", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), publicStatusAdminRouter);
+app.use("/status-data", apiRateLimit, publicStatusRouter);
+app.use("/stats", apiRateLimit, authenticate, restrictApiKeyScope, statsRouter, () => {
   /*  #swagger.tags = ['Stats']*/
 }); // mount the API router at /stats, with JWT middleware
-app.use("/backup", authenticate, requirePermission("settings"), backupRouter, () => {
+app.use("/backup", fileRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), backupRouter, () => {
   /*  #swagger.tags = ['Backup']*/
 }); // mount the API router at /backup, with JWT middleware
-app.use("/tautulli", authenticate, requirePermission("settings"), tautulliRouter, () => {
+app.use("/tautulli", fileRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), tautulliRouter, () => {
   /*  #swagger.tags = ['Tautulli']*/
 }); // mount the Tautulli import router with settings permission
-app.use("/jellystat", authenticate, requirePermission("settings"), jellystatRouter, () => {
+app.use("/jellystat", fileRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), jellystatRouter, () => {
   /*  #swagger.tags = ['Jellystat']*/
 }); // mount the Jellystat import router with settings permission
-app.use("/logs", authenticate, requirePermission("settings"), logRouter, () => {
+app.use("/external-imports", fileRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), externalImportsRouter, () => {
+  /*  #swagger.tags = ['Imports']*/
+}); // mount the Jellyfin watch sync and Trakt import router with settings permission
+app.use("/server-tasks", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), serverTasksRouter, () => {
+  /*  #swagger.tags = ['Server tasks']*/
+}); // mount ARR task running and task active times with settings permission
+app.use("/logs", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), logRouter, () => {
   /*  #swagger.tags = ['Logs']*/
 }); // mount the API router at /logs, with JWT middleware
-app.use("/utils", authenticate, requirePermission("settings"), utilsRouter, () => {
+app.use("/utils", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), utilsRouter, () => {
   /*  #swagger.tags = ['Utils']*/
 }); // mount the API router at /utils, with JWT middleware
-app.use("/webhooks", authenticate, requirePermission("settings"), webhooksRouter, () => {
+app.use("/webhooks", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), webhooksRouter, () => {
   /*  #swagger.tags = ['Webhooks']*/
 }); // mount the API router at /webhooks, with JWT middleware
-app.use("/newsletter", authenticate, requirePermission("settings"), newsletterRouter, () => {
+app.use("/newsletter", apiRateLimit, authenticate, restrictApiKeyScope, requirePermission("settings"), newsletterRouter, () => {
   /*  #swagger.tags = ['Newsletter']*/
 }); // mount the newsletter router with settings permission
 
-app.get("/backup-download/:filename", (req, res) => {
+app.get("/backup-download/:filename", fileRateLimit, (req, res) => {
   try {
     const filename = sanitizeFilename(req.params.filename);
-    const ticket = req.query.ticket;
-
-    if (!ticket || typeof ticket !== "string") {
-      res.status(401).send("Download ticket is required");
-      return;
-    }
-
-    const decoded = jwt.verify(ticket, JWT_SECRET);
+    const decoded = jwt.verify(String(req.query.ticket || ""), JWT_SECRET, { algorithms: ["HS256"] });
     if (decoded.purpose !== "backup-download" || decoded.filename !== filename) {
       res.status(403).send("Invalid download ticket");
       return;
     }
 
-    const filePath = path.join(getBackupDir(), filename);
+    const filePath = assertPathInside(getBackupDir(), path.join(getBackupDir(), filename));
     if (!fs.existsSync(filePath)) {
       res.status(404).send("Backup file not found");
       return;
@@ -451,14 +489,17 @@ app.get("/backup-download/:filename", (req, res) => {
   }
 });
 
-// Swagger
-app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// Swagger spec + standalone UI. The Glance app owns GET /swagger.
+mountSwaggerUi(app, swaggerUi, swaggerDocument);
 
 // for deployment of static page
 writeEnvVariables().then(() => {
   staticAssetIndex.clear();
   indexStaticAssets(root);
+  // staticRateLimit already applied globally; attach again so CodeQL sees these
+  // async-registered file handlers as rate-limited.
   app.use(
+    staticRateLimit,
     express.static(root, {
       setHeaders: (res, filePath) => {
         if ([".js", ".css", ".html"].includes(path.extname(filePath))) {
@@ -467,8 +508,8 @@ writeEnvVariables().then(() => {
       },
     })
   );
-  app.get("/{*splat}", (req, res, next) => {
-    if (req.url.includes("socket.io")) {
+  app.get("/{*splat}", staticRateLimit, (req, res, next) => {
+    if (isSocketIoPath(req.url)) {
       return next();
     }
     if (STATIC_FILE_EXTENSION_REGEX.test(getRequestPathname(req))) {
@@ -478,6 +519,91 @@ writeEnvVariables().then(() => {
     res.sendFile(path.join(root, "index.html"));
   });
 });
+
+// JWT middleware
+const apiKeyTouchTimes = new Map();
+const API_KEY_TOUCH_MS = 2 * 60 * 1000;
+const WIDGET_API_PATHS = [
+  "/api/widgets",
+  "/api/ops-digest",
+  "/api/library-storage",
+  "/api/jellyfin/status",
+  "/api/item-glance",
+  "/api/downloads/stitched",
+];
+
+function requestPath(req) {
+  return String(req.originalUrl || req.url || "").split("?")[0].toLowerCase();
+}
+
+function isWidgetsOnlyPath(req) {
+  const full = requestPath(req);
+  return WIDGET_API_PATHS.some((prefix) => full === prefix || full.startsWith(`${prefix}/`));
+}
+
+function restrictApiKeyScope(req, res, next) {
+  if (!req.apiKeyScope || req.apiKeyScope === "full") {
+    next();
+    return;
+  }
+  const write = req.apiKeyScope === "widgets-write";
+  const methodOk = req.method === "GET" || req.method === "HEAD" || (write && req.method === "POST");
+  if (!methodOk) {
+    return res.status(403).json({ message: write ? "This API key cannot use that method" : "This API key is widgets-only" });
+  }
+  if (!isWidgetsOnlyPath(req)) {
+    return res.status(403).json({ message: write ? "This API key is widgets-write only" : "This API key is widgets-only" });
+  }
+  next();
+}
+
+async function touchApiKeyLastUsed(apiKey) {
+  const now = Date.now();
+  if (now - (apiKeyTouchTimes.get(apiKey) || 0) < API_KEY_TOUCH_MS) return;
+  apiKeyTouchTimes.set(apiKey, now);
+  try {
+    const row = await dbInstance.query('SELECT api_keys FROM app_config where "ID"=1').then((result) => result.rows[0]);
+    const keys = Array.isArray(row?.api_keys) ? row.api_keys : [];
+    if (!keys.some((item) => item.key === apiKey)) return;
+    const next = keys.map((item) => (item.key === apiKey ? { ...item, lastUsed: new Date().toISOString() } : item));
+    await dbInstance.query('UPDATE app_config SET api_keys=$1 where "ID"=1', [JSON.stringify(next)]);
+  } catch (error) {
+    console.warn("[API-KEY] last-used update failed:", error.message);
+  }
+}
+
+function isPublicProxyAssetRequest(req) {
+  if (req.method !== "GET") {
+    return false;
+  }
+
+  const pathName = req.path.toLowerCase();
+  return (
+    pathName.startsWith("/items/images/") ||
+    pathName.startsWith("/users/images/") ||
+    pathName.startsWith("/plugins/images/") ||
+    pathName.startsWith("/audiobookshelf/images/") ||
+    pathName.startsWith("/web/assets/img/devices/")
+  );
+}
+
+function authenticateProxyAsset(req, res, next) {
+  if (isPublicProxyAssetRequest(req)) {
+    next();
+    return;
+  }
+
+  return authenticate(req, res, next);
+}
+
+function authorizeProxyRoute(req, res, next) {
+  if (isPublicProxyAssetRequest(req)) {
+    next();
+    return;
+  }
+
+  return authorizeApiRoute(req, res, next);
+}
 
 function getTokenPermissions(user) {
   if (user === "internal") {
@@ -493,17 +619,6 @@ function getTokenPermissions(user) {
   }
 
   return DEFAULT_ROLE_PERMISSIONS.Owner;
-}
-
-function getRolePermissions(settings, role) {
-  if (role === "Owner" || role === "Disabled") {
-    return DEFAULT_ROLE_PERMISSIONS[role];
-  }
-
-  return {
-    ...(DEFAULT_ROLE_PERMISSIONS[role] || DEFAULT_ROLE_PERMISSIONS.Viewer),
-    ...((settings.rolePermissions || {})[role] || {}),
-  };
 }
 
 async function resolveTokenAccess(user) {
@@ -584,6 +699,50 @@ function authorizeApiRoute(req, res, next) {
     return;
   }
 
+  if (pathName === "/sessions/stop" || pathName === "/sessions/message") {
+    if (!["Owner", "Admin"].includes(req.user?.role)) {
+      return res.status(403).json({ message: "Admin role required" });
+    }
+    next();
+    return;
+  }
+
+  // Read-only server status is used by the Homarr/Homepage widget kit, so widget keys can read it.
+  if (pathName === "/jellyfin/status" && (req.method === "GET" || req.method === "HEAD")) {
+    return requirePermission("dashboard")(req, res, next);
+  }
+
+  if (pathName.startsWith("/jellyfin/refresh")) {
+    if (!["Owner", "Admin"].includes(req.user?.role)) {
+      return res.status(403).json({ message: "Admin role required" });
+    }
+    next();
+    return;
+  }
+
+  if (pathName.startsWith("/downloads")) {
+    if (req.permissions?.downloads || req.permissions?.settings) {
+      next();
+      return;
+    }
+    if (req.method === "GET" || req.method === "HEAD") {
+      return requirePermission("dashboard")(req, res, next);
+    }
+    return requirePermission("settings")(req, res, next);
+  }
+
+  if (pathName.startsWith("/tdarr")) {
+    if (req.method === "GET" || req.method === "HEAD") {
+      return requirePermission("dashboard")(req, res, next);
+    }
+    return requirePermission("settings")(req, res, next);
+  }
+
+  // Probes arbitrary user-supplied URLs, so it's limited to admins with the settings permission.
+  if (isAdminSettingsPath(pathName)) {
+    return requireAdminSettings(req, res, next);
+  }
+
   if (pathName.startsWith("/server-management") || pathName.startsWith("/session-controls")) {
     if (!req.permissions?.settings || !["Owner", "Admin"].includes(req.user?.role)) {
       return res.status(403).json({ message: "Admin role required" });
@@ -592,9 +751,31 @@ function authorizeApiRoute(req, res, next) {
     return;
   }
 
-  if ((pathName.startsWith("/requests/") && (pathName.endsWith("/actions") || pathName.endsWith("/edit"))) || pathName === "/requests/manage") {
+  if (
+    (pathName.startsWith("/requests/") && (pathName.endsWith("/actions") || pathName.endsWith("/edit"))) ||
+    pathName === "/requests/manage" ||
+    pathName.startsWith("/requests/issues")
+  ) {
     if (!["Owner", "Admin"].includes(req.user?.role)) {
       return res.status(403).json({ message: "Admin role required" });
+    }
+    next();
+    return;
+  }
+
+
+  // Primary owner username/password changes must stay Owner-only (GHSA-fcf4-f825-3347).
+  if (pathName === "/updatecredentials" || pathName === "/updatepassword") {
+    if (req.user?.role !== "Owner") {
+      return res.status(403).json({ message: "Owner role required" });
+    }
+    next();
+    return;
+  }
+
+  if (pathName.startsWith("/requests/user-folders") || pathName === "/requests/folder-options") {
+    if (!req.permissions?.users && !["Owner", "Admin"].includes(req.user?.role)) {
+      return res.status(403).json({ message: "Users permission required" });
     }
     next();
     return;
@@ -618,13 +799,13 @@ function authorizeApiRoute(req, res, next) {
             pathName.startsWith("/wizarr") ||
             pathName.startsWith("/jellyfin/") ||
             pathName.startsWith("/first-run") ||
-            pathName.startsWith("/downloads/add") ||
             pathName.startsWith("/starttask") ||
             pathName.startsWith("/stoptask") ||
             pathName.startsWith("/gettasksettings") ||
             pathName.startsWith("/getactivitymonitorsettings") ||
             pathName.startsWith("/checkforupdates") ||
             pathName.startsWith("/admin-audit") ||
+            pathName.startsWith("/playback-retention") ||
             pathName.startsWith("/deleteplaybackactivity") ||
             pathName.startsWith("/getbackuptables")
           ? "settings"
@@ -633,34 +814,80 @@ function authorizeApiRoute(req, res, next) {
   return requirePermission(permission)(req, res, next);
 }
 
+// Graceful shutdown: on SIGTERM/SIGINT (docker stop, Ctrl+C) stop the background
+// timers, stop accepting connections, close the database pool and exit. A hard
+// exit after SHUTDOWN_TIMEOUT_MS covers connections that never close.
+const background = {};
+const SHUTDOWN_TIMEOUT_MS = 10000;
+function installShutdownHandlers(server) {
+  let shuttingDown = false;
+  const shutdown = (signal) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log(`[Barracks] ${signal} received, shutting down`);
+    setTimeout(() => process.exit(0), SHUTDOWN_TIMEOUT_MS).unref();
+    try {
+      background.taskScheduler?.stop?.();
+      background.taskManager?.stop?.();
+      thresholdAlerts.stop();
+      require("./classes/status-page").stopStatusChecks();
+      require("./classes/config-ready").stop();
+      require("./classes/timers").stopAll();
+    } catch (error) {
+      console.warn("[Barracks] Error stopping background work:", error.message);
+    }
+    server.close(() => {
+      dbInstance.pool
+        .end()
+        .catch(() => {})
+        .finally(() => process.exit(0));
+    });
+    if (typeof server.closeIdleConnections === "function") server.closeIdleConnections();
+  };
+  process.once("SIGTERM", () => shutdown("SIGTERM"));
+  process.once("SIGINT", () => shutdown("SIGINT"));
+}
+
 // start server
-try {
-  createdb.createDatabase().then((result) => {
-    if (result) {
-      console.log("[Barracks] Database created");
-    } else {
-      console.log("[Barracks] Database exists. Skipping creation");
+(async () => {
+  try {
+    const created = await createdb.createDatabase();
+    console.log(created ? "[Barracks] Database created" : "[Barracks] Database exists. Skipping creation");
+
+    await runLatestMigrations();
+
+    try {
+      await bootstrapFromEnv({ afterTaskManager: false });
+    } catch (error) {
+      console.error("[BOOTSTRAP] Env setup failed:", error.message);
     }
 
-    db.migrate.latest().then(() => {
-      const server = http.createServer(app);
-
-      setupWebSocketServer(server, BASE_NAME, { resolveTokenAccess });
-      server.listen(PORT, LISTEN_IP, async () => {
-        console.log(`[Barracks] Server listening on http://${LISTEN_IP}:${PORT}`);
-        if (require('./classes/provider').getProvider() === 'silo') {
-          // Silo owns playback history retention. Fleet polling serves live state
-          // without duplicating Silo history into Barracks PostgreSQL.
-          require('./classes/fleet-service').startFleet();
-        } else {
-          ActivityMonitor.ActivityMonitor(1000);
-        }
-        new TaskManager();
-        new TaskScheduler();
-        // new WebhookScheduler();
-      });
+    const server = http.createServer(app);
+    server.requestTimeout = 0;
+    server.headersTimeout = 0;
+    setupWebSocketServer(server, BASE_NAME, { resolveTokenAccess });
+    installShutdownHandlers(server);
+    server.listen(PORT, LISTEN_IP, async () => {
+      console.log(`[Barracks] Server listening on http://${LISTEN_IP}:${PORT}`);
+      if (require('./classes/provider').getProvider() === 'silo') {
+        // Silo owns playback history retention. Fleet polling serves live state
+        // without duplicating Silo history into Barracks PostgreSQL.
+        require('./classes/fleet-service').startFleet();
+      } else {
+        ActivityMonitor.ActivityMonitor(1000);
+      }
+      background.taskManager = new TaskManager();
+      background.taskScheduler = new TaskScheduler();
+      thresholdAlerts.start();
+      require("./classes/status-page").startStatusChecks();
+      try {
+        await bootstrapFromEnv({ afterTaskManager: true });
+      } catch (error) {
+        console.error("[BOOTSTRAP] Post-task env setup failed:", error.message);
+      }
     });
-  });
-} catch (error) {
-  console.log("[Barracks] An error has occured on startup: " + error);
-}
+  } catch (error) {
+    console.error("[Barracks] Startup failed:", error.message || error);
+    process.exit(1);
+  }
+})();

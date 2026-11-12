@@ -1,10 +1,7 @@
-import Button from "react-bootstrap/Button";
-import Dropdown from "react-bootstrap/Dropdown";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import i18next from "i18next";
-import PlayCircleLineIcon from "remixicon-react/PlayCircleLineIcon";
-import StopCircleLineIcon from "remixicon-react/StopCircleLineIcon";
-import TimerLineIcon from "remixicon-react/TimerLineIcon";
-import LinksLineIcon from "remixicon-react/LinksLineIcon";
+import { RiLinksLine, RiPlayCircleLine, RiStopCircleLine, RiTimerLine } from "@remixicon/react";
 
 import "../../css/settings/settings.css";
 
@@ -36,41 +33,43 @@ function Task({ task, taskState, processing, taskIntervals, updateTask, onClick,
 
       <div className="task-card-meta">
         <div>
-          <TimerLineIcon size={18} />
+          <RiTimerLine size={18} />
           <span>{task.type === "JOB" ? intervalLabel : "Manual"}</span>
         </div>
         <div className={hasTaskWebhook ? "is-enabled" : ""}>
-          <LinksLineIcon size={18} />
+          <RiLinksLine size={18} />
           <span>{hasTaskWebhook ? "Webhook wired" : "No task webhook"}</span>
         </div>
       </div>
 
       <div className="task-card-actions">
         {task.type === "JOB" ? (
-          <Dropdown>
-            <Dropdown.Toggle variant="outline-primary" className="dropdown-basic">
-              {intervalLabel}
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="dropdown-basic task-interval-toggle">
+                {intervalLabel}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="task-interval-menu">
               {intervals.map((interval) => (
-                <Dropdown.Item onClick={() => updateTask(task.name, interval.value)} value={interval.value} key={interval.value}>
+                <DropdownMenuItem onSelect={() => updateTask(task.name, interval.value)} value={interval.value} key={interval.value}>
                   {interval.display}
-                </Dropdown.Item>
+                </DropdownMenuItem>
               ))}
-            </Dropdown.Menu>
-          </Dropdown>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
           <span />
         )}
 
         {state?.running ? (
-          <Button variant="danger" onClick={() => stopTask(task.name)} disabled={processing}>
-            <StopCircleLineIcon size={17} />
+          <Button variant="destructive" onClick={() => stopTask(task.name)} disabled={processing}>
+            <RiStopCircleLine size={17} className="tw:size-[17px]" />
             Stop
           </Button>
         ) : (
-          <Button variant="primary" onClick={() => onClick(task.link)} disabled={processing}>
-            <PlayCircleLineIcon size={17} />
+          <Button onClick={() => onClick(task.link)} disabled={processing}>
+            <RiPlayCircleLine size={17} className="tw:size-[17px]" />
             Start
           </Button>
         )}

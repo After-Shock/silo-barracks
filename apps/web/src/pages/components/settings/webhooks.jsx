@@ -1,23 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "../../../lib/axios_instance";
-import { Alert, Button, Form, Spinner } from "react-bootstrap";
-import InformationLineIcon from "remixicon-react/InformationLineIcon";
-import LinksLineIcon from "remixicon-react/LinksLineIcon";
-import Notification3LineIcon from "remixicon-react/Notification3LineIcon";
-import PlayCircleLineIcon from "remixicon-react/PlayCircleLineIcon";
-import StopCircleLineIcon from "remixicon-react/StopCircleLineIcon";
-import Movie2LineIcon from "remixicon-react/Movie2LineIcon";
-import TaskLineIcon from "remixicon-react/TaskLineIcon";
-import CalendarEventLineIcon from "remixicon-react/CalendarEventLineIcon";
-import DownloadCloud2LineIcon from "remixicon-react/DownloadCloud2LineIcon";
-import HeartPulseLineIcon from "remixicon-react/HeartPulseLineIcon";
-import UserAddLineIcon from "remixicon-react/UserAddLineIcon";
-import CheckboxCircleLineIcon from "remixicon-react/CheckboxCircleLineIcon";
-import ErrorWarningLineIcon from "remixicon-react/ErrorWarningLineIcon";
-import Edit2LineIcon from "remixicon-react/Edit2LineIcon";
-import DeleteBinLineIcon from "remixicon-react/DeleteBinLineIcon";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
+import { Spinner } from "@/components/ui/spinner";
+import DismissibleAlert from "./dismissible-alert";
+import { RiAlarmWarningLine, RiCalendarEventLine, RiCheckboxCircleLine, RiDeleteBinLine, RiDownloadCloud2Line, RiEdit2Line, RiErrorWarningLine, RiHeartPulseLine, RiInformationLine, RiLinksLine, RiMovie2Line, RiNotification3Line, RiPlayCircleLine, RiStopCircleLine, RiTaskLine, RiUserAddLine } from "@remixicon/react";
 import { Tooltip } from "@mui/material";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import Loading from "../general/loading";
 import ErrorBoundary from "../general/ErrorBoundary";
 import { taskList } from "../../../lib/tasklist.jsx";
@@ -34,6 +25,18 @@ const webhookTypeMeta = {
     label: "Gotify",
     placeholder: "https://gotify.example.com/message?token=APP_TOKEN",
   },
+  ntfy: {
+    label: "ntfy",
+    placeholder: "https://ntfy.sh/your-topic",
+  },
+  telegram: {
+    label: "Telegram",
+    placeholder: "https://api.telegram.org/bot<token>/sendMessage?chat_id=<chat-id>",
+  },
+  pushover: {
+    label: "Pushover",
+    placeholder: "https://api.pushover.net/1/messages.json?token=APP_TOKEN&user=USER_KEY",
+  },
   generic: {
     label: "Generic",
     placeholder: "https://example.com/webhook",
@@ -45,91 +48,115 @@ const eventCards = [
     id: "playback_started",
     title: "Playback started",
     text: "When a Jellyfin user starts watching.",
-    Icon: PlayCircleLineIcon,
+    Icon: RiPlayCircleLine,
   },
   {
     id: "playback_ended",
     title: "Playback ended",
     text: "When a Jellyfin user finishes playback.",
-    Icon: StopCircleLineIcon,
+    Icon: RiStopCircleLine,
   },
   {
     id: "media_recently_added",
     title: "New media synced",
     text: "When recently added media is pulled in.",
-    Icon: Movie2LineIcon,
+    Icon: RiMovie2Line,
   },
   {
     id: "task_started",
     title: "Task started",
     text: "When a Barracks job begins.",
-    Icon: TaskLineIcon,
+    Icon: RiTaskLine,
   },
   {
     id: "task_completed",
     title: "Task completed",
     text: "When a Barracks job completes.",
-    Icon: CheckboxCircleLineIcon,
+    Icon: RiCheckboxCircleLine,
   },
   {
     id: "task_failed",
     title: "Task failed",
     text: "When a job fails or is stopped.",
-    Icon: ErrorWarningLineIcon,
+    Icon: RiErrorWarningLine,
   },
   {
     id: "calendar_refreshed",
     title: "Calendar refreshed",
     text: "When Arr release data is pulled into Calendar.",
-    Icon: CalendarEventLineIcon,
+    Icon: RiCalendarEventLine,
   },
   {
     id: "download_queue_refreshed",
     title: "Downloads refreshed",
     text: "When download clients are polled.",
-    Icon: DownloadCloud2LineIcon,
+    Icon: RiDownloadCloud2Line,
   },
   {
     id: "download_added",
     title: "Download added",
     text: "When a magnet, torrent URL, or torrent file is queued.",
-    Icon: DownloadCloud2LineIcon,
+    Icon: RiDownloadCloud2Line,
   },
   {
     id: "download_completed",
     title: "Download completed",
     text: "When a download finishes.",
-    Icon: CheckboxCircleLineIcon,
+    Icon: RiCheckboxCircleLine,
   },
   {
     id: "download_failed",
     title: "Download failed",
     text: "When a download client reports a failed item.",
-    Icon: ErrorWarningLineIcon,
+    Icon: RiErrorWarningLine,
   },
   {
     id: "invite_created",
     title: "Invite created",
     text: "When a Wizarr invite link is created.",
-    Icon: UserAddLineIcon,
+    Icon: RiUserAddLine,
   },
   {
     id: "invite_deleted",
     title: "Invite deleted",
     text: "When a Wizarr invite link is removed.",
-    Icon: DeleteBinLineIcon,
+    Icon: RiDeleteBinLine,
   },
   {
     id: "invite_links_refreshed",
     title: "Invites refreshed",
     text: "When Wizarr invite state is synced.",
-    Icon: LinksLineIcon,
+    Icon: RiLinksLine,
   },
   {
     id: "integration_health_warning",
     title: "Integration health warning",
     text: "When a connected client test fails.",
-    Icon: HeartPulseLineIcon,
+    Icon: RiHeartPulseLine,
+  },
+  {
+    id: "threshold_alert",
+    title: "Threshold alert",
+    text: "Stuck downloads, low disk space, failed server jobs and new devices.",
+    Icon: RiAlarmWarningLine,
+  },
+  {
+    id: "device_authorized",
+    title: "New Jellyfin client",
+    text: "When a device appears on Jellyfin that Glance has not seen before.",
+    Icon: RiUserAddLine,
+  },
+    {
+    id: "ops_digest",
+    title: "Ops digest",
+    text: "When failed jobs, stuck downloads, or webhook failures pile up.",
+    Icon: RiErrorWarningLine,
+  },
+  {
+    id: "playback_digest",
+    title: "Overnight playback digest",
+    text: "One summary after quiet hours instead of overnight start/stop pings.",
+    Icon: RiPlayCircleLine,
   },
 ];
 
@@ -160,14 +187,14 @@ const webhookTemplates = [
     id: "discord-ops",
     name: "Discord Ops",
     type: "discord",
-    events: ["task_failed", "integration_health_warning", "download_failed"],
+    events: ["task_failed", "integration_health_warning", "download_failed", "threshold_alert"],
     taskFilters: [],
   },
   {
     id: "gotify-health",
     name: "Gotify Health",
     type: "gotify",
-    events: ["integration_health_warning", "task_failed"],
+    events: ["integration_health_warning", "task_failed", "threshold_alert"],
     taskFilters: [],
   },
   {
@@ -255,7 +282,66 @@ function groupWebhookRows(rows) {
   return Array.from(groups.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
+const CARD_DETAIL_TOGGLES = ["showPlayMethod", "showMetaLine", "showGenres", "showProgress", "showOverview"];
+const CARD_ARTWORK_TOGGLES = ["showPoster", "showAvatar"];
+const CARD_TOGGLE_KEYS = ["showClientIcon", "showMediaDetails", ...CARD_DETAIL_TOGGLES, ...CARD_ARTWORK_TOGGLES];
+
+function normalizeCardState(data = {}) {
+  const next = {
+    style: data.style === "text" ? "text" : "card",
+    theme: data.theme || "glance",
+    accentColor: /^#[0-9a-f]{6}$/i.test(data.accentColor || "") ? data.accentColor : "",
+  };
+  for (const key of CARD_TOGGLE_KEYS) next[key] = data[key] !== false;
+  return next;
+}
+
+function TextWebhookPreview({ settings, t }) {
+  const details = settings.showMediaDetails !== false;
+  const fields = [
+    [t("FEATURES.OPS.PREVIEW_FIELD_CLIENT"), "Infuse · Apple TV"],
+  ];
+  if (settings.showPlayMethod !== false) fields.push([t("FEATURES.OPS.PREVIEW_FIELD_PLAYBACK"), "Direct Play"]);
+  if (details) {
+    fields.push([t("FEATURES.OPS.PREVIEW_FIELD_QUALITY"), "4K HDR10 · HEVC · EAC3 5.1"]);
+    if (settings.showProgress !== false) fields.push([t("FEATURES.OPS.PREVIEW_FIELD_PROGRESS"), "18:04 / 45:10 (40%)"]);
+    if (settings.showGenres !== false) fields.push([t("FEATURES.OPS.PREVIEW_FIELD_GENRES"), "Drama, Thriller, Mystery"]);
+  }
+  return (
+    <div
+      className="webhook-text-preview"
+      aria-label={t("FEATURES.OPS.CARD_STYLE_text")}
+      style={settings.accentColor ? { borderLeftColor: settings.accentColor } : undefined}
+    >
+      <div className="webhook-text-preview-body">
+        <div className="webhook-text-preview-author">
+          {settings.showAvatar !== false ? <span className="webhook-text-preview-avatar">N</span> : null}
+          <span>Nerdy · {t("FEATURES.OPS.PREVIEW_NOW_PLAYING")}</span>
+        </div>
+        <strong className="webhook-text-preview-title">Night Shift</strong>
+        <p className="webhook-text-preview-desc">
+          S01E04 · The Watcher
+          {details && settings.showMetaLine !== false ? <><br />2024 · TV-14 · 45m · ★ 8.2</> : null}
+        </p>
+        {details && settings.showOverview !== false ? (
+          <p className="webhook-text-preview-overview">A late shift at the station turns strange when an old case resurfaces.</p>
+        ) : null}
+        <div className="webhook-text-preview-fields">
+          {fields.map(([name, value]) => (
+            <div key={name}>
+              <span>{name}</span>
+              <b>{value}</b>
+            </div>
+          ))}
+        </div>
+      </div>
+      {settings.showPoster !== false ? <div className="webhook-text-preview-poster" aria-hidden="true" /> : null}
+    </div>
+  );
+}
+
 export default function WebhooksSettings() {
+  const { t } = useTranslation();
   const [webhooks, setWebhooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -263,6 +349,17 @@ export default function WebhooksSettings() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [currentWebhook, setCurrentWebhook] = useState(defaultWebhook);
+  const [quietHours, setQuietHours] = useState({ enabled: false, start: "22:00", end: "08:00", digest: true });
+  const [quietSaving, setQuietSaving] = useState(false);
+  const [cardSettings, setCardSettings] = useState(() => normalizeCardState());
+  const [cardSaving, setCardSaving] = useState(false);
+  const [cardPreviewUrl, setCardPreviewUrl] = useState("");
+  const [accentDraft, setAccentDraft] = useState("");
+  const cardPreviewKey = JSON.stringify({ ...cardSettings, style: undefined });
+
+  useEffect(() => {
+    setAccentDraft(cardSettings.accentColor || "");
+  }, [cardSettings.accentColor]);
 
   const groupedWebhooks = useMemo(() => groupWebhookRows(webhooks), [webhooks]);
   const activeEventCount = groupedWebhooks.reduce(
@@ -280,6 +377,19 @@ export default function WebhooksSettings() {
       setError(null);
       const response = await axios.get("/webhooks", { headers });
       setWebhooks(response.data);
+      const quietResponse = await axios.get("/webhooks/quiet-hours", { headers }).catch(() => null);
+      if (quietResponse?.data) {
+        setQuietHours({
+          enabled: Boolean(quietResponse.data.enabled),
+          start: quietResponse.data.start || "22:00",
+          end: quietResponse.data.end || "08:00",
+          digest: quietResponse.data.digest !== false,
+        });
+      }
+      const cardResponse = await axios.get("/webhooks/card-settings", { headers }).catch(() => null);
+      if (cardResponse?.data) {
+        setCardSettings(normalizeCardState(cardResponse.data));
+      }
     } catch (err) {
       console.error("Error loading webhooks:", err);
       setError("Unable to load webhooks: " + (err.response?.data?.error || err.message));
@@ -293,6 +403,64 @@ export default function WebhooksSettings() {
     const intervalId = setInterval(loadWebhooks, 1000 * 10);
     return () => clearInterval(intervalId);
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    let objectUrl = "";
+    axios
+      .get("/webhooks/card-preview", {
+        headers,
+        params: { ...cardSettings, style: undefined },
+        responseType: "blob",
+      })
+      .then((response) => {
+        if (!active) return;
+        objectUrl = URL.createObjectURL(response.data);
+        setCardPreviewUrl((current) => {
+          if (current) URL.revokeObjectURL(current);
+          return objectUrl;
+        });
+      })
+      .catch(() => {
+        if (active) setCardPreviewUrl("");
+      });
+    return () => {
+      active = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [cardPreviewKey]);
+
+  async function saveCardSettings(nextCard) {
+    try {
+      setCardSaving(true);
+      setError(null);
+      const response = await axios.post("/webhooks/card-settings", nextCard, { headers });
+      setCardSettings(normalizeCardState(response.data));
+      setSuccess(t("FEATURES.OPS.CARD_SAVED"));
+    } catch (err) {
+      setError(err.response?.data?.error || t("FEATURES.OPS.CARD_SAVE_FAIL"));
+    } finally {
+      setCardSaving(false);
+    }
+  }
+
+  async function saveQuietHours(nextQuiet) {
+    try {
+      setQuietSaving(true);
+      setError(null);
+      const response = await axios.post("/webhooks/quiet-hours", nextQuiet, { headers });
+      setQuietHours({
+        enabled: Boolean(response.data.enabled),
+        start: response.data.start || "22:00",
+        end: response.data.end || "08:00",
+      });
+      setSuccess(t("FEATURES.OPS.QUIET_SAVED"));
+    } catch (err) {
+      setError(err.response?.data?.error || t("FEATURES.OPS.QUIET_SAVE_FAIL"));
+    } finally {
+      setQuietSaving(false);
+    }
+  }
 
   function resetForm() {
     setCurrentWebhook(defaultWebhook);
@@ -488,7 +656,7 @@ export default function WebhooksSettings() {
           <h1>
             Webhook Configuration{" "}
             <Tooltip title={<Trans i18nKey={"SETTINGS_PAGE.WEBHOOKS_TOOLTIP"} />}>
-              <InformationLineIcon size={20} />
+              <RiInformationLine size={20} />
             </Tooltip>
           </h1>
           <p>Add one or many webhook destinations, then tick exactly which Barracks events should trigger each one.</p>
@@ -501,26 +669,191 @@ export default function WebhooksSettings() {
         </div>
       </div>
 
+      <section className="webhook-quiet-hours">
+        <div>
+          <h2>{t("FEATURES.OPS.QUIET_HOURS")}</h2>
+          <p>{t("FEATURES.OPS.QUIET_HOURS_INTRO")}</p>
+        </div>
+        <label className="webhook-quiet-toggle">
+          <input
+            type="checkbox"
+            checked={Boolean(quietHours.enabled)}
+            disabled={quietSaving}
+            onChange={(event) => saveQuietHours({ ...quietHours, enabled: event.target.checked })}
+          />
+          {t("FEATURES.OPS.QUIET_ENABLED")}
+        </label>
+        <label className="webhook-quiet-toggle">
+          <input
+            type="checkbox"
+            checked={quietHours.digest !== false}
+            disabled={quietSaving}
+            onChange={(event) => saveQuietHours({ ...quietHours, digest: event.target.checked })}
+          />
+          {t("FEATURES.OPS.QUIET_DIGEST")}
+        </label>
+        <label>
+          {t("FEATURES.OPS.QUIET_START")}
+          <input
+            type="time"
+            value={quietHours.start}
+            disabled={quietSaving}
+            onChange={(event) => setQuietHours((current) => ({ ...current, start: event.target.value }))}
+            onBlur={(event) => saveQuietHours({ ...quietHours, start: event.target.value })}
+          />
+        </label>
+        <label>
+          {t("FEATURES.OPS.QUIET_END")}
+          <input
+            type="time"
+            value={quietHours.end}
+            disabled={quietSaving}
+            onChange={(event) => setQuietHours((current) => ({ ...current, end: event.target.value }))}
+            onBlur={(event) => saveQuietHours({ ...quietHours, end: event.target.value })}
+          />
+        </label>
+      </section>
+
+      <section className="webhook-card-theme">
+        <div>
+          <h2>{t("FEATURES.OPS.CARD_THEME")}</h2>
+          <p>{t("FEATURES.OPS.CARD_THEME_INTRO")}</p>
+        </div>
+        <div className="webhook-card-theme-options">
+          <div className="webhook-card-theme-group webhook-card-style-group" role="group" aria-label={t("FEATURES.OPS.CARD_STYLE")}>
+            {["card", "text"].map((style) => (
+              <button
+                type="button"
+                key={style}
+                className={cardSettings.style === style ? "is-active" : ""}
+                disabled={cardSaving}
+                title={t(`FEATURES.OPS.CARD_STYLE_${style}_HINT`)}
+                onClick={() => saveCardSettings({ ...cardSettings, style })}
+              >
+                {t(`FEATURES.OPS.CARD_STYLE_${style}`)}
+              </button>
+            ))}
+          </div>
+          <div className="webhook-card-theme-group">
+            <button
+              type="button"
+              className={cardSettings.theme === "match" ? "is-active" : ""}
+              disabled={cardSaving}
+              onClick={() => saveCardSettings({ ...cardSettings, theme: "match" })}
+            >
+              {t("FEATURES.OPS.THEME_match")}
+            </button>
+          </div>
+          <div className="webhook-card-theme-group">
+            {["glance", "jellyfin", "midnight", "compact"].map((theme) => (
+              <button
+                type="button"
+                key={theme}
+                className={cardSettings.theme === theme ? "is-active" : ""}
+                disabled={cardSaving}
+                onClick={() => saveCardSettings({ ...cardSettings, theme })}
+              >
+                {t(`FEATURES.OPS.THEME_${theme}`)}
+              </button>
+            ))}
+          </div>
+          <label className="webhook-quiet-toggle">
+            <input
+              type="checkbox"
+              checked={cardSettings.showClientIcon !== false}
+              disabled={cardSaving}
+              onChange={(event) => saveCardSettings({ ...cardSettings, showClientIcon: event.target.checked })}
+            />
+            {t("FEATURES.OPS.SHOW_CLIENT_ICON")}
+          </label>
+          <label className="webhook-quiet-toggle">
+            <input
+              type="checkbox"
+              checked={cardSettings.showMediaDetails !== false}
+              disabled={cardSaving}
+              onChange={(event) => saveCardSettings({ ...cardSettings, showMediaDetails: event.target.checked })}
+            />
+            {t("FEATURES.OPS.SHOW_MEDIA_DETAILS")}
+          </label>
+        </div>
+        <div className="webhook-card-customise">
+          <div className="webhook-card-accent">
+            <span>{t("FEATURES.OPS.CARD_ACCENT")}</span>
+            <input
+              type="color"
+              aria-label={t("FEATURES.OPS.CARD_ACCENT")}
+              value={accentDraft || "#7c3aed"}
+              disabled={cardSaving}
+              onChange={(event) => setAccentDraft(event.target.value)}
+              onBlur={() => {
+                if (accentDraft && accentDraft !== cardSettings.accentColor) saveCardSettings({ ...cardSettings, accentColor: accentDraft });
+              }}
+            />
+            <button
+              type="button"
+              className={!cardSettings.accentColor ? "is-active" : ""}
+              disabled={cardSaving || !cardSettings.accentColor}
+              onClick={() => saveCardSettings({ ...cardSettings, accentColor: "" })}
+            >
+              {t("FEATURES.OPS.CARD_ACCENT_EVENT")}
+            </button>
+          </div>
+          <fieldset className="webhook-card-toggle-group" disabled={cardSaving}>
+            <legend>{t("FEATURES.OPS.CARD_ARTWORK")}</legend>
+            {CARD_ARTWORK_TOGGLES.map((key) => (
+              <label className="webhook-quiet-toggle" key={key}>
+                <input
+                  type="checkbox"
+                  checked={cardSettings[key] !== false}
+                  onChange={(event) => saveCardSettings({ ...cardSettings, [key]: event.target.checked })}
+                />
+                {t(`FEATURES.OPS.CARD_TOGGLE_${key}`)}
+              </label>
+            ))}
+          </fieldset>
+          {cardSettings.showMediaDetails !== false ? (
+            <fieldset className="webhook-card-toggle-group" disabled={cardSaving}>
+              <legend>{t("FEATURES.OPS.CARD_DETAILS")}</legend>
+              {CARD_DETAIL_TOGGLES.map((key) => (
+                <label className="webhook-quiet-toggle" key={key}>
+                  <input
+                    type="checkbox"
+                    checked={cardSettings[key] !== false}
+                    onChange={(event) => saveCardSettings({ ...cardSettings, [key]: event.target.checked })}
+                  />
+                  {t(`FEATURES.OPS.CARD_TOGGLE_${key}`)}
+                </label>
+              ))}
+            </fieldset>
+          ) : null}
+        </div>
+        {cardSettings.style === "text" ? (
+          <TextWebhookPreview settings={cardSettings} t={t} />
+        ) : cardPreviewUrl ? (
+          <img className="webhook-card-preview" src={cardPreviewUrl} alt={t("FEATURES.OPS.CARD_THEME")} />
+        ) : null}
+      </section>
+
       <ErrorBoundary>
         {error && (
-          <Alert variant="danger" onClose={() => setError(null)} dismissible>
+          <DismissibleAlert type="danger" onClose={() => setError(null)}>
             {error}
-          </Alert>
+          </DismissibleAlert>
         )}
         {success && (
-          <Alert variant="success" onClose={() => setSuccess(false)} dismissible>
+          <DismissibleAlert type="success" onClose={() => setSuccess(false)}>
             {success}
-          </Alert>
+          </DismissibleAlert>
         )}
 
-        <Form onSubmit={handleFormSubmit} className="settings-form webhook-builder">
+        <form onSubmit={handleFormSubmit} className="settings-form webhook-builder">
           <div className="webhook-builder-header">
             <div>
-              <Notification3LineIcon size={22} />
+              <RiNotification3Line size={22} />
               <strong>{currentWebhook.groupKey ? "Edit webhook destination" : "Add webhook destination"}</strong>
             </div>
             {currentWebhook.groupKey ? (
-              <Button type="button" variant="outline-secondary" onClick={resetForm}>
+              <Button type="button" variant="secondary" onClick={resetForm}>
                 New webhook
               </Button>
             ) : null}
@@ -535,26 +868,27 @@ export default function WebhooksSettings() {
           </div>
 
           <div className="webhook-form-grid">
-            <Form.Group>
-              <Form.Label>Webhook Name</Form.Label>
-              <Form.Control type="text" name="name" value={currentWebhook.name} onChange={handleInputChange} placeholder="Discord alerts" required />
-            </Form.Group>
+            <div>
+              <Label htmlFor="webhook-name">Webhook Name</Label>
+              <Input id="webhook-name" type="text" name="name" value={currentWebhook.name} onChange={handleInputChange} placeholder="Discord alerts" required />
+            </div>
 
-            <Form.Group>
-              <Form.Label>Webhook Type</Form.Label>
-              <Form.Select name="webhook_type" value={currentWebhook.webhook_type} onChange={handleInputChange}>
+            <div>
+              <Label htmlFor="webhook-type">Webhook Type</Label>
+              <NativeSelect id="webhook-type" name="webhook_type" value={currentWebhook.webhook_type} onChange={handleInputChange}>
                 {Object.entries(webhookTypeMeta).map(([value, meta]) => (
                   <option key={value} value={value}>
                     {meta.label}
                   </option>
                 ))}
-              </Form.Select>
-            </Form.Group>
+              </NativeSelect>
+            </div>
           </div>
 
-          <Form.Group>
-            <Form.Label>Webhook URL</Form.Label>
-            <Form.Control
+          <div>
+            <Label htmlFor="webhook-url">Webhook URL</Label>
+            <Input
+              id="webhook-url"
               type="text"
               name="url"
               value={currentWebhook.url}
@@ -563,13 +897,19 @@ export default function WebhooksSettings() {
               required
             />
             {currentWebhook.webhook_type === "gotify" ? (
-              <small className="text-secondary d-block mt-2">Use the Gotify message endpoint with an app token.</small>
+              <small className="form-text">Use the Gotify message endpoint with an app token.</small>
+            ) : currentWebhook.webhook_type === "ntfy" ? (
+              <small className="form-text">Use a topic URL. For private servers, put the access token in Headers as Authorization Bearer.</small>
+            ) : currentWebhook.webhook_type === "telegram" ? (
+              <small className="form-text">Use the Bot API sendMessage URL and include chat_id as a query parameter.</small>
+            ) : currentWebhook.webhook_type === "pushover" ? (
+              <small className="form-text">Use the Pushover messages endpoint with token and user query parameters.</small>
             ) : null}
-          </Form.Group>
+          </div>
 
           <div className="webhook-event-picker">
             <div className="webhook-event-picker-title">
-              <LinksLineIcon size={19} />
+              <RiLinksLine size={19} />
               <strong>Trigger this webhook for</strong>
             </div>
             <div className="webhook-event-check-grid">
@@ -607,7 +947,7 @@ export default function WebhooksSettings() {
           {currentWebhook.events.some((event) => taskEventIds.includes(event)) ? (
             <div className="webhook-task-picker">
               <div className="webhook-event-picker-title">
-                <TaskLineIcon size={19} />
+                <RiTaskLine size={19} />
                 <strong>Optional task filter</strong>
               </div>
               <p>Leave as all tasks, or choose specific Barracks jobs for task started/completed/failed events.</p>
@@ -638,18 +978,22 @@ export default function WebhooksSettings() {
           ) : null}
 
           <div className="webhook-builder-actions">
-            <Form.Check
-              type="switch"
-              id="webhook-enabled"
-              label="Enable webhook"
-              checked={currentWebhook.enabled}
-              onChange={() => setCurrentWebhook((prev) => ({ ...prev, enabled: !prev.enabled }))}
-            />
-            <Button variant="primary" type="submit" disabled={saving}>
-              {saving ? <Spinner size="sm" animation="border" /> : currentWebhook.groupKey ? "Save Changes" : "Add Webhook"}
+            <label className="form-check form-switch">
+              <input
+                id="webhook-enabled"
+                type="checkbox"
+                role="switch"
+                className="form-check-input"
+                checked={currentWebhook.enabled}
+                onChange={() => setCurrentWebhook((prev) => ({ ...prev, enabled: !prev.enabled }))}
+              />
+              <span>Enable webhook</span>
+            </label>
+            <Button type="submit" disabled={saving}>
+              {saving ? <Spinner className="tw:size-4" /> : currentWebhook.groupKey ? "Save Changes" : "Add Webhook"}
             </Button>
           </div>
-        </Form>
+        </form>
 
         <div className="webhook-destination-grid">
           {groupedWebhooks.map((group) => (
@@ -685,15 +1029,15 @@ export default function WebhooksSettings() {
               ) : null}
 
               <div className="webhook-destination-actions">
-                <Button variant="outline-secondary" onClick={() => handleTest(group)} disabled={testingId === group.groupKey}>
-                  {testingId === group.groupKey ? <Spinner size="sm" animation="border" /> : "Test"}
+                <Button variant="secondary" onClick={() => handleTest(group)} disabled={testingId === group.groupKey}>
+                  {testingId === group.groupKey ? <Spinner className="tw:size-4" /> : "Test"}
                 </Button>
-                <Button variant="outline-primary" onClick={() => editWebhookGroup(group)}>
-                  <Edit2LineIcon size={16} />
+                <Button variant="outline" onClick={() => editWebhookGroup(group)}>
+                  <RiEdit2Line size={16} />
                   Edit
                 </Button>
-                <Button variant="outline-secondary" onClick={() => deleteWebhookGroup(group)} disabled={saving}>
-                  <DeleteBinLineIcon size={16} />
+                <Button variant="secondary" onClick={() => deleteWebhookGroup(group)} disabled={saving}>
+                  <RiDeleteBinLine size={16} />
                   Delete
                 </Button>
               </div>
@@ -702,7 +1046,7 @@ export default function WebhooksSettings() {
 
           {groupedWebhooks.length === 0 ? (
             <div className="webhook-empty-state">
-              <LinksLineIcon size={28} />
+              <RiLinksLine size={28} />
               <strong>No webhooks yet</strong>
               <span>Add a destination above, tick the events, and Barracks will notify it automatically.</span>
             </div>

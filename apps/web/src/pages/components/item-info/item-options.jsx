@@ -2,9 +2,11 @@
 import axios from "../../../lib/axios_instance";
 import i18next from "i18next";
 import { useState } from "react";
-import { Container, Row,Col, Modal } from "react-bootstrap";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Trans } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useWatchingLock } from "../general/WatchingLockModal";
 
 
 function ItemOptions(props) {
@@ -23,11 +25,15 @@ function ItemOptions(props) {
   ];
   const [selectedOption, setSelectedOption] = useState(options[0]);
   const navigate = useNavigate();
+  const { guard, modal: watchingModal } = useWatchingLock();
 
 
 
   async function execPurge(withActivity) {
     const url=`/api/item/purge`;
+    setShow(false);
+    const { proceed } = await guard({ itemId: props.itemid, label: props.itemName }, "purge");
+    if (!proceed) return;
 
     return await axios.delete(url,
 
@@ -55,39 +61,37 @@ function ItemOptions(props) {
         <div className="Heading mb-3">
             <h1><Trans i18nKey="ITEM_INFO.ARCHIVED_DATA_OPTIONS"/></h1>
         </div>
-        <Container className="p-0 m-0">
+        <div>
             {options.map((option, index) => (
-                <Row key={index} className="mb-2 me-0">
-                    <Col>
+                <div className="item-option-row" key={index}>
+                    <div>
                         <span>{option.description}</span>
-                    </Col>
+                    </div>
 
-                    <Col>
-                        <button className="btn btn-danger w-25" onClick={()=>{setSelectedOption(option);setShow(true);}}><Trans i18nKey="ITEM_INFO.PURGE"/></button>
-                    </Col>
+                    <Button variant="destructive" className="w-25" onClick={()=>{setSelectedOption(option);setShow(true);}}><Trans i18nKey="ITEM_INFO.PURGE"/></Button>
 
-                </Row>
+                </div>
 
                 ))}
 
-            <Modal show={show} onHide={() =>{setShow(false);}}>
-                <Modal.Header closeButton>
-                  <Modal.Title><Trans i18nKey="ITEM_INFO.CONFIRM_ACTION"/></Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
+            <Dialog open={show} onOpenChange={(open) => { if (!open) { setShow(false); } }}>
+                <DialogContent showCloseButton={false}>
+                    <DialogTitle><Trans i18nKey="ITEM_INFO.CONFIRM_ACTION"/></DialogTitle>
+                    <DialogDescription className="tw:sr-only">Confirm this cache purge before it runs</DialogDescription>
                     <p>{i18next.t("ITEM_INFO.CONFIRM_ACTION_MESSAGE")+(selectedOption.withActivity ? ` ${i18next.t("ITEM_INFO.CONFIRM_ACTION_MESSAGE_2")}?` : "?")}</p>
-                </Modal.Body>
-                <Modal.Footer>
-                  <button className="btn btn-danger" onClick={() => {execPurge(selectedOption.withActivity);}}>
-                  <Trans i18nKey="ITEM_INFO.PURGE"/>
-                  </button>
-                  <button className="btn btn-primary" onClick={()=>{setShow(false);}}>
-                  <Trans i18nKey="CLOSE"/>
-                  </button>
-                </Modal.Footer>
-            </Modal>
+                    <DialogFooter>
+                      <Button variant="destructive" onClick={() => {execPurge(selectedOption.withActivity);}}>
+                      <Trans i18nKey="ITEM_INFO.PURGE"/>
+                      </Button>
+                      <Button onClick={()=>{setShow(false);}}>
+                      <Trans i18nKey="CLOSE"/>
+                      </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+            {watchingModal}
 
-        </Container>
+        </div>
 
 
     </div>

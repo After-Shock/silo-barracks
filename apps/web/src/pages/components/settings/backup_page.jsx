@@ -1,14 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "../../../lib/axios_instance";
-import { Alert, Button, Spinner } from "react-bootstrap";
-import ArchiveDrawerFillIcon from "remixicon-react/ArchiveDrawerFillIcon";
-import Database2LineIcon from "remixicon-react/Database2LineIcon";
-import DownloadCloud2LineIcon from "remixicon-react/DownloadCloud2LineIcon";
-import UploadCloud2LineIcon from "remixicon-react/UploadCloud2LineIcon";
-import DeleteBinLineIcon from "remixicon-react/DeleteBinLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import CheckboxCircleLineIcon from "remixicon-react/CheckboxCircleLineIcon";
-import ErrorWarningLineIcon from "remixicon-react/ErrorWarningLineIcon";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import DismissibleAlert from "./dismissible-alert";
+import { RiArchiveDrawerFill, RiCheckboxCircleLine, RiDatabase2Line, RiDeleteBinLine, RiDownloadCloud2Line, RiErrorWarningLine, RiRefreshLine, RiUploadCloud2Line } from "@remixicon/react";
 import "../../css/settings/backups.css";
 
 function getHeaders(contentType = "application/json") {
@@ -48,6 +43,7 @@ function BackupPage() {
   const [message, setMessage] = useState(null);
   const [busyAction, setBusyAction] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [destination, setDestination] = useState({ kind: "local", url: "", username: "", secret: "", bucket: "", region: "us-east-1", prefix: "" });
 
   const sortedFiles = useMemo(() => [...files].sort((a, b) => new Date(b.datecreated) - new Date(a.datecreated)), [files]);
   const includedTables = tables.filter((table) => !table.Excluded);
@@ -57,12 +53,15 @@ function BackupPage() {
 
   async function fetchData() {
     try {
-      const [tableResponse, fileResponse] = await Promise.all([
+      const [tableResponse, fileResponse, configResponse] = await Promise.all([
         axios.get("/api/getBackupTables", { headers: getHeaders() }),
         axios.get("/backup/files", { headers: getHeaders() }),
+        axios.get("/api/getconfig", { headers: getHeaders() }).catch(() => ({ data: {} })),
       ]);
       setTables(tableResponse.data || []);
       setFiles(fileResponse.data || []);
+      const dest = configResponse.data?.settings?.BackupDestination;
+      if (dest) setDestination({ kind: dest.kind || "local", url: dest.url || "", username: dest.username || "", secret: dest.secret || "", bucket: dest.bucket || "", region: dest.region || "us-east-1", prefix: dest.prefix || "" });
     } catch (error) {
       setMessage({ type: "danger", text: error.response?.data || "Unable to load backup data" });
     }
@@ -162,8 +161,8 @@ function BackupPage() {
       await axios.post("/backup/upload", formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "multipart/form-data",
         },
+        timeout: 0,
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
             setUploadProgress(Math.round((progressEvent.loaded / progressEvent.total) * 100));
@@ -190,12 +189,12 @@ function BackupPage() {
           <p>Create portable JSON backups, choose what data is included, and restore uploaded Barracks or legacy Jellystat files.</p>
         </div>
         <div className="backup-hero-actions">
-          <Button type="button" variant="primary" onClick={createBackup} disabled={Boolean(busyAction)}>
-            {busyAction === "create" ? <Spinner size="sm" animation="border" /> : <ArchiveDrawerFillIcon size={18} />}
+          <Button type="button" onClick={createBackup} disabled={Boolean(busyAction)}>
+            {busyAction === "create" ? <Spinner className="tw:size-4" /> : <RiArchiveDrawerFill size={18} className="tw:size-[18px]" />}
             Create Backup
           </Button>
           <label className="backup-upload-button">
-            {busyAction === "upload" ? <Spinner size="sm" animation="border" /> : <UploadCloud2LineIcon size={18} />}
+            {busyAction === "upload" ? <Spinner className="tw:size-4" /> : <RiUploadCloud2Line size={18} />}
             Upload JSON
             <input ref={fileInputRef} type="file" accept=".json,application/json" onChange={uploadBackup} />
           </label>
@@ -203,14 +202,68 @@ function BackupPage() {
       </header>
 
       {message ? (
-        <Alert variant={message.type} onClose={() => setMessage(null)} dismissible>
+        <DismissibleAlert type={message.type} onClose={() => setMessage(null)}>
           {message.text}
-        </Alert>
+        </DismissibleAlert>
       ) : null}
+
+      <section className="backup-panel">
+        <div className="backup-panel-heading">
+          <h2>Off-box copy</h2>
+        </div>
+        <p>After a local JSON backup finishes, Glance can copy it to WebDAV or an S3-compatible bucket (MinIO, Wasabi, AWS, Cloudflare R2) using SigV4.</p>
+        <div className="backup-destination-grid">
+          <label>
+            Destination
+            <select value={destination.kind} onChange={(event) => setDestination((current) => ({ ...current, kind: event.target.value }))}>
+              <option value="local">Local only</option>
+              <option value="webdav">WebDAV</option>
+              <option value="s3">S3-compatible</option>
+            </select>
+          </label>
+          <label>
+            {destination.kind === "s3" ? "Endpoint" : "URL"}
+            <input value={destination.url} onChange={(event) => setDestination((current) => ({ ...current, url: event.target.value }))} placeholder={destination.kind === "s3" ? "https://s3.amazonaws.com or https://minio.example" : "https://files.example/backups"} />
+          </label>
+          {destination.kind === "s3" ? (
+            <>
+              <label>
+                Bucket
+                <input value={destination.bucket} onChange={(event) => setDestination((current) => ({ ...current, bucket: event.target.value }))} placeholder="jellyglance-backups" />
+              </label>
+              <label>
+                Region
+                <input value={destination.region} onChange={(event) => setDestination((current) => ({ ...current, region: event.target.value }))} placeholder="us-east-1" />
+              </label>
+              <label>
+                Prefix
+                <input value={destination.prefix} onChange={(event) => setDestination((current) => ({ ...current, prefix: event.target.value }))} placeholder="optional/folder" />
+              </label>
+            </>
+          ) : null}
+          <label>
+            {destination.kind === "s3" ? "Access key" : "Username"}
+            <input value={destination.username} onChange={(event) => setDestination((current) => ({ ...current, username: event.target.value }))} />
+          </label>
+          <label>
+            {destination.kind === "s3" ? "Secret key" : "Password or token"}
+            <input type="password" value={destination.secret} onChange={(event) => setDestination((current) => ({ ...current, secret: event.target.value }))} />
+          </label>
+          <Button
+            type="button"
+            onClick={async () => {
+              await axios.post("/api/setBackupDestination", destination, { headers: getHeaders() });
+              setMessage({ type: "success", text: "Backup destination saved." });
+            }}
+          >
+            Save destination
+          </Button>
+        </div>
+      </section>
 
       <section className="backup-summary-grid">
         <article>
-          <Database2LineIcon />
+          <RiDatabase2Line />
           <div>
             <span>Included tables</span>
             <strong>{includedTables.length}</strong>
@@ -218,7 +271,7 @@ function BackupPage() {
           </div>
         </article>
         <article>
-          <ArchiveDrawerFillIcon />
+          <RiArchiveDrawerFill />
           <div>
             <span>Backup files</span>
             <strong>{files.length}</strong>
@@ -226,7 +279,7 @@ function BackupPage() {
           </div>
         </article>
         <article>
-          <RefreshLineIcon />
+          <RiRefreshLine />
           <div>
             <span>Latest backup</span>
             <strong>{latestBackup ? formatDate(latestBackup.datecreated) : "None yet"}</strong>
@@ -238,7 +291,7 @@ function BackupPage() {
       <section className="backup-panel">
         <div className="backup-panel-heading">
           <div>
-            <Database2LineIcon size={22} />
+            <RiDatabase2Line size={22} />
             <h2>Backup Coverage</h2>
           </div>
           <span>{includedTables.length} of {tables.length} tables included</span>
@@ -251,7 +304,7 @@ function BackupPage() {
               className={`backup-table-chip ${table.Excluded ? "is-excluded" : "is-included"}`}
               onClick={() => toggleTable(table.value)}
             >
-              {table.Excluded ? <ErrorWarningLineIcon size={16} /> : <CheckboxCircleLineIcon size={16} />}
+              {table.Excluded ? <RiErrorWarningLine size={16} /> : <RiCheckboxCircleLine size={16} />}
               <span>{table.name}</span>
               <small>{table.Excluded ? "Excluded" : "Included"}</small>
             </button>
@@ -262,7 +315,7 @@ function BackupPage() {
       <section className="backup-panel">
         <div className="backup-panel-heading">
           <div>
-            <ArchiveDrawerFillIcon size={22} />
+            <RiArchiveDrawerFill size={22} />
             <h2>Backup Files</h2>
           </div>
           {busyAction === "upload" ? <span>Uploading {uploadProgress}%</span> : <span>{files.length} available</span>}
@@ -272,7 +325,7 @@ function BackupPage() {
           {sortedFiles.map((file) => (
             <article className="backup-file-card" key={file.name}>
               <div className="backup-file-icon">
-                <ArchiveDrawerFillIcon size={26} />
+                <RiArchiveDrawerFill size={26} />
               </div>
               <div className="backup-file-main">
                 <h3>{file.name}</h3>
@@ -282,16 +335,16 @@ function BackupPage() {
                 </div>
               </div>
               <div className="backup-file-actions">
-                <Button type="button" variant="outline-primary" onClick={() => downloadBackup(file.name)} disabled={Boolean(busyAction)}>
-                  {busyAction === `download-${file.name}` ? <Spinner size="sm" animation="border" /> : <DownloadCloud2LineIcon size={16} />}
+                <Button type="button" variant="outline" onClick={() => downloadBackup(file.name)} disabled={Boolean(busyAction)}>
+                  {busyAction === `download-${file.name}` ? <Spinner className="tw:size-4" /> : <RiDownloadCloud2Line size={16} className="tw:size-[16px]" />}
                   Download
                 </Button>
-                <Button type="button" variant="outline-secondary" onClick={() => restoreBackup(file.name)} disabled={Boolean(busyAction)}>
-                  {busyAction === `restore-${file.name}` ? <Spinner size="sm" animation="border" /> : <RefreshLineIcon size={16} />}
+                <Button type="button" variant="secondary" onClick={() => restoreBackup(file.name)} disabled={Boolean(busyAction)}>
+                  {busyAction === `restore-${file.name}` ? <Spinner className="tw:size-4" /> : <RiRefreshLine size={16} className="tw:size-[16px]" />}
                   Restore
                 </Button>
-                <Button type="button" variant="outline-danger" onClick={() => deleteBackup(file.name)} disabled={Boolean(busyAction)}>
-                  {busyAction === `delete-${file.name}` ? <Spinner size="sm" animation="border" /> : <DeleteBinLineIcon size={16} />}
+                <Button type="button" variant="destructive" onClick={() => deleteBackup(file.name)} disabled={Boolean(busyAction)}>
+                  {busyAction === `delete-${file.name}` ? <Spinner className="tw:size-4" /> : <RiDeleteBinLine size={16} className="tw:size-[16px]" />}
                   Delete
                 </Button>
               </div>
@@ -299,7 +352,7 @@ function BackupPage() {
           ))}
           {sortedFiles.length === 0 ? (
             <div className="backup-empty-state">
-              <ArchiveDrawerFillIcon size={30} />
+              <RiArchiveDrawerFill size={30} />
               <strong>No backups yet</strong>
               <span>Create a backup or upload an existing Barracks or Jellystat JSON backup.</span>
             </div>

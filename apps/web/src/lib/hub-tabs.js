@@ -14,6 +14,13 @@ export const showServerNav = (flags) => serverHubTabIds(flags).length > 0;
 export const serverHubReachableIds = ({ isAdmin, isSilo }) => (isAdmin && !isSilo ? ['jobs', 'automation'] : ['automation']);
 
 // Visibility only drives the nav and tab bar; an explicitly requested reachable tab still opens.
+// PageTabs accepts the fork API (explicit visible/reachable id lists) and upstream's
+// (no lists; a tab with `visible: false` is hidden). Missing lists derive from tabs.
+export function hubTabIds(tabs = [], visible, reachable) {
+  const visibleIds = visible ?? tabs.filter((tab) => tab.visible !== false).map((tab) => tab.id);
+  return { visible: visibleIds, reachable: reachable ?? visibleIds };
+}
+
 export function resolveHubTabs({ visible, reachable, requested }) {
   const active = visible.includes(requested) || reachable.includes(requested) ? requested : visible[0] ?? null;
   const shown = active && !visible.includes(active) ? [...visible, active] : visible;

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from '../../../lib/axios_instance';
 import useFleet from '../../../lib/use-fleet';
-import { toast } from 'react-toastify';
+import { toast } from '../../../lib/toast';
 import '../../css/fleet.css';
 
 const emptyForm = { name: '', url: '', apiKey: '' };

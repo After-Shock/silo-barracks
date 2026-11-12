@@ -7,8 +7,37 @@ const API = require("../classes/api-loader");
 const { upstreamStatus } = require("../classes/silo/history-errors");
 
 const dayjs = require("dayjs");
+const { getIntegrations } = require("../classes/integration-store");
+const { fetchHouseholdWatchTonight } = require("../classes/watch-tonight");
+const { sendSafeError } = require("../utils/security");
+const { catalogCountSql, catalogCounts, groupPlaysByType } = require("../classes/library-types");
+const {
+  canViewAllUsers,
+  normalizeUserId,
+  ownMediaUserId,
+  resolveActivityScope,
+  resolveStatsUser,
+  restrictQueryToUser,
+  sameUserId,
+  sendForbidden,
+} = require("../classes/stats-access");
 
 const router = express.Router();
+
+router.use((req, res, next) => {
+  const pathName = String(req.path || "").toLowerCase();
+  if (pathName === "/gethomedashboard") {
+    if (req.permissions?.home === false) {
+      return res.status(403).json({ message: "Permission required: home" });
+    }
+    return next();
+  }
+  if (pathName === "/repair-hub") {
+    if (req.permissions?.repair || req.permissions?.settings) return next();
+    return res.status(403).json({ message: "Permission required: repair" });
+  }
+  next();
+});
 
 //functions
 function countOverlapsPerHour(records) {
@@ -127,6 +156,8 @@ router.get("/repair-hub", async (req, res) => {
       orphanedActivity,
       importedUnmatched,
       recentTaskFailures,
+      transcodeClients,
+      failedStarts,
     ] = await Promise.all([
       db.query(`
         SELECT
@@ -197,6 +228,34 @@ router.get("/repair-hub", async (req, res) => {
         ORDER BY "TimeRun" DESC
         LIMIT 6
       `),
+      db.query(`
+        SELECT
+          COALESCE(NULLIF("Client", ''), 'Unknown') AS "Client",
+          COALESCE(NULLIF("DeviceName", ''), 'Unknown') AS "DeviceName",
+          count(*)::int AS "Plays",
+          count(*) FILTER (WHERE lower(COALESCE("PlayMethod", '')) LIKE '%transcode%')::int AS "Transcodes"
+        FROM jf_playback_activity
+        WHERE "ActivityDateInserted" > NOW() - INTERVAL '30 days'
+        GROUP BY 1, 2
+        HAVING count(*) FILTER (WHERE lower(COALESCE("PlayMethod", '')) LIKE '%transcode%') >= 3
+        ORDER BY "Transcodes" DESC, "Plays" DESC
+        LIMIT 8
+      `).catch(() => ({ rows: [] })),
+      db.query(`
+        SELECT
+          COALESCE("NowPlayingItemId", '') AS "Id",
+          COALESCE(NULLIF("SeriesName", ''), "NowPlayingItemName") AS "Name",
+          count(*)::int AS "Fails",
+          max("ActivityDateInserted") AS "LastSeen"
+        FROM jf_playback_activity
+        WHERE "ActivityDateInserted" > NOW() - INTERVAL '30 days'
+          AND COALESCE("PlaybackDuration", 0) < 20
+          AND COALESCE("NowPlayingItemId", '') <> ''
+        GROUP BY 1, 2
+        HAVING count(*) >= 3
+        ORDER BY "Fails" DESC, max("ActivityDateInserted") DESC
+        LIMIT 8
+      `).catch(() => ({ rows: [] })),
     ]);
 
     const counts = issueCounts.rows[0] || {};
@@ -213,6 +272,8 @@ router.get("/repair-hub", async (req, res) => {
         orphanedActivity: Number(orphaned.Count || 0),
         unmatchedImports: Number(unmatched.Count || 0),
         taskFailures: recentTaskFailures.rowCount,
+        transcodeClients: (transcodeClients.rows || []).length,
+        failedStarts: (failedStarts.rows || []).length,
       },
       samples: {
         missingPosters: missingPosters.rows,
@@ -220,6 +281,8 @@ router.get("/repair-hub", async (req, res) => {
         missingRuntime: missingRuntime.rows,
         emptySeries: emptySeries.rows,
         taskFailures: recentTaskFailures.rows,
+        transcodeClients: transcodeClients.rows,
+        failedStarts: failedStarts.rows,
       },
       activityLinks: {
         orphanedLastSeen: orphaned.LastSeen || null,
@@ -238,12 +301,16 @@ router.get("/getLibraryOverview", async (req, res) => {
     res.send(rows);
   } catch (error) {
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
 router.get("/getHomeDashboard", async (req, res) => {
   try {
+    // Non-admins don't get the per-user leaderboards (Hall of Fame, quiet users). "Most active" becomes
+    // their own week instead. Server-wide totals without names stay as they are.
+    const scope = resolveActivityScope(req);
+    const ownWeekId = scope.admin ? null : scope.userId ? normalizeUserId(scope.userId) : null;
     const settingsResult = await db.query('SELECT settings FROM app_config where "ID"=1').catch(() => ({ rows: [] }));
     const excludedUsers = Array.isArray(settingsResult.rows?.[0]?.settings?.ExcludedUsers) ? settingsResult.rows[0].settings.ExcludedUsers : [];
     if (await isSiloProvider()) {
@@ -286,6 +353,8 @@ router.get("/getHomeDashboard", async (req, res) => {
       watchPartySuggestions,
       seasonGaps,
       automationFeed,
+      integrations,
+      watchTonight,
     ] = await Promise.all([
       db.query(`
         SELECT
@@ -308,6 +377,7 @@ router.get("/getHomeDashboard", async (req, res) => {
           COALESCE(sum(CASE WHEN "CollectionType" = 'tvshows' THEN "Library_Count" ELSE 0 END), 0)::int AS "Shows",
           COALESCE(sum(CASE WHEN "CollectionType" = 'tvshows' THEN "Episode_Count" ELSE 0 END), 0)::int AS "Episodes",
           COALESCE(sum(CASE WHEN "CollectionType" = 'music' THEN "Library_Count" ELSE 0 END), 0)::int AS "Artists",
+          ${catalogCountSql()},
           COALESCE(count(*) FILTER (WHERE archived = false), 0)::int AS "ActiveLibraries"
         FROM js_library_stats_overview
       `),
@@ -320,7 +390,8 @@ router.get("/getHomeDashboard", async (req, res) => {
         FROM js_library_stats_overview
         WHERE archived = false
       `),
-      db.query(`
+      scope.admin
+        ? db.query(`
         SELECT
           u."Id" AS "UserId",
           u."Name" AS "UserName",
@@ -333,7 +404,8 @@ router.get("/getHomeDashboard", async (req, res) => {
         GROUP BY u."Id", u."Name", u."PrimaryImageTag"
         ORDER BY count(a."Id") DESC, COALESCE(sum(a."PlaybackDuration"), 0) DESC, u."Name" ASC
         LIMIT 5
-      `, [excludedUsers]),
+      `, [excludedUsers])
+        : { rows: [] },
       db.query(`
         WITH library_plays AS (
           SELECT
@@ -362,7 +434,9 @@ router.get("/getHomeDashboard", async (req, res) => {
         ORDER BY count(*) DESC, COALESCE(sum("PlaybackDuration"), 0) DESC
         LIMIT 1
       `),
-      db.query(`
+      !scope.admin && !ownWeekId
+        ? { rows: [] }
+        : db.query(`
         SELECT
           "UserId",
           COALESCE(NULLIF("UserName", ''), 'Unknown user') AS "UserName",
@@ -370,11 +444,13 @@ router.get("/getHomeDashboard", async (req, res) => {
           COALESCE(sum("PlaybackDuration"), 0)::bigint AS "WatchSeconds"
         FROM jf_playback_activity
         WHERE "ActivityDateInserted" >= now() - interval '7 days'
+          ${scope.admin ? "" : `AND replace(lower("UserId"), '-', '') = $1`}
         GROUP BY "UserId", COALESCE(NULLIF("UserName", ''), 'Unknown user')
         ORDER BY count(*) DESC, COALESCE(sum("PlaybackDuration"), 0) DESC, COALESCE(NULLIF("UserName", ''), 'Unknown user') ASC
         LIMIT 1
-      `),
-      db.query(`
+      `, scope.admin ? [] : [ownWeekId]),
+      scope.admin
+        ? db.query(`
         SELECT
           u."Id" AS "UserId",
           u."Name" AS "UserName",
@@ -386,7 +462,8 @@ router.get("/getHomeDashboard", async (req, res) => {
         HAVING max(a."ActivityDateInserted") IS NULL OR max(a."ActivityDateInserted") < now() - interval '14 days'
         ORDER BY max(a."ActivityDateInserted") ASC NULLS FIRST, u."Name" ASC
         LIMIT 3
-      `),
+      `)
+        : { rows: [] },
       db.query(`
         SELECT
           count(*)::int AS "Plays",
@@ -455,6 +532,8 @@ router.get("/getHomeDashboard", async (req, res) => {
         ORDER BY "TimeRun" DESC
         LIMIT 8
       `),
+      getIntegrations().catch(() => ({ arrApps: [] })),
+      fetchHouseholdWatchTonight(excludedUsers).catch(() => []),
     ]);
 
     const totals = playbackTotals.rows[0] || {};
@@ -471,6 +550,7 @@ router.get("/getHomeDashboard", async (req, res) => {
     const trendDelta = (current, previous) => Number(current || 0) - Number(previous || 0);
 
     res.send({
+      scope: scope.admin ? "all" : "self",
       totals: {
         totalPlaybacks: Number(totals.TotalPlaybacks || 0),
         uniqueViewers: Number(totals.UniqueViewers || 0),
@@ -485,6 +565,7 @@ router.get("/getHomeDashboard", async (req, res) => {
         shows: Number(counts.Shows || 0),
         episodes: Number(counts.Episodes || 0),
         artists: Number(counts.Artists || 0),
+        ...catalogCounts(counts),
         activeLibraries: Number(activeLibraries.rows[0]?.Count || counts.ActiveLibraries || 0),
         size: Number(catalogSize.rows[0]?.Size || 0),
       },
@@ -553,12 +634,17 @@ router.get("/getHomeDashboard", async (req, res) => {
         plays: Number(item.Plays || 0),
         primaryImageHash: item.PrimaryImageHash,
       })),
+      watchTonight: Array.isArray(watchTonight) ? watchTonight : [],
       seasonGaps: seasonGaps.rows.map((item) => ({
         itemId: item.Id,
         name: item.Name,
         episodes: Number(item.Episodes || 0),
         primaryImageHash: item.PrimaryImageHash,
       })),
+      sonarrConnected: (integrations.arrApps || []).some((app) => {
+        const name = String(app.name || app.slug || "").toLowerCase();
+        return Boolean(app.connected && name.includes("sonarr"));
+      }),
       automationFeed: automationFeed.rows.map((item) => ({
         id: item.Id,
         name: item.Name,
@@ -569,7 +655,7 @@ router.get("/getHomeDashboard", async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(503).send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -631,7 +717,7 @@ router.post("/getMostViewedByType", async (req, res) => {
     res.send(rows);
   } catch (error) {
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -655,7 +741,7 @@ router.post("/getMostPopularByType", async (req, res) => {
     res.send(rows);
   } catch (error) {
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -670,7 +756,7 @@ router.post("/getMostViewedLibraries", async (req, res) => {
     res.send(rows);
   } catch (error) {
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -685,7 +771,7 @@ router.post("/getMostUsedClient", async (req, res) => {
     res.send(rows);
   } catch (error) {
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -696,11 +782,21 @@ router.post("/getMostActiveUsers", async (req, res) => {
     if (days === undefined) {
       _days = 30;
     }
-    const { rows } = await db.query(`select * from fs_most_active_user($1) limit 5`, [_days - 1]);
+    const scope = resolveActivityScope(req);
+    if (scope.admin) {
+      const { rows } = await db.query(`select * from fs_most_active_user($1) limit 5`, [_days - 1]);
+      return res.send(rows);
+    }
+    // Non-admins only get their own entry (or nothing), never the ranking of other users.
+    if (!scope.userId) return res.send([]);
+    const { rows } = await db.query(
+      `select * from fs_most_active_user($1) where replace(lower("UserId"), '-', '') = $2 limit 5`,
+      [_days - 1, normalizeUserId(scope.userId)]
+    );
     res.send(rows);
   } catch (error) {
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -747,6 +843,12 @@ router.get("/getPlaybackActivity", async (req, res) => {
     }
   }
 
+  const scope = resolveActivityScope(req, { filters: filtersArray });
+  if (scope.forbidden) return sendForbidden(res);
+  if (!scope.admin && !scope.userId) {
+    return res.send({ current_page: page, pages: 0, size: size, sort: sort, desc: desc, results: [], scope: "self" });
+  }
+
   const sortField = sortMap.find((item) => item.field === sort)?.column || "ActivityDateInserted";
   const values = [];
   try {
@@ -779,9 +881,18 @@ router.get("/getPlaybackActivity", async (req, res) => {
 
     query.values = values;
     dbHelper.buildFilterList(query, filtersArray, filterFields);
+    if (!scope.admin) restrictQueryToUser(query, scope.userId);
 
     const result = await dbHelper.query(query);
-    const response = { current_page: page, pages: result.pages, size: size, sort: sort, desc: desc, results: result.results };
+    const response = {
+      current_page: page,
+      pages: result.pages,
+      size: size,
+      sort: sort,
+      desc: desc,
+      results: result.results,
+      scope: scope.admin ? "all" : "self",
+    };
     if (search && search.length > 0) {
       response.search = search;
     }
@@ -792,7 +903,7 @@ router.get("/getPlaybackActivity", async (req, res) => {
     res.send(response);
   } catch (error) {
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -811,7 +922,22 @@ router.get("/getAllUserActivity", async (req, res) => {
         return res.status(upstreamStatus(error)).json({ error: "Unable to load Silo users" });
       }
     }
-    const { rows } = await db.query("SELECT * FROM jf_all_user_activity");
+    const admin = canViewAllUsers(req);
+    const ownId = admin ? null : ownMediaUserId(req.user);
+    if (!admin && !ownId) {
+      return res.send([]);
+    }
+    const { rows } = await db.query(
+      `
+      SELECT
+        a.*,
+        COALESCE(u."IsAdministrator", false) AS "IsAdministrator"
+      FROM jf_all_user_activity a
+      LEFT JOIN jf_users u ON u."Id" = a."UserId"
+      ${admin ? "" : `WHERE replace(lower(a."UserId"), '-', '') = $1`}
+    `,
+      admin ? [] : [normalizeUserId(ownId)]
+    );
     res.send(rows);
   } catch (error) {
     res.send([]);
@@ -935,7 +1061,13 @@ async function enrichUserWrapUp(user) {
 router.get("/getUserWrapUp", async (req, res) => {
   try {
     res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-    const { rows: users } = await db.query(`
+    const admin = canViewAllUsers(req);
+    const ownId = admin ? null : ownMediaUserId(req.user);
+    if (!admin && !ownId) {
+      return res.json([]);
+    }
+    const { rows: users } = await db.query(
+      `
       SELECT
         u."Id" AS "UserId",
         u."Name" AS "UserName",
@@ -949,16 +1081,19 @@ router.get("/getUserWrapUp", async (req, res) => {
         count(DISTINCT a."Client")::int AS "UniqueClients"
       FROM jf_users u
       LEFT JOIN jf_playback_activity a ON a."UserId" = u."Id"
+      ${admin ? "" : `WHERE replace(lower(u."Id"), '-', '') = $1`}
       GROUP BY u."Id", u."Name", u."PrimaryImageTag", u."IsAdministrator"
       ORDER BY COALESCE(sum(a."PlaybackDuration"), 0) DESC, u."Name" ASC
-    `);
+    `,
+      admin ? [] : [normalizeUserId(ownId)]
+    );
 
     const enrichedUsers = await Promise.all(users.map(enrichUserWrapUp));
 
     res.json(enrichedUsers);
   } catch (error) {
     console.log(error);
-    res.status(503).send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -968,6 +1103,11 @@ router.get("/getUserProfileWrapUp", async (req, res) => {
     const userKey = String(req.query.user || "").trim().toLowerCase();
     if (!userKey) {
       return res.status(400).json({ error: "Missing user query parameter" });
+    }
+    const admin = canViewAllUsers(req);
+    const ownId = admin ? null : ownMediaUserId(req.user);
+    if (!admin && !ownId) {
+      return sendForbidden(res);
     }
 
     const { rows } = await db.query(
@@ -1003,44 +1143,62 @@ router.get("/getUserProfileWrapUp", async (req, res) => {
       [userKey]
     );
 
+    // Non-admins can only open their own profile. Unknown users get the same 403 so the
+    // response doesn't reveal who else exists.
+    if (!admin && (!rows.length || !sameUserId(rows[0].UserId, ownId))) {
+      return sendForbidden(res);
+    }
+
     if (!rows.length) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const user = await enrichUserWrapUp(rows[0]);
-    return res.json({ user, rank: Number(rows[0].Rank || 1) });
+    if (admin) {
+      const user = await enrichUserWrapUp(rows[0]);
+      return res.json({ user, rank: Number(rows[0].Rank || 1) });
+    }
+
+    // The rank compares against everyone else's watch time, so only admins get it.
+    const { Rank: _rank, ...ownRow } = rows[0];
+    const user = await enrichUserWrapUp(ownRow);
+    return res.json({ user, rank: null });
   } catch (error) {
     console.log(error);
-    res.status(503).send(error);
+    sendSafeError(res, error);
   }
 });
 
 router.post("/getUserLastPlayed", async (req, res) => {
   try {
-    const { userid } = req.body;
-    const { rows } = await db.query(`select * from fs_last_user_activity($1) limit 15`, [userid]);
+    const scope = resolveStatsUser(req, req.body?.userid);
+    if (scope.forbidden) return sendForbidden(res);
+    if (!scope.admin && !scope.userId) return res.send([]);
+    const { rows } = await db.query(`select * from fs_last_user_activity($1) limit 15`, [scope.userId]);
     res.send(rows);
   } catch (error) {
     console.log(error);
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
 //Global Stats
 router.post("/getGlobalUserStats", async (req, res) => {
   try {
-    const { hours, userid } = req.body;
+    const { hours } = req.body;
+    const scope = resolveStatsUser(req, req.body?.userid);
+    if (scope.forbidden) return sendForbidden(res);
+    if (!scope.admin && !scope.userId) return res.send({});
     let _hours = hours;
     if (hours === undefined) {
       _hours = 24;
     }
-    const { rows } = await db.query(`select * from fs_user_stats($1,$2)`, [_hours, userid]);
+    const { rows } = await db.query(`select * from fs_user_stats($1,$2)`, [_hours, scope.userId]);
     res.send(rows[0]);
   } catch (error) {
     console.log(error);
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -1064,7 +1222,7 @@ router.post("/getGlobalItemStats", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -1080,7 +1238,34 @@ router.post("/getGlobalLibraryStats", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
+  }
+});
+
+router.get("/getStorageByLibrary", async (req, res) => {
+  try {
+    if (!canViewAllUsers(req)) {
+      return res.status(403).send({ error: "Only admins can see storage by library" });
+    }
+    const { getStorageReport } = require("../classes/storage-library");
+    res.send(await getStorageReport({ db }));
+  } catch (error) {
+    res.status(503);
+    sendSafeError(res, error);
+  }
+});
+
+router.get("/getDiskForecast", async (req, res) => {
+  try {
+    if (!canViewAllUsers(req)) {
+      return res.status(403).send({ error: "Only admins can see the disk forecast" });
+    }
+    const { getDiskForecast } = require("../classes/disk-forecast");
+    const { fetchDisks } = require("../classes/threshold-alerts");
+    res.send(await getDiskForecast({ db, fetchDisks }));
+  } catch (error) {
+    res.status(503);
+    sendSafeError(res, error);
   }
 });
 
@@ -1114,7 +1299,7 @@ router.get("/getLibraryCardStats", async (req, res) => {
     res.send(rows);
   } catch (error) {
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -1134,7 +1319,7 @@ router.post("/getLibraryCardStats", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -1150,7 +1335,7 @@ router.get("/getLibraryMetadata", async (req, res) => {
     res.send(rows);
   } catch (error) {
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -1317,7 +1502,7 @@ router.post("/getLibraryItemsPlayMethodStats", async (req, res) => {
     res.send(hoursRes);
   } catch (error) {
     console.log(error);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -1343,19 +1528,54 @@ router.post("/getPlaybackMethodStats", async (req, res) => {
     res.send(rows);
   } catch (error) {
     console.log(error);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
 router.post("/getLibraryLastPlayed", async (req, res) => {
   try {
     const { libraryid } = req.body;
-    const { rows } = await db.query(`select * from fs_last_library_activity($1) limit 15`, [libraryid]);
+    const scope = resolveActivityScope(req);
+    if (scope.admin) {
+      const { rows } = await db.query(`select * from fs_last_library_activity($1) limit 15`, [libraryid]);
+      return res.send(rows);
+    }
+    if (!scope.userId) return res.send([]);
+    // Same shape as fs_last_library_activity, limited to the caller's own plays.
+    const { rows } = await db.query(
+      `
+      SELECT *
+      FROM (
+        SELECT DISTINCT ON (i."Name", e."Name")
+          i."Id",
+          a."EpisodeId",
+          i."Name",
+          e."Name" AS "EpisodeName",
+          CASE WHEN a."SeasonId" IS NOT NULL THEN s."IndexNumber" ELSE NULL END AS "SeasonNumber",
+          CASE WHEN a."SeasonId" IS NOT NULL THEN e."IndexNumber" ELSE NULL END AS "EpisodeNumber",
+          i."PrimaryImageHash",
+          a."UserId",
+          a."UserName",
+          i.archived,
+          (NOW() - a."ActivityDateInserted") AS "LastPlayed"
+        FROM jf_playback_activity a
+        JOIN jf_library_items i ON i."Id" = a."NowPlayingItemId"
+        JOIN jf_libraries l ON i."ParentId" = l."Id"
+        LEFT JOIN jf_library_seasons s ON s."Id" = a."SeasonId"
+        LEFT JOIN jf_library_episodes e ON e."EpisodeId" = a."EpisodeId"
+        WHERE l."Id" = $1 AND replace(lower(a."UserId"), '-', '') = $2
+        ORDER BY i."Name", e."Name", a."ActivityDateInserted" DESC
+      ) AS latest_distinct_rows
+      ORDER BY "LastPlayed"
+      LIMIT 15
+      `,
+      [libraryid, normalizeUserId(scope.userId)]
+    );
     res.send(rows);
   } catch (error) {
     console.log(error);
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -1395,7 +1615,7 @@ router.get("/getViewsOverTime", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -1431,7 +1651,7 @@ router.get("/getViewsByDays", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -1467,7 +1687,32 @@ router.get("/getViewsByHour", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
+  }
+});
+
+router.get("/getLibraryHeatmap", async (req, res) => {
+  try {
+    const scope = resolveStatsUser(req, req.query.userId);
+    if (scope.forbidden) return sendForbidden(res);
+    if (!scope.admin && !scope.userId) {
+      return res.status(403).json({ error: "Link your account to see your own heat map" });
+    }
+    const { getLibraryHeatmap } = require("../classes/library-heatmap");
+    res.send(
+      await getLibraryHeatmap({
+        db,
+        days: req.query.days,
+        userId: scope.userId,
+        libraryId: req.query.libraryId || null,
+        timeZone: process.env.TZ || "UTC",
+        metric: req.query.metric,
+      })
+    );
+  } catch (error) {
+    console.log(error);
+    res.status(503);
+    sendSafeError(res, error);
   }
 });
 
@@ -1485,35 +1730,25 @@ router.get("/getViewsByLibraryType", async (req, res) => {
       [days]
     );
 
-    const supportedTypes = new Set(["Audio", "Movie", "Series", "Other"]);
-    /** @type {Map<string, number>} */
-    const reorganizedData = new Map();
-
-    rows.forEach((item) => {
-      const { type, count } = item;
-
-      if (!supportedTypes.has(type)) return;
-      reorganizedData.set(type, count);
-    });
-
-    supportedTypes.forEach((type) => {
-      if (reorganizedData.has(type)) return;
-      reorganizedData.set(type, 0);
-    });
-
-    res.send(Object.fromEntries(reorganizedData));
+    res.send(groupPlaysByType(rows));
   } catch (error) {
     console.log(error);
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
 router.get("/getGenreUserStats", async (req, res) => {
   try {
-    const { size = 50, page = 1, userid } = req.query;
+    const { size = 50, page = 1 } = req.query;
+    const scope = resolveStatsUser(req, req.query.userid);
+    if (scope.forbidden) return sendForbidden(res);
+    const userid = scope.userId;
 
-    if (userid === undefined) {
+    if (!userid) {
+      if (!scope.admin) {
+        return res.send({ current_page: page, pages: 0, size: size, results: [] });
+      }
       res.status(400);
       res.send("No User ID provided");
       return;
@@ -1569,7 +1804,7 @@ router.get("/getGenreUserStats", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -1633,7 +1868,7 @@ router.get("/getGenreLibraryStats", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 

@@ -1,12 +1,13 @@
 export const HOME_SETTINGS_STORAGE_PREFIX = "silo_barracks_home_settings";
 export const LEGACY_HOME_ORDER_STORAGE_KEY = "silo_barracks_home_section_order";
-export const HOME_LAYOUT_VERSION = 3;
+export const HOME_LAYOUT_VERSION = 5;
 
-const DEFAULT_HIDDEN_SECTION_IDS = ["seasonGaps", "tdarr", "wizarr", "bazarr", "prowlarr"];
-const INTEGRATION_WIDGET_SECTION_IDS = ["tdarr", "wizarr", "bazarr", "prowlarr"];
+const DEFAULT_HIDDEN_SECTION_IDS = ["seasonGaps", "tdarr", "wizarr", "maintainerr", "bazarr", "prowlarr"];
+const INTEGRATION_WIDGET_SECTION_IDS = ["tdarr", "wizarr", "maintainerr", "bazarr", "prowlarr"];
 
 export const HOME_SECTION_DEFINITIONS = [
   { id: "sessions", label: "Active sessions" },
+  { id: "streamCapacity", label: "Stream capacity" },
   { id: "overview", label: "Overview" },
   { id: "hall", label: "Hall of Fame" },
   { id: "library", label: "Library health" },
@@ -17,9 +18,11 @@ export const HOME_SECTION_DEFINITIONS = [
   { id: "trends", label: "Today vs last week" },
   { id: "issues", label: "Library issues" },
   { id: "watchParty", label: "Watch party" },
+  { id: "watchTonight", label: "Watch tonight" },
   { id: "seasonGaps", label: "Season gaps" },
   { id: "tdarr", label: "Tdarr transcodes" },
   { id: "wizarr", label: "Wizarr invites" },
+  { id: "maintainerr", label: "Maintainerr cleanup" },
   { id: "bazarr", label: "Bazarr subtitles" },
   { id: "prowlarr", label: "Prowlarr indexers" },
   { id: "automation", label: "Automation feed" },
@@ -31,6 +34,7 @@ export const DEFAULT_HOME_ORDER = HOME_SECTION_DEFINITIONS.map((section) => sect
 const KIOSK_DEFAULT_HIDDEN = DEFAULT_HOME_ORDER.filter((sectionId) => sectionId !== "sessions");
 export const CURATED_DEFAULT_HOME_ORDER = [
   "sessions",
+  "streamCapacity",
   "attention",
   "overview",
   "operations",
@@ -39,6 +43,7 @@ export const CURATED_DEFAULT_HOME_ORDER = [
   "hall",
   "trends",
   "watchParty",
+  "watchTonight",
   "quickActions",
   "library",
   "catalog",
@@ -46,6 +51,7 @@ export const CURATED_DEFAULT_HOME_ORDER = [
   "seasonGaps",
   "tdarr",
   "wizarr",
+  "maintainerr",
   "bazarr",
   "prowlarr",
   "automation",
@@ -60,10 +66,11 @@ export const DEFAULT_HOME_SETTINGS = {
   preset: "default",
   title: "",
   theme: "default",
-  alertRules: { backupDays: 7, requestThreshold: 1, missingPosterThreshold: 1 },
+  alertRules: { backupDays: 7, requestThreshold: 1, missingPosterThreshold: 1, streamCap: 0, transcodeCap: 0 },
   dismissedAlerts: {},
   sizes: {
     sessions: "large",
+    streamCapacity: "small",
     overview: "large",
     hall: "large",
     operations: "large",
@@ -71,8 +78,10 @@ export const DEFAULT_HOME_SETTINGS = {
     library: "large",
     milestones: "large",
     week: "large",
+    watchTonight: "large",
     tdarr: "small",
     wizarr: "small",
+    maintainerr: "small",
     bazarr: "small",
     prowlarr: "small",
   },
@@ -94,7 +103,7 @@ export const HOME_PRESETS = {
   },
   admin: {
     label: "Admin",
-    order: ["attention", "operations", "quickActions", "automation", "tdarr", "bazarr", "prowlarr", "wizarr", "sessions", "overview", "milestones", "trends", "issues", "week", "hall", "library", "catalog", "seasonGaps", "watchParty"],
+    order: ["attention", "operations", "quickActions", "automation", "tdarr", "maintainerr", "bazarr", "prowlarr", "wizarr", "sessions", "streamCapacity", "overview", "milestones", "trends", "issues", "week", "hall", "library", "catalog", "seasonGaps", "watchParty", "watchTonight"],
     hidden: ["watchParty", ...INTEGRATION_WIDGET_SECTION_IDS],
     density: "compact",
     sizes: {
@@ -103,6 +112,7 @@ export const HOME_PRESETS = {
       quickActions: "small",
       automation: "small",
       tdarr: "small",
+      maintainerr: "small",
       bazarr: "small",
       prowlarr: "small",
       wizarr: "small",
@@ -110,19 +120,19 @@ export const HOME_PRESETS = {
   },
   family: {
     label: "Family",
-    order: ["sessions", "watchParty", "week", "milestones", "hall", "overview", "trends", "catalog", "operations", "quickActions", "library", "attention", "issues", "seasonGaps", "automation", "tdarr", "wizarr", "bazarr", "prowlarr"],
-    hidden: ["issues", "seasonGaps", "automation", ...INTEGRATION_WIDGET_SECTION_IDS],
+    order: ["sessions", "watchTonight", "week", "milestones", "hall", "overview", "trends", "catalog", "operations", "quickActions", "library", "attention", "issues", "seasonGaps", "watchParty", "automation", "tdarr", "wizarr", "maintainerr", "bazarr", "prowlarr"],
+    hidden: ["watchParty", "issues", "seasonGaps", "automation", "streamCapacity", ...INTEGRATION_WIDGET_SECTION_IDS],
     density: "comfortable",
     sizes: {
       sessions: "large",
-      watchParty: "large",
+      watchTonight: "large",
       week: "medium",
       hall: "large",
     },
   },
   media: {
     label: "Media Stats",
-    order: ["overview", "milestones", "trends", "catalog", "library", "issues", "seasonGaps", "week", "watchParty", "hall", "sessions", "operations", "quickActions", "attention", "automation", "tdarr", "wizarr", "bazarr", "prowlarr"],
+    order: ["overview", "milestones", "trends", "catalog", "library", "issues", "seasonGaps", "week", "watchParty", "watchTonight", "hall", "sessions", "operations", "quickActions", "attention", "automation", "tdarr", "wizarr", "maintainerr", "bazarr", "prowlarr"],
     hidden: ["automation", ...INTEGRATION_WIDGET_SECTION_IDS],
     density: "comfortable",
     sizes: {
@@ -134,18 +144,19 @@ export const HOME_PRESETS = {
   },
   requests: {
     label: "Requests First",
-    order: ["attention", "operations", "quickActions", "automation", "wizarr", "sessions", "week", "milestones", "overview", "hall", "trends", "library", "catalog", "issues", "seasonGaps", "watchParty", "tdarr", "bazarr", "prowlarr"],
+    order: ["attention", "operations", "quickActions", "automation", "wizarr", "maintainerr", "sessions", "week", "milestones", "overview", "hall", "trends", "library", "catalog", "issues", "seasonGaps", "watchParty", "watchTonight", "tdarr", "bazarr", "prowlarr"],
     hidden: DEFAULT_HIDDEN_SECTION_IDS,
     density: "compact",
     sizes: {
       attention: "small",
       operations: "large",
       quickActions: "small",
+      maintainerr: "small",
     },
   },
   kiosk: {
     label: "Kiosk",
-    order: ["sessions", "overview", "hall", "week", "trends", "watchParty", "catalog", "library", "milestones", "operations", "attention", "issues", "seasonGaps", "tdarr", "wizarr", "bazarr", "prowlarr", "automation", "quickActions"],
+    order: ["sessions", "overview", "hall", "week", "trends", "watchParty", "watchTonight", "catalog", "library", "milestones", "operations", "attention", "issues", "seasonGaps", "tdarr", "wizarr", "maintainerr", "bazarr", "prowlarr", "automation", "quickActions"],
     hidden: KIOSK_DEFAULT_HIDDEN,
     density: "comfortable",
     sizes: {
@@ -154,6 +165,7 @@ export const HOME_PRESETS = {
       hall: "large",
       week: "large",
       trends: "large",
+      maintainerr: "small",
     },
   },
 };
@@ -172,11 +184,38 @@ export const HOME_THEME_OPTIONS = [
   { value: "wall", label: "Wall display" },
 ];
 
-export function normalizeHomeOrder(order) {
+function insertAtDefaultPosition(order, sectionId) {
+  const curatedIndex = CURATED_DEFAULT_HOME_ORDER.indexOf(sectionId);
+  for (let index = curatedIndex - 1; index >= 0; index -= 1) {
+    const position = order.indexOf(CURATED_DEFAULT_HOME_ORDER[index]);
+    if (position >= 0) {
+      order.splice(position + 1, 0, sectionId);
+      return;
+    }
+  }
+  for (let index = curatedIndex + 1; index < CURATED_DEFAULT_HOME_ORDER.length; index += 1) {
+    const position = order.indexOf(CURATED_DEFAULT_HOME_ORDER[index]);
+    if (position >= 0) {
+      order.splice(position, 0, sectionId);
+      return;
+    }
+  }
+  order.push(sectionId);
+}
+
+function savedSectionIds(order) {
   const knownSections = new Set(DEFAULT_HOME_ORDER);
-  const savedOrder = Array.isArray(order) ? order.filter((sectionId) => knownSections.has(sectionId)) : [];
-  const missingSections = DEFAULT_HOME_ORDER.filter((sectionId) => !savedOrder.includes(sectionId));
-  return [...savedOrder, ...missingSections];
+  return Array.isArray(order) ? [...new Set(order.filter((sectionId) => knownSections.has(sectionId)))] : [];
+}
+
+// Keeps the saved order as-is and slots any widget the layout has never seen
+// (one added in a newer release) next to its neighbour in the default layout.
+export function normalizeHomeOrder(order) {
+  const savedOrder = savedSectionIds(order);
+  if (!savedOrder.length) return [...DEFAULT_HOME_ORDER];
+  const nextOrder = [...savedOrder];
+  CURATED_DEFAULT_HOME_ORDER.filter((sectionId) => !nextOrder.includes(sectionId)).forEach((sectionId) => insertAtDefaultPosition(nextOrder, sectionId));
+  return nextOrder;
 }
 
 export function getHomeTokenPayload() {
@@ -196,14 +235,30 @@ export function getHomeSettingsStorageKey(scope = "user") {
   return `${HOME_SETTINGS_STORAGE_PREFIX}:${payload.sub || payload.userid || payload.username || payload.name || "user"}`;
 }
 
+function isUntouchedDefinitionOrder(order) {
+  const savedOrder = savedSectionIds(order);
+  if (!savedOrder.length) return false;
+  const savedSet = new Set(savedOrder);
+  return JSON.stringify(savedOrder) === JSON.stringify(DEFAULT_HOME_ORDER.filter((sectionId) => savedSet.has(sectionId)));
+}
+
 export function normalizeHomeSettings(settings) {
-  const normalized = { ...DEFAULT_HOME_SETTINGS, ...(settings || {}) };
+  const source = settings || {};
+  const normalized = { ...DEFAULT_HOME_SETTINGS, ...source };
   const knownSections = new Set(DEFAULT_HOME_ORDER);
-  normalized.order = normalizeHomeOrder(normalized.order);
+  const savedVersion = Number(normalized.version || 0);
+  const savedOrder = savedSectionIds(source.order);
+  const newSectionIds = savedOrder.length ? DEFAULT_HOME_ORDER.filter((sectionId) => !savedOrder.includes(sectionId)) : [];
+
+  // Layouts from before the curated default still carry the old definition
+  // order. Move those onto the curated order once, but keep everything else
+  // the user picked (pin, visibility, sizes, theme and so on).
+  const upgradeOrder = savedVersion < HOME_LAYOUT_VERSION && (!source.preset || source.preset === "custom") && isUntouchedDefinitionOrder(source.order);
+  normalized.order = upgradeOrder ? [...CURATED_DEFAULT_HOME_ORDER] : normalizeHomeOrder(normalized.order);
   normalized.hidden = Array.isArray(normalized.hidden) ? [...new Set(normalized.hidden.filter((sectionId) => knownSections.has(sectionId)))] : [];
-  if (Number(normalized.version || 0) < HOME_LAYOUT_VERSION) {
-    normalized.hidden = [...new Set([...normalized.hidden, ...DEFAULT_HIDDEN_SECTION_IDS])];
-  }
+  // Only widgets this layout has never seen pick up their default visibility;
+  // anything the user already showed or hid stays that way.
+  normalized.hidden = [...new Set([...normalized.hidden, ...newSectionIds.filter((sectionId) => DEFAULT_HIDDEN_SECTION_IDS.includes(sectionId))])];
   normalized.pinned = knownSections.has(normalized.pinned) ? normalized.pinned : "";
   normalized.density = normalized.density === "compact" ? "compact" : "comfortable";
   normalized.autoRotate = Boolean(normalized.autoRotate);
@@ -216,8 +271,34 @@ export function normalizeHomeSettings(settings) {
   };
   normalized.dismissedAlerts = normalized.dismissedAlerts && typeof normalized.dismissedAlerts === "object" ? normalized.dismissedAlerts : {};
   normalized.sizes = normalized.sizes && typeof normalized.sizes === "object" ? { ...DEFAULT_HOME_SETTINGS.sizes, ...normalized.sizes } : DEFAULT_HOME_SETTINGS.sizes;
-  normalized.version = Number(normalized.version || 0);
+  normalized.version = Math.max(savedVersion, HOME_LAYOUT_VERSION);
   return normalized;
+}
+
+// True for a layout still on a built-in preset that leads with Active sessions
+// (the default layout, Family and Kiosk). Any edit in the widget editor marks a
+// layout as custom, so a saved custom order never matches.
+function keepsSessionsOnTop(settings, ordered) {
+  const preset = settings?.preset && settings.preset !== "custom" ? HOME_PRESETS[settings.preset] : null;
+  return Boolean(preset) && preset.order[0] === "sessions" && ordered[0] === "sessions";
+}
+
+// The order Home renders in. The pinned widget always leads; Operations is
+// lifted while requests need attention, but only for display. On the default
+// layout it lands just under Active sessions, which stays on top. The saved
+// order is never rewritten by this.
+export function getHomeDisplayOrder(settings, { promoteOperations = false } = {}) {
+  const hidden = new Set(settings?.hidden || []);
+  const pinned = settings?.pinned || "";
+  let ordered = normalizeHomeOrder(settings?.order).filter((sectionId) => !hidden.has(sectionId));
+  const lift = (sectionId, position = 0) => {
+    if (!sectionId || !ordered.includes(sectionId)) return;
+    const rest = ordered.filter((id) => id !== sectionId);
+    ordered = [...rest.slice(0, position), sectionId, ...rest.slice(position)];
+  };
+  if (promoteOperations && pinned !== "operations") lift("operations", !pinned && keepsSessionsOnTop(settings, ordered) ? 1 : 0);
+  lift(pinned);
+  return ordered;
 }
 
 export function getRoleDefaultHomeSettings() {
@@ -239,8 +320,7 @@ export function loadHomeSettings(scope = "user") {
       if (scope === "kiosk" && normalized.preset === "kiosk") {
         return normalizeHomeSettings({ ...DEFAULT_HOME_SETTINGS, ...HOME_PRESETS.kiosk, sizes: HOME_PRESETS.kiosk.sizes, preset: "kiosk", autoRotate: false, title: normalized.title || "Silo Barracks Kiosk", theme: normalized.theme });
       }
-      const stillOldDefault = normalized.version < HOME_LAYOUT_VERSION && (!parsed.preset || parsed.preset === "custom") && JSON.stringify(normalizeHomeOrder(parsed.order)) === JSON.stringify(DEFAULT_HOME_ORDER);
-      return stillOldDefault ? normalizeHomeSettings(DEFAULT_HOME_SETTINGS) : normalized;
+      return normalized;
     }
 
     if (scope !== "kiosk") {

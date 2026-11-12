@@ -1,10 +1,96 @@
 const express = require("express");
+const { mediaServerAuthHeaders, chooseServerType, withServerType } = require("../classes/server-type");
 
 const { axios } = require("../classes/axios");
 const configClass = require("../classes/config");
 const API = require("../classes/api-loader");
+const { getIntegrations } = require("../classes/integration-store");
+const { joinSafeHttpUrl, sendSafeError, toSafeHttpUrl, safeHttpGet} = require("../utils/security");
+const { isValidPluginId, pluginImageRequests, shouldTryNextPluginImage } = require("../utils/jellyfin-plugins");
 
 const router = express.Router();
+const SAFE_DEVICE_NAME = /^[A-Za-z0-9._-]{1,64}$/;
+
+let sessionSonarrCache = { expiresAt: 0, ratingsByKey: new Map() };
+
+function normalizeSessionRating(value) {
+  const number = Number(String(value ?? "").replace("%", ""));
+  return Number.isFinite(number) && number > 0 ? number : null;
+}
+
+function normalizeSessionSeriesTitle(value) {
+  return String(value || "")
+    .replace(/\s*\(\d{4}\)\s*$/, "")
+    .replace(/[^a-z0-9]+/gi, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function getSessionSeriesKey(session) {
+  const item = session?.NowPlayingItem || {};
+  const providerIds = item.ProviderIds || {};
+  const tvdbId = providerIds.Tvdb || providerIds.TVDB || providerIds.tvdb;
+  const imdbId = providerIds.Imdb || providerIds.IMDb || providerIds.imdb;
+  const title = item.SeriesName || (["Series", "Season"].includes(item.Type) ? item.Name : "");
+  return {
+    id: tvdbId ? `tvdb:${tvdbId}` : imdbId ? `imdb:${imdbId}` : "",
+    title: String(title || "").trim(),
+  };
+}
+
+async function attachSonarrSessionRatings(sessions = []) {
+  const activeSeries = sessions.map(getSessionSeriesKey).filter((entry) => entry.id || entry.title);
+  if (!activeSeries.length) return sessions;
+
+  try {
+    const integrations = await getIntegrations();
+    const sonarr = (integrations.arrApps || []).find(
+      (integration) => integration.connected && String(integration.slug || integration.name || "").toLowerCase().includes("sonarr")
+    );
+    if (!sonarr?.values?.url || !sonarr?.values?.secret) return sessions;
+
+    const cacheKey = `${sonarr.instanceId || sonarr.name || sonarr.values.url}`;
+    let series = sessionSonarrCache.key === cacheKey && Date.now() < sessionSonarrCache.expiresAt ? sessionSonarrCache.series : null;
+    if (!series) {
+      const response = await axios.get(`${sonarr.values.url.replace(/\/$/, "")}/api/v3/series`, {
+        timeout: 5000,
+        headers: { "X-Api-Key": sonarr.values.secret },
+      });
+      series = Array.isArray(response.data) ? response.data : [];
+      sessionSonarrCache = { key: cacheKey, expiresAt: Date.now() + 5 * 60 * 1000, series, ratingsByKey: new Map() };
+    }
+
+    const ratingsByKey = new Map();
+    series.forEach((entry) => {
+      const ratings = {
+        // Sonarr commonly stores its IMDb score as the generic ratings.value.
+        imdb: normalizeSessionRating(entry.ratings?.imdb ?? entry.ratings?.value),
+        rottenTomatoes: normalizeSessionRating(entry.ratings?.rottenTomatoes),
+      };
+      if (!ratings.imdb && !ratings.rottenTomatoes) return;
+      const providerIds = entry.tvdbId || entry.imdbId ? [`tvdb:${entry.tvdbId}`, `imdb:${entry.imdbId}`] : [];
+      providerIds.filter((key) => !key.endsWith(":undefined")).forEach((key) => ratingsByKey.set(key, ratings));
+      if (entry.title) ratingsByKey.set(`title:${normalizeSessionSeriesTitle(entry.title)}`, ratings);
+    });
+
+    return sessions.map((session) => {
+      const key = getSessionSeriesKey(session);
+      const ratings = ratingsByKey.get(key.id) || ratingsByKey.get(`title:${normalizeSessionSeriesTitle(key.title)}`);
+      return ratings ? { ...session, SonarrRatings: ratings } : session;
+    });
+  } catch (error) {
+    console.log("Unable to load Sonarr session ratings:", error.response?.status || error.message);
+    return sessions;
+  }
+}
+
+function getJellyfinAuthHeaders(config) {
+  return {
+    Authorization: `MediaBrowser Token="${config.JF_API_KEY}"`,
+    "X-Emby-Authorization": `MediaBrowser Token="${config.JF_API_KEY}"`,
+    "X-MediaBrowser-Token": config.JF_API_KEY,
+  };
+}
 
 async function siloImage(req, res) {
   const id = req.query.id;
@@ -43,45 +129,6 @@ function toUnsignedInt(value, fallback) {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
 }
 
-function getJellyfinOrigin(config) {
-  if (!config?.JF_HOST) {
-    return null;
-  }
-
-  try {
-    const hostUrl = new URL(config.JF_HOST);
-    return `${hostUrl.protocol}//${hostUrl.host}`;
-  } catch {
-    return null;
-  }
-}
-
-function isAllowedPluginImageUrl(url, config) {
-  try {
-    const parsed = new URL(url);
-    if (!/^https?:$/.test(parsed.protocol)) {
-      return false;
-    }
-
-    const jellyfinOrigin = getJellyfinOrigin(config);
-    if (!jellyfinOrigin) {
-      return false;
-    }
-
-    if (parsed.origin === jellyfinOrigin) {
-      return true;
-    }
-
-    if (config.IS_JELLYFIN == false && parsed.hostname === "raw.githubusercontent.com") {
-      return parsed.pathname.startsWith("/MediaBrowser/Emby.Resources/");
-    }
-
-    return false;
-  } catch {
-    return false;
-  }
-}
-
 router.get("/web/assets/img/devices/", async (req, res) => {
   const { devicename } = req.query; // Get the image URL from the query string
   const config = await new configClass().getConfig();
@@ -91,15 +138,18 @@ router.get("/web/assets/img/devices/", async (req, res) => {
     return;
   }
 
-  if (!devicename) {
+  if (!devicename || !SAFE_DEVICE_NAME.test(String(devicename))) {
     res.status(400).send("device name is required");
     return;
   }
 
   const encodedDevice = encodeURIComponent(String(devicename));
-  let url = `${config.JF_HOST}/web/assets/img/devices/${encodedDevice}.svg`;
+  let url = joinSafeHttpUrl(config.JF_HOST, `/web/assets/img/devices/${encodedDevice}.svg`);
   if (config.IS_JELLYFIN == false) {
-    url = `https://raw.githubusercontent.com/MediaBrowser/Emby.Resources/master/images/devices/${devicename}.png`;
+    url = toSafeHttpUrl(
+      `https://raw.githubusercontent.com/MediaBrowser/Emby.Resources/master/images/devices/${encodedDevice}.png`,
+      { allowedHostnames: ["raw.githubusercontent.com"] }
+    );
   }
 
   axios
@@ -149,6 +199,7 @@ router.get("/Items/Images/Backdrop/", async (req, res) => {
   axios
     .get(url, {
       responseType: "arraybuffer",
+      headers: getJellyfinAuthHeaders(config),
     })
     .then((response) => {
       res.set("Content-Type", "image/jpeg");
@@ -188,6 +239,7 @@ router.get("/Items/Images/Primary/", async (req, res) => {
   axios
     .get(url, {
       responseType: "arraybuffer",
+      headers: getJellyfinAuthHeaders(config),
     })
     .then((response) => {
       res.set("Content-Type", "image/jpeg");
@@ -228,11 +280,7 @@ router.get("/Users/Images/Primary/", async (req, res) => {
   axios
     .get(url, {
       responseType: "arraybuffer",
-      headers: {
-        Authorization: `MediaBrowser Token="${config.JF_API_KEY}"`,
-        "X-Emby-Authorization": `MediaBrowser Token="${config.JF_API_KEY}"`,
-        "X-MediaBrowser-Token": config.JF_API_KEY,
-      },
+      headers: getJellyfinAuthHeaders(config),
     })
     .then((response) => {
       const contentType = response.headers["content-type"] || "";
@@ -252,7 +300,7 @@ router.get("/Users/Images/Primary/", async (req, res) => {
 });
 
 router.get("/Plugins/Images/", async (req, res) => {
-  const { id, url: imageUrl } = req.query;
+  const { id, version, url: imageUrl } = req.query;
   const config = await new configClass().getConfig();
 
   if (config.error) {
@@ -265,25 +313,26 @@ router.get("/Plugins/Images/", async (req, res) => {
     return;
   }
 
-  const encodedId = id ? encodeURIComponent(id) : undefined;
-  const candidates = imageUrl ? [imageUrl] : [
-    `${config.JF_HOST}/Plugins/${encodedId}/Image`,
-    `${config.JF_HOST}/Plugins/${encodedId}/Images/Primary`,
-    `${config.JF_HOST}/Plugins/${encodedId}/Thumb`,
-  ];
+  if (!imageUrl && !isValidPluginId(id)) {
+    res.status(400).send("Invalid plugin id");
+    return;
+  }
 
-  for (const url of candidates) {
+  const requests = pluginImageRequests(
+    config,
+    { id, version, url: imageUrl },
+    mediaServerAuthHeaders(config.JF_API_KEY),
+  );
+
+  for (const { url, headers } of requests) {
     try {
-      if (!/^https?:\/\//i.test(url) || !isAllowedPluginImageUrl(url, config)) {
-        continue;
-      }
-
-      const response = await axios.get(url, {
+      const response = await safeHttpGet(url, "", {
         responseType: "arraybuffer",
         headers: {
-          ...(imageUrl ? {} : { Authorization: `MediaBrowser Token="${config.JF_API_KEY}"` }),
+          ...headers,
           "User-Agent": "Barracks/1.0.6",
         },
+        timeout: 5000,
       });
 
       const contentType = response.headers["content-type"] || "image/png";
@@ -293,8 +342,10 @@ router.get("/Plugins/Images/", async (req, res) => {
       res.set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
       res.status(200).send(response.data);
       return;
-    } catch {
-      // Try the next Jellyfin plugin image endpoint.
+    } catch (error) {
+      // An HTTP error (e.g. 404) means try the next endpoint; a timeout or
+      // network error means Jellyfin is unreachable, so stop here.
+      if (!shouldTryNextPluginImage(error)) break;
     }
   }
 
@@ -305,7 +356,7 @@ router.get("/getSessions", async (req, res) => {
   const startedAt = Date.now();
   try {
     const sessions = await API.getSessions();
-    res.send(sessions);
+    res.send(await attachSonarrSessionRatings(sessions));
   } catch (error) {
     console.warn('[ACTIVITY] Session refresh failed', {
       elapsedMs: Date.now() - startedAt,
@@ -314,7 +365,7 @@ router.get("/getSessions", async (req, res) => {
       timeout: error?.message === 'Silo request timed out',
     });
     res.status(503);
-    res.json({ error: 'Activity is unavailable. Check the server connection and administrator API key.' });
+    sendSafeError(res, error);
   }
 });
 
@@ -328,7 +379,7 @@ router.get("/getAdminUsers", async (req, res) => {
     res.send(adminUser);
   } catch (error) {
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
@@ -340,14 +391,29 @@ router.get("/getRecentlyAdded", async (req, res) => {
     res.send(recentlyAdded);
   } catch (error) {
     res.status(503);
-    res.send(error);
+    sendSafeError(res, error);
   }
 });
 
 //API related functions
 
+// Audiobookshelf covers, public like the other poster routes above. The token stays server-side.
+router.get("/Audiobookshelf/Images/:itemId", async (req, res) => {
+  try {
+    const audiobookshelf = require("../classes/audiobookshelf");
+    const integration = await audiobookshelf.getConnectedAudiobookshelf();
+    if (!integration) return res.status(404).end();
+    const cover = await audiobookshelf.fetchAudiobookshelfCover(integration, req.params.itemId, req.query.width);
+    res.set("Content-Type", cover.contentType.startsWith("image/") ? cover.contentType : "image/webp");
+    res.set("Cache-Control", "public, max-age=86400");
+    res.send(Buffer.from(cover.data));
+  } catch (error) {
+    res.status(error.statusCode || error.response?.status || 502).end();
+  }
+});
+
 router.post("/validateSettings", async (req, res) => {
-  const { url, apikey } = req.body;
+  const { url, apikey, serverType: requestedType } = req.body;
 
   if (url === undefined || apikey === undefined) {
     res.status(400);
@@ -355,12 +421,22 @@ router.post("/validateSettings", async (req, res) => {
     return;
   }
 
-  const validation = await API.validateSettings(url, apikey);
+  let serverType;
+  let validation;
+  try {
+    // Probe mode: refuse loopback/link-local/metadata targets and don't follow redirects.
+    serverType = await chooseServerType(requestedType, url, { probe: true });
+    validation = await withServerType(serverType, () => API.validateSettings(url, apikey, { probe: true }));
+  } catch (error) {
+    res.status(error?.code === "EPROBEBLOCKED" ? 400 : 502);
+    res.send(error?.code === "EPROBEBLOCKED" ? "Destination not allowed" : "Validation failed");
+    return;
+  }
   if (validation.isValid === false) {
     res.status(validation.status);
     res.send(validation.errorMessage);
   } else {
-    res.send(validation);
+    res.send({ ...validation, serverType });
   }
 });
 

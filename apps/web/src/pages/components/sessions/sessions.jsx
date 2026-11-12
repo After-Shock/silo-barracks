@@ -6,6 +6,18 @@ import "../../css/sessions.css";
 import ErrorBoundary from "../general/ErrorBoundary";
 import SessionCard from "./session-card";
 import FleetOverview from './FleetOverview';
+import SessionWall from "./session-wall";
+import { orderSessions } from "../../../lib/session-order";
+
+const SESSION_VIEW_KEY = "jellyglance_sessions_view";
+
+function getStoredSessionView() {
+  try {
+    return localStorage.getItem(SESSION_VIEW_KEY) === "wall" ? "wall" : "cards";
+  } catch {
+    return "cards";
+  }
+}
 
 import socket from "../../../socket";
 import {
@@ -17,6 +29,7 @@ import {
   cacheSessionStatus,
   subscribeSessionStatus,
 } from "../../../lib/session-cache";
+import { useSessionGlanceStitch } from "../../../lib/session-glance-cache";
 import {
   ACTIVE_SESSION_IP_PRIVACY_EVENT,
   ACTIVE_SESSION_IP_PRIVACY_KEY,
@@ -24,9 +37,24 @@ import {
   shouldHideActiveSessionIp,
 } from "../../../lib/privacy-settings";
 
+function canManageSessions(config) {
+  const role = String(config?.settings?.auth?.role || "").toLowerCase();
+  if (role.includes("owner") || role.includes("admin")) return true;
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return false;
+    const payload = JSON.parse(window.atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+    const tokenRole = String(payload?.role || payload?.Role || "").toLowerCase();
+    return tokenRole.includes("owner") || tokenRole.includes("admin");
+  } catch {
+    return false;
+  }
+}
+
 function LegacySessions({ surface = "home" }) {
   const [data, setData] = useState(() => getCachedActiveSessions());
   const [status, setStatus] = useState(getSessionStatus);
+  const [view, setView] = useState(() => getStoredSessionView());
   const [ipPrivacy, setIpPrivacy] = useState(() => getActiveSessionIpPrivacy());
   const [config, setConfig] = useState(() => {
     try {
@@ -35,6 +63,8 @@ function LegacySessions({ surface = "home" }) {
       return null;
     }
   });
+  const canManage = canManageSessions(config);
+  const stitchByItemId = useSessionGlanceStitch(data || []);
 
   useEffect(() => {
     const handleIpPrivacyUpdate = () => setIpPrivacy(getActiveSessionIpPrivacy());
@@ -99,6 +129,15 @@ function LegacySessions({ surface = "home" }) {
     }
   }, [config]);
 
+  const changeView = (nextView) => {
+    setView(nextView);
+    try {
+      localStorage.setItem(SESSION_VIEW_KEY, nextView);
+    } catch {
+      // ignore storage errors
+    }
+  };
+
   const unavailable = ['unavailable', 'unconfigured', 'storage-unavailable'].includes(status.state);
   const statusNotice = unavailable ? (
     <div className="session-connection-status" role="status">
@@ -139,21 +178,32 @@ function LegacySessions({ surface = "home" }) {
   return (
     <div className="sessions-widget">
       {statusNotice}
-      <h1 className="my-3">
-        Active Sessions
-      </h1>
-      <div className="sessions-container">
-        {data &&
-          data.length > 0 &&
-          data
-            .sort((a, b) => a.Id.padStart(12, "0").localeCompare(b.Id.padStart(12, "0")))
-            .map((session) => (
-              <ErrorBoundary key={session.Id}>
-                <SessionCard data={{ session: session, base_url: config?.base_url }} hideIpAddress={hideIpAddress}
-                  canControl={['Owner', 'Admin'].includes(config?.settings?.auth?.role) && Boolean(config?.settings?.auth?.permissions?.settings)} />
-              </ErrorBoundary>
-            ))}
+      <div className="sessions-widget-header">
+        <h1 className="my-3">
+          Active Sessions
+        </h1>
+        <div className="sessions-view-toggle" role="group" aria-label="Session layout">
+          <button type="button" className={view === "cards" ? "is-active" : ""} aria-pressed={view === "cards"} onClick={() => changeView("cards")}>
+            Cards
+          </button>
+          <button type="button" className={view === "wall" ? "is-active" : ""} aria-pressed={view === "wall"} onClick={() => changeView("wall")}>
+            Wall
+          </button>
+        </div>
       </div>
+      {view === "wall" ? <SessionWall sessions={data} /> : <div className="sessions-container">
+        {orderSessions(data).map((session) => (
+          <ErrorBoundary key={session.Id}>
+            <SessionCard
+              data={{ session: session, base_url: config?.base_url }}
+              hideIpAddress={hideIpAddress}
+              kiosk={surface === "kiosk"}
+              canManage={canManage}
+              stitch={stitchByItemId.get(session.NowPlayingItem?.Id) || null}
+            />
+          </ErrorBoundary>
+        ))}
+      </div>}
     </div>
   );
 }

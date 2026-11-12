@@ -451,8 +451,8 @@ class SiloAPI {
       throw new SiloRequestError('Invalid Silo playback history cursor');
     }
     if (!body.page.has_more && nextCursor) throw new SiloRequestError('Invalid terminal Silo playback history cursor');
-    const methodName = value => ({ direct: 'DirectPlay', remux: 'DirectStream', transcode: 'Transcode', audio: 'Transcode' })
-      [String(value || '').toLowerCase()] || '';
+    const methodNames = { direct: 'DirectPlay', remux: 'DirectStream', transcode: 'Transcode', audio: 'Transcode' };
+    const methodName = value => methodNames[String(value || '').toLowerCase()] || '';
     const results = body.items.map(row => {
       const itemId = row.media_item_id ? String(row.media_item_id) : '';
       return {

@@ -711,3 +711,35 @@ test("CLI exits one with actionable diagnostics for invalid roots and paths", ()
     fixture.cleanup();
   }
 });
+
+test("flags Tailwind palette and arbitrary color classes but allows token utilities", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/components/ui/probe.jsx", `
+export const Probe = () => (
+  <div className="tw:bg-[#ff0000] tw:text-red-500 tw:hover:bg-black/50 tw:dark:border-[rgb(1,2,3)] tw:text-white">
+    <span className="tw:bg-primary tw:text-muted-foreground tw:bg-live tw:border-border tw:ring-ring/50 tw:text-sm tw:text-center tw:bg-destructive/60" />
+  </div>
+);
+`);
+    assert.deepEqual(values(fixture.audit([source])), [
+      "tw:bg-[#ff0000]",
+      "tw:text-red-500",
+      "tw:hover:bg-black/50",
+      "tw:dark:border-[rgb(1,2,3)]",
+      "tw:text-white",
+    ]);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("ignores unprefixed Bootstrap-style class names", () => {
+  const fixture = createFixture();
+  try {
+    const source = fixture.write("apps/web/src/legacy.jsx", `export const L = () => <p className="text-white bg-black text-secondary" />;\n`);
+    assert.deepEqual(values(fixture.audit([source])), []);
+  } finally {
+    fixture.cleanup();
+  }
+});

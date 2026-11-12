@@ -3,17 +3,8 @@ import { useState, useEffect } from "react";
 import axios from "../../lib/axios_instance";
 import { useParams, Link } from "react-router-dom";
 import { Blurhash } from "react-blurhash";
-import { Tabs, Tab, Button } from "react-bootstrap";
 
-import ExternalLinkFillIcon from "remixicon-react/ExternalLinkFillIcon";
-import ArchiveDrawerFillIcon from "remixicon-react/ArchiveDrawerFillIcon";
-import ArrowLeftSLineIcon from "remixicon-react/ArrowLeftSLineIcon";
-import InformationLineIcon from "remixicon-react/InformationLineIcon";
-import PlayFillIcon from "remixicon-react/PlayFillIcon";
-import TvLineIcon from "remixicon-react/TvLineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import FileMusicLineIcon from "remixicon-react/FileMusicLineIcon";
-import CheckboxMultipleBlankLineIcon from "remixicon-react/CheckboxMultipleBlankLineIcon";
+import { RiArchiveDrawerFill, RiArrowLeftSLine, RiCheckboxMultipleBlankLine, RiExternalLinkFill, RiFileMusicLine, RiFilmLine, RiInformationLine, RiPlayFill, RiTvLine } from "@remixicon/react";
 
 import "../css/items/item-details.css";
 
@@ -22,10 +13,12 @@ import ItemActivity from "./item-info/item-activity";
 import ItemNotFound from "./item-info/item-not-found";
 
 import Config from "../../lib/config";
+import { fetchActiveSessions, getCachedActiveSessions, subscribeActiveSessions } from "../../lib/session-cache";
 import Loading from "./general/loading";
 import ItemOptions from "./item-info/item-options";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import baseUrl from "../../lib/baseurl";
+import { toSafeHttpUrl } from "../../lib/safe-url";
 import GlobalStats from "./general/globalStats";
 import ErrorBoundary from "./general/ErrorBoundary.jsx";
 
@@ -65,19 +58,25 @@ function getIndexLabel(data) {
 const brandIconUrl = (slug, color) => `https://cdn.simpleicons.org/${slug}/${color}`;
 
 function ItemInfo() {
+  const { t } = useTranslation();
   const { Id } = useParams();
   const [data, setData] = useState();
   const [config, setConfig] = useState();
   const [refresh, setRefresh] = useState(true);
+  const [glance, setGlance] = useState(null);
+  const [retryBusy, setRetryBusy] = useState(false);
+  const [retryMessage, setRetryMessage] = useState("");
+  const [refreshBusy, setRefreshBusy] = useState(false);
+  const [liveSessions, setLiveSessions] = useState(() => getCachedActiveSessions() || []);
   const [activeTab, setActiveTab] = useState("tabOverview");
 
   const [loaded, setLoaded] = useState(false);
   const [fallback, setFallback] = useState(false);
 
-  const SeriesIcon = <TvLineIcon size={"50%"} />;
-  const MovieIcon = <FilmLineIcon size={"50%"} />;
-  const MusicIcon = <FileMusicLineIcon size={"50%"} />;
-  const MixedIcon = <CheckboxMultipleBlankLineIcon size={"50%"} />;
+  const SeriesIcon = <RiTvLine size={"50%"} />;
+  const MovieIcon = <RiFilmLine size={"50%"} />;
+  const MusicIcon = <RiFileMusicLine size={"50%"} />;
+  const MixedIcon = <RiCheckboxMultipleBlankLine size={"50%"} />;
 
   const currentLibraryDefaultIcon =
     data?.Type === "Movie" ? MovieIcon : data?.Type === "Episode" ? SeriesIcon : data?.Type === "Audio" ? MusicIcon : MixedIcon;
@@ -120,6 +119,12 @@ function ItemInfo() {
         );
 
         setData(itemData.data[0]);
+        axios
+          .get(`/api/item-glance/${encodeURIComponent(Id)}`, {
+            headers: { Authorization: `Bearer ${config.token}` },
+          })
+          .then((response) => setGlance(response.data))
+          .catch(() => setGlance(null));
       } catch (error) {
         setData({ notfound: true, message: error.response?.data });
         console.log(error);
@@ -149,6 +154,12 @@ function ItemInfo() {
     // eslint-disable-next-line
   }, [config, Id]);
 
+  useEffect(() => {
+    const unsubscribe = subscribeActiveSessions((sessions) => setLiveSessions(Array.isArray(sessions) ? sessions : []));
+    fetchActiveSessions().catch(() => {});
+    return unsubscribe;
+  }, []);
+
   if (!data || refresh) {
     return <div data-theme-screen="item-detail" aria-busy="true"><Loading /></div>;
   }
@@ -156,6 +167,18 @@ function ItemInfo() {
   if (data && data.notfound) {
     return <div data-theme-screen="item-detail"><ItemNotFound message="Item not found" itemId={Id} fetchdataMethod={fetchData} /></div>;
   }
+
+  const canOps = ["Owner", "Admin"].includes(config?.settings?.auth?.role);
+  const jellyfinWeb = String(config?.hostUrl || "").replace(/\/+$/, "");
+  const jellyfinOpenUrl = toSafeHttpUrl(jellyfinWeb ? `${jellyfinWeb}/web/#/details?id=${encodeURIComponent(Id)}` : "");
+  const watchingNow = (Array.isArray(liveSessions) ? liveSessions : [])
+    .filter((session) => {
+      const item = session?.NowPlayingItem;
+      if (!item) return false;
+      return [item.Id, item.SeriesId, item.SeasonId].map(String).includes(String(Id));
+    })
+    .map((session) => session.UserName || session.DeviceName)
+    .filter(Boolean);
 
   const itemId = data.EpisodeId || data.Id;
   const heroImageId = ["Episode", "Season"].includes(data.Type) ? data.SeriesId : data.Id;
@@ -169,19 +192,22 @@ function ItemInfo() {
   const tvdbId = getProviderId(seriesProviderIds, ["Tvdb", "TVDB", "TheTVDB"]);
   const rottenId = getProviderId(providerIds, ["RottenTomatoes", "Rotten Tomatoes"]);
   const mediaServerName = config?.IS_SILO ? "Silo" : config?.IS_JELLYFIN === false ? "Emby" : "Jellyfin";
-  const jellyfinUrl =
+  const jellyfinUrl = toSafeHttpUrl(
     data.JellyfinUrl ||
-    ((config?.settings?.EXTERNAL_URL ?? config?.hostUrl) && (config?.IS_SILO
-      ? `${config.settings?.EXTERNAL_URL ?? config.hostUrl}/watch/${encodeURIComponent(itemId)}`
-      : `${config.settings?.EXTERNAL_URL ?? config.hostUrl}/web/index.html#!/details?id=${encodeURIComponent(itemId)}`));
+      ((config?.settings?.EXTERNAL_URL ?? config?.hostUrl) && (config?.IS_SILO
+        ? `${config.settings?.EXTERNAL_URL ?? config.hostUrl}/watch/${encodeURIComponent(itemId)}`
+        : `${config.settings?.EXTERNAL_URL ?? config.hostUrl}/web/index.html#!/details?id=${encodeURIComponent(itemId)}`)) ||
+      ""
+  );
   const rottenLink = rottenId
     ? `https://www.rottentomatoes.com/m/${rottenId}`
     : `https://www.rottentomatoes.com/search?search=${encodeURIComponent(`${data.Name || title} ${data.ProductionYear || ""}`.trim())}`;
   const arrLinks = data.ArrLinks || [];
+  const seerrUrl = toSafeHttpUrl(glance?.request?.openUrl);
   const actionLinks = [
     jellyfinUrl && { label: `Open in ${mediaServerName}`, url: jellyfinUrl, primary: true },
-    ...arrLinks.map((link) => ({ label: link.matched ? `Open in ${link.name}` : `Find in ${link.name}`, url: link.url })),
-  ].filter(Boolean);
+    ...arrLinks.map((link) => ({ label: link.matched ? `Open in ${link.name}` : `Find in ${link.name}`, url: toSafeHttpUrl(link.url) })),
+  ].filter((link) => link && link.url);
   const studio = Array.isArray(data.Studios) ? data.Studios[0]?.Name || data.Studios[0] : null;
   const qualityProfile = data.Type === "Movie" ? "Main Quality" : data.Type;
   const status = data.archived ? "Archived" : "Downloaded";
@@ -198,7 +224,7 @@ function ItemInfo() {
           )}
           {["Episode", "Season"].includes(data.Type) && (
             <>
-              <ArrowLeftSLineIcon size={18} />
+              <RiArrowLeftSLine size={18} />
               <Link to={`/libraries/item/${data.SeriesId}`} className="item-crumb">
                 {data.SeriesName}
               </Link>
@@ -206,7 +232,7 @@ function ItemInfo() {
           )}
           {data.Type === "Episode" && (
             <>
-              <ArrowLeftSLineIcon size={18} />
+              <RiArrowLeftSLine size={18} />
               <Link to={`/libraries/item/${data.SeasonId}`} className="item-crumb">
                 {data.SeasonName}
               </Link>
@@ -230,7 +256,7 @@ function ItemInfo() {
               />
             ) : (
               <div className="item-poster-fallback">
-                {data.archived ? <ArchiveDrawerFillIcon size={58} /> : currentLibraryDefaultIcon}
+                {data.archived ? <RiArchiveDrawerFill size={58} /> : currentLibraryDefaultIcon}
                 <span>{data.archived ? <Trans i18nKey="ARCHIVED" /> : data.Type}</span>
               </div>
             )}
@@ -246,8 +272,8 @@ function ItemInfo() {
                   {data.ProductionYear ? <span>{data.ProductionYear}</span> : null}
                   <span>{ticksToTimeString(data.RunTimeTicks)}</span>
                   {jellyfinUrl ? (
-                    <a href={jellyfinUrl} target="_blank" rel="noreferrer" title={`Open in ${mediaServerName}`}>
-                      <ExternalLinkFillIcon size={22} />
+                    <a href={encodeURI(jellyfinUrl)} target="_blank" rel="noreferrer" title={`Open in ${mediaServerName}`}>
+                      <RiExternalLinkFill size={22} />
                     </a>
                   ) : null}
                 </div>
@@ -279,6 +305,99 @@ function ItemInfo() {
                 </a>
               ) : null}
             </div>
+
+            {glance ? (
+              <div className="item-glance-strip">
+                <span className={glance.jellyfin ? "is-on" : ""}>
+                  {glance.jellyfin ? t("FEATURES.GLANCE.JELLYFIN_IN") : t("FEATURES.GLANCE.JELLYFIN_MISSING")}
+                </span>
+                <span className={glance.request ? "is-on" : ""}>
+                  {glance.request ? t("FEATURES.GLANCE.SEERR", { status: glance.request.status }) : t("FEATURES.GLANCE.NO_REQUEST")}
+                </span>
+                <span className={glance.arr ? "is-on" : ""}>
+                  {glance.arr
+                    ? t(glance.arr.hasFile ? "FEATURES.GLANCE.ARR_HAS_FILE" : "FEATURES.GLANCE.ARR_WAITING", { service: glance.arr.service })
+                    : t("FEATURES.GLANCE.NO_ARR")}
+                </span>
+                <span className={glance.download ? "is-on" : ""}>
+                  {glance.download
+                    ? t("FEATURES.GLANCE.DOWNLOAD", { client: glance.download.client, state: glance.download.state })
+                    : t("FEATURES.GLANCE.NO_DOWNLOAD")}
+                </span>
+                {glance.tdarr ? <span className={glance.tdarr.connected ? "is-on" : ""}>Tdarr</span> : null}
+                {glance.maintainerr ? <span className={glance.maintainerr.connected ? "is-on" : ""}>Maintainerr</span> : null}
+                {glance.kometa ? <span className={glance.kometa.connected ? "is-on" : ""}>Kometa</span> : null}
+                <button
+                  type="button"
+                  className="item-glance-retry"
+                  disabled={retryBusy}
+                  onClick={async () => {
+                    setRetryBusy(true);
+                    setRetryMessage("");
+                    try {
+                      const response = await axios.post(
+                        "/api/retry-grab",
+                        {
+                          itemId: Id,
+                          title: data.Name || data.SeriesName,
+                          mediaType: data.Type,
+                          requestId: glance.request?.id,
+                          tmdb: glance.request?.tmdb || glance.arr?.tmdb,
+                          tvdb: glance.request?.tvdb || glance.arr?.tvdb,
+                        },
+                        { headers: { Authorization: `Bearer ${config.token}` } }
+                      );
+                      setRetryMessage(response.data?.ok ? t("FEATURES.GLANCE.RETRY_OK") : t("FEATURES.GLANCE.RETRY_FAIL"));
+                    } catch (error) {
+                      setRetryMessage(error.response?.data?.error || t("FEATURES.GLANCE.RETRY_FAIL"));
+                    } finally {
+                      setRetryBusy(false);
+                    }
+                  }}
+                >
+                  {retryBusy ? t("FEATURES.GLANCE.RETRYING") : t("FEATURES.GLANCE.RETRY_GRAB")}
+                </button>
+                {retryMessage ? <span className="is-on">{retryMessage}</span> : null}
+                {watchingNow.length ? (
+                  <span className="is-on">{t("FEATURES.OPS.WATCHING_NOW", { names: watchingNow.join(", ") })}</span>
+                ) : null}
+                {canOps ? (
+                  <button
+                    type="button"
+                    className="item-glance-retry"
+                    disabled={refreshBusy}
+                    onClick={async () => {
+                      setRefreshBusy(true);
+                      setRetryMessage("");
+                      try {
+                        await axios.post(
+                          "/api/jellyfin/refresh-item",
+                          { itemId: Id, recursive: true },
+                          { headers: { Authorization: `Bearer ${config.token}` } }
+                        );
+                        setRetryMessage(t("FEATURES.OPS.REFRESH_OK"));
+                      } catch (error) {
+                        setRetryMessage(error.response?.data?.error || t("FEATURES.OPS.REFRESH_FAIL"));
+                      } finally {
+                        setRefreshBusy(false);
+                      }
+                    }}
+                  >
+                    {refreshBusy ? t("FEATURES.OPS.REFRESHING") : t("FEATURES.OPS.REFRESH_ITEM")}
+                  </button>
+                ) : null}
+                {jellyfinOpenUrl ? (
+                  <a href={encodeURI(jellyfinOpenUrl)} target="_blank" rel="noreferrer">
+                    {t("FEATURES.OPS.OPEN_JELLYFIN")}
+                  </a>
+                ) : null}
+                {seerrUrl ? (
+                  <a href={encodeURI(seerrUrl)} target="_blank" rel="noreferrer">
+                    {t("FEATURES.GLANCE.OPEN_SEERR")}
+                  </a>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="item-snapshot-row">
               <div className="item-snapshot-cell is-wide">
@@ -319,8 +438,8 @@ function ItemInfo() {
 
             <div className="item-action-row">
               {actionLinks.map((link) => (
-                <a key={`${link.label}-${link.url}`} href={link.url} target="_blank" rel="noreferrer" className={`item-action-link ${link.primary ? "is-primary" : ""}`}>
-                  <ExternalLinkFillIcon size={16} />
+                <a key={`${link.label}-${link.url}`} href={encodeURI(link.url)} target="_blank" rel="noreferrer" className={`item-action-link ${link.primary ? "is-primary" : ""}`}>
+                  <RiExternalLinkFill size={16} />
                   {link.label}
                 </a>
               ))}
@@ -331,7 +450,7 @@ function ItemInfo() {
 
       <section className="item-technical-panel">
         <div className="item-section-heading">
-          <InformationLineIcon size={22} />
+          <RiInformationLine size={22} />
           <div>
             <span>Media details</span>
             <strong>{data.FileName || data.Name}</strong>
@@ -357,38 +476,56 @@ function ItemInfo() {
         </div>
       </section>
 
-      <div className="item-tabs-row">
-        <Button onClick={() => setActiveTab("tabOverview")} active={activeTab === "tabOverview"} variant="outline-primary" type="button">
-          <PlayFillIcon size={16} />
+      <div className="item-tabs-row" role="tablist" aria-label="Item views">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "tabOverview"}
+          className={`item-tab-pill ${activeTab === "tabOverview" ? "active" : ""}`.trim()}
+          onClick={() => setActiveTab("tabOverview")}
+        >
+          <RiPlayFill size={16} />
           <Trans i18nKey="TAB_CONTROLS.OVERVIEW" />
-        </Button>
-        <Button onClick={() => setActiveTab("tabActivity")} active={activeTab === "tabActivity"} variant="outline-primary" type="button">
-          <InformationLineIcon size={16} />
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "tabActivity"}
+          className={`item-tab-pill ${activeTab === "tabActivity" ? "active" : ""}`.trim()}
+          onClick={() => setActiveTab("tabActivity")}
+        >
+          <RiInformationLine size={16} />
           <Trans i18nKey="TAB_CONTROLS.ACTIVITY" />
-        </Button>
+        </button>
         {data.archived && (
-          <Button onClick={() => setActiveTab("tabOptions")} active={activeTab === "tabOptions"} variant="outline-primary" type="button">
-            <ArchiveDrawerFillIcon size={16} />
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "tabOptions"}
+            className={`item-tab-pill ${activeTab === "tabOptions" ? "active" : ""}`.trim()}
+            onClick={() => setActiveTab("tabOptions")}
+          >
+            <RiArchiveDrawerFill size={16} />
             <Trans i18nKey="TAB_CONTROLS.OPTIONS" />
-          </Button>
+          </button>
         )}
       </div>
 
-      <Tabs defaultActiveKey="tabOverview" activeKey={activeTab} variant="pills" className="hide-tab-titles">
-        <Tab eventKey="tabOverview" title="Overview" className="bg-transparent">
-          {!config?.IS_SILO ? <GlobalStats id={Id} param={"itemid"} endpoint={"getGlobalItemStats"} title={<Trans i18nKey="GLOBAL_STATS.ITEM_STATS" />} />
-            : <p className="activity-notice">Playback totals are retention-managed by Silo. Open Activity for the complete cursor-paged attempts for this exact catalog item.</p>}
-          {["Series", "Season"].includes(data && data.Type) ? <MoreItems data={data} /> : <></>}
-        </Tab>
-        <Tab eventKey="tabActivity" title="Activity" className="bg-transparent">
+      <div className="item-tab-content">
+        {activeTab === "tabOverview" && (
+          <div>
+            {!config?.IS_SILO ? <GlobalStats id={Id} param={"itemid"} endpoint={"getGlobalItemStats"} title={<Trans i18nKey="GLOBAL_STATS.ITEM_STATS" />} />
+              : <p className="activity-notice">Playback totals are retention-managed by Silo. Open Activity for the complete cursor-paged attempts for this exact catalog item.</p>}
+            {["Series", "Season"].includes(data && data.Type) ? <MoreItems data={data} /> : <></>}
+          </div>
+        )}
+        {activeTab === "tabActivity" && (
           <ErrorBoundary>
             <ItemActivity itemid={Id} />
           </ErrorBoundary>
-        </Tab>
-        <Tab eventKey="tabOptions" title="Options" className="bg-transparent">
-          <ItemOptions itemid={Id} />
-        </Tab>
-      </Tabs>
+        )}
+        {activeTab === "tabOptions" && <ItemOptions itemid={Id} itemName={data?.SeriesName || data?.Name} />}
+      </div>
     </div>
   );
 }

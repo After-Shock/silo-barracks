@@ -5,6 +5,8 @@ const roots = ['apps/web/src', 'apps/web/public/locales', 'apps/api'];
 const attributionPatterns = [
   /derived from JellyGlance by Nerdy-Technician/,
   /github\.com\/Nerdy-Technician\/JellyGlance/,
+  // Upstream moved to the JellyGlance GitHub org (attribution / contributor credits).
+  /github\.com\/JellyGlance\//,
 ];
 const violations = [];
 function walk(entry) {

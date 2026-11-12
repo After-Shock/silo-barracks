@@ -1,6 +1,7 @@
 @import '../variables.css';
 .version
 {
+    padding: 10px 12px;
     background-color: var(--barracks-canvas) !important;
 
     color: var(--barracks-text-raised) !important;
@@ -10,7 +11,7 @@
     text-align: center;
     width: 100%;
 
-  
+
 }
 
 

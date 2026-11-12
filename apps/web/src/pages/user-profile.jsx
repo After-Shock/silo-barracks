@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import axios from "../lib/axios_instance";
 import Config from "../lib/config";
 import { slugifyUserName } from "../lib/userProfile";
@@ -7,6 +8,7 @@ import Loading from "./components/general/loading";
 import UserInfo from "./components/user-info";
 import { AccountDashboard, QuickConnectUserWrap } from "./components/home/UserWrapUpDashboard";
 import "./css/home-user-wrap.css";
+import { mediaServerName } from "../lib/media-server";
 
 const token = localStorage.getItem("token");
 const PROFILE_SECTIONS = [
@@ -101,10 +103,12 @@ function UserMediaRail({ title, subtitle, items = [], onAction, actions = [], va
 }
 
 export default function UserProfilePage() {
+  const { t } = useTranslation();
   const { UserId: userKey = "" } = useParams();
   const [profileUser, setProfileUser] = useState(null);
   const [profileRank, setProfileRank] = useState(0);
   const [access, setAccess] = useState(null);
+  const [profileForbidden, setProfileForbidden] = useState(false);
   const [config, setConfig] = useState(null);
   const [mediaLists, setMediaLists] = useState({ favourites: [], watchlist: [] });
   const [mediaListsLoading, setMediaListsLoading] = useState(false);
@@ -124,6 +128,11 @@ export default function UserProfilePage() {
               headers: { Authorization: `Bearer ${token}` },
             })
             .catch(async (error) => {
+              // 403 means this isn't the signed-in user's own profile.
+              if (error.response?.status === 403) {
+                return { data: { user: null, rank: 0, forbidden: true } };
+              }
+              // 404 means no such user, so only fall back to the full list for other errors.
               if (error.response?.status !== 404) {
                 const fallback = await axios.get("/stats/getUserWrapUp", { headers: { Authorization: `Bearer ${token}` } });
                 const rankedUsers = [...(fallback.data || [])].sort((a, b) => Number(b.TotalWatchTime || 0) - Number(a.TotalWatchTime || 0));
@@ -142,12 +151,14 @@ export default function UserProfilePage() {
 
               return { data: { user: null, rank: 0 } };
             }),
-          axios.get("/api/userAccess", { headers: { Authorization: `Bearer ${token}` } }),
+          // Account management details need the Users permission; the profile itself doesn't.
+          axios.get("/api/userAccess", { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: null })),
         ]);
 
         setConfig(configResponse);
         setProfileUser(profileResponse.data?.user || null);
         setProfileRank(Number(profileResponse.data?.rank || 0));
+        setProfileForbidden(Boolean(profileResponse.data?.forbidden));
         setAccess(accessResponse.data);
       } catch (error) {
         console.log(error);
@@ -179,6 +190,7 @@ export default function UserProfilePage() {
       setMediaListsLoading(true);
       try {
         const response = await axios.get(`/api/users/${encodeURIComponent(matchedUser.UserId)}/media-lists`, {
+          params: { full: "true" },
           headers: { Authorization: `Bearer ${token}` },
         });
         if (active) {
@@ -207,6 +219,7 @@ export default function UserProfilePage() {
     setMediaListsLoading(true);
     try {
       const response = await axios.get(`/api/users/${encodeURIComponent(matchedUser.UserId)}/media-lists`, {
+        params: { full: "true" },
         headers: { Authorization: `Bearer ${token}` },
       });
       setMediaLists(response.data || { favourites: [], watchlist: [] });
@@ -224,7 +237,7 @@ export default function UserProfilePage() {
         { action },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setMediaMessage("Updated Jellyfin media state.");
+      setMediaMessage(`Updated ${mediaServerName()} media state.`);
       await reloadMediaLists();
     } catch (error) {
       setMediaMessage(error.response?.data?.error || error.message || "Unable to update item.");
@@ -269,7 +282,7 @@ export default function UserProfilePage() {
 
     return (
       <div className="user-profile-page" data-theme-screen="user-profile">
-        <QuickConnectUserWrap user={matchedUser} rank={rank || 1} />
+        <QuickConnectUserWrap user={matchedUser} rank={rank || null} />
         <nav className="user-profile-subnav" aria-label="Profile sections">
           {PROFILE_SECTIONS.map((section) => (
             <button
@@ -315,38 +328,38 @@ export default function UserProfilePage() {
           {activeProfileSection === "media" ? (
             <>
               <UserMediaRail
-                title="Continue Watching"
-                subtitle="In-progress Jellyfin media for this user."
+                title={t("USER_PROFILE.CONTINUE_WATCHING")}
+                subtitle={t("USER_PROFILE.CONTINUE_WATCHING_SUBTITLE")}
                 items={filterMedia(mediaLists.continueWatching || [])}
                 onAction={runMediaAction}
                 actions={[{ label: "Watched", action: "markWatched" }]}
               />
-              <UserMediaRail title="Recently Watched" subtitle="Last 10 synced plays for this user." items={filterMedia(mediaLists.recentlyWatched || [])} />
+              <UserMediaRail title={t("USER_PROFILE.RECENTLY_WATCHED")} subtitle={t("USER_PROFILE.RECENTLY_WATCHED_SUBTITLE")} items={filterMedia(mediaLists.recentlyWatched || [])} />
               <UserMediaRail
-                title="Favourites"
-                subtitle="Jellyfin favourites for this user."
+                title={t("USER_PROFILE.FAVOURITES")}
+                subtitle={t("USER_PROFILE.FAVOURITES_SUBTITLE")}
                 items={filterMedia(mediaLists.favourites || [])}
                 onAction={runMediaAction}
                 actions={[{ label: "Unfavourite", action: "unfavourite" }, { label: "Watched", action: "markWatched" }]}
               />
               <UserMediaRail
-                title="Watchlist Movies"
-                subtitle="Movies pulled from Jellyfin Watchlist."
+                title={t("USER_PROFILE.WATCHLIST_MOVIES")}
+                subtitle={t("USER_PROFILE.WATCHLIST_MOVIES_SUBTITLE")}
                 items={filterMedia(mediaLists.watchlistByType?.movies || [])}
                 onAction={runMediaAction}
                 actions={[{ label: "Remove", action: "removeWatchlist" }, { label: "Favourite", action: "favourite" }, { label: "Watched", action: "markWatched" }]}
                 variant="featured"
               />
               <UserMediaRail
-                title="Watchlist Shows"
-                subtitle="Shows pulled from Jellyfin Watchlist."
+                title={t("USER_PROFILE.WATCHLIST_SHOWS")}
+                subtitle={t("USER_PROFILE.WATCHLIST_SHOWS_SUBTITLE")}
                 items={filterMedia(mediaLists.watchlistByType?.shows || [])}
                 onAction={runMediaAction}
                 actions={[{ label: "Remove", action: "removeWatchlist" }, { label: "Favourite", action: "favourite" }]}
                 variant="featured"
               />
-              <UserMediaRail title="Next Episodes" subtitle="Next unwatched episodes from this profile's shows." items={filterMedia(mediaLists.nextEpisodes || [])} onAction={runMediaAction} actions={[{ label: "Watched", action: "markWatched" }]} />
-              <UserMediaRail title="Recommended" subtitle="Suggestions based on watchlist genres." items={filterMedia(mediaLists.recommendations || [])} onAction={runMediaAction} actions={[{ label: "Watchlist", action: "addWatchlist" }, { label: "Favourite", action: "favourite" }]} />
+              <UserMediaRail title={t("USER_PROFILE.NEXT_EPISODES")} subtitle={t("USER_PROFILE.NEXT_EPISODES_SUBTITLE")} items={filterMedia(mediaLists.nextEpisodes || [])} onAction={runMediaAction} actions={[{ label: "Watched", action: "markWatched" }]} />
+              <UserMediaRail title={t("USER_PROFILE.RECOMMENDED")} subtitle={t("USER_PROFILE.RECOMMENDED_SUBTITLE")} items={filterMedia(mediaLists.recommendations || [])} onAction={runMediaAction} actions={[{ label: "Watchlist", action: "addWatchlist" }, { label: "Favourite", action: "favourite" }]} />
             </>
           ) : null}
 
@@ -362,15 +375,27 @@ export default function UserProfilePage() {
               {(mediaLists.taste?.studios || []).slice(0, 6).map((item) => <span key={`studio-${item.name}`}>{item.name} · {item.count}</span>)}
             </div>
             </section>
-            <UserMediaRail title="Shared Favourites" subtitle="Items this user and others overlap on." items={filterMedia(mediaLists.sharedFavourites || [])} />
+            <UserMediaRail title={t("USER_PROFILE.SHARED_FAVOURITES")} subtitle={t("USER_PROFILE.SHARED_FAVOURITES_SUBTITLE")} items={filterMedia(mediaLists.sharedFavourites || [])} />
           </> : null}
 
           {activeProfileSection === "household" ? <>
-            <UserMediaRail title="Family Watchlist" subtitle="Combined household watchlist, grouped by popularity." items={filterMedia([...(mediaLists.familyWatchlist?.movies || []), ...(mediaLists.familyWatchlist?.shows || [])])} />
-            <UserMediaRail title="Stale Watchlist" subtitle="Watchlisted for 30+ days and not cleared yet." items={filterMedia(mediaLists.staleWatchlist || [])} onAction={runMediaAction} actions={[{ label: "Remove", action: "removeWatchlist" }]} />
-            <UserMediaRail title="Library Gaps" subtitle="Watchlisted shows with an unwatched next episode to catch up on." items={filterMedia(mediaLists.libraryGaps || [])} />
+            <UserMediaRail title={t("USER_PROFILE.FAMILY_WATCHLIST")} subtitle={t("USER_PROFILE.FAMILY_WATCHLIST_SUBTITLE")} items={filterMedia([...(mediaLists.familyWatchlist?.movies || []), ...(mediaLists.familyWatchlist?.shows || [])])} />
+            <UserMediaRail title={t("USER_PROFILE.STALE_WATCHLIST")} subtitle={t("USER_PROFILE.STALE_WATCHLIST_SUBTITLE")} items={filterMedia(mediaLists.staleWatchlist || [])} onAction={runMediaAction} actions={[{ label: "Remove", action: "removeWatchlist" }]} />
+            <UserMediaRail title={t("USER_PROFILE.LIBRARY_GAPS")} subtitle={t("USER_PROFILE.LIBRARY_GAPS_SUBTITLE")} items={filterMedia(mediaLists.libraryGaps || [])} />
           </> : null}
         </div>
+      </div>
+    );
+  }
+
+  if (profileForbidden) {
+    return (
+      <div className="user-profile-page">
+        <section className="user-profile-empty">
+          <h1>Profile not available</h1>
+          <p>You can only view your own profile.</p>
+          <Link to="/me">Go to My Glance</Link>
+        </section>
       </div>
     );
   }

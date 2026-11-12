@@ -46,7 +46,6 @@
   color: color-mix(in srgb, var(--barracks-text-raised) 68%, transparent);
 }
 
-.repair-hero .btn,
 .repair-queue-card a,
 .repair-panel-title a {
   display: inline-flex;

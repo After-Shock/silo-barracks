@@ -1,19 +1,22 @@
 const express = require("express");
-const CryptoJS = require("crypto-js");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 const db = require("../db");
+const { axios } = require("../classes/axios");
 const { addAuditEntry } = require("../classes/admin-history");
+const campaigns = require("../classes/newsletter-campaigns");
+const reportBuilder = require("../classes/newsletter-report-builder");
+const { encryptSecret, getIntegrations } = require("../classes/integration-store");
+const { isValidEmail } = require("../utils/security");
+const { decryptPassword, upgradeLegacyPassword } = require("../classes/smtp-mailer");
+const { fetchJellyfinUserItems, normalizeJellyfinMediaItem } = require("../classes/watch-tonight");
 
 const router = express.Router();
 const HISTORY_LIMIT = 50;
 const SETTINGS_KEY = "Newsletter";
 const logoPath = path.join(__dirname, "..", "..", "web", "src", "pages", "images", "icon-b-512.png");
 
-function secretKey() {
-  return process.env.JWT_SECRET || process.env.POSTGRES_PASSWORD || "jellyglance-newsletter";
-}
 
 async function getSettings() {
   const { rows } = await db.query('SELECT settings FROM app_config where "ID"=1');
@@ -41,16 +44,6 @@ function defaultNewsletterSettings() {
     },
     history: [],
   };
-}
-
-function decryptPassword(value) {
-  if (!value) return "";
-  try {
-    const bytes = CryptoJS.AES.decrypt(value, secretKey());
-    return bytes.toString(CryptoJS.enc.Utf8);
-  } catch {
-    return "";
-  }
 }
 
 function publicSettings(settings) {
@@ -84,7 +77,7 @@ function normalizeRecipients(value) {
 }
 
 function validateEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+  return isValidEmail(value);
 }
 
 function mergeNewsletterSettings(existingSettings, incoming) {
@@ -99,8 +92,8 @@ function mergeNewsletterSettings(existingSettings, incoming) {
 
   const nextPassword =
     incoming.smtp?.password && String(incoming.smtp.password).trim()
-      ? CryptoJS.AES.encrypt(String(incoming.smtp.password), secretKey()).toString()
-      : current.smtp.password;
+      ? encryptSecret(String(incoming.smtp.password))
+      : upgradeLegacyPassword(current.smtp.password);
 
   return {
     ...current,
@@ -153,6 +146,10 @@ function formatDate(value) {
     month: "short",
     year: "numeric",
   }).format(new Date(value));
+}
+
+function cleanUrl(url = "") {
+  return String(url || "").trim().replace(/\/+$/, "");
 }
 
 function formatWatchTime(seconds) {
@@ -245,20 +242,97 @@ async function buildNewsletterData() {
   };
 }
 
+async function fetchUserSeerrRequests(userName) {
+  const integrations = await getIntegrations().catch(() => ({ arrApps: [] }));
+  const seerrApps = (integrations.arrApps || []).filter((app) => {
+    const name = String(app.name || app.slug || "").toLowerCase();
+    return app.connected && (name.includes("jellyseerr") || name.includes("overseerr") || name === "seerr");
+  });
+  const needle = String(userName || "").toLowerCase();
+  const requests = [];
+  for (const app of seerrApps) {
+    try {
+      const response = await axios.get(`${cleanUrl(app.values.url)}/api/v1/request`, {
+        timeout: 12000,
+        headers: { "X-Api-Key": app.values.secret },
+        params: { take: 40, skip: 0, sort: "added", skipCount: "false" },
+      });
+      const rows = response.data?.results || response.data || [];
+      for (const row of Array.isArray(rows) ? rows : []) {
+        const requestedBy = row.requestedBy?.displayName || row.requestedBy?.jellyfinUsername || row.user?.jellyfinUsername || "";
+        if (needle && !String(requestedBy).toLowerCase().includes(needle)) continue;
+        const media = row.media || {};
+        requests.push({
+          Name: media.title || media.name || row.title || "Request",
+          Type: media.mediaType || row.type || "Request",
+          status: row.status,
+        });
+      }
+    } catch {
+      // Skip this Seerr instance and keep building the digest.
+    }
+  }
+  return requests.slice(0, 8);
+}
+
+async function buildUserNewsletterData(person) {
+  const [continueItems, recentItems, requests] = await Promise.all([
+    fetchJellyfinUserItems(person.userId, {
+      Filters: "IsResumable",
+      IncludeItemTypes: "Movie,Episode",
+      SortBy: "DatePlayed",
+      SortOrder: "Descending",
+      Limit: 8,
+    }).catch(() => []),
+    fetchJellyfinUserItems(person.userId, {
+      SortBy: "DateCreated",
+      SortOrder: "Descending",
+      IncludeItemTypes: "Movie,Series,Episode",
+      Limit: 8,
+    }).catch(() => []),
+    fetchUserSeerrRequests(person.name).catch(() => []),
+  ]);
+
+  return {
+    generatedAt: new Date().toISOString(),
+    subject: `Your Barracks digest - ${formatDate(new Date())}`,
+    perUser: true,
+    personName: person.name,
+    continueWatching: continueItems.map(normalizeJellyfinMediaItem).map((item) => ({
+      Name: item.seriesName || item.name,
+      Type: item.type,
+    })),
+    myRequests: requests,
+    recentlyAdded: recentItems.map(normalizeJellyfinMediaItem).map((item) => ({
+      Name: item.seriesName || item.name,
+      Type: item.type,
+    })),
+    topWatched: [],
+    activeUsers: [],
+    repairSummary: { missingPosters: 0, missingLogos: 0, missingRuntime: 0, unmatchedImports: 0 },
+  };
+}
+
 function listHtml(items, rowBuilder, emptyText) {
   if (!items.length) return `<p style="color:#8fa3bd;margin:0;font-size:14px;">${emptyText}</p>`;
   return `<div>${items.map(rowBuilder).join("")}</div>`;
 }
 
 function buildNewsletterHtml(data, options = {}) {
+  const perUser = Boolean(data.perUser || options.perUser);
+  const sections = perUser
+    ? { continueWatching: true, myRequests: true, recentlyAdded: true, ...(options.sections || {}) }
+    : { recentlyAdded: true, topWatched: true, activeUsers: true, repairSummary: true, ...(options.sections || {}) };
   const logoSrc = options.logoSrc || getLogoDataUri();
+  const repairSummary = data.repairSummary || {};
   const totalRepairIssues =
-    data.repairSummary.missingPosters +
-    data.repairSummary.missingLogos +
-    data.repairSummary.missingRuntime +
-    data.repairSummary.unmatchedImports;
-  const totalPlays = data.topWatched.reduce((total, item) => total + Number(item.Plays || 0), 0);
-  const totalWatchSeconds = data.topWatched.reduce((total, item) => total + Number(item.WatchSeconds || 0), 0);
+    Number(repairSummary.missingPosters || 0) +
+    Number(repairSummary.missingLogos || 0) +
+    Number(repairSummary.missingRuntime || 0) +
+    Number(repairSummary.unmatchedImports || 0);
+  const topWatched = data.topWatched || [];
+  const totalPlays = topWatched.reduce((total, item) => total + Number(item.Plays || 0), 0);
+  const totalWatchSeconds = topWatched.reduce((total, item) => total + Number(item.WatchSeconds || 0), 0);
   const metricBox = (label, value, detail, color = "#6ee7f9") => `
     <td style="width:25%;padding:6px;">
       <div style="background:#121a24;border:1px solid #27364a;border-radius:14px;padding:14px;min-height:86px;">
@@ -268,135 +342,98 @@ function buildNewsletterHtml(data, options = {}) {
       </div>
     </td>
   `;
-  const itemRow = (title, meta, badge = "") => `
-    <tr>
-      <td style="padding:12px 0;border-bottom:1px solid #223047;">
-        <div style="color:#f8fafc;font-size:15px;font-weight:800;">${escapeHtml(title)}</div>
-        <div style="color:#9fb0c7;font-size:12px;margin-top:3px;">${escapeHtml(meta)}</div>
-      </td>
-      ${badge ? `<td align="right" style="padding:12px 0;border-bottom:1px solid #223047;color:#6ee7f9;font-size:12px;font-weight:800;white-space:nowrap;">${escapeHtml(badge)}</td>` : ""}
-    </tr>
-  `;
+  const sectionTitle = (title) => `<h2 style="color:#e8eef8;font-size:16px;margin:24px 0 10px;">${title}</h2>`;
+  const recentlyAddedHtml = sections.recentlyAdded
+    ? `${sectionTitle("Recently Added")}${listHtml(
+        data.recentlyAdded || [],
+        (item) =>
+          `<div style="padding:8px 0;border-bottom:1px solid #243246;color:#d7e2f2;font-size:14px;"><strong>${escapeHtml(item.Name)}</strong> <span style="color:#8fa3bd;">${escapeHtml([item.Type, item.ProductionYear, item.status].filter(Boolean).join(" · "))}</span></div>`,
+        "No new media this period."
+      )}`
+    : "";
+  const continueWatchingHtml =
+    perUser && sections.continueWatching
+      ? `${sectionTitle("Continue Watching")}${listHtml(
+          data.continueWatching || [],
+          (item) =>
+            `<div style="padding:8px 0;border-bottom:1px solid #243246;color:#d7e2f2;font-size:14px;"><strong>${escapeHtml(item.Name)}</strong> <span style="color:#8fa3bd;">${escapeHtml(item.Type || "")}</span></div>`,
+          "Nothing in progress."
+        )}`
+      : "";
+  const myRequestsHtml =
+    perUser && sections.myRequests
+      ? `${sectionTitle("My Requests")}${listHtml(
+          data.myRequests || [],
+          (item) =>
+            `<div style="padding:8px 0;border-bottom:1px solid #243246;color:#d7e2f2;font-size:14px;"><strong>${escapeHtml(item.Name)}</strong> <span style="color:#8fa3bd;">${escapeHtml([item.Type, item.status].filter(Boolean).join(" · "))}</span></div>`,
+          "No requests for this account."
+        )}`
+      : "";
+  const topWatchedHtml =
+    !perUser && sections.topWatched
+      ? `${sectionTitle("Most Watched")}${listHtml(
+          topWatched,
+          (item) =>
+            `<div style="padding:8px 0;border-bottom:1px solid #243246;color:#d7e2f2;font-size:14px;"><strong>${escapeHtml(item.Name)}</strong> <span style="color:#8fa3bd;">${item.Plays} plays · ${formatWatchTime(item.WatchSeconds)}</span></div>`,
+          "No watch activity yet."
+        )}`
+      : "";
+  const activeUsersHtml =
+    !perUser && sections.activeUsers
+      ? `${sectionTitle("Active Viewers")}${listHtml(
+          data.activeUsers || [],
+          (item) =>
+            `<div style="padding:8px 0;border-bottom:1px solid #243246;color:#d7e2f2;font-size:14px;"><strong>${escapeHtml(item.Name)}</strong> <span style="color:#8fa3bd;">${item.Plays} plays · ${formatWatchTime(item.WatchSeconds)}</span></div>`,
+          "No active viewers this period."
+        )}`
+      : "";
+  const repairHtml =
+    !perUser && sections.repairSummary
+      ? `${sectionTitle("Repair Snapshot")}<p style="color:#9fb0c7;font-size:14px;margin:0;">Missing posters ${repairSummary.missingPosters || 0} · logos ${repairSummary.missingLogos || 0} · runtime ${repairSummary.missingRuntime || 0} · unmatched imports ${repairSummary.unmatchedImports || 0}</p>`
+      : "";
+  const customHtml = sections.customHtml ? `<div style="margin-top:20px;">${sections.customHtml}</div>` : "";
+  const metricRow = perUser
+    ? `${metricBox("Continue", String((data.continueWatching || []).length), "In progress")}
+       ${metricBox("Requests", String((data.myRequests || []).length), "Your Seerr queue", "#a78bfa")}
+       ${metricBox("New", String((data.recentlyAdded || []).length), "Recently added", "#34d399")}
+       ${metricBox("For", escapeHtml(data.personName || "You"), "Personal digest", "#fbbf24")}`
+    : `${metricBox("Plays", totalPlays.toLocaleString(), "Top titles this week")}
+       ${metricBox("Watch", formatWatchTime(totalWatchSeconds), "Across top titles", "#a78bfa")}
+       ${metricBox("New", String((data.recentlyAdded || []).length), "Recently added items", "#34d399")}
+       ${metricBox("Repair", String(totalRepairIssues), "Open metadata issues", "#fbbf24")}`;
+  const bodyHtml = perUser
+    ? `${continueWatchingHtml}${myRequestsHtml}${recentlyAddedHtml}${customHtml}`
+    : `${recentlyAddedHtml}${topWatchedHtml}${activeUsersHtml}${repairHtml}${customHtml}`;
 
   return `
     <!doctype html>
     <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>${escapeHtml(data.subject)}</title>
-      </head>
-      <body style="margin:0;background:#090d13;color:#edf2f7;font-family:Arial,Helvetica,sans-serif;">
-        <div style="display:none;max-height:0;overflow:hidden;color:transparent;">Recently added media, top watches, active viewers, and repair status from Barracks.</div>
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#090d13;">
+      <body style="margin:0;background:#0b111a;font-family:Arial,sans-serif;color:#d7e2f2;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#0b111a;padding:24px 12px;">
           <tr>
-            <td align="center" style="padding:28px 12px;">
-              <table role="presentation" width="760" cellspacing="0" cellpadding="0" style="width:100%;max-width:760px;">
+            <td align="center">
+              <table width="640" cellpadding="0" cellspacing="0" style="background:#151d29;border:1px solid #27364a;border-radius:18px;overflow:hidden;">
                 <tr>
-                  <td style="border-radius:22px;overflow:hidden;background:#0f1722;border:1px solid #26364a;">
-                    <div style="background:linear-gradient(135deg,#111827 0%,#132436 48%,#351b44 100%);padding:26px 26px 22px;">
-                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                        <tr>
-                          <td>
-                            <div style="color:#9ee8ff;font-size:12px;font-weight:900;text-transform:uppercase;">Barracks Digest</div>
-                            <h1 style="margin:8px 0 8px;color:#ffffff;font-size:34px;line-height:1.05;">Weekly media pulse</h1>
-                            <p style="margin:0;color:#c7d4e6;font-size:14px;line-height:1.5;">Fresh additions, what everyone watched, who was active, and what needs a little admin attention.</p>
-                          </td>
-                          <td align="right" width="92" style="padding-left:18px;">
-                            ${logoSrc ? `<img src="${logoSrc}" width="76" height="76" alt="Barracks" style="display:block;border-radius:18px;">` : ""}
-                          </td>
-                        </tr>
-                      </table>
-                      <div style="margin-top:18px;color:#93a8c4;font-size:12px;">${escapeHtml(data.subject)} · Generated ${formatDate(data.generatedAt)}</div>
-                    </div>
-
-                    <div style="padding:18px 20px 8px;background:#0f1722;">
-                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                        <tr>
-                          ${metricBox("New items", data.recentlyAdded.length, "recent additions", "#a78bfa")}
-                          ${metricBox("Top plays", totalPlays, "from top titles", "#6ee7f9")}
-                          ${metricBox("Watch time", formatWatchTime(totalWatchSeconds), "top title total", "#34d399")}
-                          ${metricBox("Repair queue", totalRepairIssues, "items flagged", totalRepairIssues ? "#fb7185" : "#34d399")}
-                        </tr>
-                      </table>
-                    </div>
-
-                    <div style="padding:6px 26px 26px;background:#0f1722;">
-                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                        <tr>
-                          <td style="padding:14px 0;">
-                            <div style="background:#111c2a;border:1px solid #26364a;border-radius:16px;padding:18px;">
-                              <h2 style="margin:0 0 12px;color:#ffffff;font-size:20px;">Recently Added</h2>
-          ${listHtml(
-            data.recentlyAdded,
-            (item) =>
-              `<table role="presentation" width="100%" cellspacing="0" cellpadding="0">${itemRow(
-                item.Name,
-                `${item.Type || "Media"}${item.ProductionYear ? ` · ${item.ProductionYear}` : ""} · added ${formatDate(item.DateCreated)}`,
-                "New"
-              )}</table>`,
-            "No new items found."
-          )}
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="padding:0 0 14px;">
-                            <div style="background:#111c2a;border:1px solid #26364a;border-radius:16px;padding:18px;">
-                              <h2 style="margin:0 0 12px;color:#ffffff;font-size:20px;">Most Watched This Week</h2>
-          ${listHtml(
-            data.topWatched,
-            (item) =>
-              `<table role="presentation" width="100%" cellspacing="0" cellpadding="0">${itemRow(
-                item.Name,
-                `${item.Plays} plays · ${formatWatchTime(item.WatchSeconds)} watched`,
-                `${item.Plays} plays`
-              )}</table>`,
-            "No watch activity this week."
-          )}
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="padding:0 0 14px;">
-                            <div style="background:#111c2a;border:1px solid #26364a;border-radius:16px;padding:18px;">
-                              <h2 style="margin:0 0 12px;color:#ffffff;font-size:20px;">Active Viewers</h2>
-          ${listHtml(
-            data.activeUsers,
-            (item) =>
-              `<table role="presentation" width="100%" cellspacing="0" cellpadding="0">${itemRow(
-                item.Name,
-                `${item.Plays} plays · ${formatWatchTime(item.WatchSeconds)} watched`,
-                formatWatchTime(item.WatchSeconds)
-              )}</table>`,
-            "No active viewers this week."
-          )}
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div style="background:#171321;border:1px solid #3b294f;border-radius:16px;padding:18px;">
-                              <h2 style="margin:0 0 12px;color:#ffffff;font-size:20px;">Repair Snapshot</h2>
-                              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                                <tr>
-                                  <td style="color:#c7d4e6;font-size:14px;line-height:1.7;">
-                                    <strong style="color:#f8fafc;">${data.repairSummary.missingPosters}</strong> missing posters ·
-                                    <strong style="color:#f8fafc;">${data.repairSummary.missingLogos}</strong> missing logos ·
-                                    <strong style="color:#f8fafc;">${data.repairSummary.missingRuntime}</strong> runtime gaps ·
-                                    <strong style="color:#f8fafc;">${data.repairSummary.unmatchedImports}</strong> unmatched imported plays
-                                  </td>
-                                </tr>
-                              </table>
-                            </div>
-                          </td>
-                        </tr>
-                      </table>
-                    </div>
+                  <td style="padding:28px 28px 12px;">
+                    ${logoSrc ? `<img src="${logoSrc}" alt="Barracks" width="48" height="48" style="display:block;margin-bottom:14px;" />` : ""}
+                    <div style="color:#8fa3bd;font-size:12px;font-weight:800;text-transform:uppercase;">${escapeHtml(options.campaignName || "Barracks Newsletter")}</div>
+                    <h1 style="margin:8px 0 6px;color:#f4f8ff;font-size:28px;">${escapeHtml(data.subject)}</h1>
+                    <p style="margin:0;color:#9fb0c7;font-size:14px;">Generated ${escapeHtml(formatDate(data.generatedAt))}</p>
                   </td>
                 </tr>
                 <tr>
-                  <td align="center" style="padding:16px;color:#72839a;font-size:12px;">Sent by Barracks</td>
+                  <td style="padding:8px 22px 8px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        ${metricRow}
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 28px 32px;">
+                    ${bodyHtml}
+                  </td>
                 </tr>
               </table>
             </td>
@@ -408,24 +445,39 @@ function buildNewsletterHtml(data, options = {}) {
 }
 
 function buildNewsletterText(data) {
+  if (data.perUser) {
+    return [
+      `Barracks digest for ${data.personName || "you"}`,
+      `Generated ${formatDate(data.generatedAt)}`,
+      "",
+      "Continue Watching",
+      ...((data.continueWatching || []).map((item) => `- ${item.Name} (${item.Type || "Media"})`) || ["- Nothing in progress."]),
+      "",
+      "My Requests",
+      ...((data.myRequests || []).map((item) => `- ${item.Name} (${[item.Type, item.status].filter(Boolean).join(", ") || "Request"})`) || ["- No requests."]),
+      "",
+      "Recently Added",
+      ...((data.recentlyAdded || []).map((item) => `- ${item.Name} (${item.Type || "Media"})`) || ["- No new media."]),
+    ].join("\n");
+  }
   const lines = [
     "Barracks Newsletter",
     `Generated ${formatDate(data.generatedAt)}`,
     "",
     "Recently Added",
-    ...data.recentlyAdded.map((item) => `- ${item.Name} (${[item.Type, item.ProductionYear].filter(Boolean).join(", ") || "Media"})`),
+    ...(data.recentlyAdded || []).map((item) => `- ${item.Name} (${[item.Type, item.ProductionYear].filter(Boolean).join(", ") || "Media"})`),
     "",
     "Most Watched This Week",
-    ...data.topWatched.map((item) => `- ${item.Name}: ${item.Plays} plays, ${formatWatchTime(item.WatchSeconds)}`),
+    ...(data.topWatched || []).map((item) => `- ${item.Name}: ${item.Plays} plays, ${formatWatchTime(item.WatchSeconds)}`),
     "",
     "Active Viewers",
-    ...data.activeUsers.map((item) => `- ${item.Name}: ${item.Plays} plays, ${formatWatchTime(item.WatchSeconds)}`),
+    ...(data.activeUsers || []).map((item) => `- ${item.Name}: ${item.Plays} plays, ${formatWatchTime(item.WatchSeconds)}`),
     "",
     "Repair Snapshot",
-    `Missing posters: ${data.repairSummary.missingPosters}`,
-    `Missing logos: ${data.repairSummary.missingLogos}`,
-    `Runtime gaps: ${data.repairSummary.missingRuntime}`,
-    `Unmatched imports: ${data.repairSummary.unmatchedImports}`,
+    `Missing posters: ${data.repairSummary?.missingPosters || 0}`,
+    `Missing logos: ${data.repairSummary?.missingLogos || 0}`,
+    `Runtime gaps: ${data.repairSummary?.missingRuntime || 0}`,
+    `Unmatched imports: ${data.repairSummary?.unmatchedImports || 0}`,
   ];
   return lines.join("\n");
 }
@@ -446,7 +498,7 @@ async function addNewsletterHistory(req, entry) {
   });
 }
 
-async function sendNewsletter(req, recipients, mode) {
+async function sendNewsletter(req, recipients, mode, options = {}) {
   const settings = await getSettings();
   const newsletter = {
     ...defaultNewsletterSettings(),
@@ -463,7 +515,126 @@ async function sendNewsletter(req, recipients, mode) {
     throw error;
   }
 
-  const targets = normalizeRecipients(recipients?.length ? recipients : newsletter.recipients);
+  let campaign = null;
+  if (options.campaignId) {
+    campaign = await campaigns.getCampaign(options.campaignId);
+    if (!campaign) {
+      const error = new Error("Campaign not found");
+      error.statusCode = 404;
+      throw error;
+    }
+  }
+
+  const overrideRecipients = normalizeRecipients(recipients);
+  const isPerUser = campaign?.type === "per-user";
+  const attachments = fs.existsSync(logoPath)
+    ? [
+        {
+          filename: "jellyglance-logo.png",
+          path: logoPath,
+          cid: "jellyglance-logo",
+        },
+      ]
+    : [];
+  const transporter = createTransport(newsletter);
+  const from = `"${newsletter.senderName || "Barracks"}" <${newsletter.senderEmail}>`;
+
+  if (isPerUser) {
+    const people = await campaigns.resolvePerUserCampaignRecipients(campaign);
+    const deliveries = overrideRecipients.length
+      ? [{ person: people[0] || { userId: "", name: "Viewer" }, emails: overrideRecipients }]
+      : people.map((person) => ({ person, emails: [person.email] }));
+    if (!deliveries.length) {
+      const error = new Error("No opted-in per-user recipients with an email address");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const sections = {
+      ...campaigns.PER_USER_SECTIONS,
+      ...(campaign.sections || {}),
+      ...(campaign.template?.blocks || {}),
+    };
+    let sent = 0;
+    let lastMessageId = null;
+    let lastSubject = campaign.name ? `${campaign.name} - ${formatDate(new Date())}` : "";
+    const errors = [];
+    for (const delivery of deliveries) {
+      try {
+        const data = delivery.person.userId
+          ? await buildUserNewsletterData(delivery.person)
+          : {
+              generatedAt: new Date().toISOString(),
+              subject: lastSubject || `Your Barracks digest - ${formatDate(new Date())}`,
+              perUser: true,
+              personName: delivery.person.name,
+              continueWatching: [],
+              myRequests: [],
+              recentlyAdded: [],
+              topWatched: [],
+              activeUsers: [],
+              repairSummary: { missingPosters: 0, missingLogos: 0, missingRuntime: 0, unmatchedImports: 0 },
+            };
+        if (campaign.name) data.subject = `${campaign.name} - ${formatDate(new Date())}`;
+        const built = reportEnabled(campaign)
+          ? await reportBuilder.renderReport(campaign.sections.report, {
+              campaignName: campaign.name,
+              logoSrc: "cid:jellyglance-logo",
+              personData: data,
+              perUser: true,
+            })
+          : null;
+        if (built) data.subject = built.subject;
+        lastSubject = data.subject;
+        const result = await transporter.sendMail({
+          from,
+          to: delivery.emails,
+          subject: data.subject,
+          text: built ? built.text : buildNewsletterText(data),
+          html: built
+            ? built.html
+            : buildNewsletterHtml(data, {
+                logoSrc: "cid:jellyglance-logo",
+                campaignName: campaign.name,
+                sections,
+                perUser: true,
+              }),
+          attachments,
+        });
+        lastMessageId = result.messageId;
+        sent += delivery.emails.length;
+      } catch (error) {
+        errors.push(error.message);
+      }
+    }
+    if (!sent) {
+      const error = new Error(errors[0] || "Unable to send per-user newsletter");
+      error.statusCode = 503;
+      throw error;
+    }
+    await addNewsletterHistory(req, {
+      ok: true,
+      mode,
+      subject: lastSubject,
+      recipientCount: sent,
+      messageId: lastMessageId,
+    });
+    await campaigns.addHistoryEntry({
+      campaignId: campaign.id,
+      recipientCount: sent,
+      status: "ok",
+      mode,
+      subject: lastSubject,
+      meta: { messageId: lastMessageId, perUser: true, errors },
+    });
+    return { ok: true, messageId: lastMessageId, recipientCount: sent, subject: lastSubject, campaignId: campaign.id };
+  }
+
+  const targets = overrideRecipients.length
+    ? overrideRecipients
+    : campaign
+      ? await campaigns.resolveCampaignRecipients(campaign)
+      : newsletter.recipients;
   if (!targets.length || targets.some((email) => !validateEmail(email))) {
     const error = new Error("At least one valid recipient is required");
     error.statusCode = 400;
@@ -471,22 +642,31 @@ async function sendNewsletter(req, recipients, mode) {
   }
 
   const data = await buildNewsletterData();
-  const transporter = createTransport(newsletter);
+  if (campaign?.name) {
+    data.subject = `${campaign.name} - ${formatDate(new Date())}`;
+  }
+  const sections = {
+    ...campaigns.DEFAULT_SECTIONS,
+    ...(campaign?.sections || {}),
+    ...(campaign?.template?.blocks || {}),
+  };
+  const built = reportEnabled(campaign)
+    ? await reportBuilder.renderReport(campaign.sections.report, { campaignName: campaign.name, logoSrc: "cid:jellyglance-logo" })
+    : null;
+  if (built) data.subject = built.subject;
   const result = await transporter.sendMail({
-    from: `"${newsletter.senderName || "Barracks"}" <${newsletter.senderEmail}>`,
+    from,
     to: targets,
     subject: data.subject,
-    text: buildNewsletterText(data),
-    html: buildNewsletterHtml(data, { logoSrc: "cid:jellyglance-logo" }),
-    attachments: fs.existsSync(logoPath)
-      ? [
-          {
-            filename: "jellyglance-logo.png",
-            path: logoPath,
-            cid: "jellyglance-logo",
-          },
-        ]
-      : [],
+    text: built ? built.text : buildNewsletterText(data),
+    html: built
+      ? built.html
+      : buildNewsletterHtml(data, {
+          logoSrc: "cid:jellyglance-logo",
+          campaignName: campaign?.name,
+          sections,
+        }),
+    attachments,
   });
 
   await addNewsletterHistory(req, {
@@ -496,8 +676,46 @@ async function sendNewsletter(req, recipients, mode) {
     recipientCount: targets.length,
     messageId: result.messageId,
   });
+  await campaigns.addHistoryEntry({
+    campaignId: campaign?.id || null,
+    recipientCount: targets.length,
+    status: "ok",
+    mode,
+    subject: data.subject,
+    meta: { messageId: result.messageId },
+  });
 
-  return { ok: true, messageId: result.messageId, recipientCount: targets.length, subject: data.subject };
+  return { ok: true, messageId: result.messageId, recipientCount: targets.length, subject: data.subject, campaignId: campaign?.id || null };
+}
+
+function reportEnabled(campaign) {
+  return Boolean(campaign?.sections?.report?.enabled && campaign.sections.report.blocks?.length);
+}
+
+async function previewPersonData(campaign, userId) {
+  const people = await campaigns.resolvePerUserCampaignRecipients(campaign || { id: null });
+  const person = people.find((row) => String(row.userId) === String(userId || "")) || people[0] || { userId: "", name: "Viewer" };
+  return buildUserNewsletterData(person);
+}
+
+async function sendDueCampaigns(req = null) {
+  const due = await campaigns.listDueCampaigns();
+  const results = [];
+  for (const campaign of due) {
+    try {
+      results.push(await sendNewsletter(req, [], "scheduled", { campaignId: campaign.id }));
+    } catch (error) {
+      await campaigns.addHistoryEntry({
+        campaignId: campaign.id,
+        recipientCount: 0,
+        status: "failed",
+        mode: "scheduled",
+        error: error.message,
+      });
+      results.push({ ok: false, campaignId: campaign.id, error: error.message });
+    }
+  }
+  return results;
 }
 
 router.get("/settings", async (req, res) => {
@@ -527,17 +745,69 @@ router.post("/settings", async (req, res) => {
 
 router.get("/preview", async (req, res) => {
   try {
-    const data = await buildNewsletterData();
-    res.json({ ...data, html: buildNewsletterHtml(data), text: buildNewsletterText(data) });
+    let data = await buildNewsletterData();
+    let sections = { ...campaigns.DEFAULT_SECTIONS };
+    let campaignName = "Barracks Newsletter";
+    if (req.query?.campaignId) {
+      const campaign = await campaigns.getCampaign(req.query.campaignId);
+      if (campaign) {
+        campaignName = campaign.name;
+        if (campaign.type === "per-user") {
+          const people = await campaigns.resolvePerUserCampaignRecipients(campaign);
+          const person = people.find((row) => String(row.userId) === String(req.query.userId || "")) || people[0] || { userId: "", name: "Viewer" };
+          data = person.userId ? await buildUserNewsletterData(person) : await buildUserNewsletterData({ userId: "", name: person.name });
+          sections = { ...campaigns.PER_USER_SECTIONS, ...(campaign.sections || {}), ...(campaign.template?.blocks || {}) };
+        } else {
+          sections = { ...sections, ...(campaign.sections || {}), ...(campaign.template?.blocks || {}) };
+        }
+        data.subject = `${campaign.name} - ${formatDate(new Date())}`;
+        if (reportEnabled(campaign)) {
+          const built = await reportBuilder.renderReport(campaign.sections.report, {
+            campaignName: campaign.name,
+            logoSrc: getLogoDataUri(),
+            personData: campaign.type === "per-user" ? data : null,
+            perUser: campaign.type === "per-user",
+          });
+          return res.json({ ...built, report: true });
+        }
+      }
+    }
+    res.json({ ...data, html: buildNewsletterHtml(data, { sections, campaignName, perUser: data.perUser }), text: buildNewsletterText(data) });
   } catch (error) {
     console.error("Newsletter preview failed:", error);
     res.status(503).json({ error: "Unable to generate newsletter preview" });
   }
 });
 
+router.get("/report/libraries", async (_req, res) => {
+  try {
+    res.json({ libraries: await reportBuilder.listReportLibraries(), blockTypes: reportBuilder.REPORT_BLOCK_TYPES });
+  } catch (error) {
+    res.status(503).json({ error: "Unable to load report libraries" });
+  }
+});
+
+router.post("/report/preview", async (req, res) => {
+  try {
+    const type = req.body?.type === "per-user" ? "per-user" : "global";
+    const campaign = req.body?.campaignId ? await campaigns.getCampaign(req.body.campaignId) : null;
+    const personData = type === "per-user" ? await previewPersonData(campaign, req.body?.userId).catch(() => null) : null;
+    const built = await reportBuilder.renderReport(req.body?.report || {}, {
+      campaignName: String(req.body?.campaignName || campaign?.name || "Barracks report"),
+      logoSrc: getLogoDataUri(),
+      personData,
+      perUser: type === "per-user",
+    });
+    res.json({ ...built, report: true });
+  } catch (error) {
+    console.error("Newsletter report preview failed:", error);
+    res.status(503).json({ error: "Unable to build report preview" });
+  }
+});
+
 router.post("/test", async (req, res) => {
   try {
-    res.json(await sendNewsletter(req, normalizeRecipients(req.body?.recipients), "test"));
+    res.json(await sendNewsletter(req, normalizeRecipients(req.body?.recipients), "test", { campaignId: req.body?.campaignId }));
   } catch (error) {
     await addNewsletterHistory(req, {
       ok: false,
@@ -551,7 +821,11 @@ router.post("/test", async (req, res) => {
 
 router.post("/send", async (req, res) => {
   try {
-    res.json(await sendNewsletter(req, normalizeRecipients(req.body?.recipients), "manual"));
+    res.json(
+      await sendNewsletter(req, normalizeRecipients(req.body?.recipients), "manual", {
+        campaignId: req.body?.campaignId,
+      })
+    );
   } catch (error) {
     await addNewsletterHistory(req, {
       ok: false,
@@ -563,4 +837,86 @@ router.post("/send", async (req, res) => {
   }
 });
 
+router.get("/campaigns", async (_req, res) => {
+  try {
+    const schemaReady = await campaigns.isCampaignSchemaReady();
+    res.json({
+      schemaReady,
+      campaigns: schemaReady ? await campaigns.listCampaigns() : [],
+      templates: schemaReady ? await campaigns.listTemplates() : [],
+      history: schemaReady ? await campaigns.listHistory({ limit: 30 }) : [],
+      legacyFallback: !schemaReady,
+    });
+  } catch (error) {
+    console.error("List newsletter campaigns failed:", error);
+    res.status(503).json({ error: "Unable to load newsletter campaigns" });
+  }
+});
+
+router.post("/campaigns", async (req, res) => {
+  try {
+    const campaign = await campaigns.createCampaign(req.body || {});
+    await addAuditEntry(req, "newsletter.campaign.created", { campaignId: campaign.id, name: campaign.name });
+    res.json(campaign);
+  } catch (error) {
+    console.error("Create newsletter campaign failed:", error);
+    res.status(503).json({ error: "Unable to create newsletter campaign" });
+  }
+});
+
+router.put("/campaigns/:id", async (req, res) => {
+  try {
+    const campaign = await campaigns.updateCampaign(req.params.id, req.body || {});
+    if (!campaign) return res.status(404).json({ error: "Campaign not found" });
+    await addAuditEntry(req, "newsletter.campaign.updated", { campaignId: campaign.id });
+    res.json(campaign);
+  } catch (error) {
+    console.error("Update newsletter campaign failed:", error);
+    res.status(503).json({ error: "Unable to update newsletter campaign" });
+  }
+});
+
+router.delete("/campaigns/:id", async (req, res) => {
+  try {
+    await campaigns.deleteCampaign(req.params.id);
+    await addAuditEntry(req, "newsletter.campaign.deleted", { campaignId: req.params.id });
+    res.json({ ok: true });
+  } catch (error) {
+    console.error("Delete newsletter campaign failed:", error);
+    res.status(503).json({ error: "Unable to delete newsletter campaign" });
+  }
+});
+
+router.post("/campaigns/:id/send", async (req, res) => {
+  try {
+    res.json(
+      await sendNewsletter(req, normalizeRecipients(req.body?.recipients), "manual", {
+        campaignId: req.params.id,
+      })
+    );
+  } catch (error) {
+    await campaigns
+      .addHistoryEntry({
+        campaignId: req.params.id,
+        recipientCount: 0,
+        status: "failed",
+        mode: "manual",
+        error: error.message,
+      })
+      .catch(() => {});
+    res.status(error.statusCode || 503).json({ error: error.message || "Unable to send campaign" });
+  }
+});
+
+router.post("/templates", async (req, res) => {
+  try {
+    res.json(await campaigns.upsertTemplate(req.body || {}));
+  } catch (error) {
+    console.error("Save newsletter template failed:", error);
+    res.status(503).json({ error: "Unable to save newsletter template" });
+  }
+});
+
 module.exports = router;
+module.exports.sendDueCampaigns = sendDueCampaigns;
+module.exports.sendNewsletter = sendNewsletter;

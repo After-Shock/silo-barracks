@@ -2,22 +2,19 @@ import { useState, useEffect } from "react";
 import axios from "../lib/axios_instance";
 import Config from "../lib/config";
 import baseUrl from "../lib/baseurl";
-import CryptoJS from "crypto-js";
 import "./css/setup.css";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import { InputGroup } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-import EyeFillIcon from "remixicon-react/EyeFillIcon";
-import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
+import { RiEyeFill, RiEyeOffFill } from "@remixicon/react";
 import logo_dark from "../../public/brand/barracks-mark.svg";
 import AuthArtworkBackground from "./components/AuthArtworkBackground";
-
-// import LibrarySync from "./components/settings/librarySync";
-
 import Loading from "./components/general/loading";
 import { Trans } from "react-i18next";
 import i18next from "i18next";
+import { isOpsRole } from "../lib/pwa-manifest";
+import { getStoredWorkspaceMode, workspaceHomePath } from "../lib/workspace-mode";
 
 function Login() {
   const [config, setConfig] = useState(null);
@@ -28,13 +25,46 @@ function Login() {
   const [submitButtonText, setsubmitButtonText] = useState(i18next.t("LOGIN"));
   const [quickConnect, setQuickConnect] = useState(null);
   const [quickConnectStatus, setQuickConnectStatus] = useState("");
+  const [quickConnectOpened, setQuickConnectOpened] = useState(false);
+  const [quickConnectCopied, setQuickConnectCopied] = useState(false);
   const [oidcStatus, setOidcStatus] = useState("");
-  const canQuickConnect = setupInfo?.auth?.mode === "quick-connect";
-  const canOidc = setupInfo?.auth?.mode === "oidc";
+  // Break-glass: local accounts still sign in when single sign-on is set up but broken.
+  const [useLocalLogin, setUseLocalLogin] = useState(false);
+  // Emby has no Quick Connect, so its "quick-connect" mode signs in with the Emby username and password.
+  const embyServer = setupInfo?.serverType === "emby";
+  const canQuickConnect = setupInfo?.auth?.mode === "quick-connect" && !embyServer;
+  const canMediaPassword = setupInfo?.auth?.mode === "quick-connect" && embyServer;
+  const oidcConfigured = setupInfo?.auth?.mode === "oidc";
+  const canOidc = oidcConfigured && !useLocalLogin;
   const canUseQuickConnect = canQuickConnect || canOidc;
 
   function handleFormChange(event) {
     setFormValues({ ...formValues, [event.target.name]: event.target.value });
+  }
+
+  // Jellyfin Web reads `code` from the Quick Connect page query string, so the code arrives prefilled.
+  function quickConnectDeepLink(data) {
+    if (!data?.quickConnectUrl || !data?.code) {
+      return null;
+    }
+    const separator = data.quickConnectUrl.includes("?") ? "&" : "?";
+    return `${data.quickConnectUrl}${separator}code=${encodeURIComponent(data.code)}`;
+  }
+
+  function openQuickConnectInJellyfin() {
+    const url = quickConnectDeepLink(quickConnect);
+    if (url) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      setQuickConnectOpened(true);
+    }
+  }
+
+  async function handleCopyQuickConnectCode() {
+    const copied = await copyQuickConnectCode(quickConnect?.code);
+    setQuickConnectCopied(copied);
+    if (copied) {
+      window.setTimeout(() => setQuickConnectCopied(false), 1800);
+    }
   }
 
   async function copyQuickConnectCode(code) {
@@ -65,7 +95,7 @@ function Login() {
     textarea.select();
     textarea.setSelectionRange(0, code.length);
 
-    let copied = false;
+    let copied;
     try {
       copied = document.execCommand("copy");
     } finally {
@@ -89,15 +119,40 @@ function Login() {
       return;
     }
 
-    let hashedPassword = CryptoJS.SHA3(formValues.JS_PASSWORD).toString();
+    if (canMediaPassword) {
+      mediaServerLogin(formValues.JS_USERNAME, formValues.JS_PASSWORD);
+      return;
+    }
 
-    beginLogin(formValues.JS_USERNAME, hashedPassword);
+    beginLogin(formValues.JS_USERNAME, formValues.JS_PASSWORD);
+  }
+
+  function redirectAfterLogin(nextConfig) {
+    const role = nextConfig?.settings?.auth?.role || "";
+    const permissions = nextConfig?.settings?.auth?.permissions || {};
+    const ops = isOpsRole(role);
+    window.location.replace(workspaceHomePath(ops, getStoredWorkspaceMode(ops), permissions));
   }
 
   function startOidcLogin() {
     setProcessing(true);
     setOidcStatus("");
     window.location.href = `${baseUrl}/auth/oidc/login`.replace(/\/{2,}/g, "/");
+  }
+
+  async function mediaServerLogin(username, password) {
+    try {
+      setProcessing(true);
+      setsubmitButtonText(i18next.t("LOGIN"));
+      const response = await axios.post("/auth/media-server-login", { username, password }, { headers: { "Content-Type": "application/json" } });
+      localStorage.setItem("token", response.data.token);
+      localStorage.removeItem("silo_barracks_logged_out");
+      const nextConfig = await Config.setConfig();
+      redirectAfterLogin(nextConfig);
+    } catch (error) {
+      setsubmitButtonText(error.response?.data?.errorMessage || `Error : ${error.response?.status || "Unknown"}`);
+      setProcessing(false);
+    }
   }
 
   async function finishQuickConnect(secret) {
@@ -116,8 +171,8 @@ function Login() {
 
       localStorage.setItem("token", response.data.token);
       localStorage.removeItem("silo_barracks_logged_out");
-      await Config.setConfig();
-      window.location.reload();
+      const nextConfig = await Config.setConfig();
+      redirectAfterLogin(nextConfig);
     } catch (error) {
       const errorMessage = error.response?.data?.errorMessage || `Error : ${error.response?.status || "Unknown"}`;
       setQuickConnectStatus(errorMessage);
@@ -128,19 +183,18 @@ function Login() {
   async function startQuickConnect(openJellyfin = false) {
     try {
       setQuickConnect(null);
+      setQuickConnectOpened(false);
+      setQuickConnectCopied(false);
       setQuickConnectStatus("Requesting a Jellyfin Quick Connect code...");
       const response = await axios.post("/auth/jellyfin-quick-connect/initiate");
-      const copied = await copyQuickConnectCode(response.data.code);
 
       setQuickConnect(response.data);
-      setQuickConnectStatus(
-        copied
-          ? "Code copied. Paste it into Jellyfin Quick Connect to approve this browser."
-          : "Enter this code in Jellyfin Quick Connect to approve this browser."
-      );
+      setQuickConnectStatus("");
 
-      if (openJellyfin && response.data.quickConnectUrl) {
-        window.open(response.data.quickConnectUrl, "_blank", "noopener,noreferrer");
+      const deepLink = quickConnectDeepLink(response.data);
+      if (openJellyfin && deepLink) {
+        window.open(deepLink, "_blank", "noopener,noreferrer");
+        setQuickConnectOpened(true);
       }
 
       setProcessing(false);
@@ -170,9 +224,9 @@ function Login() {
         localStorage.removeItem("silo_barracks_logged_out");
         setProcessing(false);
         if (JS_USERNAME || response.data.token) {
-          await Config.setConfig();
+          const nextConfig = await Config.setConfig();
           setsubmitButtonText(i18next.t("SUCCESS"));
-          window.location.reload();
+          redirectAfterLogin(nextConfig);
           return;
         }
       })
@@ -220,6 +274,7 @@ function Login() {
         setConfig({});
       } catch (error) {
         console.log(error);
+        setSetupInfo({ state: 2 });
         setConfig({});
       }
     };
@@ -233,14 +288,29 @@ function Login() {
   }, [config]);
 
   useEffect(() => {
+    if (!canQuickConnect || quickConnect || processing || !setupInfo) {
+      return undefined;
+    }
+    if (localStorage.getItem("token")) {
+      return undefined;
+    }
+    if (sessionStorage.getItem("jg_qc_autostarted")) {
+      return undefined;
+    }
+    sessionStorage.setItem("jg_qc_autostarted", "1");
+    startQuickConnect(false);
+    return undefined;
+  }, [canQuickConnect, setupInfo]);
+
+  useEffect(() => {
     if (!quickConnect?.secret || processing) {
       return undefined;
     }
 
     const interval = window.setInterval(async () => {
       try {
-        const response = await axios.get("/auth/jellyfin-quick-connect/status", {
-          params: { secret: quickConnect.secret },
+        const response = await axios.post("/auth/jellyfin-quick-connect/status", {
+          secret: quickConnect.secret,
         });
 
         if (response.data.authenticated) {
@@ -268,19 +338,20 @@ function Login() {
           <strong className="silo-wordmark">Silo Barracks</strong>
         </div>
 
-        <Form onSubmit={handleFormSubmit} className="setup-form login-form">
+        <form onSubmit={handleFormSubmit} className="setup-form login-form">
           {canQuickConnect ? (
-            <div className="setup-auth-summary quick-connect-intro">
-              <strong>Jellyfin Quick Connect</strong>
-              <small>Use Jellyfin Quick Connect to approve this browser with your Jellyfin admin account.</small>
+            <p className="quick-connect-lede">
+              {quickConnect?.code
+                ? "Opens Jellyfin with the code already filled in — just approve."
+                : "Approve this browser with your Jellyfin admin account via Quick Connect."}
               {!quickConnect?.code && quickConnectStatus && <small className="quick-connect-status">{quickConnectStatus}</small>}
-            </div>
+            </p>
           ) : canOidc ? (
             <div className="setup-auth-summary quick-connect-intro">
               <strong>{setupInfo?.auth?.label || "OIDC / Authentik"}</strong>
               <small>Continue with your configured identity provider.</small>
               {oidcStatus && <small className="quick-connect-status">{oidcStatus}</small>}
-              {!quickConnect?.code && (
+              {!quickConnect?.code && !embyServer && (
                 <Button
                   type="button"
                   className="quick-connect-refresh-button"
@@ -293,25 +364,31 @@ function Login() {
             </div>
           ) : (
             <>
-              <Form.Group className="inputbox">
-                <Form.Label>
+              {canMediaPassword ? (
+                <div className="setup-auth-summary quick-connect-intro">
+                  <strong>{setupInfo?.auth?.label || "Emby login"}</strong>
+                  <small>Sign in with your Emby username and password. Barracks checks it with your Emby server and does not store it.</small>
+                </div>
+              ) : null}
+              <div className="inputbox">
+                <Label htmlFor="JS_USERNAME" className="setup-field-label">
                   <Trans i18nKey={"USERNAME"} />
-                </Form.Label>
-                <Form.Control
+                </Label>
+                <Input
                   id="JS_USERNAME"
                   name="JS_USERNAME"
                   value={formValues.JS_USERNAME || ""}
                   onChange={handleFormChange}
                   placeholder=" "
                 />
-              </Form.Group>
+              </div>
 
-              <Form.Group className="inputbox">
-                <Form.Label>
+              <div className="inputbox">
+                <Label htmlFor="JS_PASSWORD" className="setup-field-label">
                   <Trans i18nKey={"PASSWORD"} />
-                </Form.Label>
-                <InputGroup>
-                  <Form.Control
+                </Label>
+                <div className="setup-input-group">
+                  <Input
                     id="JS_PASSWORD"
                     name="JS_PASSWORD"
                     value={formValues.JS_PASSWORD || ""}
@@ -320,25 +397,41 @@ function Login() {
                     placeholder=" "
                   />
                   <Button className="login-show-password" type="button" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <EyeFillIcon /> : <EyeOffFillIcon />}
+                    {showPassword ? <RiEyeFill /> : <RiEyeOffFill />}
                   </Button>
-                </InputGroup>
-              </Form.Group>
+                </div>
+              </div>
             </>
           )}
 
           {canUseQuickConnect && quickConnect?.code ? (
             <>
-              <Button type="button" className="setup-button quick-connect-open-button" disabled={processing} onClick={() => startQuickConnect(true)}>
-                Open Jellyfin Quick Connect
+              <Button type="button" className="setup-button quick-connect-open-button" disabled={processing} onClick={openQuickConnectInJellyfin}>
+                Open in Jellyfin · code ready
               </Button>
+              {quickConnectDeepLink(quickConnect) && (
+                <small className="quick-connect-link-hint" title={quickConnectDeepLink(quickConnect)}>
+                  …/web/#/quickconnect?code={quickConnect.code}
+                </small>
+              )}
 
               <div className="quick-connect-code-panel">
-                <span className="quick-connect-code">{quickConnect.code}</span>
-                <small>Enter this code in Jellyfin Quick Connect. Silo Barracks will continue automatically.</small>
+                <div className="quick-connect-code-chip">
+                  <span className="quick-connect-code" aria-label={`Quick Connect code ${quickConnect.code}`}>{quickConnect.code}</span>
+                  <Button type="button" className="quick-connect-copy-button" onClick={handleCopyQuickConnectCode}>
+                    {quickConnectCopied ? "Copied" : "Copy"}
+                  </Button>
+                </div>
+                <small>If Jellyfin doesn&apos;t open prefilled: copy the code, then paste on Quick Connect.</small>
+                {quickConnectOpened && !processing && (
+                  <span className="quick-connect-waiting" role="status">
+                    <span className="quick-connect-waiting-dot" aria-hidden="true" />
+                    Waiting for approval…
+                  </span>
+                )}
                 {quickConnectStatus && <small className="quick-connect-status">{quickConnectStatus}</small>}
-                <Button type="submit" className="quick-connect-refresh-button" disabled={processing}>
-                  {processing ? `${i18next.t("VALIDATING")}...` : "Get New Code"}
+                <Button type="submit" variant="link" className="quick-connect-new-code" disabled={processing}>
+                  {processing ? `${i18next.t("VALIDATING")}...` : "Get new code"}
                 </Button>
               </div>
             </>
@@ -347,13 +440,18 @@ function Login() {
               {processing
                 ? `${i18next.t("VALIDATING")}...`
                 : canQuickConnect
-                  ? "Jellyfin Login"
+                  ? "Continue with Quick Connect"
                   : canOidc
                     ? `Continue with ${setupInfo?.auth?.label || "OIDC"}`
                   : submitButtonText}
             </Button>
           )}
-        </Form>
+          {oidcConfigured ? (
+            <Button type="button" variant="link" className="login-local-toggle" onClick={() => setUseLocalLogin(!useLocalLogin)}>
+              {useLocalLogin ? i18next.t("SETTINGS_PAGE.OIDC.USE_SSO") : i18next.t("SETTINGS_PAGE.OIDC.USE_LOCAL")}
+            </Button>
+          ) : null}
+        </form>
       </div>
     </section>
   );

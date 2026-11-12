@@ -4,7 +4,7 @@ import ItemStatComponent from "./ItemStatComponent";
 
 
 
-import ComputerLineIcon from "remixicon-react/ComputerLineIcon";
+import { RiComputerLine } from "@remixicon/react";
 import { Trans } from "react-i18next";
 
 function MostUsedClient(props) {
@@ -53,7 +53,7 @@ function MostUsedClient(props) {
 
 
   return (
-        <ItemStatComponent icon={<ComputerLineIcon color="var(--barracks-text-raised)" size="100%" />} data={data} heading={<Trans i18nKey="STAT_CARDS.MOST_USED_CLIENTS" />} units={<Trans i18nKey="UNITS.PLAYS" />} />
+        <ItemStatComponent icon={<RiComputerLine color="var(--barracks-text-raised)" size="100%" />} data={data} heading={<Trans i18nKey="STAT_CARDS.MOST_USED_CLIENTS" />} units={<Trans i18nKey="UNITS.PLAYS" />} />
   );
 }
 

@@ -592,21 +592,6 @@
   background: transparent !important;
 }
 
-.navbar-version-row .version .card-body {
-  padding: 8px 10px 10px;
-  color: var(--barracks-text-interactive);
-  font-size: 12px;
-  text-align: center;
-}
-.navbar-toggler > .collapsed
-{
-  right: 0;
-}
-/* .navbar-toggler-icon
-{
-  width: 100% !important;
-} */
-
 .navitem {
   position: relative;
   color: var(--barracks-text-nav) !important;
@@ -817,16 +802,6 @@
   }
 }
 
-.modal-backdrop {
-  position: fixed !important;
-  inset: 0 !important;
-}
-
-@media (min-width: 901px) and (hover: hover) {
-  body.modal-open .desktop-navigation {
-    z-index: 1000;
-  }
-}
 
 @media (max-width: 900px), (hover: none) and (pointer: coarse) {
   .navbar {
@@ -991,23 +966,7 @@
   min-width: 0;
 }
 
-.navbar-version-row .version .card-body {
-  padding: 7px 8px 8px;
-}
-
-
 /* Barracks-only navigation rules (profile modal, tooltips, interaction states). */
-.barracks-nav-tooltip .tooltip-inner {
-  border: 1px solid var(--barracks-border-inset);
-  background: var(--barracks-surface-inset);
-  color: var(--barracks-text-inset);
-  box-shadow: var(--barracks-shadow);
-  font-weight: 800;
-}
-
-.barracks-nav-tooltip.bs-tooltip-end .tooltip-arrow::before {
-  border-right-color: var(--barracks-surface-inset);
-}
 
 @media (max-width: 900px), (hover: none) and (pointer: coarse) {
   .mobile-app-menu-logout svg {
@@ -1074,108 +1033,11 @@
     }
 }
 
-.profile-modal .modal-content {
-  border: 1px solid var(--barracks-border-raised);
-  border-radius: 28px;
-  background: var(--barracks-surface-raised);
-  color: var(--barracks-text-raised);
-  box-shadow: var(--barracks-shadow);
-}
-
-@media (min-width: 901px) {
-  .profile-modal {
-      position: fixed !important;
-      top: 50% !important;
-      left: 50% !important;
-      width: min(calc(100vw - 48px), 420px) !important;
-      max-width: 420px !important;
-      margin: 0 !important;
-      transform: translate(-50%, -50%) !important;
-    }
-}
-
-@media (min-width: 901px) {
-  .profile-modal .modal-header {
-      min-height: 0;
-      padding: 10px 14px 8px;
-    }
-}
-
-@media (min-width: 901px) {
-  .profile-modal .modal-body {
-      padding: 8px 14px 12px;
-      overflow-y: auto;
-  }
-}
-
-@media (min-width: 901px) {
-  .profile-modal .modal-footer {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-      padding: 10px 14px 12px;
-    }
-}
-
-@media (min-width: 901px) {
-  .profile-modal .modal-title {
-      font-size: 15px;
-    }
-}
-
-@media (min-width: 901px) {
-  .profile-modal .btn {
-      min-height: 34px;
-      padding: 6px 10px;
-      font-size: 12px;
-    }
-}
-
-.profile-modal .modal-header,
-.profile-modal .modal-footer {
-  border-color: var(--barracks-border-subtle);
-}
-
-.profile-modal .modal-title {
-  font-size: 15px;
-  font-weight: 900;
-}
-
 .profile-modal-secondary-actions {
   display: grid;
   width: 100%;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-}
-
-.profile-modal-secondary-actions .btn {
-  width: 100%;
-  margin: 0 !important;
-  color: var(--barracks-text-interactive) !important;
-  font-weight: 900 !important;
-}
-
-.profile-modal .profile-logout-button {
-  width: 100%;
-  margin: 0 !important;
-  color: var(--barracks-action-text) !important;
-  font-weight: 900 !important;
-}
-
-.profile-modal-secondary-actions .btn {
-  border-color: var(--barracks-border-strong) !important;
-  background: var(--barracks-surface-interactive) !important;
-}
-
-.profile-modal-secondary-actions .btn:not(:disabled):not(.disabled):hover {
-  border-color: var(--barracks-border-inset) !important;
-  background: var(--barracks-surface-inset) !important;
-  color: var(--barracks-text-inset) !important;
-}
-
-.profile-modal .btn-close {
-  color: var(--barracks-text-raised);
-  opacity: 1;
 }
 
 .profile-modal-identity {
@@ -1564,57 +1426,6 @@
 }
 
 @media (max-width: 900px), (hover: none) and (pointer: coarse) {
-  .profile-modal {
-      width: min(100vw - 18px, 692px) !important;
-      margin: 8px auto !important;
-    }
-}
-
-@media (max-width: 900px), (hover: none) and (pointer: coarse) {
-  .profile-modal .modal-content {
-      max-height: calc(100dvh - 16px);
-      border-radius: 18px;
-      overflow: hidden;
-    }
-}
-
-@media (max-width: 900px), (hover: none) and (pointer: coarse) {
-  .profile-modal .modal-header {
-      min-height: 44px;
-      padding: 10px 14px;
-    }
-}
-
-@media (max-width: 900px), (hover: none) and (pointer: coarse) {
-  .profile-modal .modal-title {
-      font-size: 16px;
-    }
-}
-
-@media (max-width: 900px), (hover: none) and (pointer: coarse) {
-  .profile-modal .modal-body {
-      overflow-y: auto;
-      padding: 12px 14px;
-    }
-}
-
-@media (max-width: 900px), (hover: none) and (pointer: coarse) {
-  .profile-modal .modal-footer {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      padding: 10px 14px calc(env(safe-area-inset-bottom, 0px) + 10px);
-    }
-}
-
-@media (max-width: 900px), (hover: none) and (pointer: coarse) {
-  .profile-modal .modal-footer > * {
-      width: 100%;
-      margin: 0 !important;
-    }
-}
-
-@media (max-width: 900px), (hover: none) and (pointer: coarse) {
   .profile-modal-secondary-actions {
       grid-column: 1 / -1;
     }
@@ -1857,3 +1668,7 @@ html body .navitem:is(:disabled, .disabled) .nav-text {
 html.jg-nav-collapsed {
   --jg-sidebar-width: 4.875rem;
 }
+
+/* upstream 1.4.3 (ported) */
+.install-app-button { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 8px 12px; border: 1px solid rgba(var(--primary-light-rgb, 139, 92, 246), 0.3); border-radius: 10px; background: rgba(var(--primary-rgb, 139, 92, 246), 0.14); color: #e6edf7; font-size: 13px; font-weight: 600; cursor: pointer; }
+.install-app-button:hover { background: rgba(var(--primary-rgb, 139, 92, 246), 0.26); }

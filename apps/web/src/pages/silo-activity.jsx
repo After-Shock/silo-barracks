@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "../lib/axios_instance";
 import { Link } from "react-router-dom";
-import { OverlayTrigger, Popover, Tooltip } from "react-bootstrap";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import ActivityTable from "./components/activity/activity-table";
 import FleetOverview from "./components/sessions/FleetOverview";
 import HistoryItemSearch from "./components/activity/history-item-search";
@@ -108,24 +109,29 @@ export default function SiloActivity({ config }) {
   const rows = data?.results || [];
 
   const secondaryFilterCount = (filters.profileId ? 1 : 0) + (filters.completed !== "all" ? 1 : 0);
-  const secondaryFilters = <Popover id="activity-secondary-filters" className="activity-filters-popover">
-    <Popover.Body>
+  const secondaryFilters = (
+    <PopoverContent className="activity-filters-popover tw:max-w-none tw:w-[min(22rem,calc(100vw-32px))]" align="end">
+      <div className="activity-filters-popover-body">
       <label className="activity-control-field"><span>Profile</span><select value={filters.profileId} disabled={!filters.userId} onChange={(event) => resetQuery({ ...filters, profileId: event.target.value })}>
         <option value="">{filters.userId ? "All profiles" : "Choose an account first"}</option>{profiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.name}</option>)}</select></label>
       <label className="activity-control-field"><span>Completion</span><select value={filters.completed} onChange={(event) => resetQuery({ ...filters, completed: event.target.value })}>
         <option value="all">All attempts</option><option value="true">Completed</option><option value="false">Not completed</option></select></label>
-    </Popover.Body>
-  </Popover>;
+      </div>
+    </PopoverContent>
+  );
 
-  return <div className="Activity" data-theme-screen="activity">
+  return <TooltipProvider delayDuration={150}><div className="Activity" data-theme-screen="activity">
     <header className="activity-page-header is-compact">
       <div className="activity-page-title">
         <p>Playback log</p>
         <h1>Activity</h1>
         <span>Review watch history, playback method, device, and session details. <Link to="/timeline">Open Timeline view</Link>.
-          {view === "history" && <OverlayTrigger placement="bottom" overlay={<Tooltip id="activity-retention-note">Finalized attempts are read directly from Silo retention. Barracks does not duplicate or delete them.</Tooltip>}>
-            <button type="button" className="activity-info-button" aria-label="About Silo playback history">ⓘ</button>
-          </OverlayTrigger>}
+          {view === "history" && <Tooltip>
+            <TooltipTrigger asChild>
+              <button type="button" className="activity-info-button" aria-label="About Silo playback history">ⓘ</button>
+            </TooltipTrigger>
+            <TooltipContent>Finalized attempts are read directly from Silo retention. Barracks does not duplicate or delete them.</TooltipContent>
+          </Tooltip>}
         </span>
       </div>
       <div className="activity-controls activity-silo-filters">
@@ -143,11 +149,14 @@ export default function SiloActivity({ config }) {
           <HistoryItemSearch searchUrl={`${historyBase}/search`} token={token} selected={searchItem}
             onSelect={(item) => { setSearchItem(item); resetQuery({ ...filters, mediaItemId: item.id }); }}
             onClear={() => { setSearchItem(null); resetQuery({ ...filters, mediaItemId: "" }); }} />
-          <OverlayTrigger trigger="click" rootClose placement="bottom-end" overlay={secondaryFilters}>
-            <button type="button" className="activity-control-button activity-filters-button">
-              Filters{secondaryFilterCount > 0 ? <span className="activity-filter-badge">{secondaryFilterCount}</span> : null}
-            </button>
-          </OverlayTrigger>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button type="button" className="activity-control-button activity-filters-button">
+                Filters{secondaryFilterCount > 0 ? <span className="activity-filter-badge">{secondaryFilterCount}</span> : null}
+              </button>
+            </PopoverTrigger>
+            {secondaryFilters}
+          </Popover>
           <label className="activity-control-field is-compact"><span>Items</span><select value={pageSize} onChange={(event) => resetQuery(filters, Number(event.target.value))}>{sizes.map((size) => <option key={size}>{size}</option>)}</select></label>
           <button type="button" className="activity-control-button" onClick={() => setRefreshKey((value) => value + 1)} disabled={loading}>Refresh</button>
         </>}
@@ -167,5 +176,5 @@ export default function SiloActivity({ config }) {
         {!loading && rows.length === 0 ? <p className="activity-state is-empty">No finalized attempts match these filters.</p> : null}
       </div>}
     </>}
-  </div>;
+  </div></TooltipProvider>;
 }

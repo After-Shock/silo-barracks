@@ -1,0 +1,142 @@
+/*
+ * Tailwind v4 + shadcn/ui bridge.
+ *
+ * The runtime theme engine (src/lib/theme.js → applyTheme) stays the single
+ * source of color: it writes --barracks-* vars on :root. This file maps the
+ * token names shadcn components expect onto those vars, so all presets and
+ * custom themes apply to new components with no JS changes.
+ *
+ * Migration-period rules (see docs/superpowers/plans/2026-11-11-shadcn-tailwind-migration.md):
+ *  - Preflight is NOT loaded while Bootstrap is still in the bundle.
+ *  - Utilities are imported UNLAYERED on purpose: Bootstrap is unlayered, and
+ *    unlayered CSS always beats layered CSS, so layered utilities would lose to
+ *    Bootstrap's element selectors (reboot). Unlayered, normal specificity applies.
+ *  - This file must be imported AFTER Bootstrap and the legacy CSS.
+ *  - All utilities use the `tw:` prefix (e.g. `tw:flex tw:bg-card`). Unprefixed,
+ *    ~70 Tailwind utilities collide with Bootstrap class names already in the
+ *    markup (w-100, mb-3, collapse, text-secondary, col-2, shadow...) with
+ *    different values. The prefix is removed by codemod in Phase 6.
+ */
+@layer theme;
+@import "tailwindcss/theme.css" layer(theme) prefix(tw);
+@import "tailwindcss/utilities.css";
+@import "tw-animate-css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+/* The app's existing "mobile layout" query (navbar.css): phones and touch tablets. */
+@custom-variant compact (@media (max-width: 900px), (hover: none) and (pointer: coarse));
+
+:root {
+  --background: var(--barracks-canvas);
+  --foreground: var(--barracks-text);
+  --card: var(--barracks-surface-raised);
+  --card-foreground: var(--barracks-text-raised);
+  --popover: var(--barracks-overlay);
+  --popover-foreground: var(--barracks-text-overlay);
+  --primary: var(--barracks-action);
+  --primary-foreground: var(--barracks-action-text);
+  --secondary: var(--barracks-surface-interactive);
+  --secondary-foreground: var(--barracks-text-interactive);
+  --muted: var(--barracks-surface-inset);
+  --muted-foreground: var(--barracks-text-muted);
+  --accent: var(--barracks-surface-interactive);
+  --accent-foreground: var(--barracks-text-interactive);
+  --destructive: var(--barracks-state-danger);
+  --destructive-foreground: var(--barracks-text-inverse);
+  --border: var(--barracks-border-subtle);
+  --input: var(--barracks-border-inset);
+  --ring: var(--barracks-focus);
+  --chart-1: var(--barracks-chart-1);
+  --chart-2: var(--barracks-chart-2);
+  --chart-3: var(--barracks-chart-3);
+  --chart-4: var(--barracks-chart-4);
+  --chart-5: var(--barracks-chart-5);
+  --chart-6: var(--barracks-chart-6);
+  --sidebar: var(--barracks-nav);
+  --sidebar-foreground: var(--barracks-text-nav);
+  --sidebar-primary: var(--barracks-action);
+  --sidebar-primary-foreground: var(--barracks-action-text);
+  --sidebar-accent: var(--barracks-surface-interactive);
+  --sidebar-accent-foreground: var(--barracks-text-interactive);
+  --sidebar-border: var(--barracks-border-nav);
+  --sidebar-ring: var(--barracks-focus);
+  /* Matches the existing 8px card/button radius (radius_breakpoint_css.css). */
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --font-sans: "Raleway", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Barracks-specific semantic states, for status badges / live indicators. */
+  --color-live: var(--barracks-state-live);
+  --color-success: var(--barracks-state-success);
+  --color-warning: var(--barracks-state-warning);
+  --color-danger: var(--barracks-state-danger);
+  --color-unavailable: var(--barracks-state-unavailable);
+  --color-surface-raised: var(--barracks-surface-raised);
+  --color-surface-inset: var(--barracks-surface-inset);
+  --color-surface-interactive: var(--barracks-surface-interactive);
+  --color-nav: var(--barracks-nav);
+  --color-inset-foreground: var(--barracks-text-inset);
+  --color-raised-foreground: var(--barracks-text-raised);
+  --color-border-inset: var(--barracks-border-inset);
+  --color-border-raised: var(--barracks-border-raised);
+  --color-border-strong: var(--barracks-border-strong);
+  --color-scrim: var(--barracks-scrim);
+  --color-accent-secondary: var(--barracks-accent-secondary);
+  --color-border-overlay: var(--barracks-border-overlay);
+  --color-inverse: var(--barracks-text-inverse);
+  --color-danger-interactive: var(--barracks-state-danger-interactive);
+  --color-action-foreground: var(--barracks-action-foreground);
+  --color-muted-raised: var(--barracks-text-muted-raised);
+  --shadow-barracks: var(--barracks-shadow);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/*
+ * Without preflight, borders default to currentColor. Scope the shadcn base
+ * border color to shadcn components only (they all carry data-slot), so legacy
+ * markup is untouched. :where() keeps specificity at 0 so tw:border-* wins.
+ */
+:where([data-slot]),
+:where([data-slot]) * {
+  border-color: var(--border);
+}

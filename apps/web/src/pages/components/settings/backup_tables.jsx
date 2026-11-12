@@ -3,7 +3,7 @@ import axios from "../../../lib/axios_instance";
 
 import "../../css/settings/backups.css";
 import { Trans } from "react-i18next";
-import { Button } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
 
 const token = localStorage.getItem("token");
 
@@ -65,7 +65,7 @@ export default function BackupTables() {
             <Button
               key={index}
               table={table.name}
-              variant={table.Excluded ? "danger" : "primary"}
+              variant={table.Excluded ? "destructive" : "default"}
               onClick={() => toggleTable(table.value)}
               className="me-2 mb-2"
             >

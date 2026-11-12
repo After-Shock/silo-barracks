@@ -177,99 +177,34 @@ h2 {
   color: var(--barracks-action-foreground) !important;
 }
 
-.barracks-toast-container {
-  width: min(420px, calc(100vw - 28px));
-}
-
-.barracks-toast {
-  min-height: 74px;
-  overflow: hidden;
-  border: 1px solid var(--barracks-border-overlay);
-  border-radius: 10px !important;
-  background: var(--barracks-overlay) !important;
-  color: var(--barracks-text-overlay) !important;
-  box-shadow: var(--barracks-shadow);
-  backdrop-filter: blur(14px);
-}
-
-.barracks-toast::before {
-  display: none;
-  content: none;
-}
-
-.barracks-toast .Toastify__toast-icon {
-  position: relative;
-  z-index: 1;
-  width: 38px;
-  min-width: 38px;
-  margin-inline-end: 14px;
-  color: var(--barracks-text-overlay);
-}
-
-.barracks-toast.Toastify__toast--info .Toastify__toast-icon {
-  color: var(--barracks-text-overlay);
-}
-
-.barracks-toast.Toastify__toast--success .Toastify__toast-icon {
-  color: var(--barracks-state-success);
-}
-
-.barracks-toast.Toastify__toast--error .Toastify__toast-icon {
-  color: var(--barracks-state-danger);
-}
-
-.barracks-toast-body {
-  align-items: center;
-  padding: 8px 8px 8px 2px;
-  color: var(--barracks-text-overlay);
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.35;
-}
-
-.barracks-toast .Toastify__close-button {
-  align-self: flex-start;
-  margin-top: 7px;
-  color: var(--barracks-text-overlay);
-  opacity: 0.72;
-}
-
-.barracks-toast .Toastify__close-button:hover {
-  color: var(--barracks-text-overlay);
-  opacity: 1;
+/* Toasts (sonner, see src/components/ui/sonner.jsx). Countdown bar mirrors the
+   auto-close timer; sonner pauses that timer while the stack is hovered. */
+@keyframes barracks-toast-countdown {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
 }
 
 .barracks-toast-progress {
-  height: 3px !important;
-  background: var(--barracks-action) !important;
+  animation-name: barracks-toast-countdown;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
 }
 
-.Toastify__toast--info .barracks-toast-progress {
-  background: var(--barracks-accent-secondary) !important;
-}
-
-.Toastify__toast--success .barracks-toast-progress {
-  background: var(--barracks-state-success) !important;
-}
-
-.Toastify__toast--error .barracks-toast-progress {
-  background: var(--barracks-state-danger) !important;
+.barracks-toaster:hover .barracks-toast-progress {
+  animation-play-state: paused;
 }
 
 .whats-new-modal {
-  --bs-modal-width: min(920px, calc(100vw - 28px));
-}
-
-.whats-new-modal .modal-content {
   overflow: hidden;
-  border: 1px solid var(--barracks-border-raised);
-  border-radius: 12px;
-  background: var(--barracks-surface-raised);
+  border: 1px solid var(--barracks-border-raised) !important;
+  border-radius: 12px !important;
+  background: var(--barracks-surface-raised) !important;
   color: var(--barracks-text-raised);
-  box-shadow: var(--barracks-shadow);
+  box-shadow: var(--barracks-shadow) !important;
+  padding: 0 !important;
 }
 
-.whats-new-modal .modal-body {
+.whats-new-body {
   position: relative;
   display: grid;
   gap: 14px;
@@ -374,10 +309,6 @@ h2 {
 }
 
 @media (max-width: 720px) {
-  .whats-new-modal {
-    --bs-modal-width: calc(100vw - 18px);
-  }
-
   .whats-new-list {
     grid-template-columns: 1fr;
     max-height: 56vh;

@@ -14,6 +14,8 @@ const Tasks = {
   DownloadQueueSync: { path: "./tasks/DownloadQueueSyncTask.js", name: "Download Queue Sync" },
   InviteSync: { path: "./tasks/InviteSyncTask.js", name: "Invite Sync" },
   IntegrationHealthCheck: { path: "./tasks/IntegrationHealthCheckTask.js", name: "Integration Health Check" },
+  NewsletterCampaigns: { path: "./tasks/NewsletterCampaignsTask.js", name: "Newsletter Campaigns" },
+  WrappedRecaps: { path: "./tasks/WrappedRecapsTask.js", name: "Wrapped Recaps" },
 };
 
 module.exports = Tasks;

@@ -1,8 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import CheckboxCircleLineIcon from "remixicon-react/CheckboxCircleLineIcon";
-import ErrorWarningLineIcon from "remixicon-react/ErrorWarningLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import RadarLineIcon from "remixicon-react/RadarLineIcon";
+import { RiCheckboxCircleLine, RiErrorWarningLine, RiRadarLine, RiRefreshLine } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import "./css/automation-health.css";
 
@@ -16,7 +13,7 @@ function ServiceCard({ service }) {
     <article className={`automation-service-card ${service.ok ? "is-ok" : "is-warning"}`}>
       <div className="automation-service-head">
         <span>
-          {service.ok ? <CheckboxCircleLineIcon /> : <ErrorWarningLineIcon />}
+          {service.ok ? <RiCheckboxCircleLine /> : <RiErrorWarningLine />}
         </span>
         <div>
           <h2>{service.name}</h2>
@@ -112,7 +109,7 @@ export default function AutomationHealth() {
           <span>Subtitle gaps, recent grabs, indexer health, failed indexers, and app sync status.</span>
         </div>
         <button type="button" onClick={loadAutomationHealth} disabled={loading}>
-          <RefreshLineIcon size={18} />
+          <RiRefreshLine size={18} />
           {loading ? "Refreshing" : "Refresh"}
         </button>
       </header>
@@ -120,11 +117,11 @@ export default function AutomationHealth() {
       {error ? <div className="automation-health-error" role="alert">{error}</div> : null}
 
       <section className="automation-summary-grid">
-        <article><RadarLineIcon /><strong>{formatNumber(data.stats?.services)}</strong><span>Services</span></article>
-        <article><CheckboxCircleLineIcon /><strong>{formatNumber(data.stats?.healthy)}</strong><span>Healthy</span></article>
-        <article><ErrorWarningLineIcon /><strong>{formatNumber(data.stats?.issues)}</strong><span>Issues</span></article>
-        <article><ErrorWarningLineIcon /><strong>{formatNumber(data.stats?.missingSubtitles)}</strong><span>Missing subtitles</span></article>
-        <article><ErrorWarningLineIcon /><strong>{formatNumber(data.stats?.failedIndexers)}</strong><span>Failed indexers</span></article>
+        <article><RiRadarLine /><strong>{formatNumber(data.stats?.services)}</strong><span>Services</span></article>
+        <article><RiCheckboxCircleLine /><strong>{formatNumber(data.stats?.healthy)}</strong><span>Healthy</span></article>
+        <article><RiErrorWarningLine /><strong>{formatNumber(data.stats?.issues)}</strong><span>Issues</span></article>
+        <article><RiErrorWarningLine /><strong>{formatNumber(data.stats?.missingSubtitles)}</strong><span>Missing subtitles</span></article>
+        <article><RiErrorWarningLine /><strong>{formatNumber(data.stats?.failedIndexers)}</strong><span>Failed indexers</span></article>
       </section>
 
       <section className="automation-service-grid">

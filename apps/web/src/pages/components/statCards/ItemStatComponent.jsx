@@ -2,9 +2,8 @@
 import { useState } from "react";
 import { Blurhash } from "react-blurhash";
 import { Link } from "react-router-dom";
-import Card from "react-bootstrap/Card";
 import Tooltip from "@mui/material/Tooltip";
-import ArchiveDrawerFillIcon from "remixicon-react/ArchiveDrawerFillIcon";
+import { RiArchiveDrawerFill } from "@remixicon/react";
 import "../../css/items/item-stat-component.css";
 import "../../css/statCard.css";
 
@@ -82,7 +81,7 @@ function ItemStatComponent(props) {
   };
 
   return (
-    <Card className="stat-card rounded-2" style={cardStyle}>
+    <div className="stat-card" style={cardStyle}>
       <div style={cardBgStyle} className="stat-card-overlay">
         <div className="stat-card-media">
           {props.icon ? (
@@ -93,7 +92,7 @@ function ItemStatComponent(props) {
                 <Blurhash hash={props.data[0].PrimaryImageHash} height={"100%"} width={"100%"} className="stat-card-blurhash" />
               )}
               {!props.data[0].archived ? (
-                <Card.Img
+                <img
                   className={props.isAudio ? "stat-card-image-audio" : "stat-card-image"}
                   src={"proxy/Items/Images/Primary?id=" + props.data[0].Id + "&fillWidth=220&quality=82"}
                   style={{ display: loaded ? "block" : "none" }}
@@ -102,7 +101,7 @@ function ItemStatComponent(props) {
                 />
               ) : (
                 <div className="stat-card-archived">
-                  <ArchiveDrawerFillIcon />
+                  <RiArchiveDrawerFill />
                   <span>Archived</span>
                 </div>
               )}
@@ -127,7 +126,7 @@ function ItemStatComponent(props) {
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
 

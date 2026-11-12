@@ -1,8 +1,9 @@
-const { axios } = require("../classes/axios");
 const express = require("express");
+const { sendSafeError, safeHttpGet } = require("../utils/security");
 
 const router = express.Router();
 
+// eslint-disable-next-line no-unused-vars -- existing code, kept unchanged
 const geoliteUrlBase = "https://geolite.info/geoip/v2.1/city";
 
 const geoliteAccountId = process.env.JS_GEOLITE_ACCOUNT_ID;
@@ -26,16 +27,15 @@ router.post("/geolocateIp", async (req, res) => {
       return res.status(400).send("Invalid IP address sent!");
     }
 
-    const response = await axios.get(`${geoliteUrlBase}/${ipAddress}`, {
+    const response = await safeHttpGet("https://geolite.info", `/geoip/v2.1/city/${encodeURIComponent(ipAddress)}`, {
       auth: {
         username: geoliteAccountId,
         password: geoliteLicenseKey,
       },
     });
-    return res.send(response.data);
+    return res.json(response.data);
   } catch (error) {
-    res.status(503);
-    res.send(error);
+    sendSafeError(res, error, { message: "Unable to geolocate IP" });
   }
 });
 

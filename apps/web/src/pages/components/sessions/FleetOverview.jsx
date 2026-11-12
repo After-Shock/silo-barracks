@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import useFleet from '../../../lib/use-fleet';
 import { normalizeSessions } from '../../../lib/session-cache';
 import { summarizeFleet } from '../../../lib/fleet-summary';
@@ -73,7 +73,7 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
   const fleetStreams = s.visibleServers.flatMap(server => normalizeSessions(server.sessions || []).map(session => ({ server, session })));
   const kiosk = surface === 'kiosk';
   const showSummary = fleetStreams.length > 0 || s.partial;
-  return <section className={`fleet-overview is-compact${fleetStreams.length ? '' : ' is-empty'}`} aria-label="All Silo servers">
+  return <TooltipProvider delayDuration={150}><section className={`fleet-overview is-compact${fleetStreams.length ? '' : ' is-empty'}`} aria-label="All Silo servers">
     <header className="fleet-heading">
       <h1>Active Sessions</h1>
       {showSummary ? <p className="fleet-summary">
@@ -81,9 +81,12 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
         {error ? <span>Current total unavailable</span> : <>active{s.partial && s.total != null ? ' (partial)' : ''}
         {' · '}{s.playing ?? '—'} playing · {s.paused ?? '—'} paused · {s.connected}/{s.enabled} servers</>}
       </p> : <p className="fleet-summary is-empty">No Active Sessions Found</p>}
-      <OverlayTrigger placement="bottom" overlay={<Tooltip id="fleet-note">Live activity includes all enabled servers. Paused streams are included in the total; stale streams are not. Playback History can be scoped to one connected server; library statistics remain primary-server scoped.</Tooltip>}>
-        <button type="button" className="fleet-info-button" aria-label="About live activity across servers">ⓘ</button>
-      </OverlayTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button type="button" className="fleet-info-button" aria-label="About live activity across servers">ⓘ</button>
+        </TooltipTrigger>
+        <TooltipContent>Live activity includes all enabled servers. Paused streams are included in the total; stale streams are not. Playback History can be scoped to one connected server; library statistics remain primary-server scoped.</TooltipContent>
+      </Tooltip>
       {!kiosk && <Link to="/settings/servers" className="fleet-manage-link">Manage servers</Link>}
     </header>
     <PeakLine peak={snapshot?.peaks?.[s.filter]} peaks={snapshot?.peaks}
@@ -102,7 +105,7 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
           {snapshot?.peaks?.[pill.id] && <span className="fleet-pill-peak" title={serverPeakTitle(snapshot.peaks[pill.id])}>peak {snapshot.peaks[pill.id].streams} · {snapshot.peaks[pill.id].transcodes} transcodes</span>}
         </button>;
         return pill.state === 'connected' || pill.state === 'all' ? button
-          : <OverlayTrigger key={pill.id} placement="bottom" overlay={<Tooltip id={`fleet-pill-${pill.id}`}>{pill.state === 'connecting' ? 'Connecting…' : 'Unavailable'}{pill.lastSuccessAt ? ` · Last seen ${new Date(pill.lastSuccessAt).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}` : ''}</Tooltip>}>{button}</OverlayTrigger>;
+          : <Tooltip key={pill.id}><TooltipTrigger asChild>{button}</TooltipTrigger><TooltipContent>{pill.state === 'connecting' ? 'Connecting…' : 'Unavailable'}{pill.lastSuccessAt ? ` · Last seen ${new Date(pill.lastSuccessAt).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}` : ''}</TooltipContent></Tooltip>;
       })}
     </div>
     {error && <p role="status" className="fleet-notice">{error} <button onClick={refresh}>Retry</button></p>}
@@ -116,5 +119,5 @@ export default function FleetOverview({ surface = 'home', canControl = false }) 
         </div>;
       })}
     </div>}
-  </section>;
+  </section></TooltipProvider>;
 }

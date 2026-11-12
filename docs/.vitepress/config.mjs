@@ -79,6 +79,8 @@ async function getCurrentRelease() {
 const currentRelease = await getCurrentRelease();
 
 export default defineConfig({
+  // Internal working plans (JSX snippets, not site pages).
+  srcExclude: ["superpowers/**"],
   title: "JellyGlance",
   description: "Modern Jellyfin command center for analytics, requests, health, and media control.",
   base: siteBase,

@@ -1,8 +1,9 @@
+import { ImportSourceLogo } from "../../../lib/import-source-logos";
 import { useEffect, useRef, useState } from "react";
-import { Alert, Button, Spinner } from "react-bootstrap";
-import Database2LineIcon from "remixicon-react/Database2LineIcon";
-import FileSearchLineIcon from "remixicon-react/FileSearchLineIcon";
-import UploadCloud2LineIcon from "remixicon-react/UploadCloud2LineIcon";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import DismissibleAlert from "./dismissible-alert";
+import { RiFileSearchLine, RiUploadCloud2Line } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 
 function authHeader() {
@@ -43,7 +44,7 @@ function formatSize(sizeInBytes = 0) {
   return `${size.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 }
 
-export default function JellystatImport() {
+export default function JellystatImport({ compact = false }) {
   const fileInputRef = useRef(null);
   const [uploadedBackup, setUploadedBackup] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -147,38 +148,40 @@ export default function JellystatImport() {
 
   return (
     <div className="legacy-import-page">
-      <header className="settings-section-header">
-        <div>
-          <span>Legacy history</span>
-          <h2>Jellystat Import</h2>
-          <p>Upload a Jellystat JSON backup and append its watch history into Barracks before the first sync runs.</p>
-        </div>
-      </header>
+      {!compact ? (
+        <header className="settings-section-header">
+          <div>
+            <span>Legacy history</span>
+            <h2>Jellystat Import</h2>
+            <p>Upload a Jellystat JSON backup and append its watch history into Barracks before the first sync runs.</p>
+          </div>
+        </header>
+      ) : null}
 
       {message ? (
-        <Alert variant={message.type} onClose={() => setMessage(null)} dismissible>
+        <DismissibleAlert type={message.type} onClose={() => setMessage(null)}>
           {message.text}
-        </Alert>
+        </DismissibleAlert>
       ) : null}
 
       <section className="legacy-import-panel">
         <div className="legacy-import-upload">
-          <Database2LineIcon />
+          <ImportSourceLogo source="jellystat" size={38} className="legacy-import-logo" />
           <div>
             <span>Jellystat backup file</span>
             <strong>{uploadedBackup?.originalName || (result?.sourceFile ? String(result.sourceFile).split("/").pop() : "") || "No backup uploaded"}</strong>
             <small>{uploadedBackup ? `${formatSize(uploadedBackup.size)} · ready to import` : "Accepted format: Jellystat .json backup"}</small>
           </div>
           <label className="legacy-import-upload-button">
-            {busyAction === "upload" ? <Spinner size="sm" animation="border" /> : <FileSearchLineIcon size={18} />}
+            {busyAction === "upload" ? <Spinner className="tw:size-4" /> : <RiFileSearchLine size={18} />}
             Upload and preview
             <input ref={fileInputRef} type="file" accept=".json,application/json" onChange={uploadAndPreview} disabled={Boolean(busyAction)} />
           </label>
         </div>
 
         <div className="legacy-import-actions">
-          <Button type="button" variant="primary" onClick={importBackup} disabled={!uploadedBackup?.uploadId || Boolean(busyAction)}>
-            {busyAction === "import" ? <Spinner size="sm" animation="border" /> : <UploadCloud2LineIcon size={18} />}
+          <Button type="button" onClick={importBackup} disabled={!uploadedBackup?.uploadId || Boolean(busyAction)}>
+            {busyAction === "import" ? <Spinner className="tw:size-4" /> : <RiUploadCloud2Line size={18} className="tw:size-[18px]" />}
             Import uploaded history
           </Button>
         </div>
@@ -218,7 +221,7 @@ export default function JellystatImport() {
             <h3>Unmatched Jellystat Users</h3>
             <p>Map legacy Jellystat users to Jellyfin users when the backup user IDs no longer match this server.</p>
           </div>
-          <Button type="button" variant="outline-primary" onClick={loadUnmatchedUsers} disabled={Boolean(busyAction)}>
+          <Button type="button" variant="outline" onClick={loadUnmatchedUsers} disabled={Boolean(busyAction)}>
             Refresh
           </Button>
         </div>
@@ -245,11 +248,11 @@ export default function JellystatImport() {
               </select>
               <Button
                 type="button"
-                variant="primary"
+               
                 onClick={() => linkUser(user.UserId)}
                 disabled={!selectedUserMatch[user.UserId] || Boolean(busyAction)}
               >
-                {busyAction === `link-user-${user.UserId}` ? <Spinner size="sm" animation="border" /> : <UploadCloud2LineIcon size={18} />}
+                {busyAction === `link-user-${user.UserId}` ? <Spinner className="tw:size-4" /> : <RiUploadCloud2Line size={18} className="tw:size-[18px]" />}
                 Link user
               </Button>
             </article>

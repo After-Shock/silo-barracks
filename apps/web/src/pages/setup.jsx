@@ -1,24 +1,133 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import axios from "../lib/axios_instance";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import { InputGroup } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-import EyeFillIcon from "remixicon-react/EyeFillIcon";
-import EyeOffFillIcon from "remixicon-react/EyeOffFillIcon";
+import { RiDatabase2Line, RiEyeFill, RiEyeOffFill, RiUploadCloud2Line } from "@remixicon/react";
+import baseUrl from "../lib/baseurl";
+import { clearApiCache } from "../lib/api-cache";
 import jellyfinLogo from "../../public/brand/barracks-mark.svg";
+import embyLogo from "./images/emby.svg";
 
 import "./css/setup.css";
 import i18next from "i18next";
 import { Trans } from "react-i18next";
 import SetupShell from "./components/setup/SetupShell";
 
+const RESTORE_WAIT_TIMEOUT_MS = 60 * 60 * 1000;
+
+const SERVER_TYPES = [
+  { id: "auto", label: "Auto-detect" },
+  { id: "jellyfin", label: "Jellyfin" },
+  { id: "emby", label: "Emby" },
+];
+
+function serverName(type) {
+  return type === "emby" ? "Emby" : type === "jellyfin" ? "Jellyfin" : "media server";
+}
+
+function waitForFirstRunRestoreComplete() {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error("Restore is taking longer than expected. Refresh the page to check whether setup finished."));
+    }, RESTORE_WAIT_TIMEOUT_MS);
+
+    const poll = setInterval(async () => {
+      try {
+        const [statusResponse, configResponse] = await Promise.all([
+          axios.get("/backup/first-run/restore/status"),
+          axios.get("/auth/isConfigured"),
+        ]);
+
+        const restoreStatus = statusResponse.data || {};
+        const configuredState = Number(configResponse.data?.state ?? 0);
+
+        if (restoreStatus.status === "complete") {
+          cleanup();
+          resolve({
+            setupState: Number(restoreStatus.setupState ?? configuredState ?? 0),
+            restoredRows: Number(restoreStatus.restoredRows || 0),
+          });
+          return;
+        }
+
+        if (restoreStatus.status === "failed") {
+          cleanup();
+          reject(new Error(restoreStatus.error || "Restore failed"));
+          return;
+        }
+
+        if (configuredState >= 2) {
+          cleanup();
+          resolve({ setupState: configuredState, restoredRows: Number(restoreStatus.restoredRows || 0) });
+        }
+      } catch {
+        // Ignore transient polling errors while restore runs.
+      }
+    }, 2000);
+
+    function cleanup() {
+      clearTimeout(timeout);
+      clearInterval(poll);
+    }
+  });
+}
+
 function Setup() {
-  const [formValues, setFormValues] = useState({});
+  const [formValues, setFormValues] = useState({ SERVER_TYPE: "auto" });
   const [processing, setProcessing] = useState(false);
   const [submitButtonText, setsubmitButtonText] = useState(i18next.t("SAVE_JELLYFIN_DETAILS"));
   const [showPassword, setShowPassword] = useState(false);
   const [connectionTest, setConnectionTest] = useState({ status: "idle", message: "" });
+  const [restoreStatus, setRestoreStatus] = useState({ status: "idle", message: "" });
+  const [restoreProgress, setRestoreProgress] = useState(0);
+  const [restorePhase, setRestorePhase] = useState("idle");
+  const fileInputRef = useRef(null);
+
+  function redirectToAppRoot() {
+    const rootPath = baseUrl ? `${baseUrl}/` : "/";
+    window.location.replace(rootPath);
+  }
+
+  function clearStoredAuth() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("config");
+    clearApiCache();
+  }
+
+  function finishRestoreFlow({ setupState, restoredRows }) {
+    setRestorePhase("complete");
+
+    if (setupState >= 2) {
+      setRestoreStatus({
+        status: "success",
+        message: `Restored ${restoredRows.toLocaleString()} rows. Opening login...`,
+      });
+      clearStoredAuth();
+      setTimeout(redirectToAppRoot, 700);
+      return;
+    }
+
+    if (setupState === 1) {
+      setRestoreStatus({
+        status: "success",
+        message: `Restored ${restoredRows.toLocaleString()} rows. Continue with admin access setup...`,
+      });
+      clearStoredAuth();
+      setTimeout(redirectToAppRoot, 700);
+      return;
+    }
+
+    setRestoreStatus({
+      status: "success",
+      message: `Restored ${restoredRows.toLocaleString()} rows. Connect Jellyfin to finish setup.`,
+    });
+    setProcessing(false);
+    setRestorePhase("idle");
+    setRestoreProgress(0);
+  }
 
   function handleFormChange(event) {
     setFormValues({ ...formValues, [event.target.name]: event.target.value });
@@ -26,28 +135,41 @@ function Setup() {
     setsubmitButtonText(i18next.t("SAVE_JELLYFIN_DETAILS"));
   }
 
+  function chooseServerType(type) {
+    setFormValues((current) => ({ ...current, SERVER_TYPE: type }));
+    setConnectionTest({ status: "idle", message: "" });
+  }
+
+  function serverPayload(values) {
+    const { SERVER_TYPE, ...rest } = values;
+    return SERVER_TYPE && SERVER_TYPE !== "auto" ? { ...rest, SERVER_TYPE } : rest;
+  }
+
   async function testConnection() {
     setProcessing(true);
-    setConnectionTest({ status: "testing", message: "Testing Silo administrator access..." });
+    setConnectionTest({ status: "testing", message: `Testing ${serverName(formValues.SERVER_TYPE)} connection...` });
 
     try {
-      const response = await axios.post("/auth/test-silo", formValues, {
+      const response = await axios.post("/auth/test-jellyfin", serverPayload(formValues), {
         headers: {
           "Content-Type": "application/json",
         },
       });
 
+      const detected = response.data.serverType || formValues.SERVER_TYPE;
       setFormValues((current) => ({
         ...current,
         JF_HOST: response.data.cleanedUrl || current.JF_HOST,
+        SERVER_TYPE: detected,
       }));
       setConnectionTest({
         status: "success",
         testedHost: response.data.cleanedUrl || formValues.JF_HOST,
         testedKey: formValues.JF_API_KEY,
-        message: `Connected to ${response.data.cleanedUrl || formValues.JF_HOST}`,
+        testedType: detected,
+        message: `Connected to ${serverName(detected)} at ${response.data.cleanedUrl || formValues.JF_HOST}`,
       });
-      setsubmitButtonText("Save Silo Details");
+      setsubmitButtonText(`Save ${serverName(detected)} Details`);
     } catch (error) {
       const errorMessage =
         error.response?.data?.errorMessage ||
@@ -68,16 +190,20 @@ function Setup() {
     const currentHost = formValues.JF_HOST?.trim()?.replace(/\/+$/, "");
     const testedKey = connectionTest.testedKey;
 
-    if (connectionTest.status !== "success" || testedHost !== currentHost || testedKey !== formValues.JF_API_KEY) {
-      setConnectionTest({ status: "error", message: "Test the Silo connection before saving." });
+    if (
+      connectionTest.status !== "success" ||
+      testedHost !== currentHost ||
+      testedKey !== formValues.JF_API_KEY ||
+      connectionTest.testedType !== formValues.SERVER_TYPE
+    ) {
+      setConnectionTest({ status: "error", message: `Test the ${serverName(formValues.SERVER_TYPE)} connection before saving.` });
       setsubmitButtonText("Test connection first");
       setProcessing(false);
       return;
     }
 
-    // Send a POST request to /api/setconfig/ with the updated configuration
     axios
-      .post("/auth/configSetup/", formValues)
+      .post("/auth/configSetup/", serverPayload(formValues))
       .then(async () => {
         setsubmitButtonText(i18next.t("SETTINGS_SAVED"));
         setProcessing(false);
@@ -86,7 +212,7 @@ function Setup() {
         return;
       })
       .catch((error) => {
-        let errorMessage = "";
+        let errorMessage;
         if (error.code === "ERR_NETWORK") {
           errorMessage = i18next.t("ERROR_MESSAGES.NETWORK_ERROR");
         } else if (error.response.status === 401) {
@@ -102,64 +228,194 @@ function Setup() {
       });
   }
 
+  async function handleBackupRestore(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!String(file.name || "").toLowerCase().endsWith(".json")) {
+      setRestoreStatus({ status: "error", message: "Choose a Barracks or Jellystat .json backup file." });
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      setProcessing(true);
+      setRestoreProgress(0);
+      setRestorePhase("uploading");
+      setRestoreStatus({ status: "testing", message: `Uploading ${file.name}...` });
+
+      const response = await axios.post("/backup/first-run/restore", formData, {
+        timeout: 0,
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+            setRestoreProgress(progress);
+            if (progress >= 100) {
+              setRestorePhase("applying");
+              setRestoreStatus({
+                status: "testing",
+                message: "Applying backup to database. Large backups can take several minutes...",
+              });
+            }
+          }
+        },
+      });
+
+      let restoreResult;
+      if (response.data?.status === "processing") {
+        restoreResult = await waitForFirstRunRestoreComplete();
+      } else {
+        restoreResult = {
+          setupState: Number(response.data?.setupState ?? 0),
+          restoredRows: Number(response.data?.restoredRows || 0),
+        };
+      }
+
+      finishRestoreFlow(restoreResult);
+    } catch (error) {
+      const payload = error.response?.data;
+      const message =
+        (typeof payload === "object" && payload?.error) ||
+        (typeof payload === "string" && payload) ||
+        error.message ||
+        "Restore failed";
+      setRestoreStatus({ status: "error", message });
+      setProcessing(false);
+      setRestorePhase("idle");
+      setRestoreProgress(0);
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   return (
     <SetupShell
       step={1}
       eyebrow="Media server connection"
-      title="Connect Silo Server"
-      description="Enter your Silo server URL and an administrator API key (sa_…). Barracks uses Silo’s native API to show active viewers and record playback activity."
+      title="Connect your media server"
+      description="Add your Jellyfin or Emby URL and API key, or restore a previous Barracks backup to bring an old install back."
+      minimal
     >
-        <div className="setup-jellyfin-logo" aria-hidden="true">
-          <img src={jellyfinLogo} alt="" />
-        </div>
-        <Form onSubmit={handleFormSubmit} className="setup-form">
-          <Form.Group className="inputbox">
-            <Form.Label>URL</Form.Label>
-            <Form.Control
-              id="JF_HOST"
-              name="JF_HOST"
-              value={formValues.JF_HOST || ""}
-              onChange={handleFormChange}
-              placeholder=" "
-            />
-          </Form.Group>
-
-          <Form.Group className="inputbox">
-            <Form.Label>
-              <Trans i18nKey={"SETTINGS_PAGE.API_KEY"} />
-            </Form.Label>
-            <InputGroup>
-              <Form.Control
-                className="px-0"
-                id="JF_API_KEY"
-                name="JF_API_KEY"
-                value={formValues.JF_API_KEY || ""}
-                onChange={handleFormChange}
-                type={showPassword ? "text" : "password"}
-                placeholder=" "
-                autoComplete="off"
-              />
-              <Button className="login-show-password" type="button" onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <EyeFillIcon /> : <EyeOffFillIcon />}
-              </Button>
-            </InputGroup>
-          </Form.Group>
-
-          {connectionTest.message && (
-            <div className={`setup-connection-status is-${connectionTest.status}`} role="status">
-              {connectionTest.message}
+      <section className="setup-stage-shell">
+        <section className="setup-stage-form-card">
+          <div className="setup-jellyfin-form-header">
+            <div className="setup-jellyfin-logo" aria-hidden="true">
+              <img src={formValues.SERVER_TYPE === "emby" ? embyLogo : jellyfinLogo} alt="" />
             </div>
-          )}
-
-          <div className="setup-button-row">
-            <Button type="button" className="setup-secondary-button" disabled={processing} onClick={testConnection}>
-              {connectionTest.status === "testing" ? `${i18next.t("VALIDATING")}...` : "Test Connection"}
-            </Button>
-            <Button type="submit" className="setup-button" disabled={processing || connectionTest.status !== "success"}>
-              {processing ? `${i18next.t("VALIDATING")}...` : submitButtonText}
-            </Button>
+            <div className="setup-form-heading-block">
+              <strong>{formValues.SERVER_TYPE === "auto" ? "Server connection" : `${serverName(formValues.SERVER_TYPE)} connection`}</strong>
+              <span>Enter the server you want Barracks to index and monitor.</span>
+            </div>
           </div>
-        </Form>
+          <form onSubmit={handleFormSubmit} className="setup-form">
+            <div className="setup-server-type" role="radiogroup" aria-label="Media server type">
+              {SERVER_TYPES.map((type) => (
+                <button
+                  key={type.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={formValues.SERVER_TYPE === type.id}
+                  className={formValues.SERVER_TYPE === type.id ? "is-active" : ""}
+                  onClick={() => chooseServerType(type.id)}
+                >
+                  {type.label}
+                </button>
+              ))}
+            </div>
+            <div className="inputbox">
+              <Label htmlFor="JF_HOST" className="setup-field-label">URL</Label>
+              <Input
+                id="JF_HOST"
+                name="JF_HOST"
+                value={formValues.JF_HOST || ""}
+                onChange={handleFormChange}
+                placeholder={formValues.SERVER_TYPE === "emby" ? "https://emby.example.com" : "https://jellyfin.example.com"}
+              />
+            </div>
+
+            <div className="inputbox">
+              <Label htmlFor="JF_API_KEY" className="setup-field-label">
+                <Trans i18nKey={"SETTINGS_PAGE.API_KEY"} />
+              </Label>
+              <div className="setup-input-group">
+                <Input
+                  id="JF_API_KEY"
+                  name="JF_API_KEY"
+                  value={formValues.JF_API_KEY || ""}
+                  onChange={handleFormChange}
+                  type={showPassword ? "text" : "password"}
+                  placeholder={`Paste ${serverName(formValues.SERVER_TYPE)} API key`}
+                  autoComplete="off"
+                />
+                <Button className="login-show-password" type="button" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <RiEyeFill /> : <RiEyeOffFill />}
+                </Button>
+              </div>
+            </div>
+
+            {connectionTest.message && (
+              <div className={`setup-connection-status is-${connectionTest.status}`} role="status">
+                {connectionTest.message}
+              </div>
+            )}
+
+            <div className="setup-button-row">
+              <Button type="button" className="setup-secondary-button" disabled={processing} onClick={testConnection}>
+                {connectionTest.status === "testing" ? `${i18next.t("VALIDATING")}...` : "Test Connection"}
+              </Button>
+              <Button type="submit" className="setup-button" disabled={processing || connectionTest.status !== "success"}>
+                {processing && restoreStatus.status === "idle" ? `${i18next.t("VALIDATING")}...` : submitButtonText}
+              </Button>
+            </div>
+          </form>
+        </section>
+
+        <section className="setup-stage-form-card setup-restore-card">
+          <div className="setup-jellyfin-form-header">
+            <div className="setup-jellyfin-logo" aria-hidden="true">
+              <RiDatabase2Line size={28} />
+            </div>
+            <div className="setup-form-heading-block">
+              <strong>Restore from backup</strong>
+              <span>Moving installs? Upload a Barracks JSON backup to restore config, libraries, and activity.</span>
+            </div>
+          </div>
+
+          <div className="setup-restore-actions">
+            <label className={`setup-restore-upload${processing ? " is-disabled" : ""}`}>
+              <RiUploadCloud2Line size={18} />
+              <span>
+                {processing && restoreStatus.status === "testing"
+                  ? restorePhase === "applying"
+                    ? "Applying backup..."
+                    : restoreProgress > 0
+                      ? `Uploading ${restoreProgress}%...`
+                      : "Preparing upload..."
+                  : restorePhase === "complete"
+                    ? "Restore complete"
+                    : "Choose backup JSON"}
+              </span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json,application/json"
+                disabled={processing}
+                onChange={handleBackupRestore}
+              />
+            </label>
+            <p className="setup-restore-hint">Works with Barracks backups. Older backups without app config still restore library and activity data.</p>
+          </div>
+
+          {restoreStatus.message ? (
+            <div className={`setup-connection-status is-${restoreStatus.status}`} role="status">
+              {restoreStatus.message}
+            </div>
+          ) : null}
+        </section>
+      </section>
     </SetupShell>
   );
 }

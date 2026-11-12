@@ -1,24 +1,10 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "../lib/axios_instance";
 
 import "./css/about.css";
-import ArchiveLineIcon from "remixicon-react/ArchiveLineIcon";
-import ArrowDownSLineIcon from "remixicon-react/ArrowDownSLineIcon";
-import CheckLineIcon from "remixicon-react/CheckLineIcon";
-import Database2LineIcon from "remixicon-react/Database2LineIcon";
-import DownloadCloud2LineIcon from "remixicon-react/DownloadCloud2LineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import GitBranchLineIcon from "remixicon-react/GitBranchLineIcon";
-import GithubFillIcon from "remixicon-react/GithubFillIcon";
-import HeartPulseLineIcon from "remixicon-react/HeartPulseLineIcon";
-import LayoutGridLineIcon from "remixicon-react/LayoutGridLineIcon";
-import PulseLineIcon from "remixicon-react/PulseLineIcon";
-import PriceTag3LineIcon from "remixicon-react/PriceTag3LineIcon";
-import RadarLineIcon from "remixicon-react/RadarLineIcon";
-import Settings3LineIcon from "remixicon-react/Settings3LineIcon";
-import ShieldCheckLineIcon from "remixicon-react/ShieldCheckLineIcon";
-import TaskLineIcon from "remixicon-react/TaskLineIcon";
-import TimerFlashLineIcon from "remixicon-react/TimerFlashLineIcon";
+import { RiArchiveLine, RiArrowDownSLine, RiCheckLine, RiCodeSSlashLine, RiDatabase2Line, RiDownloadCloud2Line, RiFilmLine, RiGitBranchLine, RiGithubFill, RiHeartPulseLine, RiLayoutGridLine, RiPriceTag3Line, RiPulseLine, RiRadarLine, RiSettings3Line, RiShieldCheckLine, RiTaskLine, RiTimerFlashLine } from "@remixicon/react";
+import { mediaServerName } from "../lib/media-server";
 
 function stripMarkdown(value) {
   return String(value || "")
@@ -70,9 +56,20 @@ function parseReleaseBody(body) {
   return sections.length ? sections : [{ title: "Notes", items: ["No release notes were provided for this version."] }];
 }
 
+// The API already drops automation and AI accounts; this is a second guard for
+// older servers. Keep in line with apps/api/utils/github-contributors.js.
+const EXCLUDED_CONTRIBUTORS = new Set([
+  "dependabot", "dependabot-preview", "renovate", "renovate-bot", "renovatebot", "github-actions", "actions-user", "web-flow",
+  "copilot", "copilot-swe-agent", "github-copilot", "cursor", "cursoragent", "cursor-agent", "claude", "claude-code", "anthropic-claude",
+  "codex", "chatgpt-codex-connector", "openai-codex", "devin", "devin-ai-integration", "jellyglance-bot", "jellyglance-security-bot",
+  "imgbot", "allcontributors", "snyk-bot", "pre-commit-ci",
+]);
+
 function isBotContributor(contributor) {
-  const login = String(contributor?.login || "").toLowerCase();
-  return /\bbot\b/.test(login) || login.includes("[bot]") || login.includes("dependabot") || login.includes("github-actions");
+  if (String(contributor?.type || "").toLowerCase() === "bot") return true;
+  const login = String(contributor?.login || "").trim().toLowerCase();
+  if (!login || login.endsWith("[bot]") || login.endsWith("-bot") || login.endsWith("_bot")) return true;
+  return EXCLUDED_CONTRIBUTORS.has(login.replace(/\[bot\]$/, ""));
 }
 
 const PROJECT_OWNER_LOGIN = "Nerdy-Technician";
@@ -83,6 +80,17 @@ const PROJECT_OWNER_FALLBACK = {
   profile_url: `https://github.com/${PROJECT_OWNER_LOGIN}`,
   contributions: 0,
 };
+
+function aboutUpdateMessage(data) {
+  if (data.update_available) {
+    return data.latest_version ? `Update ${data.latest_version} available` : "Update available";
+  }
+  const message = String(data.message || "");
+  if (/is up to date/i.test(message)) return "Up to date";
+  if (/beta version/i.test(message)) return "Using a beta build";
+  if (/Unable to check/i.test(message)) return "Unable to check";
+  return message || "Checking…";
+}
 
 export default function SettingsAbout() {
   const token = localStorage.getItem("token");
@@ -97,7 +105,7 @@ export default function SettingsAbout() {
   const [releaseMenuOpen, setReleaseMenuOpen] = useState(false);
   const [contributors, setContributors] = useState([]);
   const [contributorsMessage, setContributorsMessage] = useState("Loading GitHub profiles...");
-  const updateMessage = data.message === "Silo Barracks is up to date" ? "Up to date" : data.message;
+  const updateMessage = aboutUpdateMessage(data);
   const selectedRelease = releaseData.releases.find((release) => String(release.id) === selectedReleaseId) || releaseData.releases[0];
   const selectedReleaseSections = parseReleaseBody(selectedRelease?.body);
   const projectOwner = contributors.find((contributor) => contributor.login?.toLowerCase() === PROJECT_OWNER_LOGIN.toLowerCase()) || PROJECT_OWNER_FALLBACK;
@@ -184,7 +192,7 @@ export default function SettingsAbout() {
       <header className="about-header">
         <p>About</p>
         <h1>Silo Barracks</h1>
-        <span>Active Silo viewers, native server sessions, and observed playback history.</span>
+        <span>Local {mediaServerName()} visibility for sessions, libraries, requests, downloads, transcodes, automation health, and scheduled jobs.</span>
       </header>
 
       <main className="about-layout">
@@ -200,52 +208,52 @@ export default function SettingsAbout() {
 
               <div className="about-feature-grid" aria-label="Silo Barracks capabilities">
                 <article>
-                  <PulseLineIcon />
+                  <RiPulseLine />
                   <strong>Live status</strong>
                   <span>See active streams, playback method, viewer, client, internal or remote IP, bitrate, transcode progress, and session history.</span>
                 </article>
                 <article>
-                  <FilmLineIcon />
+                  <RiFilmLine />
                   <strong>Library visibility</strong>
                   <span>Track recent additions, library totals, missing artwork, item details, user activity, watch trends, and media quality signals.</span>
                 </article>
                 <article>
-                  <TaskLineIcon />
+                  <RiTaskLine />
                   <strong>Operations</strong>
                   <span>Run syncs, backups, imports, health checks, notification tests, repairs, logs, and background maintenance tasks.</span>
                 </article>
                 <article>
-                  <Database2LineIcon />
+                  <RiDatabase2Line />
                   <strong>Integrations</strong>
                   <span>Connect Seerr, download clients, Sonarr/Radarr/Lidarr, Tdarr, Bazarr, Prowlarr, Tautulli, Jellystat, webhooks, and newsletters.</span>
                 </article>
                 <article>
-                  <TaskLineIcon />
+                  <RiTaskLine />
                   <strong>Requests</strong>
                   <span>Review pending approvals, per-user queues, availability, issue reports, request trends, and Seerr search results.</span>
                 </article>
                 <article>
-                  <DownloadCloud2LineIcon />
+                  <RiDownloadCloud2Line />
                   <strong>Downloads</strong>
                   <span>Monitor torrent and usenet clients with queue state, progress, speeds, ETA, stalled items, and failed jobs.</span>
                 </article>
                 <article>
-                  <TimerFlashLineIcon />
+                  <RiTimerFlashLine />
                   <strong>Active transcodes</strong>
                   <span>Track Tdarr processing, queued items, history, thumbnails, source-to-target conversion, savings, and live percentages.</span>
                 </article>
                 <article>
-                  <RadarLineIcon />
+                  <RiRadarLine />
                   <strong>Automation health</strong>
                   <span>Check Bazarr subtitle gaps, subtitle grabs, Prowlarr indexer health, failed indexers, and connected app sync status.</span>
                 </article>
                 <article>
-                  <LayoutGridLineIcon />
+                  <RiLayoutGridLine />
                   <strong>Custom layouts</strong>
                   <span>Collapse the sidebar, reorder navigation, hide tabs, resize Home widgets, and save browser-specific dashboard layouts.</span>
                 </article>
                 <article>
-                  <Settings3LineIcon />
+                  <RiSettings3Line />
                   <strong>Admin tools</strong>
                   <span>Manage settings, devices, integrations, API keys, webhooks, backups, imports, repair tasks, and application logs.</span>
                 </article>
@@ -264,7 +272,7 @@ export default function SettingsAbout() {
               <section className="about-note">
                 <h2>What to configure</h2>
                 <ul>
-                  <li>Jellyfin connection and authentication mode for the main dashboard.</li>
+                  <li>{mediaServerName()} connection and authentication mode for the main dashboard.</li>
                   <li>Optional Jellyseerr or Overseerr instances for request management, approvals, user queues, issue reports, and request trends.</li>
                   <li>Optional qBittorrent, Transmission, Deluge, SABnzbd, NZBGet, or similar clients for download monitoring.</li>
                   <li>Optional Tdarr for active transcodes, queue, history, conversion detail, thumbnails, and live progress.</li>
@@ -319,7 +327,7 @@ export default function SettingsAbout() {
                   >
                     <strong>{selectedRelease?.version || "No releases"}</strong>
                     {selectedRelease?.date ? <em>{formatReleaseDate(selectedRelease.date)}</em> : null}
-                    <ArrowDownSLineIcon aria-hidden="true" size={16} />
+                    <RiArrowDownSLine aria-hidden="true" size={16} />
                   </button>
                   {releaseMenuOpen ? (
                     <div className="about-release-menu" role="listbox" aria-label="Release versions">
@@ -340,7 +348,7 @@ export default function SettingsAbout() {
                           >
                             <strong>{release.version}</strong>
                             <em>{formatReleaseDate(release.date)}</em>
-                            {selected ? <CheckLineIcon aria-hidden="true" size={16} /> : null}
+                            {selected ? <RiCheckLine aria-hidden="true" size={16} /> : null}
                           </button>
                         );
                       })}
@@ -355,7 +363,7 @@ export default function SettingsAbout() {
                 <article className="about-release-card">
                   <header>
                     <div>
-                      <PriceTag3LineIcon />
+                      <RiPriceTag3Line />
                       <strong>{selectedRelease.version}</strong>
                       {selectedRelease.prerelease ? <span>Pre-release</span> : null}
                     </div>
@@ -388,14 +396,17 @@ export default function SettingsAbout() {
             <dl>
               <div>
                 <dt>
-                  <GitBranchLineIcon />
+                  <RiGitBranchLine />
                   Version
                 </dt>
-                <dd>{data.current_version}</dd>
+                <dd>
+                  {data.current_version}
+                  {data.current_version && /-(alpha|beta|rc|pre|preview)/i.test(data.current_version) ? <span className="release-channel-badge">Beta channel</span> : null}
+                </dd>
               </div>
               <div className={data.update_available ? "is-update" : ""}>
                 <dt>
-                  <HeartPulseLineIcon />
+                  <RiHeartPulseLine />
                   Updates
                 </dt>
                 <dd>
@@ -406,14 +417,14 @@ export default function SettingsAbout() {
               </div>
               <div>
                 <dt>
-                  <FilmLineIcon />
+                  <RiFilmLine />
                   Media source
                 </dt>
-                <dd>Jellyfin</dd>
+                <dd>{mediaServerName()}</dd>
               </div>
               <div>
                 <dt>
-                  <ShieldCheckLineIcon />
+                  <RiShieldCheckLine />
                   License
                 </dt>
                 <dd>GPL-3.0</dd>
@@ -423,17 +434,45 @@ export default function SettingsAbout() {
 
           <section className="about-links">
             <h2>Links</h2>
-            <a href="https://github.com/Nerdy-Technician/JellyGlance" target="_blank" rel="noreferrer">
-              <GithubFillIcon />
+            <a href="https://discord.gg/dMGhv8j2kx" target="_blank" rel="noreferrer">
+              <RiPulseLine />
+              Join Discord
+            </a>
+            <Link to="/settings/api-key">
+              <RiCodeSSlashLine />
+              API / Swagger
+            </Link>
+            <a href="https://jellyglance.com/" target="_blank" rel="noreferrer">
+              <RiRadarLine />
+              Website
+            </a>
+            <a href="https://docs.jellyglance.com/" target="_blank" rel="noreferrer">
+              <RiCodeSSlashLine />
+              Documentation
+            </a>
+            <a href="https://github.com/After-Shock/silo-barracks/issues/new/choose" target="_blank" rel="noreferrer">
+              <RiGithubFill />
+              Documentation feedback
+            </a>
+            <a href="https://github.com/After-Shock/silo-barracks/tree/main/docs" target="_blank" rel="noreferrer">
+              <RiGithubFill />
+              Documentation source
+            </a>
+            <a href="https://github.com/After-Shock/silo-barracks" target="_blank" rel="noreferrer">
+              <RiGithubFill />
               Source code
             </a>
-            <a href="https://github.com/Nerdy-Technician/JellyGlance/pkgs/container/jellyglance" target="_blank" rel="noreferrer">
-              <ArchiveLineIcon />
+            <a href="https://github.com/After-Shock/silo-barracks/pkgs/container/jellyglance" target="_blank" rel="noreferrer">
+              <RiArchiveLine />
               Container image
             </a>
             <a href="https://github.com/Nerdy-Technician" target="_blank" rel="noreferrer">
-              <GithubFillIcon />
+              <RiGithubFill />
               Maintainer profile
+            </a>
+            <a href="https://buymeacoffee.com/nerdytechnician" target="_blank" rel="noreferrer">
+              <RiHeartPulseLine />
+              Buy me a coffee
             </a>
           </section>
         </aside>

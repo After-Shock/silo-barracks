@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "../../../lib/axios_instance";
-import { Form, DropdownButton, Dropdown, ButtonGroup, Button } from "react-bootstrap";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import DismissibleAlert from "./dismissible-alert";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -9,10 +17,9 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 
-import Alert from "react-bootstrap/Alert";
-
 import "../../css/settings/backups.css";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
+import { formatDate } from "../../../lib/format-date";
 import i18next from "i18next";
 
 function getHeaders(contentType = "application/json") {
@@ -25,6 +32,7 @@ function getHeaders(contentType = "application/json") {
 function Row(file) {
   const { data } = file;
   const [disabled, setDisabled] = useState(false);
+  const { i18n } = useTranslation();
 
   async function downloadBackup(filename) {
     axios
@@ -120,22 +128,29 @@ function Row(file) {
     <React.Fragment>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
         <TableCell>{data.name}</TableCell>
-        <TableCell>{Intl.DateTimeFormat("en-UK", options).format(new Date(data.datecreated))}</TableCell>
+        <TableCell>{formatDate(data.datecreated, options, { locale: i18n.language })}</TableCell>
         <TableCell>{formatFileSize(data.size)}</TableCell>
         <TableCell className="">
           <div className="d-flex justify-content-center">
-            <DropdownButton title={i18next.t("ACTIONS")} variant="outline-primary" disabled={disabled}>
-              <Dropdown.Item as="button" variant="primary" onClick={() => downloadBackup(data.name)}>
-                <Trans i18nKey={"DOWNLOAD"} />
-              </Dropdown.Item>
-              <Dropdown.Item as="button" variant="warning" onClick={() => restoreBackup(data.name)}>
-                <Trans i18nKey={"RESTORE"} />
-              </Dropdown.Item>
-              <Dropdown.Divider></Dropdown.Divider>
-              <Dropdown.Item as="button" variant="danger" onClick={() => deleteBackup(data.name)}>
-                <Trans i18nKey={"DELETE"} />
-              </Dropdown.Item>
-            </DropdownButton>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="button" variant="outline" disabled={disabled}>
+                  {i18next.t("ACTIONS")}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => downloadBackup(data.name)}>
+                  <Trans i18nKey={"DOWNLOAD"} />
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => restoreBackup(data.name)}>
+                  <Trans i18nKey={"RESTORE"} />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => deleteBackup(data.name)}>
+                  <Trans i18nKey={"DELETE"} />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </TableCell>
       </TableRow>
@@ -219,10 +234,9 @@ export default function BackupFiles() {
         <Trans i18nKey={"SETTINGS_PAGE.BACKUPS"} />
       </h1>
       {showAlert && showAlert.visible && (
-        <Alert variant={showAlert.type} bg="dark" data-bs-theme="dark" onClose={handleCloseAlert} dismissible>
-          <Alert.Heading>{showAlert.title}</Alert.Heading>
-          <p>{showAlert.message}</p>
-        </Alert>
+        <DismissibleAlert type={showAlert.type} title={showAlert.title} onClose={handleCloseAlert}>
+          {showAlert.message}
+        </DismissibleAlert>
       )}
 
       <TableContainer className="rounded-2 h-100">
@@ -262,15 +276,17 @@ export default function BackupFiles() {
             )}
             <TableRow>
               <TableCell colSpan="5">
-                <Form.Group controlId="formFile" onChange={handleFileSelect} className="mx-2">
-                  <Form.Control
+                <div className="mx-2">
+                  <input
+                    id="backup-upload"
                     type="file"
                     accept=".json"
                     className="upload-file"
+                    onChange={handleFileSelect}
                     style={{ backgroundColor: "var(--barracks-action)", borderColor: "var(--barracks-action)" }}
                   />
                   <progress className="w-100" value={progress} max="100" />
-                </Form.Group>
+                </div>
               </TableCell>
             </TableRow>
           </TableBody>
@@ -278,12 +294,12 @@ export default function BackupFiles() {
       </TableContainer>
 
       <div className="d-flex justify-content-end my-2">
-        <ButtonGroup className="pagination-buttons">
-          <Button className="page-btn" onClick={() => setPage(0)} disabled={page === 0}>
+        <div className="pagination-buttons">
+          <Button type="button" className="page-btn" onClick={() => setPage(0)} disabled={page === 0}>
             <Trans i18nKey={"TABLE_NAV_BUTTONS.FIRST"} />
           </Button>
 
-          <Button className="page-btn" onClick={handlePreviousPageClick} disabled={page === 0}>
+          <Button type="button" className="page-btn" onClick={handlePreviousPageClick} disabled={page === 0}>
             <Trans i18nKey={"TABLE_NAV_BUTTONS.PREVIOUS"} />
           </Button>
 
@@ -292,18 +308,19 @@ export default function BackupFiles() {
             files.length
           )} of ${files.length}`}</div>
 
-          <Button className="page-btn" onClick={handleNextPageClick} disabled={page >= Math.ceil(files.length / rowsPerPage) - 1}>
+          <Button type="button" className="page-btn" onClick={handleNextPageClick} disabled={page >= Math.ceil(files.length / rowsPerPage) - 1}>
             <Trans i18nKey={"TABLE_NAV_BUTTONS.NEXT"} />
           </Button>
 
           <Button
+            type="button"
             className="page-btn"
             onClick={() => setPage(Math.ceil(files.length / rowsPerPage) - 1)}
             disabled={page >= Math.ceil(files.length / rowsPerPage) - 1}
           >
             <Trans i18nKey={"TABLE_NAV_BUTTONS.LAST"} />
           </Button>
-        </ButtonGroup>
+        </div>
       </div>
     </div>
   );

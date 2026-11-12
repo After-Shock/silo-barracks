@@ -1,24 +1,18 @@
-import { Tabs, Tab } from "react-bootstrap";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../lib/axios_instance";
-import BarChartFillIcon from "remixicon-react/BarChartFillIcon";
-import CalendarLineIcon from "remixicon-react/CalendarLineIcon";
-import ComputerLineIcon from "remixicon-react/ComputerLineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import PulseLineIcon from "remixicon-react/PulseLineIcon";
-import TimeLineIcon from "remixicon-react/TimeLineIcon";
-import TvLineIcon from "remixicon-react/TvLineIcon";
-import UserStarLineIcon from "remixicon-react/UserStarLineIcon";
+import { RiBarChartFill, RiCalendarLine, RiComputerLine, RiFilmLine, RiPulseLine, RiTimeLine, RiTvLine, RiUserStarLine } from "@remixicon/react";
 
 import "./css/stats.css";
 
 import DailyPlayStats from "./components/statistics/daily-play-count";
 import PlayStatsByDay from "./components/statistics/play-stats-by-day";
 import PlayStatsByHour from "./components/statistics/play-stats-by-hour";
+import LibraryHeatmap from "./components/statistics/library-heatmap";
 import HomeStatisticCards from "./components/HomeStatisticCards";
 import { Trans } from "react-i18next";
 import Config from "../lib/config";
+import { readAuth } from "./components/general/PageTabs";
 
 function getStatValue(item = {}) {
   return Number(item.Plays ?? item.Count ?? item.unique_viewers ?? 0);
@@ -70,6 +64,8 @@ function StatsRankList({ title, icon, items, emptyText }) {
 }
 
 function StatsOverview({ days }) {
+  const { isAdmin, permissions } = readAuth();
+  const seesEveryone = isAdmin || Boolean(permissions.users);
   const [overview, setOverview] = useState({
     movies: [],
     series: [],
@@ -159,36 +155,37 @@ function StatsOverview({ days }) {
 
   const methodTotal = overview.methods.reduce((sum, item) => sum + getStatValue(item), 0);
   const topCards = [
-    { label: "Top library", value: metrics.topLibrary?.Name || (nativeMeta ? "Not provided" : "No data"), detail: nativeMeta ? "Not part of this Silo aggregate" : `${formatNumber(getStatValue(metrics.topLibrary))} plays`, icon: <BarChartFillIcon /> },
+    { label: "Top library", value: metrics.topLibrary?.Name || (nativeMeta ? "Not provided" : "No data"), detail: nativeMeta ? "Not part of this Silo aggregate" : `${formatNumber(getStatValue(metrics.topLibrary))} plays`, icon: <RiBarChartFill /> },
     {
-      label: nativeMeta ? "Most active profile" : "Most active user",
+      // Without the Users permission the API only returns the signed-in user's own entry.
+      label: nativeMeta ? "Most active profile" : seesEveryone ? "Most active user" : "Your plays",
       value: metrics.topUser?.Name || "No data",
       detail: `${formatNumber(getStatValue(metrics.topUser))} plays`,
-      icon: metrics.topUser?.UserId ? <img src={`/proxy/Users/Images/Primary?id=${metrics.topUser.UserId}&fillWidth=80&quality=80`} alt="" /> : <UserStarLineIcon />,
+      icon: metrics.topUser?.UserId ? <img src={`/proxy/Users/Images/Primary?id=${metrics.topUser.UserId}&fillWidth=80&quality=80`} alt="" /> : <RiUserStarLine />,
     },
-    { label: "Top client", value: metrics.topClient?.Client || metrics.topClient?.Name || (nativeMeta ? "Live only" : "No data"), detail: nativeMeta ? "See Activity > Live sessions" : `${formatNumber(getStatValue(metrics.topClient))} plays`, icon: <ComputerLineIcon /> },
+    { label: "Top client", value: metrics.topClient?.Client || metrics.topClient?.Name || (nativeMeta ? "Live only" : "No data"), detail: nativeMeta ? "See Activity > Live sessions" : `${formatNumber(getStatValue(metrics.topClient))} plays`, icon: <RiComputerLine /> },
   ];
 
   return (
     <section className="stats-overview">
       <div className="stats-overview-kpis" aria-label="Playback overview">
         <article>
-          <FilmLineIcon />
+          <RiFilmLine />
           <span>Total plays</span>
           <strong>{status === "loading" ? "..." : formatNumber(metrics.totalPlays)}</strong>
         </article>
         <article>
-          <TvLineIcon />
+          <RiTvLine />
           <span>Direct play</span>
           <strong>{status === "loading" ? "..." : `${metrics.directPercent}%`}</strong>
         </article>
         <article>
-          <PulseLineIcon />
+          <RiPulseLine />
           <span>Transcode</span>
           <strong>{status === "loading" ? "..." : `${metrics.transcodePercent}%`}</strong>
         </article>
         <article>
-          <TimeLineIcon />
+          <RiTimeLine />
           <span>Window</span>
           <strong>{nativeMeta?.days || days} days</strong>
         </article>
@@ -214,8 +211,8 @@ function StatsOverview({ days }) {
             ))}
           </div>
           <div className="stats-rank-grid">
-            <StatsRankList title="Movies" icon={<FilmLineIcon />} items={overview.movies} emptyText="No movie plays in this window." />
-            <StatsRankList title="Shows" icon={<TvLineIcon />} items={overview.series} emptyText="No show plays in this window." />
+            <StatsRankList title="Movies" icon={<RiFilmLine />} items={overview.movies} emptyText="No movie plays in this window." />
+            <StatsRankList title="Shows" icon={<RiTvLine />} items={overview.series} emptyText="No show plays in this window." />
           </div>
         </div>
 
@@ -301,7 +298,7 @@ function Statistics() {
       <div className="stats-page-header">
         <div className="stats-title-block">
           <div className="stats-title-icon">
-            <BarChartFillIcon />
+            <RiBarChartFill />
           </div>
           <div>
             <p className="stats-eyebrow">Playback analytics</p>
@@ -313,18 +310,48 @@ function Statistics() {
         </div>
 
         <div className="stats-controls">
-          {!isSilo && <div className="stats-tab-nav">
-            <Tabs defaultActiveKey={activeTab} activeKey={activeTab} onSelect={setTab} variant="pills">
-              <Tab eventKey="tabOverview" className="bg-transparent" title="Overview" />
-
-              <Tab eventKey="tabCount" className="bg-transparent" title={<Trans i18nKey="STAT_PAGE.COUNT_VIEW" />} />
-
-              <Tab eventKey="tabDuration" className="bg-transparent" title={<Trans i18nKey="STAT_PAGE.DURATION_VIEW" />} />
-            </Tabs>
-          </div>}
+          {!isSilo && (
+            <div className="stats-tab-nav">
+              <nav className="nav nav-pills" role="tablist" aria-label="Statistics views">
+                <div className="nav-item">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === "tabOverview"}
+                    className={`nav-link ${activeTab === "tabOverview" ? "active" : ""}`.trim()}
+                    onClick={() => setTab("tabOverview")}
+                  >
+                    Overview
+                  </button>
+                </div>
+                <div className="nav-item">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === "tabCount"}
+                    className={`nav-link ${activeTab === "tabCount" ? "active" : ""}`.trim()}
+                    onClick={() => setTab("tabCount")}
+                  >
+                    <Trans i18nKey="STAT_PAGE.COUNT_VIEW" />
+                  </button>
+                </div>
+                <div className="nav-item">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === "tabDuration"}
+                    className={`nav-link ${activeTab === "tabDuration" ? "active" : ""}`.trim()}
+                    onClick={() => setTab("tabDuration")}
+                  >
+                    <Trans i18nKey="STAT_PAGE.DURATION_VIEW" />
+                  </button>
+                </div>
+              </nav>
+            </div>
+          )}
           <div className="stats-range-panel">
             <div className="stats-range-label">
-              <CalendarLineIcon size={17} />
+              <RiCalendarLine size={17} />
               <span>
                 <Trans i18nKey={"LAST"} />
               </span>
@@ -368,6 +395,7 @@ function Statistics() {
               <strong>{days} day window</strong>
             </div>
             <DailyPlayStats days={days} viewName={activeTab === "tabCount" ? "count" : "duration"} />
+            <LibraryHeatmap days={days} viewName={activeTab === "tabCount" ? "count" : "duration"} />
             <div className="statistics-graphs">
               <PlayStatsByDay days={days} viewName={activeTab === "tabCount" ? "count" : "duration"} />
               <PlayStatsByHour days={days} viewName={activeTab === "tabCount" ? "count" : "duration"} />

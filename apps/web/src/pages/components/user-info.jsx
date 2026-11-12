@@ -1,9 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "../../lib/axios_instance";
-import AccountCircleFillIcon from "remixicon-react/AccountCircleFillIcon";
+import { RiAccountCircleFill } from "@remixicon/react";
 import Config from "../../lib/config";
-import { Tabs, Tab, Button, ButtonGroup } from "react-bootstrap";
 
 import LastPlayed from "./user-info/lastplayed";
 import UserActivity from "./user-info/user-activity";
@@ -75,7 +74,7 @@ function UserInfo() {
       <div className="user-detail-container">
         <div className="user-image-container">
           {imgError ? (
-            <AccountCircleFillIcon size={"100%"} />
+            <RiAccountCircleFill size={"100%"} />
           ) : (
             <img
               className="user-image"
@@ -88,53 +87,60 @@ function UserInfo() {
 
         <div>
           <p className="user-name">{data.Name}</p>
-          <ButtonGroup>
-            <Button
-              onClick={() => setActiveTab("tabOverview")}
-              active={activeTab === "tabOverview"}
-              variant="outline-primary"
-              type="button"
-            >
-              <Trans i18nKey="TAB_CONTROLS.OVERVIEW" />
-            </Button>
-            <Button
-              onClick={() => setActiveTab("tabActivity")}
-              active={activeTab === "tabActivity"}
-              variant="outline-primary"
-              type="button"
-            >
-              <Trans i18nKey="TAB_CONTROLS.ACTIVITY" />
-            </Button>
-            <Button
-              onClick={() => setActiveTab("tabTimeline")}
-              active={activeTab === "tabTimeline"}
-              variant="outline-primary"
-              type="button"
-            >
-              <Trans i18nKey="TAB_CONTROLS.TIMELINE" />
-            </Button>
-          </ButtonGroup>
+          <nav className="nav nav-pills" role="tablist" aria-label="User views">
+            <div className="nav-item">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === "tabOverview"}
+                className={`nav-link ${activeTab === "tabOverview" ? "active" : ""}`.trim()}
+                onClick={() => setActiveTab("tabOverview")}
+              >
+                <Trans i18nKey="TAB_CONTROLS.OVERVIEW" />
+              </button>
+            </div>
+            <div className="nav-item">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === "tabActivity"}
+                className={`nav-link ${activeTab === "tabActivity" ? "active" : ""}`.trim()}
+                onClick={() => setActiveTab("tabActivity")}
+              >
+                <Trans i18nKey="TAB_CONTROLS.ACTIVITY" />
+              </button>
+            </div>
+            <div className="nav-item">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === "tabTimeline"}
+                className={`nav-link ${activeTab === "tabTimeline" ? "active" : ""}`.trim()}
+                onClick={() => setActiveTab("tabTimeline")}
+              >
+                <Trans i18nKey="TAB_CONTROLS.TIMELINE" />
+              </button>
+            </div>
+          </nav>
         </div>
       </div>
 
-      <Tabs defaultActiveKey="tabOverview" activeKey={activeTab} variant="pills">
-        <Tab eventKey="tabOverview" className="bg-transparent">
-          <GlobalStats
-            id={UserId}
-            param={"userid"}
-            endpoint={"getGlobalUserStats"}
-            title={<Trans i18nKey="USERS_PAGE.USER_STATS" />}
-          />
-          <GenreUserStats UserId={UserId} />
-          <LastPlayed UserId={UserId} />
-        </Tab>
-        <Tab eventKey="tabActivity" className="bg-transparent">
-          <UserActivity UserId={UserId} />
-        </Tab>
-        <Tab eventKey="tabTimeline" className="bg-transparent">
-          <ActivityTimeline preselectedUser={UserId} />
-        </Tab>
-      </Tabs>
+      <div className="user-detail-tab-content">
+        {activeTab === "tabOverview" && (
+          <div>
+            <GlobalStats
+              id={UserId}
+              param={"userid"}
+              endpoint={"getGlobalUserStats"}
+              title={<Trans i18nKey="USERS_PAGE.USER_STATS" />}
+            />
+            <GenreUserStats UserId={UserId} />
+            <LastPlayed UserId={UserId} />
+          </div>
+        )}
+        {activeTab === "tabActivity" && <UserActivity UserId={UserId} />}
+        {activeTab === "tabTimeline" && <ActivityTimeline preselectedUser={UserId} />}
+      </div>
     </div>
   );
 }
