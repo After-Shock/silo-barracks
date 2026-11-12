@@ -1,42 +1,35 @@
-version: v1.2.8
-title: JellyGlance v1.2.8
+version: v1.2.2
+title: JellyGlance v1.2.2
 ---
-feat: stabilize playback sync, richer notifications, and requests tooling
+chore: update release, Docker, update-check, task, and webhook infrastructure since v1.2.1
 
 Added
-- Optional `.env` bootstrap to skip the first-run wizard (`JF_HOST`, `JF_API_KEY`, `JS_AUTH_MODE=local`, `JS_USER`, `JS_PASSWORD`, `JS_SKIP_FIRST_RUN`, `JS_AUTO_START_SYNC`)
-- First-run backup restore path for headless / Compose installs
-- Debounced materialized-view refreshes under heavy playback webhook load
-- Discord and Gotify media cards for playback and download events (poster artwork, viewer avatar on Discord, client/device details)
-- Requests status pipeline (requested → approved → grabbed → available) with stage filters and richer cards
-- Seerr Issues inbox on the Requests page for Overseerr/Jellyseerr reports
-- Per-user Films/TV root-folder overrides on user cards, with sync to Seerr plus linked Radarr/Sonarr paths
-- Multi-campaign newsletters (global, role-based, and personal) with shared SMTP, section toggles, preview, and schedules
-- Downloads queue remove action when the download client supports it
-- Brief Home/Requests API response caching and finer Vite vendor chunk splitting
-- Dedicated JellyGlance GitHub Action bots plus PR validation / Actions naming standards
-
-Fixed
-- Webhook bursts no longer crash-loop JellyGlance on native/systemd installs ([#80](https://github.com/JellyGlance/Server/pull/80))
-- Playback webhook spam from session flicker / device-id churn is filtered; episode start alerts are more reliable
-- Discord rich embeds no longer drop when multipart image uploads fail (text card still sends)
-- Active Sessions cards truncate long stream labels and titles so desktop/mobile layouts no longer overlap
-- Requests Issues layout no longer leaves a large empty gap under the filters
-- Outbound HTTPS prefers IPv4 to avoid dual-stack timeouts to Cloudflare-hosted Seerr/Arr hosts
-- Release pipeline now commits package version bumps back to the branch so GitHub tags stay in sync with `package.json`
+- Multi-architecture Docker image support for linux/amd64, linux/arm64, and linux/arm/v7
+- Invite Sync task registration and scheduler defaults for background invite integration refreshes
+- Invite webhook event plumbing for invite_created, invite_deleted, and invite_links_refreshed
+- Third-party integration data storage for invite sync state and health checks
+- Direct Settings hash routing support for deep-linkable settings tabs
+- Account profile font-weight preference for default, comfortable, and light UI text density
 
 Changed
-- Release documentation now describes the file-driven Release Bot pipeline as the canonical release path
-- Dependency bumps for production and development packages
+- Improved release metadata handling for stable and beta channels
+- Improved Docker release publishing so supported platforms are advertised correctly
+- Updated release workflow behavior for GitHub Container Registry multi-architecture images
+- Updated webhook event status and test payload handling for new invite events
+- Updated integration sync to include invite integration state alongside calendar and download data
+- Updated What's New and README release metadata for v1.2.2
+- Updated account appearance controls so font-weight preferences apply immediately and persist per browser
 
-## What's Changed
-* chore(deps-dev): bump the development-dependencies group with 6 updates by @dependabot[bot] in https://github.com/JellyGlance/Server/pull/77
-* chore(deps): bump the production-dependencies group with 5 updates by @dependabot[bot] in https://github.com/JellyGlance/Server/pull/76
-* Feat  add PR validation checks and standardize Actions naming by @Nerdy-Technician in https://github.com/JellyGlance/Server/pull/78
-* fix: prevent crash-restart loop from unhandled refreshMaterializedView rejections by @mcgarrah in https://github.com/JellyGlance/Server/pull/80
-* Update README.md by @Nerdy-Technician in https://github.com/JellyGlance/Server/pull/81
+Fixed
+- Fixed "update available" notifications so installed stable builds ignore beta/prerelease versions
+- Fixed release note filtering so beta notes and stable notes stay in the correct channel
+- Fixed GitHub Container Registry publishing so multi-architecture manifests are preserved instead of being overwritten by single-platform images
+- Fixed Wizarr API payload handling for default/never invite expiry values
+- Fixed relative invite URL normalization against the configured integration host
+- Fixed raw third-party user object strings leaking through invite normalization
 
-## New Contributors
-* @mcgarrah made their first contribution in https://github.com/JellyGlance/Server/pull/80
-
-**Full Changelog**: https://github.com/JellyGlance/Server/compare/v1.2.7...v1.2.8
+Security / Stability
+- Keep beta and stable release detection separated for safer update prompts.
+- Include invite integrations in integration health checks.
+- Cache invite sync data for task/webhook use instead of relying only on live page loads.
+- Keep multi-architecture Docker publishing aligned with the release workflow.

@@ -1,17 +1,14 @@
 services:
   silo-barracks-db:
-    image: postgres:18-alpine
-    container_name: silo-barracks-db
+    image: postgres:16-alpine
     restart: unless-stopped
     shm_size: "1gb"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: silo_barracks
-    # Postgres 18 uses PGDATA=/var/lib/postgresql/18/docker.
-    # Fresh installs only: dump/restore before reusing data from another major version.
     volumes:
-      - barracks-postgres:/var/lib/postgresql
+      - barracks-postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready --dbname=silo_barracks --username=postgres"]
       interval: 10s
@@ -39,14 +36,6 @@ services:
       TZ: America/New_York
       CONFIG_DIR: /app/config
       BACKUP_DIR: /app/backups
-      # Optional first-run bootstrap (uncomment to skip the setup wizard):
-      # JF_HOST: https://jellyfin.example.com
-      # JF_API_KEY: your-jellyfin-api-key
-      # JS_AUTH_MODE: local
-      # JS_USER: admin
-      # JS_PASSWORD: choose-a-strong-password
-      # JS_SKIP_FIRST_RUN: "true"
-      # JS_AUTO_START_SYNC: "true"
     volumes:
       - barracks-config:/app/config
       - barracks-backups:/app/backups

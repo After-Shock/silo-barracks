@@ -2,13 +2,12 @@ name: JellyGlance Feature Request
 description: Suggest a new JellyGlance feature or command-center improvement.
 title: "feat: "
 labels: ["enhancement", "needs triage"]
-assignees: ["Nerdy-Technician"]
 body:
   - type: markdown
     attributes:
       value: |
         <p align="center">
-          <img src="https://raw.githubusercontent.com/JellyGlance/Server/main/.github/assets/full-logo-transparent.png" alt="JellyGlance" width="220">
+          <img src="https://raw.githubusercontent.com/Nerdy-Technician/JellyGlance/main/docs/public/full-logo-transparent.png" alt="JellyGlance" width="220">
         </p>
 
         ## JellyGlance Feature Intake
@@ -51,22 +50,6 @@ body:
         - Other
     validations:
       required: true
-
-
-  - type: checkboxes
-    id: related_tags
-    attributes:
-      label: Related tags
-      description: Optional — tick anything that also applies. These become GitHub labels.
-      options:
-        - label: "`enhancement` — improvement to something that already exists"
-        - label: "`integration` — new or deeper 3rd-party support"
-        - label: "`security` — auth / permissions / hardening"
-        - label: "`performance` — speed or resource use"
-        - label: "`documentation` — needs docs with the feature"
-        - label: "`docker` — deploy / packaging impact"
-        - label: "`api` — public API / widgets"
-        - label: "`webhooks` — notifications"
 
   - type: textarea
     id: problem

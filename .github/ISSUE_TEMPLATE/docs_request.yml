@@ -1,21 +1,18 @@
 name: JellyGlance Docs Request
-description: Report documentation or README changes specific to the application repository.
+description: Report missing, confusing, or outdated JellyGlance documentation.
 title: "docs: "
 labels: ["documentation", "needs triage"]
-assignees: ["Nerdy-Technician"]
 body:
   - type: markdown
     attributes:
       value: |
         <p align="center">
-          <img src="https://raw.githubusercontent.com/JellyGlance/Server/main/.github/assets/full-logo-transparent.png" alt="JellyGlance" width="220">
+          <img src="https://raw.githubusercontent.com/Nerdy-Technician/JellyGlance/main/docs/public/full-logo-transparent.png" alt="JellyGlance" width="220">
         </p>
 
         ## JellyGlance Docs Intake
 
-        Guides and site documentation are maintained in [JellyGlance/Documentation](https://github.com/JellyGlance/Documentation).
-        For missing guides, incorrect instructions, or docs-site problems, [use the documentation issue forms](https://github.com/JellyGlance/Documentation/issues/new/choose).
-        Use this form for README or documentation changes that belong in the application repository.
+        Help keep the JellyGlance README and docs site clear, useful, and up to date.
 
   - type: checkboxes
     id: checks
@@ -42,19 +39,6 @@ body:
         - Other
     validations:
       required: true
-
-
-  - type: checkboxes
-    id: related_tags
-    attributes:
-      label: Related tags
-      description: Optional — tick anything that also applies. These become GitHub labels.
-      options:
-        - label: "`docker` — Docker / Compose docs"
-        - label: "`integration` — integration docs"
-        - label: "`api` — API / widgets docs"
-        - label: "`security` — auth / hardening docs"
-        - label: "`webhooks` — webhook / Discord docs"
 
   - type: textarea
     id: issue

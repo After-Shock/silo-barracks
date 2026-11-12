@@ -32,7 +32,8 @@
   "type": "module",
   "workspaces": [
     "apps/*",
-    "packaging/shims/*"
+    "packaging/shims/*",
+    "docs"
   ],
   "scripts": {
     "theme:check": "node scripts/check-theme-colors.cjs",
@@ -50,12 +51,21 @@
     "test": "npm run test -w @jellyglance/api && npm run test -w @jellyglance/web && node --test \"scripts/*.test.cjs\"",
     "bundle:budget": "node scripts/check-bundle-budget.cjs",
     "bundle:budget:update": "npm run build && node scripts/check-bundle-budget.cjs --update",
-    "start": "npm run start -w @jellyglance/api"
+    "start": "npm run start -w @jellyglance/api",
+    "build:docs": "npm run build -w @jellyglance/docs",
+    "docs:dev": "npm run dev -w @jellyglance/docs",
+    "release": "semantic-release"
   },
   "devDependencies": {
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "concurrently": "^10.0.5"
+    "concurrently": "^10.0.5",
+    "@semantic-release/changelog": "^7.0.0",
+    "@semantic-release/git": "^11.0.1",
+    "@semantic-release/github": "^12.0.9",
+    "@semantic-release/npm": "^13.1.5",
+    "@semantic-release/release-notes-generator": "^14.1.1",
+    "semantic-release": "^25.0.9"
   },
   "overrides": {
     "@mui/material": "7.3.11",

@@ -33,7 +33,7 @@ Leave the body blank to use the format above, or write any JSON with placeholder
 { "text": "{{title}}: {{message}}", "severity": "{{severity}}", "client": "{{data.client}}" }
 ```
 
-Placeholders: `{{title}} {{message}} {{severity}} {{trigger}} {{event}} {{alertType}} {{user}} {{item}} {{series}} {{device}} {{at}}` and `{{data.<field>}}`. Values are JSON-escaped. Header values accept the same placeholders.
+<span v-pre>Placeholders: `{{title}} {{message}} {{severity}} {{trigger}} {{event}} {{alertType}} {{user}} {{item}} {{series}} {{device}} {{at}}` and `{{data.<field>}}`. Values are JSON-escaped. Header values accept the same placeholders.</span>
 
 ## Security
 

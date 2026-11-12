@@ -1,12 +1,11 @@
-name: Notify / Mastodon Release
+name: Post Release to Mastodon
 
 on:
-  # Post only after the release pipeline has built and pushed the images, so
-  # nobody pulls a tag that doesn't exist yet. A failed or cancelled pipeline
-  # never posts.
   workflow_run:
-    workflows: ["JellyGlance Release Bot"]
-    types: [completed]
+    workflows:
+      - Release Pipeline
+    types:
+      - completed
   workflow_dispatch:
     inputs:
       tag:
@@ -19,19 +18,8 @@ permissions:
 jobs:
   post:
     name: Publish Mastodon release post
-    # Only a successful pipeline run started by a published release (head_branch is
-    # then the tag). Manual image rebuilds of an old tag don't post again; use
-    # workflow_dispatch here for that.
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'release')
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
-    permissions:
-      contents: read # read the release via gh api
-      packages: read # confirm the image tag exists on ghcr.io
-    env:
-      IMAGE_NAME: ghcr.io/jellyglance/server
 
     steps:
       - name: Resolve release details
@@ -41,7 +29,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           REPO: ${{ github.repository }}
           WORKFLOW_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
-          INPUT_TAG: ${{ github.event.workflow_run.head_branch || github.event.inputs.tag }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
         run: |
           node <<'NODE'
           const fs = require("fs");
@@ -84,21 +72,6 @@ jobs:
           output("body", release.body || "");
           output("url", release.html_url);
           NODE
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Confirm the release image is published
-        env:
-          TAG: ${{ steps.release.outputs.tag }}
-        run: |
-          set -euo pipefail
-          docker buildx imagetools inspect "${IMAGE_NAME}:${TAG}" >/dev/null
-          echo "Found ${IMAGE_NAME}:${TAG}"
 
       - name: Create Mastodon status
         env:

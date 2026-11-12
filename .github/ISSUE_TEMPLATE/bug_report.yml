@@ -2,13 +2,12 @@ name: JellyGlance Bug Report
 description: Report something broken in the JellyGlance command center.
 title: "bug: "
 labels: ["bug", "needs triage"]
-assignees: ["Nerdy-Technician"]
 body:
   - type: markdown
     attributes:
       value: |
         <p align="center">
-          <img src="https://raw.githubusercontent.com/JellyGlance/Server/main/.github/assets/full-logo-transparent.png" alt="JellyGlance" width="220">
+          <img src="https://raw.githubusercontent.com/Nerdy-Technician/JellyGlance/main/docs/public/full-logo-transparent.png" alt="JellyGlance" width="220">
         </p>
 
         ## JellyGlance Bug Intake
@@ -51,20 +50,6 @@ body:
         - Other
     validations:
       required: true
-
-
-  - type: checkboxes
-    id: related_tags
-    attributes:
-      label: Related tags
-      description: Optional — tick anything that also applies. These become GitHub labels.
-      options:
-        - label: "`security` — auth, tokens, exposure, CVE-ish"
-        - label: "`docker` — compose, image, deploy"
-        - label: "`performance` — slow, lag, memory, CPU"
-        - label: "`api` — REST / widgets API"
-        - label: "`webhooks` — Discord / notifications"
-        - label: "`integration` — Arr / Seerr / Homarr / etc."
 
   - type: input
     id: version
