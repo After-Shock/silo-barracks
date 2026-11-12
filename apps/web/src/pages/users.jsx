@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "../lib/axios_instance";
 import Config from "../lib/config";
 import { Link } from "react-router-dom";
-import CryptoJS from "crypto-js";
-import { RiAccountCircleFill, RiCheckFill, RiCloseFill, RiDeleteBinLine, RiEyeLine, RiEyeOffLine, RiLockPasswordLine, RiPriceTag3Line, RiSearchLine, RiShieldKeyholeLine, RiShieldUserLine, RiUserAddLine, RiUserSettingsLine } from "@remixicon/react";
+import { RiAccountCircleFill, RiCheckFill, RiCloseFill, RiDeleteBinLine, RiEyeLine, RiEyeOffLine, RiLockPasswordLine, RiPriceTag3Line, RiSearchLine, RiSettings3Line, RiShieldKeyholeLine, RiShieldUserLine, RiUserAddLine, RiUserSettingsLine } from "@remixicon/react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,10 +18,16 @@ import "./css/users/users.css";
 
 import Loading from "./components/general/loading";
 import i18next from "i18next";
+import { mediaServerName } from "../lib/media-server";
 
 const token = localStorage.getItem("token");
 const PERMISSION_DEFINITIONS = [
-  { key: "dashboard", label: "Dashboard", detail: "Can open Silo Barracks and view dashboards." },
+  { key: "dashboard", label: "Dashboard", detail: "Can sign in and call protected routes." },
+  { key: "home", label: "Home", detail: "Can open the admin Home dashboard." },
+  { key: "myGlance", label: "My Glance", detail: "Can open their personal Glance page." },
+  { key: "requests", label: "Requests", detail: "Can open the Requests page." },
+  { key: "downloads", label: "Downloads", detail: "Can manage the download queue." },
+  { key: "repair", label: "Repair", detail: "Can open the Repair hub." },
   { key: "users", label: "Users", detail: "Can manage user roles, tracking, and local accounts." },
   { key: "settings", label: "Settings", detail: "Can change integrations, backups, imports, and maintenance settings." },
   { key: "apiKeys", label: "API Keys", detail: "Can view and manage API keys." },
@@ -54,8 +59,10 @@ function formatLastSeen(time) {
 }
 
 function userImage(user, size = 48) {
-  if (user.PrimaryImageTag) {
-    return <img className="users-avatar" src={`proxy/Users/Images/Primary?id=${user.UserId}&quality=70`} alt="" loading="lazy" decoding="async" style={{ width: size, height: size }} />;
+  const userId = user.UserId || user.Id || user.id;
+  const primaryImageTag = user.PrimaryImageTag || user.primaryImageTag;
+  if (userId && primaryImageTag) {
+    return <img className="users-avatar" src={`/proxy/Users/Images/Primary?id=${encodeURIComponent(userId)}&tag=${encodeURIComponent(primaryImageTag)}&fillWidth=${Math.max(size * 2, 96)}&quality=80`} alt="" loading="lazy" decoding="async" style={{ width: size, height: size }} />;
   }
 
   return (
@@ -67,6 +74,11 @@ function userImage(user, size = 48) {
 
 function roleClass(role) {
   return `role-${role?.toLowerCase?.().replace(/[^a-z0-9]+/g, "-") || "viewer"}`;
+}
+
+function isJellyfinAdministrator(user) {
+  const value = user?.IsAdministrator;
+  return value === true || value === 1 || value === "1" || value === "t" || value === "true";
 }
 
 function sourceClass(source) {
@@ -97,6 +109,12 @@ export default function Users() {
   const [newRole, setNewRole] = useState("");
   const [resetPassword, setResetPassword] = useState("");
   const [previewRole, setPreviewRole] = useState("Viewer");
+  const [folderTarget, setFolderTarget] = useState(null);
+  const [folderOptions, setFolderOptions] = useState({ movie: [], tv: [] });
+  const [userFoldersMap, setUserFoldersMap] = useState({});
+  const [folderDraft, setFolderDraft] = useState({ movieValue: "", tvValue: "" });
+  const [folderMessage, setFolderMessage] = useState("");
+  const [savingFolders, setSavingFolders] = useState(false);
 
   async function fetchAccess() {
     const response = await axios.get("/api/userAccess", {
@@ -136,7 +154,7 @@ export default function Users() {
       try {
         const newConfig = await Config.getConfig();
         setConfig(newConfig);
-        await Promise.all([fetchAccess(), fetchData()]);
+        await Promise.all([fetchAccess(), fetchData(), fetchUserFolders()]);
       } catch (error) {
         console.log(error);
       }
@@ -159,9 +177,11 @@ export default function Users() {
     }
 
     const jellyfinRows = data.map((user) => {
-      const role = access.jellyfinRoles?.[user.UserId] || (user.IsAdministrator ? "Admin" : "Viewer");
+      const serverAdmin = isJellyfinAdministrator(user);
+      const role = access.jellyfinRoles?.[user.UserId] || (serverAdmin ? "Admin" : "Viewer");
       return {
         ...user,
+        IsAdministrator: serverAdmin,
         AccountId: user.UserId,
         Role: role,
         Source: "Jellyfin",
@@ -277,6 +297,113 @@ export default function Users() {
   const selectedRolePermissions = previewPermissions;
   const selectedRoleLocked = LOCKED_PERMISSION_ROLES.has(previewRole);
 
+  async function fetchUserFolders() {
+    try {
+      const response = await axios.get("/api/requests/user-folders", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUserFoldersMap(response.data?.folders || {});
+    } catch (error) {
+      console.log("Unable to load user request folders", error);
+    }
+  }
+
+  function folderOptionValue(option) {
+    return JSON.stringify({
+      sourceId: option.sourceId,
+      serverId: option.serverId,
+      path: option.path,
+    });
+  }
+
+  function folderSelectValue(folders, mediaType) {
+    const path = mediaType === "tv" ? folders?.tvRootFolder : folders?.movieRootFolder;
+    if (!path) return "";
+    return JSON.stringify({
+      sourceId: mediaType === "tv" ? folders.tvSourceId : folders.movieSourceId,
+      serverId: mediaType === "tv" ? folders.tvServerId : folders.movieServerId,
+      path,
+    });
+  }
+
+  function folderDraftLabel(value) {
+    try {
+      return JSON.parse(value)?.path || value;
+    } catch {
+      return value;
+    }
+  }
+
+  function hasFolderOverride(user) {
+    const folders = userFoldersMap[user?.UserId];
+    return Boolean(folders?.movieRootFolder || folders?.tvRootFolder);
+  }
+
+  async function openFolderModal(user) {
+    const folders = userFoldersMap[user.UserId] || {};
+    setFolderTarget(user);
+    setFolderMessage("");
+    setFolderDraft({
+      movieValue: folderSelectValue(folders, "movie"),
+      tvValue: folderSelectValue(folders, "tv"),
+    });
+    try {
+      const response = await axios.get("/api/requests/folder-options", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFolderOptions({ movie: response.data?.movie || [], tv: response.data?.tv || [] });
+    } catch (error) {
+      setFolderOptions({ movie: [], tv: [] });
+      setFolderMessage(error.response?.data?.error || "Unable to load Seerr folders. You can still reset this user to default.");
+    }
+  }
+
+  async function saveFolderOverride(event) {
+    event.preventDefault();
+    if (!folderTarget?.UserId) return;
+    setSavingFolders(true);
+    setFolderMessage("");
+    try {
+      let movie = {};
+      let tv = {};
+      if (folderDraft.movieValue) movie = JSON.parse(folderDraft.movieValue);
+      if (folderDraft.tvValue) tv = JSON.parse(folderDraft.tvValue);
+      const response = await axios.put(
+        `/api/requests/user-folders/${encodeURIComponent(folderTarget.UserId)}`,
+        {
+          movieRootFolder: movie.path || "",
+          movieServerId: movie.serverId ?? null,
+          movieSourceId: movie.sourceId || null,
+          tvRootFolder: tv.path || "",
+          tvServerId: tv.serverId ?? null,
+          tvSourceId: tv.sourceId || null,
+        },
+        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+      );
+      setUserFoldersMap((current) => {
+        const next = { ...current };
+        const saved = response.data?.folders;
+        if (!saved?.movieRootFolder && !saved?.tvRootFolder) delete next[folderTarget.UserId];
+        else next[folderTarget.UserId] = saved;
+        return next;
+      });
+      setFolderTarget(null);
+      const synced = Number(response.data?.sync?.updated || 0);
+      const syncErrors = response.data?.sync?.errors?.length || 0;
+      setAlert({
+        variant: syncErrors ? "warning" : "success",
+        message:
+          synced > 0
+            ? `Request folders updated for ${folderTarget.UserName}. Updated ${synced} Seerr/Arr item${synced === 1 ? "" : "s"}${syncErrors ? ` (${syncErrors} failed)` : ""}.`
+            : `Request folders saved for ${folderTarget.UserName}${syncErrors ? `, but sync reported errors` : ""}. Open approved/pending requests already matched in Seerr and Radarr/Sonarr, or none were found.`,
+      });
+    } catch (error) {
+      setFolderMessage(error.response?.data?.error || "Unable to save request folders");
+    } finally {
+      setSavingFolders(false);
+    }
+  }
+
   async function toggleTrackedState(userid) {
     try {
       setSavingUserId(userid);
@@ -327,7 +454,7 @@ export default function Users() {
         "/api/localUsers",
         {
           ...newLocalUser,
-          password: CryptoJS.SHA3(newLocalUser.password).toString(),
+          password: newLocalUser.password,
         },
         { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
       );
@@ -393,6 +520,11 @@ export default function Users() {
   async function updateRolePermission(role, permission, enabled) {
     const nextPermissions = {
       dashboard: false,
+      home: false,
+      myGlance: false,
+      requests: false,
+      downloads: false,
+      repair: false,
       users: false,
       settings: false,
       apiKeys: false,
@@ -466,7 +598,7 @@ export default function Users() {
       return;
     }
 
-    const payload = { password: CryptoJS.SHA3(resetPassword).toString() };
+    const payload = { password: resetPassword };
     if (resetTarget.primary) {
       await axios.patch("/api/primaryLocalPassword", payload, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -522,24 +654,40 @@ export default function Users() {
   }
 
   function renderUserActions(user) {
+    const folderButton = user.Source !== "OIDC" ? (
+      <Button
+        type="button"
+        className={`users-row-action-button users-folder-button${hasFolderOverride(user) ? " has-override" : ""}`}
+        title="Request folders"
+        aria-label={`Request folders for ${user.UserName}`}
+        onClick={() => openFolderModal(user)}
+      >
+        <RiSettings3Line size={17} />
+      </Button>
+    ) : null;
+
     if (user.Source === "Jellyfin") {
       return (
-        <Button
-          variant="ghost"
-          className={`users-track-button ${user.Tracked ? "is-tracked" : ""}`}
-          type="button"
-          onClick={() => toggleTrackedState(user.UserId)}
-          disabled={savingUserId === user.UserId}
-          title={user.Tracked ? "Hide user" : "Unhide user"}
-        >
-          {savingUserId === user.UserId ? <Spinner className="tw:size-4" /> : user.Tracked ? <RiEyeLine size={20} /> : <RiEyeOffLine size={20} />}
-        </Button>
+        <div className="users-row-actions">
+          {folderButton}
+          <Button
+            variant="ghost"
+            className={`users-track-button ${user.Tracked ? "is-tracked" : ""}`}
+            type="button"
+            onClick={() => toggleTrackedState(user.UserId)}
+            disabled={savingUserId === user.UserId}
+            title={user.Tracked ? "Hide user" : "Unhide user"}
+          >
+            {savingUserId === user.UserId ? <Spinner className="tw:size-4" /> : user.Tracked ? <RiEyeLine size={20} /> : <RiEyeOffLine size={20} />}
+          </Button>
+        </div>
       );
     }
 
     if (user.IsLocalAccount) {
       return (
         <div className="users-row-actions">
+          {folderButton}
           <Button
             type="button"
             className="users-row-action-button"
@@ -689,7 +837,7 @@ export default function Users() {
               {visibleRows.map((user) => (
                 <article className={`users-profile-card ${user.Source !== "Jellyfin" ? "is-account-card" : ""} ${!user.Tracked && user.Source === "Jellyfin" ? "is-hidden-user" : ""}`} key={user.AccountId}>
                   <div className="users-profile-top">
-                    {userImage(user, 72)}
+                    {userImage(user, 48)}
                     <div className="users-profile-actions">
                       {renderUserActions(user)}
                     </div>
@@ -701,6 +849,7 @@ export default function Users() {
                   <div className="users-profile-badges">
                     <Badge className={`users-role-badge ${roleClass(user.Role)}`}>{user.Role}</Badge>
                     <Badge className={`users-source-badge ${sourceClass(user.Source)}`}>{user.Source === "Jellyfin" ? (config.IS_SILO ? "Silo" : "Media server") : user.Source}</Badge>
+                    {user.IsAdministrator && user.Role !== "Admin" ? <Badge className="users-source-badge source-admin">{config.IS_SILO ? "Silo" : "Media server"} admin</Badge> : null}
                     {user.Source === "Jellyfin" && !user.Tracked ? <Badge className="users-source-badge source-hidden">Hidden</Badge> : null}
                   </div>
                   {!(config.IS_SILO && user.Source === "Jellyfin") ? <div className="users-profile-metrics">
@@ -737,6 +886,7 @@ export default function Users() {
                   <div className="users-row-badges">
                     <Badge className={`users-role-badge ${roleClass(user.Role)}`}>{user.Role}</Badge>
                     <Badge className={`users-source-badge ${sourceClass(user.Source)}`}>{user.Source === "Jellyfin" ? (config.IS_SILO ? "Silo" : "Media server") : user.Source}</Badge>
+                    {user.IsAdministrator && user.Role !== "Admin" ? <Badge className="users-source-badge source-admin">{config.IS_SILO ? "Silo" : "Media server"} admin</Badge> : null}
                     {user.Source === "Jellyfin" && !user.Tracked ? <Badge className="users-source-badge source-hidden">Hidden</Badge> : null}
                   </div>
 
@@ -922,7 +1072,7 @@ export default function Users() {
                 <article className="role-permission-card" key={role}>
                   <div className="role-permission-title">
                     <Badge className={`users-role-badge ${roleClass(role)}`}>{role}</Badge>
-                    {!["Owner", "Admin", "Manager", "Viewer", "Disabled"].includes(role) && (
+                    {!["Owner", "Admin", "Manager", "Viewer", "Household", "Disabled"].includes(role) && (
                       <button type="button" onClick={() => removeRole(role)} aria-label={`Remove ${role}`}>
                         <RiCloseFill size={14} />
                       </button>
@@ -1017,6 +1167,77 @@ export default function Users() {
             </Button>
           </DialogFooter>
         </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!folderTarget} onOpenChange={(open) => !open && setFolderTarget(null)}>
+        <DialogContent className="users-modal users-dialog tw:max-w-[500px] tw:sm:max-w-[500px]" closeClassName="users-dialog-close">
+          <form onSubmit={saveFolderOverride}>
+            <DialogHeader className="users-modal-header">
+              <DialogTitle asChild><h5 className="users-modal-title">Request folders</h5></DialogTitle>
+              <DialogDescription className="tw:sr-only">Request folders</DialogDescription>
+            </DialogHeader>
+            <div className="users-modal-body">
+              <p className="users-modal-copy">
+                Override Seerr movie and TV root folders for {folderTarget?.UserName}. Leave as default to use the Seerr / Radarr / Sonarr folder.
+              </p>
+              {folderMessage ? (
+                <Alert variant="warning">
+                  <AlertDescription>{folderMessage}</AlertDescription>
+                </Alert>
+              ) : null}
+              <div className="inputbox">
+                <Label htmlFor="users-folder-movie">Films folder</Label>
+                <NativeSelect
+                  id="users-folder-movie"
+                  value={folderDraft.movieValue}
+                  onChange={(event) => setFolderDraft((current) => ({ ...current, movieValue: event.target.value }))}
+                >
+                  <NativeSelectOption value="">Seerr default</NativeSelectOption>
+                  {(folderOptions.movie || []).map((option) => (
+                    <NativeSelectOption
+                      key={`movie-${option.sourceId}-${option.serverId}-${option.path}`}
+                      value={folderOptionValue(option)}
+                    >
+                      {option.label}
+                    </NativeSelectOption>
+                  ))}
+                  {folderDraft.movieValue && !(folderOptions.movie || []).some((option) => folderOptionValue(option) === folderDraft.movieValue) ? (
+                    <NativeSelectOption value={folderDraft.movieValue}>{folderDraftLabel(folderDraft.movieValue)}</NativeSelectOption>
+                  ) : null}
+                </NativeSelect>
+              </div>
+              <div className="inputbox">
+                <Label htmlFor="users-folder-tv">TV folder</Label>
+                <NativeSelect
+                  id="users-folder-tv"
+                  value={folderDraft.tvValue}
+                  onChange={(event) => setFolderDraft((current) => ({ ...current, tvValue: event.target.value }))}
+                >
+                  <NativeSelectOption value="">Seerr default</NativeSelectOption>
+                  {(folderOptions.tv || []).map((option) => (
+                    <NativeSelectOption
+                      key={`tv-${option.sourceId}-${option.serverId}-${option.path}`}
+                      value={folderOptionValue(option)}
+                    >
+                      {option.label}
+                    </NativeSelectOption>
+                  ))}
+                  {folderDraft.tvValue && !(folderOptions.tv || []).some((option) => folderOptionValue(option) === folderDraft.tvValue) ? (
+                    <NativeSelectOption value={folderDraft.tvValue}>{folderDraftLabel(folderDraft.tvValue)}</NativeSelectOption>
+                  ) : null}
+                </NativeSelect>
+              </div>
+            </div>
+            <DialogFooter className="users-modal-footer">
+              <Button type="button" variant="secondary" onClick={() => setFolderTarget(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" className="users-primary-action" disabled={savingFolders}>
+                {savingFolders ? "Saving..." : "Save folders"}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { RiAddLine, RiClipboardLine, RiDeleteBinLine, RiExternalLinkLine, RiMailSendLine, RiRefreshLine, RiSearchLine, RiUserAddLine } from "@remixicon/react";
+import { useTranslation } from "react-i18next";
 import axios from "../lib/axios_instance";
+import { formatDate as formatLocaleDate } from "../lib/format-date";
 import "./css/integrations.css";
 import "./css/wizarr.css";
 
@@ -20,14 +22,13 @@ const emptyForm = {
 };
 
 function formatDate(value) {
-  if (!value) return "Never";
-  return new Intl.DateTimeFormat("en-GB", {
+  return formatLocaleDate(value, {
     day: "2-digit",
     month: "2-digit",
     year: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(value));
+  }, { fallback: "Never" });
 }
 
 function statusLabel(invite) {
@@ -44,6 +45,7 @@ function cleanUsedBy(value) {
 }
 
 export default function WizarrPage() {
+  const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(true);
@@ -115,7 +117,7 @@ export default function WizarrPage() {
         serverIds: current.serverIds.length ? current.serverIds : firstServer ? [firstServer.id] : [],
       }));
     } catch (loadError) {
-      setError(loadError?.response?.data?.error || "Unable to load Wizarr. Check Settings > Integrations > Invites.");
+      setError(loadError?.response?.data?.error || "Unable to load Wizarr. Check Settings > Integrations > 3rd party apps.");
     } finally {
       setLoading(false);
     }
@@ -401,6 +403,7 @@ export default function WizarrPage() {
             <div className="wizarr-invite-list">
             {visibleInvites.map((invite) => {
               const usedBy = cleanUsedBy(invite.usedBy);
+              const inviteCode = invite.code || invite.id;
               return (
               <article key={invite.id || invite.code} className={`wizarr-invite-card is-${String(statusLabel(invite)).toLowerCase()}`}>
                 <div>
@@ -411,16 +414,22 @@ export default function WizarrPage() {
                 <div className="wizarr-invite-meta">
                   <span>Created {formatDate(invite.created)}</span>
                   <span>Expires {formatDate(invite.expires)}</span>
-                  {usedBy ? <span>Used by {usedBy}</span> : null}
+                  {usedBy ? <span>{t("WIZARR.USED_BY", { user: usedBy })}</span> : null}
                 </div>
                 <div className="wizarr-invite-actions">
-                  <button type="button" onClick={() => copyInvite(invite)} disabled={!invite.url} title="Copy invite link">
+                  <button type="button" onClick={() => copyInvite(invite)} disabled={!invite.url} title={t("WIZARR.COPY_INVITE", { code: inviteCode })} aria-label={t("WIZARR.COPY_INVITE", { code: inviteCode })}>
                     <RiClipboardLine size={18} />
                   </button>
-                  <a href={invite.url || "#"} target="_blank" rel="noreferrer" title="Open invite" aria-disabled={!invite.url}>
-                    <RiExternalLinkLine size={18} />
-                  </a>
-                  <button type="button" className="is-danger" onClick={() => deleteInvite(invite)} title="Delete invite">
+                  {invite.url ? (
+                    <a href={invite.url} target="_blank" rel="noreferrer" title={t("WIZARR.OPEN_INVITE", { code: inviteCode })} aria-label={t("WIZARR.OPEN_INVITE", { code: inviteCode })}>
+                      <RiExternalLinkLine size={18} />
+                    </a>
+                  ) : (
+                    <a role="link" aria-disabled="true" title={t("WIZARR.OPEN_INVITE", { code: inviteCode })} aria-label={t("WIZARR.OPEN_INVITE", { code: inviteCode })}>
+                      <RiExternalLinkLine size={18} />
+                    </a>
+                  )}
+                  <button type="button" className="is-danger" onClick={() => deleteInvite(invite)} title={t("WIZARR.DELETE_INVITE", { code: inviteCode })} aria-label={t("WIZARR.DELETE_INVITE", { code: inviteCode })}>
                     <RiDeleteBinLine size={18} />
                   </button>
                 </div>

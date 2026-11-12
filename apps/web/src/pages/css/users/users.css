@@ -1261,3 +1261,8 @@
     flex-basis: auto;
   }
 }
+
+/* upstream 1.4.3 (ported) */
+.source-admin {
+  background: rgba(var(--primary-light-rgb), 0.28) !important;
+}

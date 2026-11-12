@@ -1,6 +1,6 @@
 {
   "name": "silo-barracks",
-  "version": "1.2.3-beta.3",
+  "version": "1.4.3-beta.1",
   "private": true,
   "description": "Silo Barracks - native Silo Server activity and playback analytics, based on JellyGlance.",
   "keywords": [
@@ -28,14 +28,13 @@
   "bugs": {
     "url": "https://github.com/After-Shock/silo-barracks/issues"
   },
-  "license": "GPL-3.0",
+  "license": "MIT",
   "type": "module",
   "workspaces": [
     "apps/*",
-    "docs"
+    "packaging/shims/*"
   ],
   "scripts": {
-    "test": "node --test apps/api/tests/*.test.js apps/web/src/lib/*.test.js scripts/*.test.cjs",
     "theme:check": "node scripts/check-theme-colors.cjs",
     "ui:add": "node scripts/shadcn-add.mjs",
     "branding:check": "node scripts/check-barracks-branding.cjs",
@@ -43,31 +42,46 @@
     "dev:web": "npm run dev -w @jellyglance/web",
     "dev:api": "npm run dev -w @jellyglance/api",
     "build": "npm run build -w @jellyglance/web",
-    "build:docs": "npm run build -w @jellyglance/docs",
-    "docs:dev": "npm run dev -w @jellyglance/docs",
     "i18n:check": "node scripts/i18n-sync.mjs --check",
     "i18n:sync": "node scripts/i18n-sync.mjs",
-    "lint": "npm run lint -w @jellyglance/web",
-    "start": "npm run start -w @jellyglance/api",
-    "release": "semantic-release"
+    "widgets:check": "node scripts/widget-files.mjs --check",
+    "widgets:sync": "node scripts/widget-files.mjs",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test -w @jellyglance/api && npm run test -w @jellyglance/web && node --test \"scripts/*.test.cjs\"",
+    "bundle:budget": "node scripts/check-bundle-budget.cjs",
+    "bundle:budget:update": "npm run build && node scripts/check-bundle-budget.cjs --update",
+    "start": "npm run start -w @jellyglance/api"
   },
   "devDependencies": {
-    "@semantic-release/changelog": "^7.0.0",
-    "@semantic-release/git": "^11.0.1",
-    "@semantic-release/github": "^12.0.9",
-    "@semantic-release/npm": "^13.1.5",
-    "@semantic-release/release-notes-generator": "^14.1.1",
-    "ajv": "8.17.1",
-    "ajv-formats": "3.0.1",
-    "concurrently": "^9.2.1",
-    "semantic-release": "^25.0.9"
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "concurrently": "^10.0.5"
   },
   "overrides": {
     "@mui/material": "7.3.11",
     "@mui/icons-material": "7.3.11",
     "@mui/system": "7.3.11",
-    "@semantic-release/npm": {
-      "npm": "^12.0.2"
+    "eslint": {
+      ".": "10.14.0",
+      "minimatch": "11.0.3"
+    },
+    "fast-uri": "4.2.3",
+    "js-yaml": "5.5.0",
+    "qs": "6.16.1",
+    "vite@5.4.21": "6.4.3",
+    "esbuild@0.21.5": "0.25.12",
+    "brace-expansion@1": "1.1.21",
+    "engine.io": "6.6.11",
+    "brace-expansion@5": "5.0.12",
+    "shell-quote": "1.12.0",
+    "source-map-js": "1.2.2",
+    "follow-redirects": "1.16.3",
+    "deepmerge": "4.3.1",
+    "@eslint/config-array": {
+      "minimatch": "11.0.3"
+    },
+    "swagger-jsdoc": {
+      "glob": "14.0.4"
     }
   },
   "engines": {

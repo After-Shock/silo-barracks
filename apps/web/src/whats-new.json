@@ -1,16 +1,868 @@
 {
-  "1.2.3.beta.3": [
+  "1.4.3-beta": [
+    {
+      "icon": "movie",
+      "title": "Full Jellyfin Sync Finishes Again",
+      "body": "Full Jellyfin Sync no longer stops partway through Media Sync when a library has Live TV channels, extras or other items with no media files attached. Those items are skipped for file info and the rest of the sync carries on, so titles you removed from Jellyfin get marked as gone again and Purge Cached Library Items Only has something to clear. Run one full sync after updating, then purge."
+    },
+    {
+      "icon": "shield",
+      "title": "Postgres 18 Recommended",
+      "body": "Postgres 18 is the recommended database again. The bundled Docker Compose files, the Proxmox and Unraid packaging and the README all use postgres:18-alpine. Postgres 18 keeps its data under /var/lib/postgresql/18/docker, so mount the database volume at /var/lib/postgresql, not the old /var/lib/postgresql/data. Changing the image tag or the mount does not move existing data: dump it with your current version, restore it into a fresh Postgres 18 volume and check it before removing the old one. Purging items removed from Jellyfin still shows an error when it fails, instead of a success message."
+    },
+    {
+      "icon": "speed",
+      "title": "Active Sessions Wall Stays Put",
+      "body": "The Active Sessions wall on Home no longer shuffles its tiles every few seconds. Jellyfin reorders sessions on every progress update and the wall used to follow along. Wall and Cards now keep the same fixed order, so a tile only moves when someone starts or stops watching."
+    },
+    {
+      "icon": "speed",
+      "title": "Active Sessions Timings Fixed",
+      "body": "Active Sessions cards now read position, runtime, time left and the progress bar from the same playback values, so they always agree. The ETA field is now Left: it shows the time remaining, plus the clock time it ends while playing. Paused streams just show what's left instead of an end time that keeps moving. A stream that hasn't reported its position yet shows --:--:-- instead of NaN or Invalid Date, and an empty bar no longer shows a stray dot. The progress bar now sits between the two timestamps, and the poster fills the card with space before the text, so nothing crowds the artwork."
+    },
+    {
+      "icon": "rocket",
+      "title": "One-Click Deploy and Updates",
+      "body": "The README Quick start now links a one-click deploy option. Under the hood, follow-redirects is on 1.16.3, eslint on 10.14.0 and the Renovate action on 46.3.13."
+    }
+  ],
+  "1.4.2": [
+    {
+      "icon": "shield",
+      "title": "Safer Sign-In And Restore",
+      "body": "Three security fixes land in this release. Media-server and Quick Connect login only issue a session when that sign-in mode is turned on, or during first-run setup. Restoring a backup on a brand-new install can no longer write into the live backup folder once setup is finished. Changing the primary owner username now needs the current password, and only the Owner can change credentials or password."
+    },
+    {
+      "icon": "palette",
+      "title": "Calmer Blobbo, Costumes That Stay On",
+      "body": "Blobbo's idle is gentler now: a soft float and squish instead of the big bounce, with the same little blink. Every look's hat, scarf, glasses or helmet now moves with Blobbo through the whole motion instead of sliding off, and tiny floating props hide at small sizes so they don't smudge."
+    },
+    {
+      "icon": "palette",
+      "title": "Blobbo Costumes and Seasonal Looks",
+      "body": "Blobbo now has 20 looks: Classic plus Halloween, festive winter, Valentine's hearts and summer outfits, and 15 costumes including New Year, Easter, Pride, birthday, gaming, St Patrick's, harvest, cozy night, chef, space, music, bookworm, sports, wizard and movie night. Each look keeps Blobbo's soft bouncy idle. Pick one from Blobbo's Options or Settings → General → Blobbo look and it stays on. Leave it on Auto and Blobbo dresses for the calendar: New Year's Eve, winter in December, Valentine's week, St Patrick's, Easter, Pride week, summer, harvest and Halloween. Choices stay in this browser only."
+    },
+    {
+      "icon": "rocket",
+      "title": "Storage by Library",
+      "body": "Libraries now shows admins how much space each library takes, with its share of the total and title count. Open the top 20 largest titles to see size, plays and when each was last played, plus soft hints for anything worth a second look: never played, not played in 2+ years, or a movie that shares its name and year with another copy. Titles added in the last 90 days never get a hint, and nothing is deleted from here."
+    },
+    {
+      "icon": "movie",
+      "title": "Incomplete Season Hunter",
+      "body": "Server → Incomplete Seasons lists every series with a season that is short on episodes. With Sonarr connected under Integrations it compares what is on disk against Sonarr's aired episode count; without it, gaps in episode numbering (like E01, E02, E04) are flagged. Each row shows which seasons are short and the missing episode numbers, with buttons to open the series in Sonarr (or add it if Sonarr doesn't have it yet) and on TVDB."
+    },
+    {
+      "icon": "speed",
+      "title": "Why Is This Transcoding?",
+      "body": "Active Sessions now explains every transcode for admins. Each transcoding stream gets a small chip such as “Transcode: Subtitle burn-in” or “Remux: Container”; tap it for a plain-English reason (HEVC to H.264, audio codec, bitrate over the limit, HDR tone-mapping, image subtitles being burned in, resolution caps or direct play turned off) plus a fix hint for that device, like enabling HEVC in Infuse or Android TV, raising the max streaming bitrate, or switching to SRT subtitles. Remuxes and audio-only transcodes are labelled separately so you can tell the cheap ones from the heavy ones."
+    },
     {
       "icon": "magic",
-      "title": "Integrations and activity improvements",
-      "body": "Added SickChill as a TV automation option, default media-agent presets for TV/movies/audio, clearer webhook placeholders, and improved Active Transcodes loading plus richer playback/download webhook notifications."
+      "title": "Watching Heat Map",
+      "body": "Statistics → Play Count and Watch Duration now open with a heat map of when your household watches, by day of the week and hour of the day, in your server's time zone. Hover or tap a square for plays and watch time in that hour, and see the busiest slot, day and hour at a glance. Filter by library, and admins can pick a single user; everyone else sees just their own viewing."
+    },
+    {
+      "icon": "shield",
+      "title": "Heads-Up Before Removing Something Being Watched",
+      "body": "Removing a download, re-grabbing a new copy, or purging an item now checks Active Sessions first. If someone is playing that title you'll see who and on which device, and can cancel or carry on anyway."
+    },
+    {
+      "icon": "speed",
+      "title": "Device Profiles",
+      "body": "Insights → Devices gives every TV, phone, browser and cast device its own card: how often it direct plays versus transcodes, its typical bitrate, which apps and versions it runs, who uses it and when it was last seen. Devices that transcode get their top reasons with a fix hint for that device. Admins only."
+    },
+    {
+      "icon": "speed",
+      "title": "Quiet Hours For Scans And Intros",
+      "body": "Server → Server Jobs now has Quiet hours. Pick a start and end time, an optional time zone and which days it applies to, and Barracks holds Jellyfin library scans and intro / credits detection during that window so evening or overnight playback is not slowed down. Jobs that start on their own schedule are stopped and run once as soon as the window ends (or you can let them wait for their next schedule instead). Held jobs show an In quiet hours tag, and pressing Run still starts a job straight away."
+    },
+    {
+      "icon": "chat",
+      "title": "Subtitle And Audio Gap Report",
+      "body": "Server → Subtitle Gaps lists every movie and series missing your household's preferred subtitle or audio languages, using the tracks Jellyfin already knows about. Set the languages once (codes or names like en, fr or German), filter by missing subtitles or audio, and with Bazarr connected under Integrations hit Search in Bazarr on any row, or tick several and search them together."
+    },
+    {
+      "icon": "upload",
+      "title": "Outbound Webhook Rules",
+      "body": "Settings → Notifications now has outbound webhook rules. Pick a trigger such as a stuck or failed download, Cleanuparr needing attention, low disk space or playback starting, and Barracks POSTs it as JSON to Home Assistant, ntfy, Discord or any URL. Filter on any field, add headers, write your own JSON body with placeholders, preview the payload and send a test. Recent deliveries show the status code or error, and saved URLs and header values stay encrypted and hidden."
+    },
+    {
+      "icon": "users",
+      "title": "Taste Map",
+      "body": "Statistics → Taste map shows what each person watches by genre and decade, with their most watched titles. Admins also get a household view: a match grid showing how closely everyone's tastes line up, the genres you share, and the shows and films more than one of you has watched. Everyone else sees their own map."
+    },
+    {
+      "icon": "magic",
+      "title": "Blobbo Notices Live Sessions",
+      "body": "Blobbo now reacts when someone starts watching: a quick wave when playback begins on an idle server, and a glance over when another stream joins. Reactions have a short cool-down so busy evenings do not keep it bouncing, and with reduced motion turned on Blobbo simply shows a small badge without moving."
+    },
+    {
+      "icon": "users",
+      "title": "Live Session Wall",
+      "body": "Active Sessions on Home now has a Wall layout: a compact tile for every stream showing who is watching, the poster, progress, device and whether it is direct playing or transcoding. Switch between Cards and Wall with the toggle beside the heading, and your choice is remembered in this browser. When nobody is playing, the Active Sessions section is hidden completely instead of showing an empty box, and it reappears as soon as playback starts."
+    },
+    {
+      "icon": "rocket",
+      "title": "Disk-Fill Forecast",
+      "body": "Libraries now opens with a disk-fill forecast for admins: free and used space from your Sonarr, Radarr or Lidarr disks, how much is being added per day, and roughly how long until the disks are full, with a range based on the last 30 and 90 days. It shows which libraries are growing fastest, says Stable when little is being added, and asks for more data instead of guessing when the history is too short."
+    },
+    {
+      "icon": "rocket",
+      "title": "Smart Request Routing",
+      "body": "Requests → Rules now has Smart routing. Build rules that match on who is asking, the genre and whether it is a movie or TV show, then choose Approve to send it straight to Sonarr/Radarr or Hold to keep it for an admin. Rules run top to bottom and the first match wins; anything that matches no rule keeps your existing settings, which hold requests unless auto-approve is on. A routing log shows every request, the rule that caught it and whether it was sent on or held."
+    },
+    {
+      "icon": "rocket",
+      "title": "Ops Copilot Preview",
+      "body": "Server → Ops Copilot lets admins ask plain questions like “why is Dune buffering for Mum?”, “free 500 GB without touching favourites” or “anything stuck in downloads?”. It explains transcodes, library space and download health from your own data, and anything that would change something is shown as a dry-run plan you approve or cancel. Pausing a stalled download and messaging a session can run after approval (pauses can be undone); deletions stay as proposals for now. Every question and decision is kept in an audit log."
+    },
+    {
+      "icon": "mail",
+      "title": "Wrapped Recaps By Email Or Webhook",
+      "body": "Statistics → Recap now lets you schedule a weekly or monthly Wrapped for any user, with top shows, hours watched and the busiest day. Recaps arrive by email or on one of your webhooks as soon as each week or month finishes, with the recap card attached. Users can set up email delivery of their own recap, and Send now resends the last finished period whenever you like."
+    },
+    {
+      "icon": "rocket",
+      "title": "Meet Blobbo",
+      "body": "Blobbo, a friendly little jellyfish, now floats in the corner of your dashboard. Tap it, or press Shift+A anywhere to say hello, for tips, quick links and answers about your server. Its chat now matches your chosen theme colours, it stays still if you prefer reduced motion, and you can show or hide it under Settings → General. Blobbo's idle animation now has a properly transparent background, so the dark square behind it is gone."
+    },
+    {
+      "icon": "chat",
+      "title": "Ask Blobbo About Your Server",
+      "body": "Ask who is watching, how busy today was, how much space your libraries take up, what is new, who watches most, whether everything is healthy, if downloads are stuck, or if you are up to date. Blobbo now understands far more ways of asking, gives clearer answers straight from your server data, and always links to the full page. Tap a topic chip or type your own question."
+    },
+    {
+      "icon": "movie",
+      "title": "Find A Title With Blobbo",
+      "body": "Ask Blobbo to find a film or show, for example “find Dune” or “do I have The Expanse?”, and it lists the matches from your libraries. Each result, and titles in answers about what is playing, what is new and what is most watched, comes with Open in… buttons that take you straight to the title in Barracks or Jellyfin."
+    },
+    {
+      "icon": "chat",
+      "title": "Blobbo Remembers And Suggests",
+      "body": "After each answer Blobbo offers a few follow-up questions to tap. Your last five questions stay in this browser so you can ask them again in one tap, and More topics shows everything Blobbo knows. Ask Blobbo to explain the page you are on, and look for the Ask Blobbo button beside it on every page."
+    },
+    {
+      "icon": "users",
+      "title": "Digests And Picks",
+      "body": "Ask what changed since yesterday, for a weekend digest, who has been offline, what is trending, for something to watch from your newest arrivals, for titles similar to your taste, or about your achievement badges."
+    },
+    {
+      "icon": "shield",
+      "title": "Troubleshooting With Blobbo",
+      "body": "Blobbo can explain why something is buffering, why a download failed, how scheduled tasks are doing, whether new devices have joined and whether remote access looks right. It can also hunt for duplicate films and empty series, draw a storage per library pie and a transcode heat map. Its mood now follows server health, so a worried Blobbo means a check needs a look."
+    },
+    {
+      "icon": "rocket",
+      "title": "Getting To Know Blobbo",
+      "body": "New installs get a short guided tour and an optional setup quiz, there is a tip of the day when you sign in, and Blobbo says welcome back after an upgrade. Under Options you can turn on kids-safe answers, have answers read aloud and let Blobbo wear seasonal outfits. Tips can now be translated."
+    },
+    {
+      "icon": "shield",
+      "title": "Cleanuparr Integration",
+      "body": "Connect Cleanuparr under Integrations → 3rd party apps to see its strikes, removals, cleaned downloads and client and arr health on the Downloads page. Point Cleanuparr's Gotify notifications at Barracks and downloads it is already handling are tagged instead of raising stuck download alerts, while failed imports, errored downloads and repeated stalls alert you because they need a look."
+    }
+  ],
+  "1.4.2-beta": [
+    {
+      "icon": "palette",
+      "title": "Calmer Blobbo, Costumes That Stay On",
+      "body": "Blobbo's idle is gentler now: a soft float and squish instead of the big bounce, with the same little blink. Every look's hat, scarf, glasses or helmet now moves with Blobbo through the whole motion instead of sliding off, and tiny floating props hide at small sizes so they don't smudge."
+    },
+    {
+      "icon": "shield",
+      "title": "Beta Builds Show Beta Notes",
+      "body": "Beta images such as v1.4.2-beta.3 now say they are on the Beta channel in About, the version card and What's New, and open What's New (beta) with the notes for this beta line instead of falling back to the last stable release. Each new beta build shows What's New again once, so you can catch up on what changed since the previous beta."
+    },
+    {
+      "icon": "palette",
+      "title": "Blobbo Costumes and Seasonal Looks",
+      "body": "Blobbo now has 20 looks: Classic plus Halloween, festive winter, Valentine's hearts and summer outfits, and 15 costumes including New Year, Easter, Pride, birthday, gaming, St Patrick's, harvest, cozy night, chef, space, music, bookworm, sports, wizard and movie night. Each look keeps Blobbo's soft bouncy idle. Pick one from Blobbo's Options or Settings → General → Blobbo look and it stays on. Leave it on Auto and Blobbo dresses for the calendar: New Year's Eve, winter in December, Valentine's week, St Patrick's, Easter, Pride week, summer, harvest and Halloween. Choices stay in this browser only."
+    },
+    {
+      "icon": "rocket",
+      "title": "Storage by Library",
+      "body": "Libraries now shows admins how much space each library takes, with its share of the total and title count. Open the top 20 largest titles to see size, plays and when each was last played, plus soft hints for anything worth a second look: never played, not played in 2+ years, or a movie that shares its name and year with another copy. Titles added in the last 90 days never get a hint, and nothing is deleted from here."
+    },
+    {
+      "icon": "movie",
+      "title": "Incomplete Season Hunter",
+      "body": "Server → Incomplete Seasons lists every series with a season that is short on episodes. With Sonarr connected under Integrations it compares what is on disk against Sonarr's aired episode count; without it, gaps in episode numbering (like E01, E02, E04) are flagged. Each row shows which seasons are short and the missing episode numbers, with buttons to open the series in Sonarr (or add it if Sonarr doesn't have it yet) and on TVDB."
+    },
+    {
+      "icon": "speed",
+      "title": "Why Is This Transcoding?",
+      "body": "Active Sessions now explains every transcode for admins. Each transcoding stream gets a small chip such as “Transcode: Subtitle burn-in” or “Remux: Container”; tap it for a plain-English reason (HEVC to H.264, audio codec, bitrate over the limit, HDR tone-mapping, image subtitles being burned in, resolution caps or direct play turned off) plus a fix hint for that device, like enabling HEVC in Infuse or Android TV, raising the max streaming bitrate, or switching to SRT subtitles. Remuxes and audio-only transcodes are labelled separately so you can tell the cheap ones from the heavy ones."
+    },
+    {
+      "icon": "magic",
+      "title": "Watching Heat Map",
+      "body": "Statistics → Play Count and Watch Duration now open with a heat map of when your household watches, by day of the week and hour of the day, in your server's time zone. Hover or tap a square for plays and watch time in that hour, and see the busiest slot, day and hour at a glance. Filter by library, and admins can pick a single user; everyone else sees just their own viewing."
+    },
+    {
+      "icon": "shield",
+      "title": "Heads-Up Before Removing Something Being Watched",
+      "body": "Removing a download, re-grabbing a new copy, or purging an item now checks Active Sessions first. If someone is playing that title you'll see who and on which device, and can cancel or carry on anyway."
+    },
+    {
+      "icon": "speed",
+      "title": "Device Profiles",
+      "body": "Insights → Devices gives every TV, phone, browser and cast device its own card: how often it direct plays versus transcodes, its typical bitrate, which apps and versions it runs, who uses it and when it was last seen. Devices that transcode get their top reasons with a fix hint for that device. Admins only."
+    },
+    {
+      "icon": "speed",
+      "title": "Quiet Hours For Scans And Intros",
+      "body": "Server → Server Jobs now has Quiet hours. Pick a start and end time, an optional time zone and which days it applies to, and Barracks holds Jellyfin library scans and intro / credits detection during that window so evening or overnight playback is not slowed down. Jobs that start on their own schedule are stopped and run once as soon as the window ends (or you can let them wait for their next schedule instead). Held jobs show an In quiet hours tag, and pressing Run still starts a job straight away."
+    },
+    {
+      "icon": "chat",
+      "title": "Subtitle And Audio Gap Report",
+      "body": "Server → Subtitle Gaps lists every movie and series missing your household's preferred subtitle or audio languages, using the tracks Jellyfin already knows about. Set the languages once (codes or names like en, fr or German), filter by missing subtitles or audio, and with Bazarr connected under Integrations hit Search in Bazarr on any row, or tick several and search them together."
+    },
+    {
+      "icon": "upload",
+      "title": "Outbound Webhook Rules",
+      "body": "Settings → Notifications now has outbound webhook rules. Pick a trigger such as a stuck or failed download, Cleanuparr needing attention, low disk space or playback starting, and Barracks POSTs it as JSON to Home Assistant, ntfy, Discord or any URL. Filter on any field, add headers, write your own JSON body with placeholders, preview the payload and send a test. Recent deliveries show the status code or error, and saved URLs and header values stay encrypted and hidden."
+    },
+    {
+      "icon": "users",
+      "title": "Taste Map",
+      "body": "Statistics → Taste map shows what each person watches by genre and decade, with their most watched titles. Admins also get a household view: a match grid showing how closely everyone's tastes line up, the genres you share, and the shows and films more than one of you has watched. Everyone else sees their own map."
+    },
+    {
+      "icon": "magic",
+      "title": "Blobbo Notices Live Sessions",
+      "body": "Blobbo now reacts when someone starts watching: a quick wave when playback begins on an idle server, and a glance over when another stream joins. Reactions have a short cool-down so busy evenings do not keep it bouncing, and with reduced motion turned on Blobbo simply shows a small badge without moving."
+    },
+    {
+      "icon": "users",
+      "title": "Live Session Wall",
+      "body": "Active Sessions on Home now has a Wall layout: a compact tile for every stream showing who is watching, the poster, progress, device and whether it is direct playing or transcoding. Switch between Cards and Wall with the toggle beside the heading, and your choice is remembered in this browser. When nobody is playing, the Active Sessions section is hidden completely instead of showing an empty box, and it reappears as soon as playback starts."
+    },
+    {
+      "icon": "rocket",
+      "title": "Disk-Fill Forecast",
+      "body": "Libraries now opens with a disk-fill forecast for admins: free and used space from your Sonarr, Radarr or Lidarr disks, how much is being added per day, and roughly how long until the disks are full, with a range based on the last 30 and 90 days. It shows which libraries are growing fastest, says Stable when little is being added, and asks for more data instead of guessing when the history is too short."
+    },
+    {
+      "icon": "rocket",
+      "title": "Smart Request Routing",
+      "body": "Requests → Rules now has Smart routing. Build rules that match on who is asking, the genre and whether it is a movie or TV show, then choose Approve to send it straight to Sonarr/Radarr or Hold to keep it for an admin. Rules run top to bottom and the first match wins; anything that matches no rule keeps your existing settings, which hold requests unless auto-approve is on. A routing log shows every request, the rule that caught it and whether it was sent on or held."
+    },
+    {
+      "icon": "rocket",
+      "title": "Ops Copilot Preview",
+      "body": "Server → Ops Copilot lets admins ask plain questions like “why is Dune buffering for Mum?”, “free 500 GB without touching favourites” or “anything stuck in downloads?”. It explains transcodes, library space and download health from your own data, and anything that would change something is shown as a dry-run plan you approve or cancel. Pausing a stalled download and messaging a session can run after approval (pauses can be undone); deletions stay as proposals for now. Every question and decision is kept in an audit log."
+    },
+    {
+      "icon": "mail",
+      "title": "Wrapped Recaps By Email Or Webhook",
+      "body": "Statistics → Recap now lets you schedule a weekly or monthly Wrapped for any user, with top shows, hours watched and the busiest day. Recaps arrive by email or on one of your webhooks as soon as each week or month finishes, with the recap card attached. Users can set up email delivery of their own recap, and Send now resends the last finished period whenever you like."
+    },
+    {
+      "icon": "rocket",
+      "title": "Meet Blobbo",
+      "body": "Blobbo, a friendly little jellyfish, now floats in the corner of your dashboard. Tap it, or press Shift+A anywhere to say hello, for tips, quick links and answers about your server. Its chat now matches your chosen theme colours, it stays still if you prefer reduced motion, and you can show or hide it under Settings → General. Blobbo's idle animation now has a properly transparent background, so the dark square behind it is gone."
+    },
+    {
+      "icon": "chat",
+      "title": "Ask Blobbo About Your Server",
+      "body": "Ask who is watching, how busy today was, how much space your libraries take up, what is new, who watches most, whether everything is healthy, if downloads are stuck, or if you are up to date. Blobbo now understands far more ways of asking, gives clearer answers straight from your server data, and always links to the full page. Tap a topic chip or type your own question."
+    },
+    {
+      "icon": "movie",
+      "title": "Find A Title With Blobbo",
+      "body": "Ask Blobbo to find a film or show, for example “find Dune” or “do I have The Expanse?”, and it lists the matches from your libraries. Each result, and titles in answers about what is playing, what is new and what is most watched, comes with Open in… buttons that take you straight to the title in Barracks or Jellyfin."
+    },
+    {
+      "icon": "chat",
+      "title": "Blobbo Remembers And Suggests",
+      "body": "After each answer Blobbo offers a few follow-up questions to tap. Your last five questions stay in this browser so you can ask them again in one tap, and More topics shows everything Blobbo knows. Ask Blobbo to explain the page you are on, and look for the Ask Blobbo button beside it on every page."
+    },
+    {
+      "icon": "users",
+      "title": "Digests And Picks",
+      "body": "Ask what changed since yesterday, for a weekend digest, who has been offline, what is trending, for something to watch from your newest arrivals, for titles similar to your taste, or about your achievement badges."
+    },
+    {
+      "icon": "shield",
+      "title": "Troubleshooting With Blobbo",
+      "body": "Blobbo can explain why something is buffering, why a download failed, how scheduled tasks are doing, whether new devices have joined and whether remote access looks right. It can also hunt for duplicate films and empty series, draw a storage per library pie and a transcode heat map. Its mood now follows server health, so a worried Blobbo means a check needs a look."
+    },
+    {
+      "icon": "rocket",
+      "title": "Getting To Know Blobbo",
+      "body": "New installs get a short guided tour and an optional setup quiz, there is a tip of the day when you sign in, and Blobbo says welcome back after an upgrade. Under Options you can turn on kids-safe answers, have answers read aloud and let Blobbo wear seasonal outfits. Tips can now be translated."
+    },
+    {
+      "icon": "shield",
+      "title": "Cleanuparr Integration",
+      "body": "Connect Cleanuparr under Integrations → 3rd party apps to see its strikes, removals, cleaned downloads and client and arr health on the Downloads page. Point Cleanuparr's Gotify notifications at Barracks and downloads it is already handling are tagged instead of raising stuck download alerts, while failed imports, errored downloads and repeated stalls alert you because they need a look."
+    }
+  ],
+  "1.4.0": [
+    {
+      "icon": "rocket",
+      "title": "Made For Phones And Tablets",
+      "body": "Phones and smaller tablets get a bottom tab bar, with More for the rest of your pages, your account and Install app. The main pages have proper phone and tablet layouts, detail pages get a back button, and installing as an app is cleaner. Desktop is unchanged."
+    },
+    {
+      "icon": "shield",
+      "title": "Safer Single Sign-On",
+      "body": "OIDC sign-in now properly checks every login with your provider's signing keys, so a forged or replayed login can't get in. Accounts are linked more carefully, so a matching username at the provider can't take over an existing account, and you can map provider groups to Barracks roles."
+    },
+    {
+      "icon": "users",
+      "title": "Viewers See Only Their Own Activity",
+      "body": "Viewers now only see their own history, stats, wrap-up and profile, across the Activity page, the most active lists and the Timeline. Opening someone else's profile shows Profile not available. Owners, admins and managers still see everyone, as before."
+    },
+    {
+      "icon": "shield",
+      "title": "Locked-Down Media Server Checks",
+      "body": "Only admins can change or test the media server address, and those checks refuse loopback, link-local and cloud metadata addresses. Running Jellyfin or Emby on the same host? Set JS_ALLOW_LOOPBACK_MEDIA_SERVER=true. LAN servers work as before."
+    },
+    {
+      "icon": "movie",
+      "title": "Every Stream Counted",
+      "body": "When one person or device plays more than one thing at once, each stream now gets its own history entry, watch time and start and stop notifications. Stopping one stream no longer ends or silences the other."
+    },
+    {
+      "icon": "speed",
+      "title": "Faster Stats And Optional History Clean-Up",
+      "body": "Views over time and Popular days now load several times faster on big libraries, with the same numbers. You can also trim old per-play history under Settings → Health → Playback History Retention. It's off by default and permanent, so back up first."
+    },
+    {
+      "icon": "chat",
+      "title": "Smarter Alert Rules",
+      "body": "Alerts can now fire on events too: a new user, the media server going down or coming back, new library items or a new device. Each rule can post to Discord, Gotify or a webhook, with its own cooldown and a Send test button. Existing rules keep working as before."
+    },
+    {
+      "icon": "movie",
+      "title": "Books, Photos, Trailers And Home Videos",
+      "body": "Music video, home video, book, audiobook, photo and trailer libraries now sync properly instead of showing as empty, and they get their own icons, labels and counts across the library pages and stats."
+    },
+    {
+      "icon": "magic",
+      "title": "Redesigned Plugins Page",
+      "body": "The Jellyfin plugins page shows a clear status for every plugin, groups duplicate copies left behind by updates, counts only plugins that are really running, and adds search and filters."
+    },
+    {
+      "icon": "palette",
+      "title": "Home Keeps Your Layout",
+      "body": "Your saved Home layout, pins and sizes now survive updates and expired sign-ins. Active sessions stays at the top of the built-in layouts even when requests need attention, and the layout editor shows the full width labels again."
+    },
+    {
+      "icon": "palette",
+      "title": "Tidier Media Server Settings",
+      "body": "The Jellyfin Connection card has the form and the connection status side by side, a hidden saved API key, Test connection and Update in one row, and a clearer pass, warning or fail result for each check."
+    },
+    {
+      "icon": "chat",
+      "title": "45 More Languages",
+      "body": "Barracks now speaks 55 languages, with 45 new ones including Japanese, Korean, Hindi, Dutch, Swedish, Turkish and Brazilian Portuguese. Pick yours from the language picker, where each one is listed under its own name. Arabic, Hebrew, Persian and Urdu switch the whole layout to right-to-left."
+    },
+    {
+      "icon": "chat",
+      "title": "More Of Barracks In Your Language",
+      "body": "Dates and numbers now follow the language you pick. The user wrap-up, profile rails and Wizarr invites are translated, the wrap-up is in German, the connection test is in Czech, and Wizarr's invite buttons have clear screen reader labels."
+    },
+    {
+      "icon": "speed",
+      "title": "Smaller Fixes",
+      "body": "crypto-js is gone, and older newsletter SMTP passwords are upgraded next time you save. The About page lists every contributor, and Documentation opens docs.jellyglance.com. Nothing to change on your side, just update and restart."
+    }
+  ],
+  "1.3.4": [
+    {
+      "icon": "magic",
+      "title": "Test Your Media Server Connection",
+      "body": "Settings → Media server now has a Test connection panel for admins. It checks the saved Jellyfin or Emby address and API key live and tells you in plain language what is wrong, instead of leaving you with empty lists and a 404 in the logs."
+    },
+    {
+      "icon": "download",
+      "title": "Deluge 2 Connection Test Fixed",
+      "body": "Testing a Deluge 2.x download client no longer fails with \"Unknown method\". Older Deluge 1.3 setups keep working too."
+    },
+    {
+      "icon": "shield",
+      "title": "Safer Media Server Checks",
+      "body": "Only admins can change or check the media server address now, and Barracks refuses to send those checks to loopback, link-local or cloud metadata addresses or follow redirects. Media servers on your LAN work exactly as before."
+    },
+    {
+      "icon": "speed",
+      "title": "Cleaner Restarts",
+      "body": "When the container stops or restarts, Barracks now stops its background tasks and closes the database connection cleanly, so restarts are quicker and tidier."
+    },
+    {
+      "icon": "rocket",
+      "title": "Dependency Updates",
+      "body": "React 19.3.1, js-yaml 5.5.0, qs 6.16.1 and a refreshed Node base image. Nothing to change on your side, just update and restart."
+    }
+  ],
+  "1.3.3": [
+    {
+      "icon": "download",
+      "title": "Now On The New Image Only",
+      "body": "From v1.3.3, updates are only published to ghcr.io/jellyglance/server:latest. If you are still on the old image, change the image: line in your docker-compose file (or your docker run command) to it, then pull and restart. Your settings and history stay as they are."
+    },
+    {
+      "icon": "shield",
+      "title": "Server Addresses With A Trailing Slash",
+      "body": "A Jellyfin or Emby address ending in / (for example http://192.168.1.10:8096/) no longer breaks user lists and other requests with 404 errors. Saved addresses and the JF_HOST setting are cleaned up automatically, and addresses with a subpath like /jellyfin keep working."
+    },
+    {
+      "icon": "magic",
+      "title": "New Project Home",
+      "body": "Barracks now lives at github.com/After-Shock/silo-barracks, with the guides at After-Shock/silo-barracks. Links in the app, README and issue forms point to the new locations, and old links redirect."
+    },
+    {
+      "icon": "speed",
+      "title": "Dependency Update",
+      "body": "fast-uri is updated to 4.2.2. Nothing to change on your side, just update and restart."
+    }
+  ],
+  "1.3.2": [
+    {
+      "icon": "download",
+      "title": "New Docker Image: Please Switch",
+      "body": "After v1.3.2, Barracks updates will only be published to the After-Shock/silo-barracks image, ghcr.io/jellyglance/server:latest. Change the image: line in your docker-compose file (or your docker run command) to it as soon as possible, then pull and restart. Settings shows a reminder until you have switched."
+    },
+    {
+      "icon": "chat",
+      "title": "Čeština",
+      "body": "Barracks now speaks Czech. Pick Čeština from the language menu to switch, with proper Czech plural forms throughout."
+    },
+    {
+      "icon": "users",
+      "title": "Easier To Report And Contribute",
+      "body": "The bug report, feature, docs and integration request forms are back on GitHub, and labels, assignments and bot comments now work on pull requests from forks."
+    },
+    {
+      "icon": "magic",
+      "title": "A Leaner Repository",
+      "body": "The jellyglance.com website now lives in its own After-Shock/silo-barracks repository, keeping this one focused on the app. Nothing to change on your side, just update and restart."
+    }
+  ],
+  "1.3.1": [
+    {
+      "icon": "shield",
+      "title": "Security Patches",
+      "body": "proxy-addr is updated to 2.0.8 and sharp to 0.35.5 to fix a reported vulnerability, with source-map-js and shell-quote also moved to patched versions."
+    },
+    {
+      "icon": "speed",
+      "title": "Fresher Foundations",
+      "body": "An updated Node base image, a cleaner lockfile and the latest MUI icons, ESLint and build tooling. Nothing to change on your side, just update and restart."
+    }
+  ],
+  "1.3.0": [
+    {
+      "icon": "rocket",
+      "title": "Emby Support",
+      "body": "Pick Jellyfin or Emby during setup, or let Barracks detect it for you. Emby installs sign in with their Emby username and password, can import history from the Emby Playback Reporting plugin, and see Emby wording throughout."
+    },
+    {
+      "icon": "chat",
+      "title": "Audiobookshelf",
+      "body": "Connect Audiobookshelf under Settings > Integrations > 3rd party apps to see who is listening, recent sessions, library totals and newly added books under Server > Audiobooks."
+    },
+    {
+      "icon": "movie",
+      "title": "Weekly And Monthly Recaps",
+      "body": "The Recap tab now covers a week, a month or a year. Step back through past periods and tap Share card to save a ready-to-post image of any recap."
+    },
+    {
+      "icon": "shield",
+      "title": "Custom Alert Rules",
+      "body": "Build your own alerts for active streams, transcodes, one user running several streams, bandwidth, disk space or the download queue, with optional active hours. Presets cover late-night streaming and account sharing."
+    },
+    {
+      "icon": "speed",
+      "title": "Faster, Steadier Under The Hood",
+      "body": "Fixes for integrations on custom ports, tighter protection of saved API keys and secrets, no more blank pages after quick reloads, a setup wizard that works on smaller screens, a single MUI version and new automated tests."
+    }
+  ],
+  "1.2.11": [
+    {
+      "icon": "magic",
+      "title": "Statistics, Users And Server Hubs",
+      "body": "The side menu is tidier. Related pages now sit as tabs under Statistics, Users and Server, and old links still take you to the right place."
+    },
+    {
+      "icon": "movie",
+      "title": "Year In Review And Insights",
+      "body": "See your year in review, a library health report, stream and transcode insights, and shows you have started but not finished."
+    },
+    {
+      "icon": "rocket",
+      "title": "Achievements And Watch Goals",
+      "body": "My Glance now has 13 badges with Bronze to Platinum tiers, a yearly watch goal, and “Because you watched” suggestions."
+    },
+    {
+      "icon": "speed",
+      "title": "Public Status Page",
+      "body": "Build a public status page from blocks in Settings, with a live preview and regular Jellyfin uptime checks. Threshold alerts warn you when things go wrong."
+    },
+    {
+      "icon": "users",
+      "title": "Request Rules And Quotas",
+      "body": "Set per-user request quotas and auto-approve rules. The Requests page adds summary tiles, Approve all pending, and a Movies/TV filter."
+    },
+    {
+      "icon": "upload",
+      "title": "Jellyfin And Trakt Imports",
+      "body": "Pull watch history in from Jellyfin or Trakt. All imports now run in the background with a progress bar."
+    },
+    {
+      "icon": "chat",
+      "title": "Notifications, Webhooks And Newsletters",
+      "body": "Notifications arrive in-app, on desktop or on mobile with per-type toggles. Webhooks get richer Discord and Gotify cards, and newsletters have a block-based builder."
+    },
+    {
+      "icon": "palette",
+      "title": "Install Barracks As An App",
+      "body": "Add Barracks to your phone or desktop as an app (needs HTTPS). Settings also has a search box to find any option fast."
+    },
+    {
+      "icon": "shield",
+      "title": "Fixes And Privacy",
+      "body": "NZBGet now signs in with a username and password. Year in review and Up next only show people their own data unless they are an admin."
+    },
+    {
+      "icon": "shield",
+      "title": "Hardened API",
+      "body": "Every medium, high, and critical CodeQL finding is closed. Outbound requests go through one sanitised helper, and static routes are rate limited."
+    },
+    {
+      "icon": "shield",
+      "title": "Stronger Sign-In",
+      "body": "Passwords use scrypt only and sessions expire after 12 hours. Accounts still on the old SHA3 hash need a password reset."
+    },
+    {
+      "icon": "rocket",
+      "title": "Unraid And Proxmox",
+      "body": "Install from Unraid Community Apps templates or spin up a Proxmox LXC with the new packaging scripts."
+    },
+    {
+      "icon": "speed",
+      "title": "Nightly Builds",
+      "body": "A nightly GHCR image tracks main. Images run Node 25 on amd64 and arm64, and Node 22 on arm/v7."
+    },
+    {
+      "icon": "magic",
+      "title": "Docs Have A New Home",
+      "body": "Documentation now lives in its own repository and is published at jellyglance.com."
+    },
+    {
+      "icon": "palette",
+      "title": "Fresher Foundations",
+      "body": "MUI 9, Vite 8, and ESLint 10, with Renovate keeping dependencies current from here on."
+    }
+  ],
+  "1.2.10": [
+    {
+      "icon": "rocket",
+      "title": "Token Widget API",
+      "body": "Homarr and Homepage poll compact JSON for sessions, queues, catalog, requests, and ops — real Glance data, not a health ping."
+    },
+    {
+      "icon": "shield",
+      "title": "Widgets-Only API Keys",
+      "body": "New keys default to GET widget routes only. Full keys keep the previous /api behaviour. Existing keys stay full until you change them."
+    },
+    {
+      "icon": "magic",
+      "title": "Homarr And Homepage Kit",
+      "body": "Copy or download 36 Homarr widgets and a Homepage YAML pack from Settings → API Key. Homarr never stores the key in the file — paste x-api-token after import."
+    },
+    {
+      "icon": "movie",
+      "title": "Now Playing, Repair, Issues",
+      "body": "New tiles for live sessions, repair counts, weekly stats, Seerr issues, newsletter, and Jellyfin jobs. Item glance stays Homarr-only."
+    },
+    {
+      "icon": "palette",
+      "title": "API Key Page",
+      "body": "Keys show last used and scope. Widget files sit in grouped rows with a filter. Swagger opens in its own tab instead of an iframe."
+    },
+    {
+      "icon": "speed",
+      "title": "Try Routes In Swagger",
+      "body": "Authorize with x-api-token and use the Widgets tag, or try a route from Settings. Standalone UI is at /swagger-ui."
+    }
+  ],
+  "1.2.9": [
+    {
+      "icon": "download",
+      "title": "Full Download Client Queues",
+      "body": "Transmission, Deluge, NZBGet, and rTorrent now poll, add, pause, and remove like qBittorrent and SABnzbd."
+    },
+    {
+      "icon": "movie",
+      "title": "Session Command",
+      "body": "Owners and admins can stop a live stream or send an on-screen Jellyfin message. Cards explain why a session is transcoding."
+    },
+    {
+      "icon": "speed",
+      "title": "Stream Capacity on Home",
+      "body": "Watch concurrent streams versus a configured cap, split transcode vs direct play, and alert when you go over."
+    },
+    {
+      "icon": "magic",
+      "title": "Honest Navigation",
+      "body": "Timeline sits in the main menu. Calendar stays hidden until Sonarr, Radarr, or Lidarr is connected. SickChill is health-only."
+    },
+    {
+      "icon": "upload",
+      "title": "ntfy and Telegram Alerts",
+      "body": "Webhooks can deliver the same events to ntfy topics and Telegram bots alongside Discord and Gotify."
+    },
+    {
+      "icon": "rocket",
+      "title": "Installable Dashboard",
+      "body": "Barracks can be installed as a standalone PWA for phone or kiosk home screens."
+    },
+    {
+      "icon": "movie",
+      "title": "Item Glance And My Glance",
+      "body": "Item pages stitch Jellyfin, Seerr, Arr, downloads, Tdarr, and Maintainerr. Viewers get a My Glance page for continue watching, watchlist, and their requests."
+    },
+    {
+      "icon": "speed",
+      "title": "Ops Digest And Storage",
+      "body": "Home surfaces stuck downloads, webhook failures, live Jellyfin jobs, and on-disk library size with an Arr upcoming-size estimate."
+    },
+    {
+      "icon": "upload",
+      "title": "Pushover, Readarr, And Widgets",
+      "body": "Webhooks can target Pushover. Readarr joins the Arr calendar. Homepage can poll /api/widgets/homepage with an API key. Unpackerr and Kometa connect as health pings."
+    },
+    {
+      "icon": "hammer",
+      "title": "Playback Quality Repair",
+      "body": "Repair Hub lists clients that keep transcoding and titles that fail to start, with jumps into Activity."
+    },
+    {
+      "icon": "download",
+      "title": "Retry Grab And S3 Backups",
+      "body": "Retry a failed Arr/Seerr grab from item glance or Downloads. Backups can copy to S3-compatible storage. autobrr, Notifiarr, and Recyclarr connect as status integrations."
+    },
+    {
+      "icon": "upload",
+      "title": "Quiet Hours And Ops Shortcuts",
+      "body": "Mute overnight playback webhooks, send a morning digest of what you missed, retry a failed delivery from Health, refresh or scan in Jellyfin, and see who is watching now. Downloads show why a torrent stalled. Nav and Home warn when Jellyfin is down."
+    },
+    {
+      "icon": "palette",
+      "title": "Themes That Follow You",
+      "body": "Search and preview palettes in Settings or the account menu. Apply when you are ready. The chosen theme is stored on your account so it comes back on another device."
+    },
+    {
+      "icon": "speed",
+      "title": "Jellyfin Job Schedules",
+      "body": "Set daily, weekly, interval, or startup times for Jellyfin library scans, metadata, and other scheduled jobs from Settings. The Jellyfin Jobs page shows those times and still lets you run a job now."
+    },
+    {
+      "icon": "users",
+      "title": "Jellyfin Admins On Users",
+      "body": "Server administrators show up on Users again, with a Jellyfin admin badge when their Glance role is not Admin."
+    },
+    {
+      "icon": "upload",
+      "title": "Tighter Discord Cards",
+      "body": "Playback and status webhook images wrap long titles instead of clipping, on a smaller card that fits Discord better."
+    },
+    {
+      "icon": "movie",
+      "title": "Cleaner Tdarr Labels",
+      "body": "Active Transcodes no longer prints [object Object] for format, status, or reason — those fields resolve to readable text."
+    },
+    {
+      "icon": "palette",
+      "title": "Desktop Layout Without Zoom",
+      "body": "Desktop pages no longer look zoomed or soft. Type, spacing, and the sidebar stay sharp and a bit denser."
+    },
+    {
+      "icon": "magic",
+      "title": "Quick Connect Starts Itself",
+      "body": "Login with Jellyfin Quick Connect now begins the approval flow as soon as the page is ready."
+    }
+  ],
+  "1.2.8": [
+    {
+      "icon": "shield",
+      "title": "More Stable Under Playback Load",
+      "body": "Webhook bursts and overlapping playback activity no longer crash-loop Barracks. Materialized view refreshes are debounced and run in a safer order."
+    },
+    {
+      "icon": "upload",
+      "title": "Richer Discord and Gotify Alerts",
+      "body": "Playback and download webhooks can send poster cards (with the viewer avatar on Discord). Session flicker spam is filtered, episode starts notify cleanly, and Gotify gets image-friendly extras when your server supports them."
+    },
+    {
+      "icon": "rocket",
+      "title": "Skip the First-Run Wizard",
+      "body": "Docker and Compose installs can seed Jellyfin plus a local admin from environment variables and optionally skip first-run extras, restore a backup on first run, and start the initial sync automatically."
+    },
+    {
+      "icon": "chat",
+      "title": "Requests Pipeline and Seerr Issues",
+      "body": "Requests show a clearer requested → approved → grabbed → available timeline, with stage filters, richer cards, and an admin Issues inbox for Overseerr/Jellyseerr reports."
+    },
+    {
+      "icon": "users",
+      "title": "Per-User Request Folders",
+      "body": "Set Films and TV root-folder overrides from the cog on user cards. Saving syncs open Seerr requests and moves linked Radarr/Sonarr titles onto those paths."
+    },
+    {
+      "icon": "mail",
+      "title": "Multi-Campaign Newsletters",
+      "body": "Create global, role-based, and personal newsletter campaigns with shared SMTP, section toggles, preview, and scheduled weekly or monthly sends."
+    },
+    {
+      "icon": "movie",
+      "title": "Downloads and Sessions Polish",
+      "body": "Remove items from the Downloads queue when supported, while Active Sessions cards truncate long titles and stream labels cleanly on desktop and mobile."
+    },
+    {
+      "icon": "speed",
+      "title": "Snappier Loads and Steadier Integrations",
+      "body": "Vendor chunks split further, common routes preload after login, Home/Requests responses cache briefly, and outbound HTTPS prefers IPv4 so Cloudflare-hosted Seerr/Arr hosts are more reliable on IPv6-less networks."
+    },
+    {
+      "icon": "magic",
+      "title": "Release and CI Tooling",
+      "body": "PR validation checks and dedicated GitHub Action bots are in place, and the release pipeline commits package version bumps so the app version matches the published GitHub tag."
+    }
+  ],
+  "1.2.7": [
+    {
+      "icon": "palette",
+      "title": "Ten New Themes",
+      "body": "Sakura, Volcanic, Deep Sea, Honey, Plasma, Moss, Paper, Electric Blue, Tangerine, and Violet Night are now available in Settings and the profile theme menu."
+    },
+    {
+      "icon": "movie",
+      "title": "Richer Active Session Cards",
+      "body": "Active session cards now show transcoded progress as a lighter progress-bar overlay, while expanded cards include the viewer profile picture and a client icon beside the client details."
+    },
+    {
+      "icon": "magic",
+      "title": "A Note About Today's Updates",
+      "body": "We are sorry for the three updates in one day. Route and proxy changes touched the frontend, API, authentication, artwork, activity, and third-party integrations together, so several quick releases were needed while those connected response paths were brought back into sync."
+    },
+    {
+      "icon": "speed",
+      "title": "More Reliable Pages",
+      "body": "Activity now avoids blank loading states and theme-related table crashes, while release notes continue to work when GitHub is rate-limited or older beta version names are present."
+    },
+    {
+      "icon": "palette",
+      "title": "Mobile Navigation Polish",
+      "body": "Mobile navigation and Settings tabs now stay within the viewport, scroll horizontally when needed, and no longer overlap the page content. Home cards and transcode cards are also more compact on smaller screens."
+    }
+  ],
+  "1.2.6": [
+    {
+      "icon": "palette",
+      "title": "Ten New Themes",
+      "body": "Sakura, Volcanic, Deep Sea, Honey, Plasma, Moss, Paper, Electric Blue, Tangerine, and Violet Night are now available in Settings and the profile theme menu."
+    },
+    {
+      "icon": "movie",
+      "title": "Richer Active Session Cards",
+      "body": "Active session cards now show transcoded progress as a lighter progress-bar overlay, while expanded cards include the viewer profile picture and a client icon beside the client details."
+    },
+    {
+      "icon": "magic",
+      "title": "A Note About Today's Updates",
+      "body": "We are sorry for the three updates in one day. Route and proxy changes touched the frontend, API, authentication, artwork, activity, and third-party integrations together, so several quick releases were needed while those connected response paths were brought back into sync."
+    },
+    {
+      "icon": "speed",
+      "title": "More Reliable Pages",
+      "body": "Activity now avoids blank loading states and theme-related table crashes, while release notes continue to work when GitHub is rate-limited or older beta version names are present."
+    }
+  ],
+  "1.2.5": [
+    {
+      "icon": "speed",
+      "title": "Tdarr Queue Rows",
+      "body": "Queued Tdarr files now come from the same paged client data used by the Tdarr UI, so the Queue tab shows real media instead of only an aggregate count."
+    },
+    {
+      "icon": "movie",
+      "title": "Tdarr History Rows",
+      "body": "Finished and errored Tdarr jobs now display as history cards with the media name, posters, backdrops, finished format, source format, size changes, and saved space."
+    },
+    {
+      "icon": "magic",
+      "title": "Tdarr Refresh Reliability",
+      "body": "Active, queued, and history response mapping now keeps worker progress, queue rows, history rows, and summary counts in the correct views."
+    },
+    {
+      "icon": "speed",
+      "title": "Tdarr Endpoint Handling",
+      "body": "Tdarr refreshes no longer wait on the slow full database dump or blocking job-report lookups, keeping the dashboard responsive when optional endpoints are slow."
+    },
+    {
+      "icon": "movie",
+      "title": "Tdarr Active Artwork",
+      "body": "Active transcode posters and backdrops now stay matched during live polling refreshes instead of disappearing between updates."
+    }
+  ],
+  "1.2.3": [
+    {
+      "icon": "magic",
+      "title": "3rd Party Apps",
+      "body": "Barracks now pulls Wizarr invites, Tdarr transcodes, Maintainerr cleanup, and SickChill series automation into one clearer `3rd party apps` setup area."
+    },
+    {
+      "icon": "upload",
+      "title": "Wizarr Invites",
+      "body": "Create, copy, open, and manage Wizarr invites directly in Barracks without bouncing out to another app."
+    },
+    {
+      "icon": "speed",
+      "title": "Tdarr And Maintainerr",
+      "body": "Tdarr now has clearer active, queued, and history views, while Maintainerr adds cleanup monitoring, summary data, alerts, widgets, and its own dashboard page."
+    },
+    {
+      "icon": "palette",
+      "title": "Settings And Kiosk",
+      "body": "Settings now uses cleaner categories with a collapsible sidebar, and Kiosk has its own custom controls for title, density, theme, visible widgets, widget sizes, and widget order."
+    },
+    {
+      "icon": "palette",
+      "title": "Home And Hall Of Fame",
+      "body": "Hall of Fame has been polished up, and Home plus Kiosk now give you better widget ordering, layout control, and dashboard customisation."
+    },
+    {
+      "icon": "movie",
+      "title": "Requests Upgraded",
+      "body": "Requests now has a richer display, newer features, and more advanced management controls for handling request queues and approvals."
+    },
+    {
+      "icon": "speed",
+      "title": "Activity And Statistics",
+      "body": "The `/activity` view is cleaner to scan, and `/statistics` now presents summaries and watch trends with stronger visual structure."
+    },
+    {
+      "icon": "magic",
+      "title": "Profiles And Privacy",
+      "body": "The profile modal has been cleaned up, logout now lives there, font-weight options are available, and Active Sessions privacy controls let you choose where viewer IPs are hidden."
+    },
+    {
+      "icon": "upload",
+      "title": "Libraries And Users",
+      "body": "Libraries and Users both had a broader UI overhaul, including better list views and the option to hide selected users from stats and activity when needed."
     }
   ],
   "1.2.3.beta.1": [
     {
       "icon": "palette",
       "title": "Big UI Beta",
-      "body": "Home, Settings, Statistics, Requests, Activity, Users, Wizarr, About, and integrations have all had a proper redesign pass with cleaner spacing, cards, and controls."
+      "body": "Home, Settings, Statistics, Requests, Activity, Users, Libraries, Hall of Fame, Wizarr, About, and integrations all had a broader redesign pass with cleaner spacing, cards, controls, and layout polish."
     },
     {
       "icon": "speed",
@@ -20,32 +872,37 @@
     {
       "icon": "magic",
       "title": "Smarter Settings",
-      "body": "Settings now uses stable grouped sections, cleaner routes, Kiosk controls, privacy options, sidebar ordering, hidden tabs, and a safer theme preview flow."
+      "body": "Settings now uses grouped categories, a collapsible sidebar, cleaner routes, custom Kiosk controls, privacy options, sidebar ordering, hidden tabs, and a safer theme preview flow."
+    },
+    {
+      "icon": "magic",
+      "title": "3rd Party Apps",
+      "body": "Integrations are grouped more clearly with Wizarr for invites, Tdarr for transcodes, Maintainerr for cleanup, and SickChill as an alternative to Sonarr for series automation."
     },
     {
       "icon": "movie",
       "title": "Cleaner Requests",
-      "body": "Requests now has richer media cards, an optional list view, requester profile pictures, admin user filtering, tidier actions, and user-scoped visibility for non-admins."
+      "body": "Requests now has richer media cards, an optional list view, requester profile pictures, admin user filtering, tidier actions, newer request features, and more advanced management for admins."
     },
     {
       "icon": "upload",
       "title": "Kiosk And Privacy",
-      "body": "Kiosk mode can stay static, refresh every 5 minutes, and show only enabled sections. IP visibility can now be controlled for Home, Kiosk, both, or neither."
+      "body": "Kiosk mode can stay static, refresh every 5 minutes, and use custom title, density, theme, visible widgets, widget sizes, and widget order. IP visibility can now be controlled for Home, Kiosk, both, or neither."
     },
     {
       "icon": "palette",
       "title": "Hall Of Fame Glow-Up",
-      "body": "Hall of Fame now uses a podium-style layout with medal icons, and hidden users are filtered out of Hall of Fame and Activity."
+      "body": "Hall of Fame now uses a podium-style layout with medal icons, and hidden users can be filtered out of Hall of Fame, Statistics, and Activity."
     },
     {
       "icon": "speed",
       "title": "Statistics Rebuilt",
-      "body": "Statistics has clearer summary panels, redesigned watch stats, profile pictures, client icons, and media links through to Barracks media pages where possible."
+      "body": "Statistics has clearer summary panels, redesigned watch stats, profile pictures, client icons, stronger visual hierarchy, and media links through to Barracks media pages where possible."
     },
     {
       "icon": "magic",
       "title": "Sharper Polish",
-      "body": "Profile modal sizing, account labels, sidebar collapse, profile hover pills, device icons, backup sizing, and several clipped or cramped layouts have been cleaned up."
+      "body": "Profile modal sizing, account labels, sidebar collapse, logout placement, profile hover pills, device icons, backup sizing, library and user list layouts, and several clipped or cramped screens have been cleaned up."
     }
   ],
   "1.2.2": [

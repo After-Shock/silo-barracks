@@ -2,6 +2,7 @@ const express = require("express");
 const { Pool } = require("pg");
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
 const { randomUUID } = require("crypto");
 const multer = require("multer");
 const jwt = require("jsonwebtoken");
@@ -12,13 +13,16 @@ const taskstate = require("../logging/taskstate");
 const taskName = require("../logging/taskName");
 const sanitizeFilename = require("../utils/sanitizer");
 const { getBackupDir } = require("../utils/storage-paths");
+const { assertPathInside, safeJoin, fileRateLimit } = require("../utils/security");
 const db = require("../db");
 const { addAuditEntry } = require("../classes/admin-history");
 const { tables } = require("../global/backup_tables");
+const configClass = require("../classes/config");
 
 const { sendUpdate } = require("../ws");
 
 const router = express.Router();
+router.use(fileRateLimit);
 const TaskManager = require("../classes/task-manager-singleton");
 const TaskScheduler = require("../classes/task-scheduler-singleton");
 const restorableTables = new Set(tables.map((table) => table.value));
@@ -34,9 +38,10 @@ const jwtSecret = process.env.JWT_SECRET;
 
 // Restore function
 
-function readFile(path) {
+function readFile(filePath) {
+  const safePath = assertPathInside(getBackupDir(), filePath);
   return new Promise((resolve, reject) => {
-    fs.readFile(path, "utf8", (err, data) => {
+    fs.readFile(safePath, "utf8", (err, data) => {
       if (err) {
         reject(err);
         return;
@@ -118,7 +123,75 @@ function getBackupTableEntry(table) {
   return { tableName, data };
 }
 
-async function restore(file, refLog) {
+const RESTORE_BATCH_SIZE = Number(process.env.RESTORE_BATCH_SIZE || 500);
+
+function normalizeRestoreValue(value) {
+  return value && typeof value === "object" ? JSON.stringify(value) : value;
+}
+
+async function insertRestoreRows(pool, tableName, tableColumns, data, skippedColumns) {
+  let restoredRows = 0;
+  const validRows = [];
+  const usedColumns = new Set();
+
+  for (const row of data) {
+    if (!row || typeof row !== "object" || Array.isArray(row)) {
+      continue;
+    }
+
+    const rowKeys = Object.keys(row);
+    const filteredKeys = rowKeys.filter((key) => tableColumns.has(key));
+    const ignoredKeys = rowKeys.filter((key) => !tableColumns.has(key));
+
+    if (ignoredKeys.length > 0) {
+      skippedColumns[tableName] = Array.from(new Set([...(skippedColumns[tableName] || []), ...ignoredKeys]));
+    }
+
+    if (filteredKeys.length === 0) {
+      continue;
+    }
+
+    filteredKeys.forEach((key) => usedColumns.add(key));
+    validRows.push(row);
+  }
+
+  if (validRows.length === 0) {
+    return 0;
+  }
+
+  const keys = [...usedColumns].sort();
+  const keyString = keys.map(quoteIdentifier).join(", ");
+  // App config is a single-row table; always replace so auth/settings come back on restore.
+  const conflictClause =
+    tableName === "app_config"
+      ? `ON CONFLICT ("ID") DO UPDATE SET ${keys
+          .filter((key) => key !== "ID")
+          .map((key) => `${quoteIdentifier(key)} = EXCLUDED.${quoteIdentifier(key)}`)
+          .join(", ")}`
+      : "ON CONFLICT DO NOTHING";
+
+  for (let offset = 0; offset < validRows.length; offset += RESTORE_BATCH_SIZE) {
+    const batch = validRows.slice(offset, offset + RESTORE_BATCH_SIZE);
+    const values = [];
+    let paramIndex = 1;
+    const rowPlaceholders = batch.map((row) => {
+      const placeholders = keys.map((key) => {
+        values.push(Object.prototype.hasOwnProperty.call(row, key) ? normalizeRestoreValue(row[key]) : null);
+        return `$${paramIndex++}`;
+      });
+      return `(${placeholders.join(", ")})`;
+    });
+
+    const query = `INSERT INTO ${quoteIdentifier(tableName)} (${keyString}) VALUES ${rowPlaceholders.join(", ")} ${conflictClause}`;
+    const result = await pool.query(query, values);
+    restoredRows += result.rowCount;
+  }
+
+  return restoredRows;
+}
+
+async function restore(file, refLog, options = {}) {
+  const deferViewRefresh = options.deferViewRefresh === true;
   refLog.logData.push({ color: "lawngreen", Message: "Starting Restore" });
   refLog.logData.push({
     color: "yellow",
@@ -128,7 +201,6 @@ async function restore(file, refLog) {
   let jsonData;
 
   try {
-    // Use await to wait for the Promise to resolve
     jsonData = await readFile(file);
   } catch (err) {
     refLog.logData.push({
@@ -137,6 +209,9 @@ async function restore(file, refLog) {
     });
     Logging.updateLog(refLog.uuid, refLog.logData, taskstate.FAILED);
     console.error(err);
+    if (err instanceof SyntaxError) {
+      throw new Error("Backup file is not valid JSON. Re-export the backup or upload a complete .json file.");
+    }
     throw err;
   }
 
@@ -195,46 +270,36 @@ async function restore(file, refLog) {
       refLog.logData.push({
         color: "dodgerblue",
         key: tableName,
-        Message: `Restoring ${tableName}`,
+        Message: `Restoring ${tableName} (${data.length.toLocaleString()} rows)`,
       });
-      for (let index in data) {
-        const row = data[index];
+      console.log(`[BACKUP] Restoring ${tableName} (${data.length.toLocaleString()} rows)...`);
+      const tableStartedAt = Date.now();
+      restoredRows += await insertRestoreRows(pool, tableName, tableColumns, data, skippedColumns);
+      console.log(`[BACKUP] Finished ${tableName} in ${((Date.now() - tableStartedAt) / 1000).toFixed(1)}s`);
+    }
 
-        if (!row || typeof row !== "object" || Array.isArray(row)) {
-          continue;
-        }
-
-        const rowKeys = Object.keys(row);
-        const filteredKeys = rowKeys.filter((key) => tableColumns.has(key));
-        const ignoredKeys = rowKeys.filter((key) => !tableColumns.has(key));
-
-        if (ignoredKeys.length > 0) {
-          skippedColumns[tableName] = Array.from(new Set([...(skippedColumns[tableName] || []), ...ignoredKeys]));
-        }
-
-        if (filteredKeys.length === 0) {
-          continue;
-        }
-
-        const keyString = filteredKeys.map(quoteIdentifier).join(", ");
-        const placeholders = filteredKeys.map((_, keyIndex) => `$${keyIndex + 1}`).join(", ");
-        const values = filteredKeys.map((key) => {
-          const value = row[key];
-          return value && typeof value === "object" ? JSON.stringify(value) : value;
+    if (deferViewRefresh) {
+      db.scheduleMaterializedViewRefreshes();
+      refLog.logData.push({
+        color: "yellow",
+        Message: "Scheduled materialized view refresh in background",
+      });
+    } else {
+      for (const view of db.materializedViews) {
+        const refresh = await db.refreshMaterializedView(view);
+        refLog.logData.push({
+          color: refresh.Result === "SUCCESS" ? "lawngreen" : "red",
+          Message: refresh.message,
         });
-
-        const query = `INSERT INTO ${quoteIdentifier(tableName)} (${keyString}) VALUES(${placeholders}) ON CONFLICT DO NOTHING`;
-        const result = await pool.query(query, values);
-        restoredRows += result.rowCount;
       }
     }
 
-    for (const view of db.materializedViews) {
-      const refresh = await db.refreshMaterializedView(view);
+    if (!restoredTables.includes("app_config")) {
       refLog.logData.push({
-        color: refresh.Result === "SUCCESS" ? "lawngreen" : "red",
-        Message: refresh.message,
+        color: "yellow",
+        Message: "Backup did not include app_config. Auth method was not restored — finish setup or re-save authentication.",
       });
+      console.warn("[BACKUP] Restore finished without app_config; auth method was not restored");
     }
 
     refLog.logData.push({ color: "lawngreen", Message: "Restore Complete" });
@@ -248,6 +313,81 @@ async function restore(file, refLog) {
     };
   } finally {
     await pool.end();
+  }
+}
+
+function createPool() {
+  return new Pool({
+    user: postgresUser,
+    password: postgresPassword,
+    host: postgresIp,
+    port: postgresPort,
+    database: postgresDatabase,
+    ...(process.env.POSTGRES_SSL_ENABLED === "true"
+      ? { ssl: { rejectUnauthorized: postgresSslRejectUnauthorized } }
+      : {}),
+  });
+}
+
+async function clearRestorableTables(pool) {
+  for (const tableName of restorableTables) {
+    const columns = await getTableColumns(pool, tableName);
+    if (!columns.size) continue;
+    await pool.query(`TRUNCATE TABLE ${quoteIdentifier(tableName)} CASCADE`);
+  }
+}
+
+async function assertFirstRunAvailable() {
+  const config = await new configClass().getConfig();
+  if (config.state != null && config.state >= 2) {
+    const error = new Error("Setup is already complete. Sign in instead, or restore backups from Settings > Backups.");
+    error.statusCode = 403;
+    throw error;
+  }
+}
+
+const firstRunRestoreStatus = {
+  status: "idle",
+  setupState: null,
+  restoredRows: 0,
+  error: null,
+  updatedAt: null,
+};
+
+function setFirstRunRestoreStatus(nextStatus) {
+  Object.assign(firstRunRestoreStatus, nextStatus, { updatedAt: new Date().toISOString() });
+}
+
+function getFirstRunRestoreStatusHandler(req, res) {
+  res.json(firstRunRestoreStatus);
+}
+
+async function runFirstRunRestore(filePath) {
+  const uuid = randomUUID();
+  const refLog = { logData: [], uuid };
+  Logging.insertLog(uuid, triggertype.Manual, taskName.restore);
+
+  const pool = createPool();
+  try {
+    await clearRestorableTables(pool);
+    refLog.logData.push({ color: "yellow", Message: "Cleared existing tables for first-run restore" });
+  } finally {
+    await pool.end();
+  }
+
+  try {
+    const restoreResult = await restore(filePath, refLog, { deferViewRefresh: true });
+    Logging.updateLog(uuid, refLog.logData, taskstate.SUCCESS);
+    const config = await new configClass().getConfig();
+    return {
+      ...restoreResult,
+      setupState: config.state ?? 0,
+      message: "Restore completed successfully",
+    };
+  } catch (error) {
+    refLog.logData.push({ color: "red", Message: `Restore failed: ${error.message}` });
+    Logging.updateLog(uuid, refLog.logData, taskstate.FAILED);
+    throw error;
   }
 }
 
@@ -294,16 +434,26 @@ router.get("/restore/:filename", async (req, res) => {
     const filename = sanitizeFilename(req.params.filename);
     const filePath = path.join(getBackupDir(), filename);
 
-    const restoreResult = await restore(filePath, refLog);
+    const pool = createPool();
+    try {
+      await clearRestorableTables(pool);
+      refLog.logData.push({ color: "yellow", Message: "Cleared existing tables before restore" });
+    } finally {
+      await pool.end();
+    }
+
+    const restoreResult = await restore(filePath, refLog, { deferViewRefresh: true });
     Logging.updateLog(uuid, refLog.logData, taskstate.SUCCESS);
     await addAuditEntry(req, "backup.restored", { filename, restoredRows: restoreResult?.restoredRows || 0 });
 
+    const config = await new configClass().getConfig();
     res.json({
       message: "Restore completed successfully",
+      setupState: config.state ?? 0,
       ...restoreResult,
     });
     sendUpdate("GeneralAlert", { type: "Success", message: "Restore completed successfully. Dashboard data refreshed.", triggerType: triggertype.Manual, taskName: taskName.restore });
-    sendUpdate("BackupRestore", { type: "Success", message: "Restore completed successfully", triggerType: triggertype.Manual, taskName: taskName.restore, ...restoreResult });
+    sendUpdate("BackupRestore", { type: "Success", message: "Restore completed successfully", triggerType: triggertype.Manual, taskName: taskName.restore, setupState: config.state ?? 0, ...restoreResult });
   } catch (error) {
     console.error(error);
     refLog.logData.push({ color: "red", Message: `Restore failed: ${error.message}` });
@@ -496,9 +646,168 @@ router.post("/upload", (req, res) => {
   });
 });
 
+
+// First-run restores must never land in the live backup directory before we know
+// setup is still open (GHSA-pjwm-mr57-hjv4). Temp + random name, then unlink on failure.
+const firstRunTempDir = path.join(os.tmpdir(), "jellyglance-first-run");
+const firstRunStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    if (!fs.existsSync(firstRunTempDir)) {
+      fs.mkdirSync(firstRunTempDir, { recursive: true });
+    }
+    cb(null, firstRunTempDir);
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${randomUUID()}.json`);
+  },
+});
+
+const firstRunUpload = multer({
+  storage: firstRunStorage,
+  fileFilter: function (req, file, cb) {
+    const safeName = sanitizeFilename(file.originalname);
+    if (!safeName.endsWith(".json")) {
+      cb(new Error("Only JSON backup files can be uploaded"));
+      return;
+    }
+    cb(null, true);
+  },
+  limits: { fileSize: 1024 * 1024 * 512 },
+});
+
+const discardFirstRunUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 1024 * 1024 * 512 },
+});
+
+// Only remove uploads that multer wrote under our own upload directories.
+function unlinkQuietly(filePath) {
+  if (!filePath) return;
+  const name = path.basename(String(filePath));
+  for (const root of [firstRunTempDir, getBackupDir()]) {
+    if (path.resolve(String(filePath)) !== path.resolve(root, name)) continue;
+    let safePath;
+    try {
+      safePath = safeJoin(root, name);
+    } catch {
+      return;
+    }
+    fs.unlink(safePath, () => {});
+    return;
+  }
+}
+
+async function firstRunRestoreHandler(req, res) {
+  let setupOpen = true;
+  let setupError = null;
+  try {
+    await assertFirstRunAvailable();
+  } catch (error) {
+    setupOpen = false;
+    setupError = error;
+  }
+
+  // If setup is already complete, consume the multipart body in memory only so
+  // nothing is written under the backup directory, then return 403.
+  const uploader = setupOpen ? firstRunUpload : discardFirstRunUpload;
+
+  uploader.single("file")(req, res, async (error) => {
+    if (!setupOpen) {
+      res.status(setupError?.statusCode || 403).json({
+        error: setupError?.message || "Setup is already complete",
+      });
+      return;
+    }
+
+    if (error) {
+      unlinkQuietly(req.file?.path);
+      const message = /boundary not found/i.test(error.message)
+        ? "Upload failed. Try choosing the backup file again."
+        : error.message;
+      res.status(400).json({ error: message });
+      return;
+    }
+
+    try {
+      // Re-check after the upload in case setup finished while the file was in flight.
+      await assertFirstRunAvailable();
+
+      if (!req.file) {
+        res.status(400).json({ error: "No backup file received. Choose a .json backup file and try again." });
+        return;
+      }
+
+      const filePath = req.file.path;
+      const filename = req.file.filename;
+
+      setFirstRunRestoreStatus({
+        status: "running",
+        setupState: null,
+        restoredRows: 0,
+        error: null,
+      });
+
+      res.status(202).json({
+        status: "processing",
+        message: "Backup uploaded. Restore is running in the background.",
+        filename,
+      });
+
+      runFirstRunRestore(filePath)
+        .then(async (restoreResult) => {
+          unlinkQuietly(filePath);
+          setFirstRunRestoreStatus({
+            status: "complete",
+            setupState: restoreResult?.setupState ?? 0,
+            restoredRows: restoreResult?.restoredRows || 0,
+            error: null,
+          });
+          await addAuditEntry(req, "backup.first_run_restored", {
+            filename,
+            restoredRows: restoreResult?.restoredRows || 0,
+            setupState: restoreResult?.setupState,
+          }).catch(() => {});
+
+          sendUpdate("BackupRestore", {
+            type: "Success",
+            message: "First-run restore completed successfully",
+            triggerType: triggertype.Manual,
+            taskName: taskName.restore,
+            ...restoreResult,
+          });
+        })
+        .catch((restoreError) => {
+          unlinkQuietly(filePath);
+          console.error("[BACKUP] First-run restore failed:", restoreError);
+          setFirstRunRestoreStatus({
+            status: "failed",
+            setupState: null,
+            restoredRows: 0,
+            error: restoreError.message || "Restore failed",
+          });
+          sendUpdate("BackupRestore", {
+            type: "Error",
+            message: restoreError.message || "Restore failed",
+            triggerType: triggertype.Manual,
+            taskName: taskName.restore,
+          });
+        });
+    } catch (restoreError) {
+      unlinkQuietly(req.file?.path);
+      console.error("[BACKUP] First-run restore failed:", restoreError);
+      res.status(restoreError.statusCode || 500).json({
+        error: restoreError.message || "Restore failed",
+      });
+    }
+  });
+}
+
 // Handle other routes
 router.use((req, res) => {
   res.status(404).send({ error: "Not Found" });
 });
 
 module.exports = router;
+module.exports.firstRunRestoreHandler = firstRunRestoreHandler;
+module.exports.getFirstRunRestoreStatusHandler = getFirstRunRestoreStatusHandler;
+module.exports.runFirstRunRestore = runFirstRunRestore;

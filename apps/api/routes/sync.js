@@ -15,6 +15,8 @@ const API = require("../classes/api-loader");
 const { retryTransient } = require("../classes/silo/http");
 const TaskManager = require("../classes/task-manager-singleton");
 const TaskScheduler = require("../classes/task-scheduler-singleton");
+const { sendSafeError } = require("../utils/security");
+const { filterLibraryItems } = require("../classes/library-types");
 
 const router = express.Router();
 
@@ -22,8 +24,13 @@ const { jf_libraries_columns, jf_libraries_mapping } = require("../models/jf_lib
 const { jf_library_items_columns, jf_library_items_mapping } = require("../models/jf_library_items");
 const { jf_library_seasons_columns, jf_library_seasons_mapping } = require("../models/jf_library_seasons");
 const { jf_library_episodes_columns, jf_library_episodes_mapping } = require("../models/jf_library_episodes");
-const { jf_item_info_columns, jf_item_info_mapping } = require("../models/jf_item_info");
+const { jf_item_info_columns, jf_item_info_mapping, jf_item_info_rows } = require("../models/jf_item_info");
 const { columnsPlaybackReporting, mappingPlaybackReporting } = require("../models/jf_playback_reporting_plugin_data");
+
+function isPlaybackReportingPlugin(plugin) {
+  const file = String(plugin?.ConfigurationFileName || "");
+  return ["playback_reporting.xml", "Jellyfin.Plugin.PlaybackReporting.xml"].includes(file) || /playback\s*reporting/i.test(String(plugin?.Name || ""));
+}
 
 const { jf_users_columns, jf_users_mapping } = require("../models/jf_users");
 const taskstate = require("../logging/taskstate");
@@ -366,7 +373,7 @@ async function syncItemInfo(seasons_and_episodes, library_items) {
 
     if ((existingItemInfo.length == 0 && syncTask.taskName === taskName.partialsync) || syncTask.taskName === taskName.fullsync) {
       //dont update item info if it already exists and running a partial sync
-      const mapped_data = await Item.MediaSources.map((item) => jf_item_info_mapping(item, "Item"));
+      const mapped_data = jf_item_info_rows(Item, "Item");
       data_to_insert.push(...mapped_data);
 
       if (mapped_data.length !== 0) {
@@ -387,7 +394,7 @@ async function syncItemInfo(seasons_and_episodes, library_items) {
       syncTask.taskName === taskName.fullsync
     ) {
       //dont update item info if it already exists and running a partial sync
-      const mapped_data = await Episode.MediaSources.map((item) => jf_item_info_mapping(item, "Episode"));
+      const mapped_data = jf_item_info_rows(Episode, "Episode");
       data_to_insert.push(...mapped_data);
 
       //filter fix if jf_libraries is empty
@@ -527,19 +534,14 @@ async function syncPlaybackPluginData() {
     //Playback Reporting Plugin Check
     const installed_plugins = await API.getInstalledPlugins();
 
-    const hasPlaybackReportingPlugin = installed_plugins.filter(
-      (plugins) => ["playback_reporting.xml", "Jellyfin.Plugin.PlaybackReporting.xml"].includes(plugins?.ConfigurationFileName) //TO-DO Change this to the correct plugin name
-    );
+    // Jellyfin and Emby both ship a "Playback Reporting" plugin with the same query API.
+    const hasPlaybackReportingPlugin = (Array.isArray(installed_plugins) ? installed_plugins : []).filter(isPlaybackReportingPlugin);
 
-    if (!hasPlaybackReportingPlugin || hasPlaybackReportingPlugin.length === 0) {
-      if (!hasPlaybackReportingPlugin || hasPlaybackReportingPlugin.length === 0) {
-        PlaybacksyncTask.loggedData.push({ color: "dodgerblue", Message: `No new data to insert.` });
-      } else {
-        PlaybacksyncTask.loggedData.push({
-          color: "lawngreen",
-          Message: "Playback Reporting Plugin not detected. Skipping step.",
-        });
-      }
+    if (hasPlaybackReportingPlugin.length === 0) {
+      PlaybacksyncTask.loggedData.push({
+        color: "dodgerblue",
+        Message: "Playback Reporting Plugin not detected. Skipping step.",
+      });
     } else {
       //
 
@@ -669,7 +671,7 @@ async function scanSingleLibrary(library) {
       ParentId: library.Id,
     }));
 
-    let library_items = libraryItemsWithParent.filter((item) => ["Movie", "Audio", "Series"].includes(item.Type));
+    let library_items = filterLibraryItems(libraryItemsWithParent);
     let seasons = libraryItemsWithParent.filter((item) => ["Season"].includes(item.Type));
     let episodes = libraryItemsWithParent.filter((item) => ["Episode"].includes(item.Type));
 
@@ -807,7 +809,7 @@ async function fullSync(triggertype) {
           ...{ ParentId: item.Id },
         }));
 
-        let library_items = libraryItemsWithParent.filter((item) => ["Movie", "Audio", "Series"].includes(item.Type));
+        let library_items = filterLibraryItems(libraryItemsWithParent);
 
         let seasons = libraryItemsWithParent.filter((item) => ["Season"].includes(item.Type));
         let episodes = libraryItemsWithParent.filter((item) => ["Episode"].includes(item.Type));
@@ -1034,7 +1036,7 @@ async function partialSync(triggertype) {
           ...{ ParentId: library.Id },
         }));
 
-        let library_items = libraryItemsWithParent.filter((item) => ["Movie", "Audio", "Series"].includes(item.Type));
+        let library_items = filterLibraryItems(libraryItemsWithParent);
 
         let seasons = libraryItemsWithParent.filter((item) => ["Season"].includes(item.Type));
         let episodes = libraryItemsWithParent.filter((item) => ["Episode"].includes(item.Type));
@@ -1386,7 +1388,7 @@ router.post("/fetchItem", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500);
-    res.send(error);
+    sendSafeError(res, error, { status: 500 });
   }
 });
 
@@ -1429,6 +1431,7 @@ router.get("/syncPlaybackPluginData", async (req, res) => {
   }
 });
 
+// eslint-disable-next-line no-unused-vars -- existing code, kept unchanged
 function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);

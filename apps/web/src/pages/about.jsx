@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "../lib/axios_instance";
 
 import "./css/about.css";
-import { RiArchiveLine, RiArrowDownSLine, RiCheckLine, RiDatabase2Line, RiDownloadCloud2Line, RiFilmLine, RiGitBranchLine, RiGithubFill, RiHeartPulseLine, RiLayoutGridLine, RiPriceTag3Line, RiPulseLine, RiRadarLine, RiSettings3Line, RiShieldCheckLine, RiTaskLine, RiTimerFlashLine } from "@remixicon/react";
+import { RiArchiveLine, RiArrowDownSLine, RiCheckLine, RiCodeSSlashLine, RiDatabase2Line, RiDownloadCloud2Line, RiFilmLine, RiGitBranchLine, RiGithubFill, RiHeartPulseLine, RiLayoutGridLine, RiPriceTag3Line, RiPulseLine, RiRadarLine, RiSettings3Line, RiShieldCheckLine, RiTaskLine, RiTimerFlashLine } from "@remixicon/react";
+import { mediaServerName } from "../lib/media-server";
 
 function stripMarkdown(value) {
   return String(value || "")
@@ -54,9 +56,20 @@ function parseReleaseBody(body) {
   return sections.length ? sections : [{ title: "Notes", items: ["No release notes were provided for this version."] }];
 }
 
+// The API already drops automation and AI accounts; this is a second guard for
+// older servers. Keep in line with apps/api/utils/github-contributors.js.
+const EXCLUDED_CONTRIBUTORS = new Set([
+  "dependabot", "dependabot-preview", "renovate", "renovate-bot", "renovatebot", "github-actions", "actions-user", "web-flow",
+  "copilot", "copilot-swe-agent", "github-copilot", "cursor", "cursoragent", "cursor-agent", "claude", "claude-code", "anthropic-claude",
+  "codex", "chatgpt-codex-connector", "openai-codex", "devin", "devin-ai-integration", "jellyglance-bot", "jellyglance-security-bot",
+  "imgbot", "allcontributors", "snyk-bot", "pre-commit-ci",
+]);
+
 function isBotContributor(contributor) {
-  const login = String(contributor?.login || "").toLowerCase();
-  return /\bbot\b/.test(login) || login.includes("[bot]") || login.includes("dependabot") || login.includes("github-actions");
+  if (String(contributor?.type || "").toLowerCase() === "bot") return true;
+  const login = String(contributor?.login || "").trim().toLowerCase();
+  if (!login || login.endsWith("[bot]") || login.endsWith("-bot") || login.endsWith("_bot")) return true;
+  return EXCLUDED_CONTRIBUTORS.has(login.replace(/\[bot\]$/, ""));
 }
 
 const PROJECT_OWNER_LOGIN = "Nerdy-Technician";
@@ -67,6 +80,17 @@ const PROJECT_OWNER_FALLBACK = {
   profile_url: `https://github.com/${PROJECT_OWNER_LOGIN}`,
   contributions: 0,
 };
+
+function aboutUpdateMessage(data) {
+  if (data.update_available) {
+    return data.latest_version ? `Update ${data.latest_version} available` : "Update available";
+  }
+  const message = String(data.message || "");
+  if (/is up to date/i.test(message)) return "Up to date";
+  if (/beta version/i.test(message)) return "Using a beta build";
+  if (/Unable to check/i.test(message)) return "Unable to check";
+  return message || "Checking…";
+}
 
 export default function SettingsAbout() {
   const token = localStorage.getItem("token");
@@ -81,7 +105,7 @@ export default function SettingsAbout() {
   const [releaseMenuOpen, setReleaseMenuOpen] = useState(false);
   const [contributors, setContributors] = useState([]);
   const [contributorsMessage, setContributorsMessage] = useState("Loading GitHub profiles...");
-  const updateMessage = data.message === "Silo Barracks is up to date" ? "Up to date" : data.message;
+  const updateMessage = aboutUpdateMessage(data);
   const selectedRelease = releaseData.releases.find((release) => String(release.id) === selectedReleaseId) || releaseData.releases[0];
   const selectedReleaseSections = parseReleaseBody(selectedRelease?.body);
   const projectOwner = contributors.find((contributor) => contributor.login?.toLowerCase() === PROJECT_OWNER_LOGIN.toLowerCase()) || PROJECT_OWNER_FALLBACK;
@@ -168,7 +192,7 @@ export default function SettingsAbout() {
       <header className="about-header">
         <p>About</p>
         <h1>Silo Barracks</h1>
-        <span>Active Silo viewers, native server sessions, and observed playback history.</span>
+        <span>Local {mediaServerName()} visibility for sessions, libraries, requests, downloads, transcodes, automation health, and scheduled jobs.</span>
       </header>
 
       <main className="about-layout">
@@ -248,7 +272,7 @@ export default function SettingsAbout() {
               <section className="about-note">
                 <h2>What to configure</h2>
                 <ul>
-                  <li>Jellyfin connection and authentication mode for the main dashboard.</li>
+                  <li>{mediaServerName()} connection and authentication mode for the main dashboard.</li>
                   <li>Optional Jellyseerr or Overseerr instances for request management, approvals, user queues, issue reports, and request trends.</li>
                   <li>Optional qBittorrent, Transmission, Deluge, SABnzbd, NZBGet, or similar clients for download monitoring.</li>
                   <li>Optional Tdarr for active transcodes, queue, history, conversion detail, thumbnails, and live progress.</li>
@@ -375,7 +399,10 @@ export default function SettingsAbout() {
                   <RiGitBranchLine />
                   Version
                 </dt>
-                <dd>{data.current_version}</dd>
+                <dd>
+                  {data.current_version}
+                  {data.current_version && /-(alpha|beta|rc|pre|preview)/i.test(data.current_version) ? <span className="release-channel-badge">Beta channel</span> : null}
+                </dd>
               </div>
               <div className={data.update_available ? "is-update" : ""}>
                 <dt>
@@ -393,7 +420,7 @@ export default function SettingsAbout() {
                   <RiFilmLine />
                   Media source
                 </dt>
-                <dd>Jellyfin</dd>
+                <dd>{mediaServerName()}</dd>
               </div>
               <div>
                 <dt>
@@ -407,17 +434,45 @@ export default function SettingsAbout() {
 
           <section className="about-links">
             <h2>Links</h2>
-            <a href="https://github.com/Nerdy-Technician/JellyGlance" target="_blank" rel="noreferrer">
+            <a href="https://discord.gg/dMGhv8j2kx" target="_blank" rel="noreferrer">
+              <RiPulseLine />
+              Join Discord
+            </a>
+            <Link to="/settings/api-key">
+              <RiCodeSSlashLine />
+              API / Swagger
+            </Link>
+            <a href="https://jellyglance.com/" target="_blank" rel="noreferrer">
+              <RiRadarLine />
+              Website
+            </a>
+            <a href="https://docs.jellyglance.com/" target="_blank" rel="noreferrer">
+              <RiCodeSSlashLine />
+              Documentation
+            </a>
+            <a href="https://github.com/After-Shock/silo-barracks/issues/new/choose" target="_blank" rel="noreferrer">
+              <RiGithubFill />
+              Documentation feedback
+            </a>
+            <a href="https://github.com/After-Shock/silo-barracks/tree/main/docs" target="_blank" rel="noreferrer">
+              <RiGithubFill />
+              Documentation source
+            </a>
+            <a href="https://github.com/After-Shock/silo-barracks" target="_blank" rel="noreferrer">
               <RiGithubFill />
               Source code
             </a>
-            <a href="https://github.com/Nerdy-Technician/JellyGlance/pkgs/container/jellyglance" target="_blank" rel="noreferrer">
+            <a href="https://github.com/After-Shock/silo-barracks/pkgs/container/jellyglance" target="_blank" rel="noreferrer">
               <RiArchiveLine />
               Container image
             </a>
             <a href="https://github.com/Nerdy-Technician" target="_blank" rel="noreferrer">
               <RiGithubFill />
               Maintainer profile
+            </a>
+            <a href="https://buymeacoffee.com/nerdytechnician" target="_blank" rel="noreferrer">
+              <RiHeartPulseLine />
+              Buy me a coffee
             </a>
           </section>
         </aside>

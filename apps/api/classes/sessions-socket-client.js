@@ -1,8 +1,10 @@
+const timers = require("./timers");
 const WebSocketClient = require("./websocket-client.js");
 
 let wsClient;
 
 let sessionData = [];
+let emptySessionLists = 0;
 let errorCount = 0;
 const maxErrorCount = 3;
 const reconnectInterval = 60000;
@@ -26,13 +28,13 @@ function initializeClient(websocketUrl, apiKey) {
 
     // Start sending ForceKeepAlive every 30 seconds
     if (keepAliveInterval) {
-      clearInterval(keepAliveInterval); // Clear any existing interval to avoid duplicates
+      timers.clear(keepAliveInterval); // Clear any existing interval to avoid duplicates
     }
-    keepAliveInterval = setInterval(() => {
+    keepAliveInterval = timers.every(() => {
       if (wsClient.getConnectionStatus() === "OPEN") {
         wsClient.send(JSON.stringify({ MessageType: "KeepAlive" }));
       } else {
-        clearInterval(keepAliveInterval); // Stop sending pings if connection is not open
+        timers.clear(keepAliveInterval); // Stop sending pings if connection is not open
       }
     }, 30000); // 30 seconds interval
   };
@@ -41,17 +43,23 @@ function initializeClient(websocketUrl, apiKey) {
     try {
       const message = JSON.parse(data);
       if (message.MessageType === "Sessions") {
-        let result = message.Data && Array.isArray(message.Data) ? message.Data : [];
+        const raw = message.Data;
+        const list = Array.isArray(raw) ? raw : raw && typeof raw === "object" ? [raw] : [];
 
-        if (result.length > 0) {
-          result = result.filter(
+        if (list.length === 0) {
+          emptySessionLists += 1;
+          if (emptySessionLists >= 3) {
+            sessionData = [];
+          }
+        } else {
+          emptySessionLists = 0;
+          sessionData = list.filter(
             (session) =>
               session.NowPlayingItem !== undefined &&
               session.NowPlayingItem?.Type != "Trailer" &&
               (session.NowPlayingItem?.ProviderIds || {})["prerolls.video"] == undefined
           );
         }
-        sessionData = result;
       } else if (message.MessageType === "ForceKeepAlive") {
         wsClient.send(JSON.stringify({ MessageType: "SessionsStart", Data: "0,1500" }));
       }
@@ -62,13 +70,11 @@ function initializeClient(websocketUrl, apiKey) {
 
   wsClient.onClose = () => {
     console.log(`[JELLYFIN-WEBSOCKET]: Disconnected from the server.`);
-    sessionData = [];
   };
 
   wsClient.onError = (error) => {
     console.error("[JELLYFIN-WEBSOCKET]: Error:", error);
     errorCount++;
-    sessionData = [];
   };
 }
 

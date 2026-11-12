@@ -1,8 +1,9 @@
+import { ImportSourceLogo } from "../../../lib/import-source-logos";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import DismissibleAlert from "./dismissible-alert";
-import { RiDatabase2Line, RiFileSearchLine, RiUploadCloud2Line } from "@remixicon/react";
+import { RiFileSearchLine, RiUploadCloud2Line } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 
 function authHeader() {
@@ -43,7 +44,7 @@ function formatSize(sizeInBytes = 0) {
   return `${size.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 }
 
-export default function TautulliImport() {
+export default function TautulliImport({ compact = false }) {
   const fileInputRef = useRef(null);
   const [uploadedBackup, setUploadedBackup] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -215,13 +216,15 @@ export default function TautulliImport() {
 
   return (
     <div className="legacy-import-page">
-      <header className="settings-section-header">
-        <div>
-          <span>Legacy history</span>
-          <h2>Tautulli Import</h2>
-          <p>Upload an old Tautulli backup and append its Plex watch history into Barracks without overwriting current playback data.</p>
-        </div>
-      </header>
+      {!compact ? (
+        <header className="settings-section-header">
+          <div>
+            <span>Legacy history</span>
+            <h2>Tautulli Import</h2>
+            <p>Upload an old Tautulli backup and append its Plex watch history into Barracks without overwriting current playback data.</p>
+          </div>
+        </header>
+      ) : null}
 
       {message ? (
         <DismissibleAlert type={message.type} onClose={() => setMessage(null)}>
@@ -231,7 +234,7 @@ export default function TautulliImport() {
 
       <section className="legacy-import-panel">
         <div className="legacy-import-upload">
-          <RiDatabase2Line />
+<ImportSourceLogo source="tautulli" size={38} className="legacy-import-logo" />
           <div>
             <span>Tautulli backup file</span>
             <strong>{uploadedBackup?.originalName || (result?.sourceFile ? String(result.sourceFile).split("/").pop() : "") || "No backup uploaded"}</strong>

@@ -344,7 +344,7 @@ test('required sync collection methods throw on upstream failures and malformed 
 
 test('uses the Silo Barracks package identity as its user agent', async t => {
   const fixture = await fixtureServer((req, res) => {
-    assert.equal(req.headers['user-agent'], 'Silo-Barracks/1.2.3-beta.3');
+    assert.equal(req.headers['user-agent'], `Silo-Barracks/${require('../package.json').version}`);
     json(res, 200, []);
   });
   t.after(fixture.close);

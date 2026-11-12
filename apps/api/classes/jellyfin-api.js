@@ -1,8 +1,11 @@
 const { compareVersions } = require("compare-versions");
 
 const configClass = require("./config");
+const { whenReady } = require("./config-ready");
 const { axios } = require("./axios");
 const { getSessionData } = require("./sessions-socket-client");
+const { joinSafeHttpUrl, stripTrailingSlashes, toSafeHttpUrl } = require("../utils/security");
+const { assertProbeUrlAllowed, probeRequestOptions } = require("../utils/probe-guard");
 
 class JellyfinAPI {
   constructor() {
@@ -15,12 +18,8 @@ class JellyfinAPI {
   }
   //Helper classes
   #checkReadyStatus() {
-    let checkConfigError = setInterval(async () => {
-      const success = await this.#fetchConfig();
-      if (success) {
-        clearInterval(checkConfigError);
-      }
-    }, 5000); // Check every 5 seconds
+    // Retry every 5 seconds until the config is ready, on the shared config-ready poll.
+    this.stopReadyCheck = whenReady(() => this.#fetchConfig());
   }
 
   async #fetchConfig() {
@@ -509,7 +508,7 @@ class JellyfinAPI {
           (session) =>
             session.NowPlayingItem !== undefined &&
             session.NowPlayingItem.Type != "Trailer" &&
-            session.NowPlayingItem.ProviderIds["prerolls.video"] == undefined
+            (session.NowPlayingItem.ProviderIds || {})["prerolls.video"] == undefined
         );
       }
       return result;
@@ -545,6 +544,86 @@ class JellyfinAPI {
       await axios.post(`${this.config.JF_HOST}/Sessions/${encodeURIComponent(id)}/Playing/${jellyfinCommand}`, null, { headers });
     }
     return { action: command, status: 204, receipt: null, reason: String(reason || "").trim().slice(0, 1024) };
+  }
+
+  async stopSession(sessionId) {
+    if (!this.configReady || !sessionId) {
+      throw Object.assign(new Error("Jellyfin is not ready"), { statusCode: 503 });
+    }
+    await axios.post(
+      `${this.config.JF_HOST}/Sessions/${encodeURIComponent(sessionId)}/Playing/Stop`,
+      {},
+      {
+        headers: {
+          Authorization: 'MediaBrowser Token="' + this.config.JF_API_KEY + '"',
+          "User-Agent": this.userAgent,
+        },
+        timeout: 15000,
+      }
+    );
+    return { ok: true };
+  }
+
+  async sendSessionMessage(sessionId, { header = "Barracks", text = "", timeoutMs = 8000 } = {}) {
+    if (!this.configReady || !sessionId) {
+      throw Object.assign(new Error("Jellyfin is not ready"), { statusCode: 503 });
+    }
+    await axios.post(
+      `${this.config.JF_HOST}/Sessions/${encodeURIComponent(sessionId)}/Message`,
+      { Header: header, Text: text, TimeoutMs: Number(timeoutMs) || 8000 },
+      {
+        headers: {
+          Authorization: 'MediaBrowser Token="' + this.config.JF_API_KEY + '"',
+          "User-Agent": this.userAgent,
+          "Content-Type": "application/json",
+        },
+        timeout: 15000,
+      }
+    );
+    return { ok: true };
+  }
+
+  async refreshItem(itemId, { recursive = true } = {}) {
+    if (!this.configReady || !itemId) {
+      throw Object.assign(new Error("Jellyfin is not ready"), { statusCode: 503 });
+    }
+    const params = new URLSearchParams({
+      Recursive: String(Boolean(recursive)),
+      ImageRefreshMode: "Default",
+      MetadataRefreshMode: "Default",
+      ReplaceAllImages: "false",
+      ReplaceAllMetadata: "false",
+    });
+    await axios.post(
+      `${this.config.JF_HOST}/Items/${encodeURIComponent(itemId)}/Refresh?${params.toString()}`,
+      {},
+      {
+        headers: {
+          Authorization: 'MediaBrowser Token="' + this.config.JF_API_KEY + '"',
+          "User-Agent": this.userAgent,
+        },
+        timeout: 20000,
+      }
+    );
+    return { ok: true };
+  }
+
+  async refreshLibrary() {
+    if (!this.configReady) {
+      throw Object.assign(new Error("Jellyfin is not ready"), { statusCode: 503 });
+    }
+    await axios.post(
+      `${this.config.JF_HOST}/Library/Refresh`,
+      {},
+      {
+        headers: {
+          Authorization: 'MediaBrowser Token="' + this.config.JF_API_KEY + '"',
+          "User-Agent": this.userAgent,
+        },
+        timeout: 20000,
+      }
+    );
+    return { ok: true };
   }
 
   async getInstalledPlugins() {
@@ -608,31 +687,41 @@ class JellyfinAPI {
     }
   }
 
-  async validateSettings(url, apikey) {
+  async validateSettings(url, apikey, { probe = false } = {}) {
     let result = { isValid: false, status: 400, errorMessage: "Invalid URL", url: url, cleanedUrl: "" };
     try {
-      let _url = url.replace(/\/web\/index\.html#!\/home\.html$/, "");
+      let _url = String(url || "").replace(/\/web\/index\.html#!\/home\.html$/, "");
 
-      _url = _url.replace(/\/$/, "");
+      _url = stripTrailingSlashes(_url);
       if (!/^https?:\/\//i.test(_url)) {
         _url = "http://" + _url;
       }
 
+      _url = stripTrailingSlashes(toSafeHttpUrl(_url));
       result.cleanedUrl = _url;
 
       if (!this.#isValidUrl(_url)) {
         return result;
       }
 
-      const validation_url = _url.replace(/\/$/, "") + "/system/configuration";
+      const validation_url = joinSafeHttpUrl(_url, "/system/configuration");
 
-      const response = await axios.get(validation_url, {
+      let requestOptions = {
         headers: {
           Authorization: 'MediaBrowser Token="' + apikey + '"',
           "User-Agent": this.userAgent,
         },
-      });
+      };
+      if (probe) {
+        await assertProbeUrlAllowed(validation_url);
+        requestOptions = probeRequestOptions(requestOptions);
+      }
+      const response = await axios.get(validation_url, requestOptions);
       result.isValid = response.status == 200;
+      if (result.isValid) {
+        result.status = 200;
+        result.errorMessage = "";
+      }
       return result;
     } catch (error) {
       this.#errorHandler(error);

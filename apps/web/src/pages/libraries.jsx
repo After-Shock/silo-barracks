@@ -5,6 +5,8 @@ import Config from "../lib/config";
 import "./css/library/libraries.css";
 import Loading from "./components/general/loading";
 import LibraryCard from "./components/library/library-card";
+import StorageByLibrary from "./components/library/storage-by-library";
+import DiskForecastCard from "./components/library/disk-forecast-card";
 import ErrorBoundary from "./components/general/ErrorBoundary";
 import { RiEyeFill, RiEyeOffFill, RiFileList3Line, RiGridLine, RiRefreshLine, RiSearchLine } from "@remixicon/react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -148,6 +150,9 @@ function Libraries() {
             </Tooltip>
           ))}
       </div>
+
+      {config?.token ? <StorageByLibrary token={config.token} /> : null}
+      {config?.token ? <DiskForecastCard token={config.token} /> : null}
 
       {scanMessage ? <div className={`libraries-scan-message is-${scanMessage.type}`}>{scanMessage.text}</div> : null}
 

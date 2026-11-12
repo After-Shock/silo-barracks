@@ -6,9 +6,9 @@ import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Spinner } from "@/components/ui/spinner";
 import DismissibleAlert from "./dismissible-alert";
-import { RiCalendarEventLine, RiCheckboxCircleLine, RiDeleteBinLine, RiDownloadCloud2Line, RiEdit2Line, RiErrorWarningLine, RiHeartPulseLine, RiInformationLine, RiLinksLine, RiMovie2Line, RiNotification3Line, RiPlayCircleLine, RiStopCircleLine, RiTaskLine, RiUserAddLine } from "@remixicon/react";
+import { RiAlarmWarningLine, RiCalendarEventLine, RiCheckboxCircleLine, RiDeleteBinLine, RiDownloadCloud2Line, RiEdit2Line, RiErrorWarningLine, RiHeartPulseLine, RiInformationLine, RiLinksLine, RiMovie2Line, RiNotification3Line, RiPlayCircleLine, RiStopCircleLine, RiTaskLine, RiUserAddLine } from "@remixicon/react";
 import { Tooltip } from "@mui/material";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import Loading from "../general/loading";
 import ErrorBoundary from "../general/ErrorBoundary";
 import { taskList } from "../../../lib/tasklist.jsx";
@@ -24,6 +24,18 @@ const webhookTypeMeta = {
   gotify: {
     label: "Gotify",
     placeholder: "https://gotify.example.com/message?token=APP_TOKEN",
+  },
+  ntfy: {
+    label: "ntfy",
+    placeholder: "https://ntfy.sh/your-topic",
+  },
+  telegram: {
+    label: "Telegram",
+    placeholder: "https://api.telegram.org/bot<token>/sendMessage?chat_id=<chat-id>",
+  },
+  pushover: {
+    label: "Pushover",
+    placeholder: "https://api.pushover.net/1/messages.json?token=APP_TOKEN&user=USER_KEY",
   },
   generic: {
     label: "Generic",
@@ -122,6 +134,30 @@ const eventCards = [
     text: "When a connected client test fails.",
     Icon: RiHeartPulseLine,
   },
+  {
+    id: "threshold_alert",
+    title: "Threshold alert",
+    text: "Stuck downloads, low disk space, failed server jobs and new devices.",
+    Icon: RiAlarmWarningLine,
+  },
+  {
+    id: "device_authorized",
+    title: "New Jellyfin client",
+    text: "When a device appears on Jellyfin that Glance has not seen before.",
+    Icon: UserAddLineIcon,
+  },
+    {
+    id: "ops_digest",
+    title: "Ops digest",
+    text: "When failed jobs, stuck downloads, or webhook failures pile up.",
+    Icon: ErrorWarningLineIcon,
+  },
+  {
+    id: "playback_digest",
+    title: "Overnight playback digest",
+    text: "One summary after quiet hours instead of overnight start/stop pings.",
+    Icon: PlayCircleLineIcon,
+  },
 ];
 
 const eventPlaceholderGroups = {
@@ -151,14 +187,14 @@ const webhookTemplates = [
     id: "discord-ops",
     name: "Discord Ops",
     type: "discord",
-    events: ["task_failed", "integration_health_warning", "download_failed"],
+    events: ["task_failed", "integration_health_warning", "download_failed", "threshold_alert"],
     taskFilters: [],
   },
   {
     id: "gotify-health",
     name: "Gotify Health",
     type: "gotify",
-    events: ["integration_health_warning", "task_failed"],
+    events: ["integration_health_warning", "task_failed", "threshold_alert"],
     taskFilters: [],
   },
   {
@@ -246,7 +282,66 @@ function groupWebhookRows(rows) {
   return Array.from(groups.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
+const CARD_DETAIL_TOGGLES = ["showPlayMethod", "showMetaLine", "showGenres", "showProgress", "showOverview"];
+const CARD_ARTWORK_TOGGLES = ["showPoster", "showAvatar"];
+const CARD_TOGGLE_KEYS = ["showClientIcon", "showMediaDetails", ...CARD_DETAIL_TOGGLES, ...CARD_ARTWORK_TOGGLES];
+
+function normalizeCardState(data = {}) {
+  const next = {
+    style: data.style === "text" ? "text" : "card",
+    theme: data.theme || "glance",
+    accentColor: /^#[0-9a-f]{6}$/i.test(data.accentColor || "") ? data.accentColor : "",
+  };
+  for (const key of CARD_TOGGLE_KEYS) next[key] = data[key] !== false;
+  return next;
+}
+
+function TextWebhookPreview({ settings, t }) {
+  const details = settings.showMediaDetails !== false;
+  const fields = [
+    [t("FEATURES.OPS.PREVIEW_FIELD_CLIENT"), "Infuse · Apple TV"],
+  ];
+  if (settings.showPlayMethod !== false) fields.push([t("FEATURES.OPS.PREVIEW_FIELD_PLAYBACK"), "Direct Play"]);
+  if (details) {
+    fields.push([t("FEATURES.OPS.PREVIEW_FIELD_QUALITY"), "4K HDR10 · HEVC · EAC3 5.1"]);
+    if (settings.showProgress !== false) fields.push([t("FEATURES.OPS.PREVIEW_FIELD_PROGRESS"), "18:04 / 45:10 (40%)"]);
+    if (settings.showGenres !== false) fields.push([t("FEATURES.OPS.PREVIEW_FIELD_GENRES"), "Drama, Thriller, Mystery"]);
+  }
+  return (
+    <div
+      className="webhook-text-preview"
+      aria-label={t("FEATURES.OPS.CARD_STYLE_text")}
+      style={settings.accentColor ? { borderLeftColor: settings.accentColor } : undefined}
+    >
+      <div className="webhook-text-preview-body">
+        <div className="webhook-text-preview-author">
+          {settings.showAvatar !== false ? <span className="webhook-text-preview-avatar">N</span> : null}
+          <span>Nerdy · {t("FEATURES.OPS.PREVIEW_NOW_PLAYING")}</span>
+        </div>
+        <strong className="webhook-text-preview-title">Night Shift</strong>
+        <p className="webhook-text-preview-desc">
+          S01E04 · The Watcher
+          {details && settings.showMetaLine !== false ? <><br />2024 · TV-14 · 45m · ★ 8.2</> : null}
+        </p>
+        {details && settings.showOverview !== false ? (
+          <p className="webhook-text-preview-overview">A late shift at the station turns strange when an old case resurfaces.</p>
+        ) : null}
+        <div className="webhook-text-preview-fields">
+          {fields.map(([name, value]) => (
+            <div key={name}>
+              <span>{name}</span>
+              <b>{value}</b>
+            </div>
+          ))}
+        </div>
+      </div>
+      {settings.showPoster !== false ? <div className="webhook-text-preview-poster" aria-hidden="true" /> : null}
+    </div>
+  );
+}
+
 export default function WebhooksSettings() {
+  const { t } = useTranslation();
   const [webhooks, setWebhooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -254,6 +349,17 @@ export default function WebhooksSettings() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [currentWebhook, setCurrentWebhook] = useState(defaultWebhook);
+  const [quietHours, setQuietHours] = useState({ enabled: false, start: "22:00", end: "08:00", digest: true });
+  const [quietSaving, setQuietSaving] = useState(false);
+  const [cardSettings, setCardSettings] = useState(() => normalizeCardState());
+  const [cardSaving, setCardSaving] = useState(false);
+  const [cardPreviewUrl, setCardPreviewUrl] = useState("");
+  const [accentDraft, setAccentDraft] = useState("");
+  const cardPreviewKey = JSON.stringify({ ...cardSettings, style: undefined });
+
+  useEffect(() => {
+    setAccentDraft(cardSettings.accentColor || "");
+  }, [cardSettings.accentColor]);
 
   const groupedWebhooks = useMemo(() => groupWebhookRows(webhooks), [webhooks]);
   const activeEventCount = groupedWebhooks.reduce(
@@ -271,6 +377,19 @@ export default function WebhooksSettings() {
       setError(null);
       const response = await axios.get("/webhooks", { headers });
       setWebhooks(response.data);
+      const quietResponse = await axios.get("/webhooks/quiet-hours", { headers }).catch(() => null);
+      if (quietResponse?.data) {
+        setQuietHours({
+          enabled: Boolean(quietResponse.data.enabled),
+          start: quietResponse.data.start || "22:00",
+          end: quietResponse.data.end || "08:00",
+          digest: quietResponse.data.digest !== false,
+        });
+      }
+      const cardResponse = await axios.get("/webhooks/card-settings", { headers }).catch(() => null);
+      if (cardResponse?.data) {
+        setCardSettings(normalizeCardState(cardResponse.data));
+      }
     } catch (err) {
       console.error("Error loading webhooks:", err);
       setError("Unable to load webhooks: " + (err.response?.data?.error || err.message));
@@ -284,6 +403,64 @@ export default function WebhooksSettings() {
     const intervalId = setInterval(loadWebhooks, 1000 * 10);
     return () => clearInterval(intervalId);
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    let objectUrl = "";
+    axios
+      .get("/webhooks/card-preview", {
+        headers,
+        params: { ...cardSettings, style: undefined },
+        responseType: "blob",
+      })
+      .then((response) => {
+        if (!active) return;
+        objectUrl = URL.createObjectURL(response.data);
+        setCardPreviewUrl((current) => {
+          if (current) URL.revokeObjectURL(current);
+          return objectUrl;
+        });
+      })
+      .catch(() => {
+        if (active) setCardPreviewUrl("");
+      });
+    return () => {
+      active = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [cardPreviewKey]);
+
+  async function saveCardSettings(nextCard) {
+    try {
+      setCardSaving(true);
+      setError(null);
+      const response = await axios.post("/webhooks/card-settings", nextCard, { headers });
+      setCardSettings(normalizeCardState(response.data));
+      setSuccess(t("FEATURES.OPS.CARD_SAVED"));
+    } catch (err) {
+      setError(err.response?.data?.error || t("FEATURES.OPS.CARD_SAVE_FAIL"));
+    } finally {
+      setCardSaving(false);
+    }
+  }
+
+  async function saveQuietHours(nextQuiet) {
+    try {
+      setQuietSaving(true);
+      setError(null);
+      const response = await axios.post("/webhooks/quiet-hours", nextQuiet, { headers });
+      setQuietHours({
+        enabled: Boolean(response.data.enabled),
+        start: response.data.start || "22:00",
+        end: response.data.end || "08:00",
+      });
+      setSuccess(t("FEATURES.OPS.QUIET_SAVED"));
+    } catch (err) {
+      setError(err.response?.data?.error || t("FEATURES.OPS.QUIET_SAVE_FAIL"));
+    } finally {
+      setQuietSaving(false);
+    }
+  }
 
   function resetForm() {
     setCurrentWebhook(defaultWebhook);
@@ -492,6 +669,171 @@ export default function WebhooksSettings() {
         </div>
       </div>
 
+      <section className="webhook-quiet-hours">
+        <div>
+          <h2>{t("FEATURES.OPS.QUIET_HOURS")}</h2>
+          <p>{t("FEATURES.OPS.QUIET_HOURS_INTRO")}</p>
+        </div>
+        <label className="webhook-quiet-toggle">
+          <input
+            type="checkbox"
+            checked={Boolean(quietHours.enabled)}
+            disabled={quietSaving}
+            onChange={(event) => saveQuietHours({ ...quietHours, enabled: event.target.checked })}
+          />
+          {t("FEATURES.OPS.QUIET_ENABLED")}
+        </label>
+        <label className="webhook-quiet-toggle">
+          <input
+            type="checkbox"
+            checked={quietHours.digest !== false}
+            disabled={quietSaving}
+            onChange={(event) => saveQuietHours({ ...quietHours, digest: event.target.checked })}
+          />
+          {t("FEATURES.OPS.QUIET_DIGEST")}
+        </label>
+        <label>
+          {t("FEATURES.OPS.QUIET_START")}
+          <input
+            type="time"
+            value={quietHours.start}
+            disabled={quietSaving}
+            onChange={(event) => setQuietHours((current) => ({ ...current, start: event.target.value }))}
+            onBlur={(event) => saveQuietHours({ ...quietHours, start: event.target.value })}
+          />
+        </label>
+        <label>
+          {t("FEATURES.OPS.QUIET_END")}
+          <input
+            type="time"
+            value={quietHours.end}
+            disabled={quietSaving}
+            onChange={(event) => setQuietHours((current) => ({ ...current, end: event.target.value }))}
+            onBlur={(event) => saveQuietHours({ ...quietHours, end: event.target.value })}
+          />
+        </label>
+      </section>
+
+      <section className="webhook-card-theme">
+        <div>
+          <h2>{t("FEATURES.OPS.CARD_THEME")}</h2>
+          <p>{t("FEATURES.OPS.CARD_THEME_INTRO")}</p>
+        </div>
+        <div className="webhook-card-theme-options">
+          <div className="webhook-card-theme-group webhook-card-style-group" role="group" aria-label={t("FEATURES.OPS.CARD_STYLE")}>
+            {["card", "text"].map((style) => (
+              <button
+                type="button"
+                key={style}
+                className={cardSettings.style === style ? "is-active" : ""}
+                disabled={cardSaving}
+                title={t(`FEATURES.OPS.CARD_STYLE_${style}_HINT`)}
+                onClick={() => saveCardSettings({ ...cardSettings, style })}
+              >
+                {t(`FEATURES.OPS.CARD_STYLE_${style}`)}
+              </button>
+            ))}
+          </div>
+          <div className="webhook-card-theme-group">
+            <button
+              type="button"
+              className={cardSettings.theme === "match" ? "is-active" : ""}
+              disabled={cardSaving}
+              onClick={() => saveCardSettings({ ...cardSettings, theme: "match" })}
+            >
+              {t("FEATURES.OPS.THEME_match")}
+            </button>
+          </div>
+          <div className="webhook-card-theme-group">
+            {["glance", "jellyfin", "midnight", "compact"].map((theme) => (
+              <button
+                type="button"
+                key={theme}
+                className={cardSettings.theme === theme ? "is-active" : ""}
+                disabled={cardSaving}
+                onClick={() => saveCardSettings({ ...cardSettings, theme })}
+              >
+                {t(`FEATURES.OPS.THEME_${theme}`)}
+              </button>
+            ))}
+          </div>
+          <label className="webhook-quiet-toggle">
+            <input
+              type="checkbox"
+              checked={cardSettings.showClientIcon !== false}
+              disabled={cardSaving}
+              onChange={(event) => saveCardSettings({ ...cardSettings, showClientIcon: event.target.checked })}
+            />
+            {t("FEATURES.OPS.SHOW_CLIENT_ICON")}
+          </label>
+          <label className="webhook-quiet-toggle">
+            <input
+              type="checkbox"
+              checked={cardSettings.showMediaDetails !== false}
+              disabled={cardSaving}
+              onChange={(event) => saveCardSettings({ ...cardSettings, showMediaDetails: event.target.checked })}
+            />
+            {t("FEATURES.OPS.SHOW_MEDIA_DETAILS")}
+          </label>
+        </div>
+        <div className="webhook-card-customise">
+          <div className="webhook-card-accent">
+            <span>{t("FEATURES.OPS.CARD_ACCENT")}</span>
+            <input
+              type="color"
+              aria-label={t("FEATURES.OPS.CARD_ACCENT")}
+              value={accentDraft || "#7c3aed"}
+              disabled={cardSaving}
+              onChange={(event) => setAccentDraft(event.target.value)}
+              onBlur={() => {
+                if (accentDraft && accentDraft !== cardSettings.accentColor) saveCardSettings({ ...cardSettings, accentColor: accentDraft });
+              }}
+            />
+            <button
+              type="button"
+              className={!cardSettings.accentColor ? "is-active" : ""}
+              disabled={cardSaving || !cardSettings.accentColor}
+              onClick={() => saveCardSettings({ ...cardSettings, accentColor: "" })}
+            >
+              {t("FEATURES.OPS.CARD_ACCENT_EVENT")}
+            </button>
+          </div>
+          <fieldset className="webhook-card-toggle-group" disabled={cardSaving}>
+            <legend>{t("FEATURES.OPS.CARD_ARTWORK")}</legend>
+            {CARD_ARTWORK_TOGGLES.map((key) => (
+              <label className="webhook-quiet-toggle" key={key}>
+                <input
+                  type="checkbox"
+                  checked={cardSettings[key] !== false}
+                  onChange={(event) => saveCardSettings({ ...cardSettings, [key]: event.target.checked })}
+                />
+                {t(`FEATURES.OPS.CARD_TOGGLE_${key}`)}
+              </label>
+            ))}
+          </fieldset>
+          {cardSettings.showMediaDetails !== false ? (
+            <fieldset className="webhook-card-toggle-group" disabled={cardSaving}>
+              <legend>{t("FEATURES.OPS.CARD_DETAILS")}</legend>
+              {CARD_DETAIL_TOGGLES.map((key) => (
+                <label className="webhook-quiet-toggle" key={key}>
+                  <input
+                    type="checkbox"
+                    checked={cardSettings[key] !== false}
+                    onChange={(event) => saveCardSettings({ ...cardSettings, [key]: event.target.checked })}
+                  />
+                  {t(`FEATURES.OPS.CARD_TOGGLE_${key}`)}
+                </label>
+              ))}
+            </fieldset>
+          ) : null}
+        </div>
+        {cardSettings.style === "text" ? (
+          <TextWebhookPreview settings={cardSettings} t={t} />
+        ) : cardPreviewUrl ? (
+          <img className="webhook-card-preview" src={cardPreviewUrl} alt={t("FEATURES.OPS.CARD_THEME")} />
+        ) : null}
+      </section>
+
       <ErrorBoundary>
         {error && (
           <DismissibleAlert type="danger" onClose={() => setError(null)}>
@@ -556,6 +898,12 @@ export default function WebhooksSettings() {
             />
             {currentWebhook.webhook_type === "gotify" ? (
               <small className="form-text">Use the Gotify message endpoint with an app token.</small>
+            ) : currentWebhook.webhook_type === "ntfy" ? (
+              <small className="form-text">Use a topic URL. For private servers, put the access token in Headers as Authorization Bearer.</small>
+            ) : currentWebhook.webhook_type === "telegram" ? (
+              <small className="form-text">Use the Bot API sendMessage URL and include chat_id as a query parameter.</small>
+            ) : currentWebhook.webhook_type === "pushover" ? (
+              <small className="form-text">Use the Pushover messages endpoint with token and user query parameters.</small>
             ) : null}
           </div>
 

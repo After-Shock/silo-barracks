@@ -16,6 +16,452 @@
         "#4285f4"
       ],
       "reason": "Official Google Chrome SVG artwork embedded for the browser activity icon."
+    },
+    {
+      "path": "apps/web/src/components/ui/chart.jsx",
+      "values": [
+        "#ccc",
+        "#fff"
+      ],
+      "reason": "shadcn chart attribute selectors ([stroke=#ccc]/[stroke=#fff]) that target recharts default stroke colors; not rendered colors."
+    },
+    {
+      "path": "apps/web/src/lib/widgetSnippets.js",
+      "values": [
+        "blue",
+        "green",
+        "indigo",
+        "orange",
+        "red",
+        "teal",
+        "violet"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/components/LibrarySelector/SelectionCard.jsx",
+      "values": [
+        "white"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/components/general/Blobbo.jsx",
+      "values": [
+        "#5bc0be",
+        "#8ab17d",
+        "#8d99ae",
+        "#9b6ac8",
+        "#e76f51",
+        "#f4a261"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/components/settings/NewsletterReportBuilder.jsx",
+      "values": [
+        "#6ee7f9"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/audiobookshelf.css",
+      "values": [
+        "#8b5cf6",
+        "rgba(199, 211, 230, 0.7)",
+        "rgba(230, 237, 247, 0.6)",
+        "rgba(255, 255, 255, 0.08)",
+        "rgba(var(--primary-rgb), 0.12)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/blobbo.css",
+      "values": [
+        "#0b0d12",
+        "#111",
+        "#131820",
+        "#1b212b",
+        "#4caf7a",
+        "#94a3b8",
+        "#9b6ac8",
+        "#b3bfce",
+        "#c9a7e6",
+        "#e0a030",
+        "#f8fafc",
+        "rgba(0, 0, 0, 0.35)",
+        "rgba(0, 0, 0, 0.45)",
+        "rgba(155, 106, 200, 0.18)",
+        "rgba(196, 168, 255, 0.5)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/incomplete-seasons.css",
+      "values": [
+        "#00a4dc",
+        "#0b0d12",
+        "#151922",
+        "#9aa4b5",
+        "#ff7a7a",
+        "#ffb36b",
+        "#fff",
+        "rgba(255, 179, 107, 0.15)",
+        "rgba(255, 196, 0, 0.08)",
+        "rgba(255, 196, 0, 0.25)",
+        "rgba(255, 255, 255, 0.04)",
+        "rgba(255, 255, 255, 0.06)",
+        "rgba(255, 255, 255, 0.08)",
+        "rgba(255, 255, 255, 0.12)",
+        "rgba(255, 255, 255, 0.14)",
+        "rgba(255, 255, 255, 0.3)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/insights.css",
+      "values": [
+        "#151c2c",
+        "#22c55e",
+        "#38bdf8",
+        "#4ade80",
+        "#64748b",
+        "#8a97ad",
+        "#8fe3b0",
+        "#a78bfa",
+        "#a7b1c2",
+        "#c7d3e6",
+        "#d8b4fe",
+        "#e6edf7",
+        "#f59e0b",
+        "#f87171",
+        "#fbbf24",
+        "#fca5a5",
+        "#ff9a9a",
+        "#fff",
+        "rgba(10, 14, 24, 0.78)",
+        "rgba(10, 14, 24, 0.9)",
+        "rgba(199, 211, 230, 0.5)",
+        "rgba(199, 211, 230, 0.6)",
+        "rgba(199, 211, 230, 0.65)",
+        "rgba(199, 211, 230, 0.7)",
+        "rgba(199, 211, 230, 0.75)",
+        "rgba(199, 211, 230, 0.8)",
+        "rgba(217, 70, 239, 0.55)",
+        "rgba(230, 237, 247, 0.7)",
+        "rgba(230, 237, 247, 0.8)",
+        "rgba(239, 68, 68, 0.15)",
+        "rgba(245, 158, 11, 0.07)",
+        "rgba(245, 158, 11, 0.15)",
+        "rgba(255, 120, 120, 0.35)",
+        "rgba(34, 197, 94, 0.15)",
+        "rgba(8, 12, 20, 0.6)",
+        "rgba(8, 12, 20, 0.72)",
+        "rgba(8, 12, 20, 0.8)",
+        "rgba(var(--primary-light-rgb), 0.12)",
+        "rgba(var(--primary-light-rgb), 0.16)",
+        "rgba(var(--primary-light-rgb), 0.2)",
+        "rgba(var(--primary-light-rgb), 0.25)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/items/item-details.css",
+      "values": [
+        "#d8f5c8",
+        "#f8fafc",
+        "rgba(10, 14, 22, 0.5)",
+        "rgba(132, 209, 96, 0.5)",
+        "rgba(235, 240, 246, 0.82)",
+        "rgba(255, 255, 255, 0.14)",
+        "rgba(var(--primary-light-rgb), 0.42)",
+        "rgba(var(--primary-rgb), 0.22)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/library/disk-forecast.css",
+      "values": [
+        "#22c55e",
+        "#ef4444",
+        "#f59e0b",
+        "rgba(255, 255, 255, 0.06)",
+        "rgba(255, 255, 255, 0.07)",
+        "rgba(255, 255, 255, 0.08)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/library/storage-by-library.css",
+      "values": [
+        "#c4b5fd",
+        "#f59e0b",
+        "#fbbf24",
+        "rgba(167, 139, 250, 0.6)",
+        "rgba(245, 158, 11, 0.55)",
+        "rgba(255, 255, 255, 0.04)",
+        "rgba(255, 255, 255, 0.05)",
+        "rgba(255, 255, 255, 0.06)",
+        "rgba(255, 255, 255, 0.08)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/maintainerr.css",
+      "values": [
+        "#8da0b8",
+        "#8ea0b8",
+        "#98a8bf",
+        "#9fb0ca",
+        "#a8b7cf",
+        "#c9d4e6",
+        "#e6f0ff",
+        "#e7f0ff",
+        "#f8fafc",
+        "rgba(248, 113, 113, 0.08)",
+        "rgba(248, 113, 113, 0.5)",
+        "rgba(9, 12, 19, 0.82)",
+        "rgba(var(--primary-light-rgb), 0.16)",
+        "rgba(var(--primary-light-rgb), 0.18)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/my-glance.css",
+      "values": [
+        "#00c8ff",
+        "#22c55e",
+        "#6b7280",
+        "#7dd3fc",
+        "#86efac",
+        "#8b5cf6",
+        "#94a3b8",
+        "#9cabbe",
+        "#a7b4c8",
+        "#c0c7d2",
+        "#cd7f32",
+        "#dbe7f7",
+        "#e6edf7",
+        "#e9d5ff",
+        "#f59e0b",
+        "#f5c542",
+        "#f8fafc",
+        "#fca5a5",
+        "#fcd34d",
+        "#fff",
+        "rgba(0, 0, 0, 0.34)",
+        "rgba(0, 0, 0, 0.45)",
+        "rgba(199, 211, 230, 0.55)",
+        "rgba(199, 211, 230, 0.6)",
+        "rgba(199, 211, 230, 0.7)",
+        "rgba(199, 211, 230, 0.75)",
+        "rgba(5, 8, 13, 0.72)",
+        "rgba(8, 11, 17, 0.88)",
+        "rgba(8, 11, 17, 0.92)",
+        "rgba(8, 12, 20, 0.5)",
+        "rgba(8, 12, 20, 0.85)",
+        "rgba(9, 12, 19, 0.94)",
+        "rgba(var(--primary-light-rgb), 0.2)",
+        "rgba(var(--primary-light-rgb), 0.28)",
+        "rgba(var(--primary-light-rgb), 0.32)",
+        "rgba(var(--primary-light-rgb), 0.34)",
+        "rgba(var(--primary-light-rgb), 0.45)",
+        "rgba(var(--primary-light-rgb), 0.55)",
+        "rgba(var(--primary-light-rgb, 167, 139, 250), 0.18)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/navbar.css",
+      "values": [
+        "#e6edf7",
+        "rgba(var(--primary-light-rgb, 139, 92, 246), 0.3)",
+        "rgba(var(--primary-rgb, 139, 92, 246), 0.14)",
+        "rgba(var(--primary-rgb, 139, 92, 246), 0.26)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/ops-copilot.css",
+      "values": [
+        "#00a4dc",
+        "#0b0d12",
+        "#151922",
+        "#9aa4b5",
+        "#ff7a7a",
+        "#fff",
+        "rgba(0, 0, 0, 0.2)",
+        "rgba(255, 255, 255, 0.04)",
+        "rgba(255, 255, 255, 0.06)",
+        "rgba(255, 255, 255, 0.08)",
+        "rgba(255, 255, 255, 0.12)",
+        "rgba(255, 255, 255, 0.14)",
+        "rgba(255, 255, 255, 0.18)",
+        "rgba(60, 200, 120, 0.2)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/settings/backups.css",
+      "values": [
+        "rgba(255, 255, 255, 0.14)",
+        "rgba(8, 12, 20, 0.7)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/settings/status-page-builder.css",
+      "values": [
+        "#0b1117",
+        "#8b5cf6",
+        "#bbf7d0",
+        "#c4b5fd",
+        "#e6edf7",
+        "#f8fafc",
+        "#fff",
+        "rgba(12, 15, 22, 0.72)",
+        "rgba(199, 211, 230, 0.55)",
+        "rgba(199, 211, 230, 0.6)",
+        "rgba(199, 211, 230, 0.7)",
+        "rgba(199, 211, 230, 0.72)",
+        "rgba(199, 211, 230, 0.75)",
+        "rgba(199, 211, 230, 0.78)",
+        "rgba(245, 158, 11, 0.08)",
+        "rgba(245, 158, 11, 0.45)",
+        "rgba(255, 255, 255, 0.03)",
+        "rgba(255, 255, 255, 0.06)",
+        "rgba(255, 255, 255, 0.08)",
+        "rgba(255, 255, 255, 0.1)",
+        "rgba(255, 255, 255, 0.15)",
+        "rgba(34, 197, 94, 0.12)",
+        "rgba(34, 197, 94, 0.5)",
+        "rgba(8, 12, 20, 0.5)",
+        "rgba(8, 12, 20, 0.7)",
+        "rgba(8, 12, 20, 0.85)",
+        "rgba(var(--primary-light-rgb), 0.16)",
+        "rgba(var(--primary-light-rgb), 0.18)",
+        "rgba(var(--primary-light-rgb), 0.2)",
+        "rgba(var(--primary-light-rgb), 0.22)",
+        "rgba(var(--primary-light-rgb), 0.25)",
+        "rgba(var(--primary-light-rgb), 0.4)",
+        "rgba(var(--primary-light-rgb), 0.45)",
+        "rgba(var(--primary-rgb), 0.14)",
+        "rgba(var(--primary-rgb), 0.2)",
+        "rgba(var(--primary-rgb), 0.45)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/setup.css",
+      "values": [
+        "#6b7280",
+        "#9fb0c8",
+        "#a8b3c7",
+        "#e2e8f0",
+        "#f8fafc",
+        "#fff",
+        "#ffffff",
+        "rgba(0, 0, 0, 0.28)",
+        "rgba(255, 255, 255, 0.07)",
+        "rgba(255, 255, 255, 0.16)",
+        "rgba(var(--primary-light-rgb), 0)",
+        "rgba(var(--primary-light-rgb), 0.32)",
+        "rgba(var(--primary-light-rgb), 0.5)",
+        "rgba(var(--primary-rgb), 0.2)",
+        "rgba(var(--primary-rgb), 0.28)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/statistics/library-heatmap.css",
+      "values": [
+        "#111827",
+        "#f8fafc",
+        "rgb(var(--primary-light-rgb))",
+        "rgba(248, 250, 252, 0.5)",
+        "rgba(248, 250, 252, 0.6)",
+        "rgba(248, 250, 252, 0.7)",
+        "rgba(248, 250, 252, 0.75)",
+        "rgba(248, 250, 252, 0.8)",
+        "rgba(255, 255, 255, 0.05)",
+        "rgba(255, 255, 255, 0.12)",
+        "rgba(var(--primary-rgb), 0.28)",
+        "rgba(var(--primary-rgb), 0.5)",
+        "rgba(var(--primary-rgb), 0.74)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/subtitle-gap.css",
+      "values": [
+        "#00a4dc",
+        "#0b0d12",
+        "#151922",
+        "#5ad18f",
+        "#9aa4b5",
+        "#ff7a7a",
+        "#ffb36b",
+        "#fff",
+        "rgba(255, 196, 0, 0.08)",
+        "rgba(255, 196, 0, 0.25)",
+        "rgba(255, 255, 255, 0.04)",
+        "rgba(255, 255, 255, 0.06)",
+        "rgba(255, 255, 255, 0.08)",
+        "rgba(255, 255, 255, 0.12)",
+        "rgba(255, 255, 255, 0.14)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/swagger.css",
+      "values": [
+        "#9aa7bb",
+        "#d7e0ee",
+        "#f8fafc",
+        "#fff",
+        "rgba(255, 255, 255, 0.03)",
+        "rgba(255, 255, 255, 0.035)",
+        "rgba(255, 255, 255, 0.04)",
+        "rgba(255, 255, 255, 0.05)",
+        "rgba(255, 255, 255, 0.06)",
+        "rgba(255, 255, 255, 0.08)",
+        "rgba(255, 255, 255, 0.11)",
+        "rgba(255, 255, 255, 0.12)",
+        "rgba(5, 8, 13, 0.72)",
+        "rgba(var(--primary-light-rgb), 0.45)",
+        "rgba(var(--primary-rgb), 0.14)",
+        "white"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/timeline/activity-timeline.css",
+      "values": [
+        "rgba(245, 234, 254, 0.72)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/css/users/users.css",
+      "values": [
+        "rgba(var(--primary-light-rgb), 0.28)"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
+    },
+    {
+      "path": "apps/web/src/pages/insights.jsx",
+      "values": [
+        "#101624",
+        "#2a3350",
+        "#8a97ad",
+        "#8b5cf6",
+        "#d946ef",
+        "#f59e0b",
+        "rgba(255,255,255,0.04)",
+        "rgba(255,255,255,0.12)",
+        "rgba(var(--primary-rgb, 139, 92, 246), ${0.08 + value * 0.72})"
+      ],
+      "reason": "Upstream 1.4.3-beta.1 merge (2026-11-12): literal colors not yet re-themed to --barracks-* tokens. Ratchet: remove values as the page is re-themed; never add new ones."
     }
   ]
 }

@@ -4,6 +4,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { Spinner } from "@/components/ui/spinner";
 import { RiEyeFill, RiEyeOffFill, RiLoginCircleLine, RiShieldKeyholeLine, RiUserSettingsLine } from "@remixicon/react";
 import { Link } from "react-router-dom";
@@ -19,6 +20,18 @@ import "../../css/settings/settings.css";
 
 // Keep the remixicon size props; the Button primitive would otherwise force 1rem icons.
 const BUTTON_ICON_NATURAL_SIZE = "tw:[&_svg:not([class*=size-])]:size-auto";
+
+import { useTranslation } from "react-i18next";
+
+const OIDC = "SETTINGS_PAGE.OIDC";
+const OIDC_ROLES = ["Owner", "Admin", "Manager", "Viewer", "Household", "Disabled"];
+
+function roleMappingToText(mapping) {
+  if (!mapping || typeof mapping !== "object") return typeof mapping === "string" ? mapping : "";
+  return Object.entries(mapping)
+    .map(([group, role]) => `${group}=${role}`)
+    .join("\n");
+}
 
 const authModes = [
   {
@@ -43,6 +56,7 @@ const authModes = [
 
 export default function SecuritySettings() {
   const [isSilo, setIsSilo] = useState(true);
+  const { t } = useTranslation();
   const [authMode, setAuthMode] = useState("quick-connect");
   const [showOidcSecret, setShowOidcSecret] = useState(false);
   const [oidcValues, setOidcValues] = useState({});
@@ -66,8 +80,15 @@ export default function SecuritySettings() {
         setOidcValues({
           issuerUrl: nextAuth.issuerUrl || "",
           clientId: nextAuth.clientId || "",
-          clientSecret: nextAuth.clientSecret || "",
+          clientSecret: "",
           redirectUri: nextAuth.redirectUri || `${window.location.origin}/auth/oidc/callback`,
+          scopes: nextAuth.scopes || "openid profile email",
+          groupsClaim: nextAuth.groupsClaim || "groups",
+          roleMapping: roleMappingToText(nextAuth.roleMapping),
+          linkPolicy: nextAuth.linkPolicy || "verified_email",
+          autoProvision: Boolean(nextAuth.autoProvision),
+          defaultRole: nextAuth.defaultRole || "Viewer",
+          clearClientSecret: false,
         });
       } catch (error) {
         console.log(error);
@@ -129,7 +150,8 @@ export default function SecuritySettings() {
   }
 
   function handleOidcChange(event) {
-    setOidcValues({ ...oidcValues, [event.target.name]: event.target.value });
+    const { name, type, checked, value } = event.target;
+    setOidcValues({ ...oidcValues, [name]: type === "checkbox" ? checked : value });
   }
 
   function handleActiveSessionIpPrivacyChange(value) {
@@ -262,6 +284,7 @@ export default function SecuritySettings() {
                     name="clientSecret"
                     value={oidcValues.clientSecret || ""}
                     onChange={handleOidcChange}
+                    placeholder="Leave blank to keep the saved secret"
                     type={showOidcSecret ? "text" : "password"}
                     autoComplete="off"
                   />
@@ -277,6 +300,88 @@ export default function SecuritySettings() {
               <div className="col">
                 <Input id="oidc-redirect-uri" name="redirectUri" value={oidcValues.redirectUri || ""} onChange={handleOidcChange} />
               </div>
+            </div>
+
+            <div className="mb-3 security-oidc-check">
+              <label>
+                <input
+                  type="checkbox"
+                  id="oidc-public-client"
+                  name="clearClientSecret"
+                  checked={Boolean(oidcValues.clearClientSecret)}
+                  onChange={handleOidcChange}
+                />
+                {t(`${OIDC}.PUBLIC_CLIENT`)}
+              </label>
+            </div>
+
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-scopes" className="col">{t(`${OIDC}.SCOPES`)}</Label>
+              <div className="col">
+                <Input id="oidc-scopes" name="scopes" value={oidcValues.scopes || ""} onChange={handleOidcChange} placeholder="openid profile email groups" />
+              </div>
+            </div>
+
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-groups-claim" className="col">{t(`${OIDC}.GROUPS_CLAIM`)}</Label>
+              <div className="col">
+                <Input id="oidc-groups-claim" name="groupsClaim" value={oidcValues.groupsClaim || ""} onChange={handleOidcChange} placeholder="groups" />
+              </div>
+            </div>
+
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-role-mapping" className="col">{t(`${OIDC}.ROLE_MAPPING`)}</Label>
+              <div className="col">
+                <textarea
+                  id="oidc-role-mapping"
+                  name="roleMapping"
+                  rows={3}
+                  value={oidcValues.roleMapping || ""}
+                  onChange={handleOidcChange}
+                  placeholder={"jellyglance-admins=Admin\njellyglance-users=Viewer"}
+                  className="tw:w-full tw:rounded-[8px] tw:border tw:border-border-strong tw:bg-surface-interactive tw:px-3 tw:py-1.5 tw:text-base tw:leading-normal tw:text-secondary-foreground tw:outline-none tw:disabled:pointer-events-none tw:disabled:cursor-not-allowed tw:disabled:opacity-65"
+                />
+                <small className="tw:block tw:mt-1 tw:text-muted-foreground">{t(`${OIDC}.ROLE_MAPPING_HINT`)}</small>
+              </div>
+            </div>
+
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-link-policy" className="col">{t(`${OIDC}.LINK_POLICY`)}</Label>
+              <div className="col">
+                <NativeSelect id="oidc-link-policy" name="linkPolicy" value={oidcValues.linkPolicy || "verified_email"} onChange={handleOidcChange}>
+                  <NativeSelectOption value="verified_email">{t(`${OIDC}.LINK_VERIFIED_EMAIL`)}</NativeSelectOption>
+                  <NativeSelectOption value="username">{t(`${OIDC}.LINK_USERNAME`)}</NativeSelectOption>
+                  <NativeSelectOption value="manual">{t(`${OIDC}.LINK_MANUAL`)}</NativeSelectOption>
+                </NativeSelect>
+                {oidcValues.linkPolicy === "username" ? <small className="tw:block tw:mt-1 tw:text-warning">{t(`${OIDC}.LINK_USERNAME_WARNING`)}</small> : null}
+              </div>
+            </div>
+
+            <div className="mb-3 row">
+              <Label htmlFor="oidc-default-role" className="col">{t(`${OIDC}.DEFAULT_ROLE`)}</Label>
+              <div className="col">
+                <NativeSelect id="oidc-default-role" name="defaultRole" value={oidcValues.defaultRole || "Viewer"} onChange={handleOidcChange}>
+                  {OIDC_ROLES.map((role) => (
+                    <NativeSelectOption key={role} value={role}>
+                      {role}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
+              </div>
+            </div>
+
+            <div className="mb-3 security-oidc-check">
+              <label>
+                <input
+                  type="checkbox"
+                  id="oidc-auto-provision"
+                  name="autoProvision"
+                  checked={Boolean(oidcValues.autoProvision)}
+                  onChange={handleOidcChange}
+                />
+                {t(`${OIDC}.AUTO_PROVISION`)}
+              </label>
+              <small className="tw:block tw:mt-1 tw:text-muted-foreground">{t(`${OIDC}.BREAK_GLASS`)}</small>
             </div>
           </div>
         )}

@@ -5,6 +5,24 @@ import { resolveHubTabs } from "../../../lib/hub-tabs";
 import Loading from "./loading";
 import "./css/page-tabs.css";
 
+export function readNavAvailability(key) {
+  try {
+    return localStorage.getItem(key) === "true";
+  } catch {
+    return false;
+  }
+}
+
+export function readAuth() {
+  try {
+    const config = JSON.parse(localStorage.getItem("config") || "{}");
+    const role = config?.settings?.auth?.role || "Viewer";
+    return { isAdmin: role === "Owner" || role === "Admin", permissions: config?.settings?.auth?.permissions || {} };
+  } catch {
+    return { isAdmin: false, permissions: {} };
+  }
+}
+
 // Tabbed hub page: the active tab lives in ?tab=, and the tab bar hides when only one tab is shown.
 // `tabs` lists every tab the hub has; `visible` and `reachable` are tab ids (see hub-tabs.js).
 export default function PageTabs({ title, tabs, visible, reachable, empty = null }) {

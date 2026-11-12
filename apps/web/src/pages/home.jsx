@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import axios from "../lib/axios_instance";
+import { formatDate as formatLocaleDate } from "../lib/format-date";
+import { cachedGet } from "../lib/api-cache";
 import Config from "../lib/config";
+import { useTranslation } from "react-i18next";
 
-import { RiArrowDownSLine, RiArrowUpSLine, RiBarChartGroupedLine, RiChatCheckLine, RiCheckboxCircleLine, RiDatabase2Line, RiDownloadCloud2Line, RiErrorWarningLine, RiEyeLine, RiEyeOffLine, RiFilmLine, RiFireLine, RiGroupLine, RiHeartPulseLine, RiMagicLine, RiMedalFill, RiMenuLine, RiMusic2Line, RiPlayCircleLine, RiRefreshLine, RiRestartLine, RiSettings3Line, RiStarSmileLine, RiTimeLine, RiTrophyLine, RiTv2Line, RiUser3Line } from "@remixicon/react";
+import { RiArrowDownSLine, RiArrowUpSLine, RiBarChartGroupedLine, RiChatCheckLine, RiCheckboxCircleLine, RiDatabase2Line, RiDownloadCloud2Line, RiErrorWarningLine, RiEyeLine, RiEyeOffLine, RiFilmLine, RiFireLine, RiGroupLine, RiHeartPulseLine, RiMagicLine, RiMedalFill, RiMenuLine, RiMusic2Line, RiPlayCircleLine, RiRefreshLine, RiRestartLine, RiServerFill, RiSettings3Line, RiStarSmileLine, RiTimeLine, RiTrophyLine, RiTv2Line, RiUser3Line } from "@remixicon/react";
 
 import Sessions from "./components/sessions/sessions";
-import { fetchActiveSessions } from "../lib/session-cache";
+import { fetchActiveSessions, getCachedActiveSessions, subscribeActiveSessions } from "../lib/session-cache";
 import "./css/home.css";
 import {
   DEFAULT_HOME_ORDER,
@@ -16,11 +19,13 @@ import {
   HOME_SECTION_DEFINITIONS,
   HOME_THEME_OPTIONS,
   HOME_WIDGET_SIZE_LABELS,
+  getHomeDisplayOrder,
   getHomeSettingsStorageKey,
   loadHomeSettings,
   normalizeHomeOrder,
   normalizeHomeSettings,
 } from "../lib/home-settings";
+import { mediaServerName } from "../lib/media-server";
 
 const numberFormat = new Intl.NumberFormat();
 const HOME_DASHBOARD_CACHE_KEY = "silo_barracks_home_dashboard_cache";
@@ -51,13 +56,12 @@ function formatNumber(value) {
 }
 
 function formatDate(value) {
-  if (!value) return "Unknown";
-  return new Intl.DateTimeFormat("en-GB", {
+  return formatLocaleDate(value, {
     day: "2-digit",
     month: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(value));
+  }, { fallback: "Unknown" });
 }
 
 function formatBytes(bytes) {
@@ -277,7 +281,9 @@ function getTdarrWidget(bundle) {
 
   return {
     status: active > 0 ? `${formatNumber(active)} active` : queued > 0 ? `${formatNumber(queued)} queued` : "Idle",
-    detail: firstJob?.title || firstJob?.name || firstJob?.file || "No active workers right now",
+    detail: firstJob
+      ? [firstJob.nodeName, firstJob.hardware === "gpu" ? "GPU" : firstJob.hardware === "cpu" ? "CPU" : "", firstJob.workKind === "healthcheck" ? "Health check" : firstJob.workKind === "transcode" ? "Transcode" : firstJob.title].filter(Boolean).join(" · ")
+      : "No active workers right now",
     metrics: [
       { label: "Active", value: formatNumber(active) },
       { label: "Queue", value: formatNumber(queued) },
@@ -298,6 +304,23 @@ function getWizarrWidget(data) {
       { label: "Invites", value: formatNumber(data?.status?.invites ?? invites.length) },
       { label: "Used", value: formatNumber(used) },
       { label: "Users", value: formatNumber(data?.status?.users || 0) },
+    ],
+  };
+}
+
+function getMaintainerrWidget(bundle) {
+  const storage = bundle?.storage || {};
+  const stats = bundle?.stats || {};
+  const health = bundle?.health || {};
+  const due = Number(stats.upcomingWeek || 0);
+  const scheduled = Number(stats.scheduledItems || 0);
+  return {
+    status: health.ok ? "Healthy" : "Needs attention",
+    detail: health.status ? `${health.status}${health.live ? ", live" : ""}${health.ready ? ", ready" : ""}`.replace(/^\s*,/g, "").trim() || "Monitor cleanup schedules" : "Monitor cleanup schedules",
+    metrics: [
+      { label: "Scheduled", value: formatNumber(scheduled) },
+      { label: "Due in 7d", value: formatNumber(due) },
+      { label: "Reclaimable", value: formatBytes(storage.reclaimableBytes || 0) },
     ],
   };
 }
@@ -384,9 +407,11 @@ function timeZoneLabel(timeZone) {
 }
 
 export default function Home({ kioskMode = false }) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const [dashboard, setDashboard] = useState(() => loadHomeCache(HOME_DASHBOARD_CACHE_KEY));
   const [operations, setOperations] = useState(() => loadHomeCache(HOME_OPERATIONS_CACHE_KEY) || { requests: null, health: null });
-  const [integrationWidgets, setIntegrationWidgets] = useState({ tdarr: null, wizarr: null, automation: null });
+  const [integrationWidgets, setIntegrationWidgets] = useState({ tdarr: null, wizarr: null, maintainerr: null, automation: null });
   const [integrationWidgetErrors, setIntegrationWidgetErrors] = useState({});
   const [isOrderingHome, setIsOrderingHome] = useState(false);
   const [isHomeActionsOpen, setIsHomeActionsOpen] = useState(false);
@@ -395,8 +420,26 @@ export default function Home({ kioskMode = false }) {
   const [actionMessage, setActionMessage] = useState("");
   const [busyAction, setBusyAction] = useState("");
   const [draggedSection, setDraggedSection] = useState("");
+  const [liveSessions, setLiveSessions] = useState(() => getCachedActiveSessions() || []);
   const [detailModal, setDetailModal] = useState(null);
   const [error, setError] = useState("");
+  const [gapBusyId, setGapBusyId] = useState("");
+  const [gapMessage, setGapMessage] = useState("");
+
+  useEffect(() => {
+    if (kioskMode) return undefined;
+    let active = true;
+    Config.getConfig()
+      .then((cfg) => {
+        if (active && cfg?.settings?.auth?.permissions?.home === false) {
+          navigate("/me", { replace: true });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [kioskMode, navigate]);
 
   async function loadDashboardData() {
     try {
@@ -420,10 +463,15 @@ export default function Home({ kioskMode = false }) {
     if (!token) return;
 
     try {
-      const response = await axios.get("/api/home/operations", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: forceRequests ? { forceRequests: "true" } : undefined,
-      });
+      const response = await cachedGet(
+        axios,
+        "/api/home/operations",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: forceRequests ? { forceRequests: "true" } : undefined,
+        },
+        forceRequests ? 0 : 25000
+      );
       const nextOperations = response.data || { requests: null, health: null };
       setOperations(nextOperations);
       saveHomeCache(HOME_OPERATIONS_CACHE_KEY, nextOperations);
@@ -465,6 +513,12 @@ export default function Home({ kioskMode = false }) {
     };
   }, [kioskMode]);
 
+  useEffect(() => {
+    const unsubscribe = subscribeActiveSessions((sessions) => setLiveSessions(Array.isArray(sessions) ? sessions : []));
+    fetchActiveSessions().catch(() => {});
+    return unsubscribe;
+  }, []);
+
   const isSiloDashboard = String(dashboard?.source || "").startsWith("silo");
   const peakZone = timeZoneLabel(dashboard?.history?.timeZone);
   const isNativeSiloDashboard = dashboard?.source === "silo-native";
@@ -489,6 +543,7 @@ export default function Home({ kioskMode = false }) {
   const requestStats = operations.requests?.stats || {};
   const recentRequests = (operations.requests?.requests || []).slice(0, 4);
   const healthChecks = operations.health?.checks || [];
+  const jellyfinCheck = healthChecks.find((check) => check.key === "jellyfin");
   const failingChecks = healthChecks.filter((check) => !check.ok);
   const healthLabel = operations.health ? (operations.health.ok ? "Healthy" : `${failingChecks.length} issue${failingChecks.length === 1 ? "" : "s"}`) : "Loading";
   const backupDate = operations.health?.backup?.latestBackup?.datecreated;
@@ -496,13 +551,37 @@ export default function Home({ kioskMode = false }) {
   const topItem = weekPulse.topItem;
   const activeViewer = weekPulse.mostActiveViewer;
   const quietUsers = weekPulse.quietUsers || [];
+  // Accounts that can't see every user get their own week instead of the leaderboards.
+  const ownActivityOnly = dashboard?.scope === "self";
   const trendDelta = dashboard?.trends?.delta || {};
   const todayTrend = dashboard?.trends?.today || {};
   const libraryIssues = dashboard?.libraryIssues || {};
   const watchParty = dashboard?.watchParty || [];
+  const watchTonight = dashboard?.watchTonight || [];
+  const watchTonightReasonLabel = {
+    continue: t("FEATURES.WATCH_TONIGHT.CONTINUE"),
+    "shared-watchlist": t("FEATURES.WATCH_TONIGHT.SHARED_WATCHLIST"),
+    "shared-favourite": t("FEATURES.WATCH_TONIGHT.SHARED_FAVOURITE"),
+    unfinished: t("FEATURES.WATCH_TONIGHT.UNFINISHED"),
+  };
   const requestUrgency = Number(requestStats.pending || 0) + Number(requestStats.failed || 0);
+  const maintainerrData = operations.maintainerr || null;
+  const digestItems = operations.digest?.items || [];
+  const storage = operations.storage || null;
+  const runningJobs = operations.jobs?.running || [];
+  const maintainerrScheduled = Number(maintainerrData?.stats?.scheduledItems || 0);
+  const maintainerrUpcoming = Number(maintainerrData?.stats?.upcomingWeek || 0);
+  const maintainerrFailures = Number(maintainerrData?.stats?.collectionFailures || 0);
+  const maintainerrReclaimableBytes = Number(maintainerrData?.storage?.reclaimableBytes || 0);
   const backupAgeMs = backupDate ? Date.now() - new Date(backupDate).getTime() : Infinity;
   const backupAgeDays = Number.isFinite(backupAgeMs) ? Math.floor(backupAgeMs / (24 * 60 * 60 * 1000)) : Infinity;
+  const activeSessionCount = Array.isArray(liveSessions) ? liveSessions.length : 0;
+  const transcodingSessionCount = Array.isArray(liveSessions)
+    ? liveSessions.filter((session) => session.TranscodingInfo || String(session.PlayState?.PlayMethod || "").toLowerCase() === "transcode").length
+    : 0;
+  const directPlayCount = Math.max(0, activeSessionCount - transcodingSessionCount);
+  const streamCap = Number(homeSettings.alertRules.streamCap || 0);
+  const transcodeCap = Number(homeSettings.alertRules.transcodeCap || 0);
   const attentionItems = [
     requestUrgency >= Number(homeSettings.alertRules.requestThreshold || 1)
       ? { key: `requests:${requestUrgency}`, label: `${formatNumber(requestUrgency)} request${requestUrgency === 1 ? "" : "s"} need attention`, type: "requests" }
@@ -512,8 +591,75 @@ export default function Home({ kioskMode = false }) {
     Number(libraryIssues.missingPosters || 0) >= Number(homeSettings.alertRules.missingPosterThreshold || 1)
       ? { key: `posters:${libraryIssues.missingPosters}`, label: `${formatNumber(libraryIssues.missingPosters)} missing posters`, type: "posters" }
       : null,
+    streamCap > 0 && activeSessionCount > streamCap
+      ? { key: `streams:${activeSessionCount}:${streamCap}`, label: `${formatNumber(activeSessionCount)} streams over the cap of ${formatNumber(streamCap)}`, type: "streams" }
+      : null,
+    transcodeCap > 0 && transcodingSessionCount > transcodeCap
+      ? { key: `transcodes:${transcodingSessionCount}:${transcodeCap}`, label: `${formatNumber(transcodingSessionCount)} transcodes over the cap of ${formatNumber(transcodeCap)}`, type: "transcodes" }
+      : null,
+    maintainerrData && maintainerrData.health && maintainerrData.health.ok === false
+      ? {
+          key: `maintainerr-health:${maintainerrData.health.status || "unknown"}`,
+          label: maintainerrData.health.status ? `Maintainerr health: ${maintainerrData.health.status}` : "Maintainerr service degraded",
+          type: "maintainerr",
+        }
+      : null,
+    maintainerrScheduled > 0
+      ? {
+          key: `maintainerr-scheduled:${maintainerrScheduled}`,
+          label: `${formatNumber(maintainerrScheduled)} media item${maintainerrScheduled === 1 ? "" : "s"} scheduled for cleanup`,
+          type: "maintainerr",
+        }
+      : null,
+    maintainerrUpcoming > 0
+      ? {
+          key: `maintainerr-upcoming:${maintainerrUpcoming}`,
+          label: `${formatNumber(maintainerrUpcoming)} cleanup action${maintainerrUpcoming === 1 ? "" : "s"} in the next 7 days`,
+          type: "maintainerr",
+        }
+      : null,
+    maintainerrFailures > 0
+      ? {
+          key: `maintainerr-failures:${maintainerrFailures}`,
+          label: `${formatNumber(maintainerrFailures)} cleanup collection${maintainerrFailures === 1 ? "" : "s"} failed`,
+          type: "maintainerr",
+        }
+      : null,
+    maintainerrReclaimableBytes >= 5 * 1024 * 1024 * 1024
+      ? {
+          key: `maintainerr-reclaimable:${maintainerrReclaimableBytes}`,
+          label: `${formatBytes(maintainerrReclaimableBytes)} reclaimable storage available`,
+          type: "maintainerr",
+        }
+      : null,
+    ...digestItems.map((item) => ({
+      key: `digest:${item.type}:${item.label}`,
+      label: item.label,
+      type: item.type || "digest",
+    })),
   ].filter((item) => item && !homeSettings.dismissedAlerts?.[item.key]);
   const seasonGaps = dashboard?.seasonGaps || [];
+  const sonarrConnected = Boolean(dashboard?.sonarrConnected);
+
+  async function searchSeasonGap(item) {
+    if (!sonarrConnected || !item?.itemId) return;
+    setGapBusyId(item.itemId);
+    setGapMessage("");
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "/api/retry-grab",
+        { itemId: item.itemId, title: item.name, mediaType: "series" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setGapMessage(response.data?.ok ? t("FEATURES.SEASON_GAPS.SEARCH_OK") : response.data?.error || t("FEATURES.SEASON_GAPS.SEARCH_FAIL"));
+    } catch (error) {
+      const message = error?.response?.data?.error || t("FEATURES.SEASON_GAPS.SEARCH_FAIL");
+      setGapMessage(message === "Series not found in Sonarr" ? t("FEATURES.SEASON_GAPS.NOT_IN_SONARR") : message);
+    } finally {
+      setGapBusyId("");
+    }
+  }
   const automationFeed = dashboard?.automationFeed || [];
   const milestones = useMemo(() => buildHomeMilestones(dashboard, operations), [dashboard, operations]);
   const visibleWidgetCount = HOME_SECTION_DEFINITIONS.length - homeSettings.hidden.length;
@@ -606,7 +752,7 @@ export default function Home({ kioskMode = false }) {
     const token = localStorage.getItem("token");
     const headers = { Authorization: `Bearer ${token}` };
     const actions = {
-      sync: { label: "Media catalog sync", request: () => axios.get("/sync/beginSync", { headers }) },
+      sync: { label: `${mediaServerName()} sync`, request: () => axios.get("/sync/beginSync", { headers }) },
       backup: { label: "Backup", request: () => axios.get("/backup/beginBackup", { headers }) },
       integrations: { label: "Integration test", request: () => axios.post("/api/integrations/test-all", {}, { headers }) },
     };
@@ -625,25 +771,11 @@ export default function Home({ kioskMode = false }) {
     }
   }
 
-  const sectionLabels = HOME_SECTION_DEFINITIONS.reduce((labels, section) => ({ ...labels, [section.id]: section.label }), {});
+  const sectionLabels = HOME_SECTION_DEFINITIONS.reduce((labels, section) => ({ ...labels, [section.id]: t(`HOME_PAGE.SECTIONS.${section.id}`, { defaultValue: section.label }) }), {});
   const orderedSectionIds = useMemo(() => {
-    const hidden = new Set(homeSettings.hidden);
     const unavailable = new Set(error && !dashboard ? DASHBOARD_SECTIONS : dashboard?.unavailableSections || []);
-    let ordered = normalizeHomeOrder(homeSettings.order).filter((sectionId) => !hidden.has(sectionId) && !unavailable.has(sectionId));
-
-    if (homeSettings.pinned && ordered.includes(homeSettings.pinned)) {
-      ordered = [homeSettings.pinned, ...ordered.filter((sectionId) => sectionId !== homeSettings.pinned)];
-    }
-
-    if (requestUrgency > 0 && ordered.includes("operations") && homeSettings.pinned !== "operations") {
-      ordered = ["operations", ...ordered.filter((sectionId) => sectionId !== "operations")];
-      if (homeSettings.pinned && ordered.includes(homeSettings.pinned)) {
-        ordered = [homeSettings.pinned, ...ordered.filter((sectionId) => sectionId !== homeSettings.pinned)];
-      }
-    }
-
-    return ordered;
-  }, [homeSettings.hidden, homeSettings.order, homeSettings.pinned, requestUrgency, dashboard, error]);
+    return getHomeDisplayOrder(homeSettings, { promoteOperations: requestUrgency > 0 }).filter((sectionId) => !unavailable.has(sectionId));
+  }, [homeSettings, requestUrgency, dashboard, error]);
   useEffect(() => {
     if (!kioskMode) return undefined;
     const refreshSessions = () => {
@@ -664,6 +796,7 @@ export default function Home({ kioskMode = false }) {
     () => ({
       tdarr: orderedSectionIds.includes("tdarr"),
       wizarr: orderedSectionIds.includes("wizarr"),
+      maintainerr: orderedSectionIds.includes("maintainerr"),
       bazarr: orderedSectionIds.includes("bazarr"),
       prowlarr: orderedSectionIds.includes("prowlarr"),
     }),
@@ -673,8 +806,9 @@ export default function Home({ kioskMode = false }) {
   useEffect(() => {
     const wantsTdarr = visibleIntegrationWidgets.tdarr;
     const wantsWizarr = visibleIntegrationWidgets.wizarr;
+    const wantsMaintainerr = visibleIntegrationWidgets.maintainerr;
     const wantsAutomation = visibleIntegrationWidgets.bazarr || visibleIntegrationWidgets.prowlarr;
-    if (!wantsTdarr && !wantsWizarr && !wantsAutomation) return undefined;
+    if (!wantsTdarr && !wantsWizarr && !wantsMaintainerr && !wantsAutomation) return undefined;
 
     let cancelled = false;
 
@@ -711,6 +845,22 @@ export default function Home({ kioskMode = false }) {
         );
       }
 
+      if (wantsMaintainerr) {
+        requests.push(
+          axios
+            .get("/api/maintainerr")
+            .then((response) => {
+              if (cancelled) return;
+              setIntegrationWidgets((current) => ({ ...current, maintainerr: response.data }));
+              setIntegrationWidgetErrors((current) => ({ ...current, maintainerr: "" }));
+            })
+            .catch((error) => {
+              if (cancelled) return;
+              setIntegrationWidgetErrors((current) => ({ ...current, maintainerr: error.response?.data?.error || "Unable to load Maintainerr." }));
+            })
+        );
+      }
+
       if (wantsAutomation) {
         requests.push(
           axios.get("/api/automation-health")
@@ -737,7 +887,7 @@ export default function Home({ kioskMode = false }) {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [kioskMode, visibleIntegrationWidgets.tdarr, visibleIntegrationWidgets.wizarr, visibleIntegrationWidgets.bazarr, visibleIntegrationWidgets.prowlarr]);
+  }, [kioskMode, visibleIntegrationWidgets.tdarr, visibleIntegrationWidgets.wizarr, visibleIntegrationWidgets.maintainerr, visibleIntegrationWidgets.bazarr, visibleIntegrationWidgets.prowlarr]);
 
   useEffect(() => {
     setRotateIndex(0);
@@ -824,6 +974,16 @@ export default function Home({ kioskMode = false }) {
           <Link to="/activity">View activity</Link>
         </div>
       ) : null}
+      {jellyfinCheck && jellyfinCheck.ok === false ? (
+        <div className="home-jellyfin-down" role="status">
+          <RiErrorWarningLine size={18} />
+          <div>
+            <strong>{t("FEATURES.OPS.JELLYFIN_DOWN")}</strong>
+            <span>{jellyfinCheck.message}</span>
+          </div>
+          {kioskMode ? null : <Link to="/settings/health">{t("FEATURES.OPS.OPEN_HEALTH")}</Link>}
+        </div>
+      ) : null}
 
       {isOrderingHome ? (
         <div className="home-order-panel home-glass-card">
@@ -898,9 +1058,17 @@ export default function Home({ kioskMode = false }) {
               <span>Missing posters</span>
               <input type="number" min="1" value={homeSettings.alertRules.missingPosterThreshold} onChange={(event) => updateHomeSettings((current) => ({ ...current, alertRules: { ...current.alertRules, missingPosterThreshold: Number(event.target.value) || 1 }, preset: "custom" }))} />
             </label>
+            <label>
+              <span>Stream cap</span>
+              <input type="number" min="0" value={homeSettings.alertRules.streamCap ?? 0} onChange={(event) => updateHomeSettings((current) => ({ ...current, alertRules: { ...current.alertRules, streamCap: Number(event.target.value) || 0 }, preset: "custom" }))} />
+            </label>
+            <label>
+              <span>Transcode cap</span>
+              <input type="number" min="0" value={homeSettings.alertRules.transcodeCap ?? 0} onChange={(event) => updateHomeSettings((current) => ({ ...current, alertRules: { ...current.alertRules, transcodeCap: Number(event.target.value) || 0 }, preset: "custom" }))} />
+            </label>
             <button type="button" onClick={() => updateHomeSettings((current) => ({ ...current, dismissedAlerts: {}, preset: "custom" }))}>Restore alerts</button>
           </div>
-          {requestUrgency > 0 ? <p className="home-order-note">{formatNumber(requestUrgency)} request issue{requestUrgency === 1 ? "" : "s"} detected, so Operations is bubbling up.</p> : null}
+          {requestUrgency > 0 ? <p className="home-order-note">{t("HOME_PAGE.OPERATIONS_MOVED_UP", { count: requestUrgency, section: sectionLabels.operations })}</p> : null}
           <div className="home-order-list">
             {normalizeHomeOrder(homeSettings.order).map((sectionId, index) => {
               const isHidden = homeSettings.hidden.includes(sectionId);
@@ -920,21 +1088,21 @@ export default function Home({ kioskMode = false }) {
                 <span>{index + 1}</span>
                 <strong className={isHidden ? "is-hidden-section" : ""}>
                   {sectionLabels[sectionId]}
-                  <small>{dashboard?.unavailableSections?.includes(sectionId) ? "Not yet available for Silo" : isHidden ? "Hidden" : HOME_WIDGET_SIZE_LABELS[homeSettings.sizes?.[sectionId] || "medium"]}</small>
+                  <small>{dashboard?.unavailableSections?.includes(sectionId) ? "Not yet available for Silo" : isHidden ? t("HOME_PAGE.HIDDEN") : t(`HOME_PAGE.SIZE_${String(homeSettings.sizes?.[sectionId] || "medium").toUpperCase()}`, { defaultValue: HOME_WIDGET_SIZE_LABELS[homeSettings.sizes?.[sectionId] || "medium"] })}</small>
                 </strong>
                 <div>
-                  <select title="Widget size" value={homeSettings.sizes?.[sectionId] || "medium"} onChange={(event) => updateWidgetSize(sectionId, event.target.value)}>
-                    <option value="small">Compact</option>
-                    <option value="medium">Half</option>
-                    <option value="large">Full</option>
+                  <select title={t("HOME_PAGE.WIDGET_SIZE")} value={homeSettings.sizes?.[sectionId] || "medium"} onChange={(event) => updateWidgetSize(sectionId, event.target.value)}>
+                    <option value="small">{t("HOME_PAGE.SIZE_SMALL")}</option>
+                    <option value="medium">{t("HOME_PAGE.SIZE_MEDIUM")}</option>
+                    <option value="large">{t("HOME_PAGE.SIZE_LARGE")}</option>
                   </select>
-                  <button type="button" title={isHidden ? "Show section" : "Hide section"} onClick={() => toggleHomeSection(sectionId)}>
+                  <button type="button" title={isHidden ? t("HOME_PAGE.SHOW_SECTION") : t("HOME_PAGE.HIDE_SECTION")} onClick={() => toggleHomeSection(sectionId)}>
                     {isHidden ? <RiEyeOffLine size={17} /> : <RiEyeLine size={17} />}
                   </button>
-                  <button type="button" title="Move up" disabled={index === 0} onClick={() => moveHomeSection(sectionId, -1)}>
+                  <button type="button" title={t("HOME_PAGE.MOVE_UP")} disabled={index === 0} onClick={() => moveHomeSection(sectionId, -1)}>
                     <RiArrowUpSLine size={18} />
                   </button>
-                  <button type="button" title="Move down" disabled={index === homeSettings.order.length - 1} onClick={() => moveHomeSection(sectionId, 1)}>
+                  <button type="button" title={t("HOME_PAGE.MOVE_DOWN")} disabled={index === homeSettings.order.length - 1} onClick={() => moveHomeSection(sectionId, 1)}>
                     <RiArrowDownSLine size={18} />
                   </button>
                 </div>
@@ -946,9 +1114,33 @@ export default function Home({ kioskMode = false }) {
       ) : null}
 
       <div className="home-section-stack">
-      {shouldRenderSection("sessions") ? <section className={getHomeSectionClass("sessions", "home-active-sessions home-glass-card")} style={getHomeSectionStyle("sessions")}>
+      {shouldRenderSection("sessions") && activeSessionCount > 0 ? <section className={getHomeSectionClass("sessions", "home-active-sessions home-glass-card")} style={getHomeSectionStyle("sessions")}>
         <Sessions surface={kioskMode ? "kiosk" : "home"} />
       </section> : null}
+
+      {shouldRenderSection("streamCapacity") ? (
+        <section className={getHomeSectionClass("streamCapacity", "home-stream-capacity home-glass-card")} aria-label="Stream capacity" style={getHomeSectionStyle("streamCapacity")}>
+          <div className="home-section-title">
+            <RiPlayCircleLine size={20} />
+            <h2>Stream capacity</h2>
+          </div>
+          <div className="home-stream-capacity-grid">
+            <div>
+              <span>Active</span>
+              <strong>{formatNumber(activeSessionCount)}{streamCap > 0 ? ` / ${formatNumber(streamCap)}` : ""}</strong>
+            </div>
+            <div>
+              <span>Transcoding</span>
+              <strong>{formatNumber(transcodingSessionCount)}{transcodeCap > 0 ? ` / ${formatNumber(transcodeCap)}` : ""}</strong>
+            </div>
+            <div>
+              <span>Direct play</span>
+              <strong>{formatNumber(directPlayCount)}</strong>
+            </div>
+          </div>
+          <small>Set stream and transcode caps in Home layout. 0 means no alert.</small>
+        </section>
+      ) : null}
 
       {shouldRenderSection("overview") ? <section className={getHomeSectionClass("overview", "home-hero-grid")} aria-label="Silo Barracks overview" style={getHomeSectionStyle("overview")}>
         <MetricCard
@@ -995,7 +1187,7 @@ export default function Home({ kioskMode = false }) {
         </article>
       </section> : null}
 
-      {shouldRenderSection("hall") ? <section className={getHomeSectionClass("hall", "home-hall-section")} style={getHomeSectionStyle("hall")}>
+      {shouldRenderSection("hall") && !ownActivityOnly ? <section className={getHomeSectionClass("hall", "home-hall-section")} style={getHomeSectionStyle("hall")}>
         <div className="home-section-title">
           <RiTrophyLine size={20} />
           <h2>Hall of Fame</h2>
@@ -1058,6 +1250,17 @@ export default function Home({ kioskMode = false }) {
           value={dashboard ? formatNumber(dashboard?.catalog?.movies + dashboard?.catalog?.shows) : undefined}
           detail={dashboard ? formatBytes(dashboard?.catalog?.size) : ""}
         />
+        <article className="home-glass-card home-balance-card">
+          <p>On-disk libraries</p>
+          <strong className={!storage ? "home-value-skeleton" : ""}>{storage?.totalLabel || ""}</strong>
+          {storage ? (
+            <small>
+              Next {storage.upcomingCount} Arr releases ≈ {storage.upcomingEstimate}
+            </small>
+          ) : (
+            <small className="home-detail-skeleton" />
+          )}
+        </article>
         <article className="home-glass-card home-balance-card">
           <p>Usage concentration</p>
           <strong className={!dashboard ? "home-value-skeleton" : ""}>{dashboard ? `${concentration.toFixed(1)}%` : ""}</strong>
@@ -1126,22 +1329,32 @@ export default function Home({ kioskMode = false }) {
           <RiFireLine size={20} />
           <h2>This Week</h2>
         </div>
-        <div className="home-week-grid">
+        <div className={`home-week-grid${ownActivityOnly ? " is-own-week" : ""}`}>
           <article className="home-week-feature">
             <span>Top item</span>
             <strong className={!dashboard ? "home-value-skeleton" : ""}>{dashboard ? topItem?.name || "No plays yet" : ""}</strong>
             {dashboard ? <small>{topItem ? `${formatNumber(topItem.plays)} plays · ${formatDuration(topItem.watchSeconds)}${topItem.servers?.length ? ` · ${topItem.servers.map((server) => server.serverName).join(", ")}` : ""}` : "Waiting for this week's viewing history."}</small> : <small className="home-detail-skeleton" />}
           </article>
-          <article>
-            <span>Most active</span>
-            <strong className={!dashboard ? "home-value-skeleton" : ""}>{dashboard ? activeViewer?.userName || "Nobody yet" : ""}</strong>
-            {dashboard ? <small>{activeViewer ? `${formatNumber(activeViewer.plays)} plays this week${activeViewer.serverName ? ` · ${activeViewer.serverName}` : ""}` : "No weekly activity found."}</small> : <small className="home-detail-skeleton" />}
-          </article>
-          <article>
-            <span>Quiet users</span>
-            <strong className={!dashboard ? "home-value-skeleton" : ""}>{isSiloDashboard ? "Unavailable" : dashboard ? formatNumber(quietUsers.length) : ""}</strong>
-            {dashboard ? <small>{isSiloDashboard ? "Silo’s bounded activity response does not classify inactive accounts." : quietUsers.length ? quietUsers.map((user) => user.userName).join(", ") : "Everyone has checked in recently."}</small> : <small className="home-detail-skeleton" />}
-          </article>
+          {ownActivityOnly ? (
+            <article>
+              <span>Your week</span>
+              <strong>{formatNumber(activeViewer?.plays || 0)} plays</strong>
+              <small>{activeViewer ? `${formatDuration(activeViewer.watchSeconds)} watched this week` : "No plays this week yet."}</small>
+            </article>
+          ) : (
+            <>
+              <article>
+                <span>Most active</span>
+                <strong className={!dashboard ? "home-value-skeleton" : ""}>{dashboard ? activeViewer?.userName || "Nobody yet" : ""}</strong>
+                {dashboard ? <small>{activeViewer ? `${formatNumber(activeViewer.plays)} plays this week${activeViewer.serverName ? ` · ${activeViewer.serverName}` : ""}` : "No weekly activity found."}</small> : <small className="home-detail-skeleton" />}
+              </article>
+              <article>
+                <span>Quiet users</span>
+                <strong className={!dashboard ? "home-value-skeleton" : ""}>{isSiloDashboard ? "Unavailable" : dashboard ? formatNumber(quietUsers.length) : ""}</strong>
+                {dashboard ? <small>{isSiloDashboard ? "Silo’s bounded activity response does not classify inactive accounts." : quietUsers.length ? quietUsers.map((user) => user.userName).join(", ") : "Everyone has checked in recently."}</small> : <small className="home-detail-skeleton" />}
+              </article>
+            </>
+          )}
         </div>
       </section> : null}
 
@@ -1201,6 +1414,33 @@ export default function Home({ kioskMode = false }) {
         </section>
       ) : null}
 
+      {shouldRenderSection("watchTonight") ? (
+        <section className={getHomeSectionClass("watchTonight", "home-watch-party home-glass-card")} aria-label={t("FEATURES.WATCH_TONIGHT.TITLE")} style={getHomeSectionStyle("watchTonight")}>
+          <div className="home-section-title">
+            <RiPlayCircleLine size={20} />
+            <h2>{t("FEATURES.WATCH_TONIGHT.TITLE")}</h2>
+          </div>
+          <div className="home-watch-party-list">
+            {watchTonight.length ? watchTonight.map((item) => (
+              <article key={`${item.itemId}-${item.name}`}>
+                <Link to={`/libraries/item/${item.itemId}`} className="home-watch-tonight-card">
+                  <strong>{item.name}</strong>
+                  <small>{t("FEATURES.WATCH_TONIGHT.USERS", { count: (item.users || []).length })}</small>
+                  {(item.users || []).length ? <span className="home-watch-tonight-users">{item.users.join(", ")}</span> : null}
+                  {(item.reasons || []).length ? (
+                    <span className="home-watch-tonight-reasons">
+                      {item.reasons.map((reason) => (
+                        <em key={`${item.itemId}-${reason}`}>{watchTonightReasonLabel[reason] || reason}</em>
+                      ))}
+                    </span>
+                  ) : null}
+                </Link>
+              </article>
+            )) : <span>{t("FEATURES.WATCH_TONIGHT.NO_PICKS")}</span>}
+          </div>
+        </section>
+      ) : null}
+
       {shouldRenderSection("seasonGaps") ? (
         <section className={getHomeSectionClass("seasonGaps", "home-watch-party home-glass-card")} aria-label="Season gaps" style={getHomeSectionStyle("seasonGaps")}>
           <div className="home-section-title">
@@ -1209,12 +1449,20 @@ export default function Home({ kioskMode = false }) {
           </div>
           <div className="home-watch-party-list">
             {seasonGaps.length ? seasonGaps.map((item) => (
-              <article key={item.itemId}>
-                <strong>{item.name}</strong>
-                <small>No synced episodes found</small>
+              <article key={item.itemId} className="home-season-gap-row">
+                <div>
+                  <strong>{item.name}</strong>
+                  <small>No synced episodes found</small>
+                </div>
+                {sonarrConnected ? (
+                  <button type="button" disabled={Boolean(gapBusyId)} onClick={() => searchSeasonGap(item)}>
+                    {gapBusyId === item.itemId ? t("FEATURES.SEASON_GAPS.SEARCHING") : t("FEATURES.SEASON_GAPS.SEARCH_SONARR")}
+                  </button>
+                ) : null}
               </article>
             )) : <span>No season gaps found.</span>}
           </div>
+          {gapMessage ? <p className="home-season-gap-message">{gapMessage}</p> : null}
         </section>
       ) : null}
 
@@ -1261,6 +1509,23 @@ export default function Home({ kioskMode = false }) {
         </section>
       ) : null}
 
+      {shouldRenderSection("maintainerr") ? (
+        <section
+          className={getHomeSectionClass("maintainerr", "home-integration-widget home-glass-card")}
+          aria-label="Maintainerr cleanup widget"
+          style={getHomeSectionStyle("maintainerr")}
+        >
+          <HomeIntegrationWidget
+            icon={Database2LineIcon}
+            title="Maintainerr"
+            eyebrow="Cleanup schedule"
+            widget={integrationWidgets.maintainerr ? getMaintainerrWidget(integrationWidgets.maintainerr) : null}
+            error={integrationWidgetErrors.maintainerr}
+            to="/maintainerr"
+          />
+        </section>
+      ) : null}
+
       {shouldRenderSection("bazarr") ? (
         <section className={getHomeSectionClass("bazarr", "home-integration-widget home-glass-card")} aria-label="Bazarr subtitle widget" style={getHomeSectionStyle("bazarr")}>
           <HomeIntegrationWidget
@@ -1294,7 +1559,7 @@ export default function Home({ kioskMode = false }) {
             <h2>Quick Actions</h2>
           </div>
           <div className="home-quick-action-grid">
-            <button type="button" disabled={Boolean(busyAction)} onClick={() => runQuickAction("sync")}>Sync media catalog</button>
+            <button type="button" disabled={Boolean(busyAction)} onClick={() => runQuickAction("sync")}>Sync {mediaServerName()}</button>
             <button type="button" disabled={Boolean(busyAction)} onClick={() => runQuickAction("integrations")}>Test integrations</button>
             <button type="button" disabled={Boolean(busyAction)} onClick={() => runQuickAction("backup")}>Run backup</button>
             <Link to="/requests">Open Requests</Link>
@@ -1333,6 +1598,13 @@ export default function Home({ kioskMode = false }) {
             to="/settings"
             accent="purple"
           />
+          <HomeOpsCard
+            icon={RiServerFill}
+            label="Server jobs"
+            value={runningJobs.length ? `${runningJobs.length} running` : "Idle"}
+            detail={runningJobs[0]?.name || "No library scans in progress"}
+            to="/server-management"
+          />
         </div>
 
         <div className="home-request-preview home-glass-card">
@@ -1347,7 +1619,7 @@ export default function Home({ kioskMode = false }) {
             {recentRequests.length ? (
               recentRequests.map((request) => (
                 <article key={request.id}>
-                  <span className={`home-request-status is-${String(request.status || "unknown").toLowerCase()}`}>{request.status}</span>
+                  <span className={`home-request-status is-${String(request.pipelineStatus || request.status || "unknown").toLowerCase()}`}>{request.pipelineLabel || request.status}</span>
                   <div>
                     <strong>{request.title}{request.year ? ` (${request.year})` : ""}</strong>
                     <small>{request.requestedBy} · {request.source}</small>
@@ -1374,11 +1646,19 @@ export default function Home({ kioskMode = false }) {
             </p>
           ) : null}
           {detailModal?.items?.length ? detailModal.items.map((item) => (
-            <article key={item.itemId} className="home-detail-row">
-              <strong>{item.name}</strong>
-              <small>No synced episodes found</small>
+            <article key={item.itemId} className="home-detail-row home-season-gap-row">
+              <div>
+                <strong>{item.name}</strong>
+                <small>No synced episodes found</small>
+              </div>
+              {sonarrConnected ? (
+                <button type="button" disabled={Boolean(gapBusyId)} onClick={() => searchSeasonGap(item)}>
+                  {gapBusyId === item.itemId ? t("FEATURES.SEASON_GAPS.SEARCHING") : t("FEATURES.SEASON_GAPS.SEARCH_SONARR")}
+                </button>
+              ) : null}
             </article>
           )) : null}
+          {detailModal?.type === "seasonGaps" && gapMessage ? <p className="home-season-gap-message">{gapMessage}</p> : null}
         </DialogContent>
       </Dialog>
     </div>

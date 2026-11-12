@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "../../lib/axios_instance";
-import { RiBarChartBoxLine, RiFilmLine, RiHistoryLine, RiSettings3Line, RiStackLine, RiTvLine } from "@remixicon/react";
+import { RiBarChartBoxLine, RiHistoryLine, RiSettings3Line, RiStackLine } from "@remixicon/react";
 
 // import LibraryDetails from './library/library-details';
 import Loading from "./general/loading";
@@ -17,6 +17,7 @@ import GlobalStats from "./general/globalStats";
 import GenreLibraryStats from "./library/genre-library-stats.jsx";
 import "../css/library-detail.css";
 import Config from "../../lib/config";
+import { libraryTypeMeta } from "../../lib/library-types";
 
 function formatBytes(value) {
   const bytes = Number(value);
@@ -85,8 +86,9 @@ function LibraryInfo() {
     { key: "tabActivity", label: <Trans i18nKey="TAB_CONTROLS.ACTIVITY" />, icon: RiHistoryLine },
     ...(!isSilo ? [{ key: "tabOptions", label: <Trans i18nKey="TAB_CONTROLS.OPTIONS" />, icon: RiSettings3Line }] : []),
   ];
-  const LibraryIcon = data.CollectionType === "tvshows" ? RiTvLine : RiFilmLine;
-  const libraryType = data.CollectionType === "tvshows" ? "Series library" : "Movie library";
+  const libraryMeta = libraryTypeMeta(data.CollectionType);
+  const LibraryIcon = libraryMeta.icon;
+  const libraryType = libraryMeta.label;
 
   return (
     <div className="library-detail-page" data-theme-screen="library-detail">

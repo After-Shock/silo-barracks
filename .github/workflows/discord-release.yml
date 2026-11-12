@@ -1,4 +1,4 @@
-name: Discord Release Notifications
+name: Notify / Discord Release
 
 on:
   workflow_dispatch:
@@ -6,8 +6,12 @@ on:
       tag:
         description: Release tag to announce, for example v1.1.0
         required: true
-  release:
-    types: [published]
+  # Announce only after the release pipeline has built and pushed the images,
+  # so nobody pulls a tag that doesn't exist yet. A failed or cancelled pipeline
+  # never announces.
+  workflow_run:
+    workflows: ["JellyGlance Release Bot"]
+    types: [completed]
 
 permissions:
   contents: read
@@ -15,22 +19,34 @@ permissions:
 jobs:
   release:
     name: Post release update
+    # Only a successful pipeline run started by a published release (head_branch is
+    # then the tag). Manual image rebuilds of an old tag don't re-announce; use
+    # workflow_dispatch here for that.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'release')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # read the release via gh api
+      packages: read # confirm the image tag exists on ghcr.io
     env:
+      IMAGE_NAME: ghcr.io/jellyglance/server
       DISCORD_RELEASES_WEBHOOK: ${{ secrets.DISCORD_RELEASES_WEBHOOK }}
       DISCORD_BETA_RELEASES_WEBHOOK: ${{ secrets.DISCORD_BETA_RELEASES_WEBHOOK }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
+      # Always read the release so we know prerelease vs stable even when a
+      # webhook secret is missing — otherwise the job can succeed with no post.
       - name: Read release
         id: release
-        if: ${{ env.DISCORD_RELEASES_WEBHOOK != '' || env.DISCORD_BETA_RELEASES_WEBHOOK != '' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+          RELEASE_TAG: ${{ github.event.workflow_run.head_branch || inputs.tag }}
         run: |
           node <<'NODE'
           const fs = require("fs");
@@ -44,6 +60,34 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `is_prerelease=${!!release.prerelease}\n`);
           NODE
 
+      - name: Require beta Discord webhook for prereleases
+        if: >-
+          steps.release.outcome == 'success' &&
+          steps.release.outputs.is_prerelease == 'true' &&
+          env.DISCORD_BETA_RELEASES_WEBHOOK == ''
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          echo "::error::DISCORD_BETA_RELEASES_WEBHOOK is empty. Prerelease ${TAG} cannot be announced to the beta Discord channel. Add the Actions secret for the beta releases webhook, then re-run Notify / Discord Release with this tag."
+          exit 1
+
+      - name: Login to GitHub Container Registry
+        if: ${{ steps.release.outcome == 'success' }}
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Confirm the release image is published
+        if: ${{ steps.release.outcome == 'success' }}
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          set -euo pipefail
+          docker buildx imagetools inspect "${IMAGE_NAME}:${TAG}" >/dev/null
+          echo "Found ${IMAGE_NAME}:${TAG}"
+
       - name: Post Discord release update (stable)
         if: ${{ env.DISCORD_RELEASES_WEBHOOK != '' && steps.release.outputs.is_prerelease != 'true' }}
         env:
@@ -52,6 +96,7 @@ jobs:
           RELEASE_TAG: ${{ steps.release.outputs.tag }}
           RELEASE_TITLE: ${{ steps.release.outputs.title }}
           RELEASE_URL: ${{ steps.release.outputs.url }}
+          RELEASE_PRERELEASE: ${{ steps.release.outputs.is_prerelease }}
           DISCORD_CHANNEL: stable
         run: |
           RELEASE_NOTES="$(cat RELEASE_NOTES.txt)" node .github/scripts/discord-notify.mjs
@@ -64,6 +109,7 @@ jobs:
           RELEASE_TAG: ${{ steps.release.outputs.tag }}
           RELEASE_TITLE: ${{ steps.release.outputs.title }}
           RELEASE_URL: ${{ steps.release.outputs.url }}
+          RELEASE_PRERELEASE: ${{ steps.release.outputs.is_prerelease }}
           DISCORD_CHANNEL: beta
         run: |
           RELEASE_NOTES="$(cat RELEASE_NOTES.txt)" node .github/scripts/discord-notify.mjs

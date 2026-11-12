@@ -1,12 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { RiAddLine, RiCheckboxCircleLine, RiClipboardLine, RiDownloadCloud2Fill, RiErrorWarningLine, RiEyeFill, RiEyeOffFill, RiHeartPulseLine, RiPlug2Fill, RiSettings3Line, RiUploadCloud2Line, RiUserAddLine } from "@remixicon/react";
+import { RiAddLine, RiArrowDownSLine, RiCheckboxCircleLine, RiClipboardLine, RiDownloadCloud2Fill, RiErrorWarningLine, RiEyeFill, RiEyeOffFill, RiHeartPulseLine, RiPlug2Fill, RiSettings3Line, RiUploadCloud2Line, RiUserAddLine } from "@remixicon/react";
 import axios from "../lib/axios_instance";
+import baseUrl from "../lib/baseurl";
+import { useTranslation } from "react-i18next";
+import { formatDate as formatLocaleDate } from "../lib/format-date";
 import { loadSavedIntegrations, saveSavedIntegrations } from "../lib/integrations-storage";
 import JellyfinIntegrationSettings from "./components/settings/JellyfinIntegrationSettings";
 import "./css/integrations.css";
+import { selfhstIconUrl } from "../lib/selfhst-icons";
 
-const iconUrl = (slug) => `https://cdn.jsdelivr.net/gh/selfhst/icons/svg/${slug}.svg`;
+const iconUrl = (slug) => {
+  const safe = String(slug || "sonarr")
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "");
+  const iconSlug = /^[a-z0-9][a-z0-9-]{0,63}$/.test(safe) ? safe : "sonarr";
+  return selfhstIconUrl(iconSlug);
+};
 const tdarrLogoUrl = "https://home.tdarr.io/static/media/logo3-min.246d6df44c7f16ddebaf.png";
 const sickChillLogoUrl = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/sickchill.png";
 const integrationTabItems = [
@@ -14,7 +24,7 @@ const integrationTabItems = [
   ["automation", "Arr Apps"],
   ["seerr", "Seerr Apps"],
   ["downloads", "Download Clients"],
-  ["invites", "Invites / Transcodes"],
+  ["invites", "3rd party apps"],
 ];
 const integrationTabKeys = integrationTabItems.map(([key]) => key);
 
@@ -53,6 +63,7 @@ const automationApps = [
   { name: "SickChill", slug: "sickchill", purpose: "Series automation", accent: "var(--barracks-state-danger)" },
   { name: "Radarr", slug: "radarr", purpose: "Movie automation", accent: "var(--barracks-state-danger)" },
   { name: "Lidarr", slug: "lidarr", purpose: "Music automation", accent: "var(--barracks-accent-secondary)" },
+  { name: "Readarr", slug: "readarr", purpose: "Book automation", accent: "var(--barracks-accent-secondary)" },
   { name: "Prowlarr", slug: "prowlarr", purpose: "Indexer management", accent: "var(--barracks-action)" },
   { name: "Bazarr", slug: "bazarr", purpose: "Subtitle automation", accent: "var(--barracks-state-success)" },
   { name: "Jellyseerr", slug: "jellyseerr", purpose: "Request management", accent: "var(--barracks-action)" },
@@ -64,14 +75,34 @@ const downloadClientOptions = [
   { name: "Transmission", slug: "transmission", protocol: "Torrent", auth: "userpass" },
   { name: "Deluge", slug: "deluge", protocol: "Torrent", auth: "password" },
   { name: "SABnzbd", slug: "sabnzbd", protocol: "Usenet" },
-  { name: "NZBGet", slug: "nzbget", protocol: "Usenet" },
+  { name: "NZBGet", slug: "nzbget", protocol: "Usenet", auth: "userpass", authHint: "Use the Restricted username and password from NZBGet Settings > Security." },
+  { name: "rTorrent", slug: "rtorrent", protocol: "Torrent", auth: "userpass" },
   { name: "BitTorrent", slug: null, protocol: "Torrent" },
-  { name: "rTorrent", slug: null, protocol: "Torrent" },
 ];
+
+// Saved clients keep the fields they were created with, so look the auth style up from the catalog too.
+function downloadClientAuth(app = {}) {
+  const slug = String(app.slug || app.name || "").toLowerCase();
+  const option = downloadClientOptions.find((item) => item.slug && slug.includes(item.slug));
+  return { auth: option?.auth || app.auth, authHint: option?.authHint || app.authHint };
+}
 
 const thirdPartyOptions = [
   { name: "Tdarr", slug: "tdarr", purpose: "Active transcodes", accent: "var(--barracks-action)", secretOptional: true },
   { name: "Wizarr", slug: "wizarr", purpose: "Jellyfin invite links", accent: "var(--barracks-action)" },
+  { name: "Maintainerr", slug: "maintainerr", purpose: "Cleanup schedule", accent: "var(--barracks-action)" },
+  { name: "Unpackerr", slug: "unpackerr", purpose: "Extract status", accent: "var(--barracks-action)", secretOptional: true },
+  { name: "Kometa", slug: "kometa", purpose: "Collections and overlays", accent: "var(--barracks-action)", secretOptional: true },
+  { name: "Notifiarr", slug: "notifiarr", purpose: "Arr notify status", accent: "var(--barracks-action)" },
+  { name: "Recyclarr", slug: "recyclarr", purpose: "Arr config health", accent: "var(--barracks-action)", secretOptional: true },
+  { name: "autobrr", slug: "autobrr", purpose: "Filter hits", accent: "var(--barracks-action)" },
+  { name: "Cleanuparr", slug: "cleanuparr", purpose: "Strikes, cleanup and health", accent: "var(--barracks-action)" },
+  { name: "Audiobookshelf", slug: "audiobookshelf", purpose: "Audiobook listening", accent: "var(--barracks-action)", secretLabel: "API token" },
+];
+const firstRunIntegrationPickerOptions = [
+  ...automationApps.map((app) => ({ ...app, key: `arr:${app.slug}`, label: app.name, description: app.purpose, kind: "Arr Apps" })),
+  ...thirdPartyOptions.map((app) => ({ ...app, key: `third:${app.slug}`, label: app.name, description: app.purpose, kind: "3rd party apps" })),
+  ...downloadClientOptions.map((app) => ({ ...app, key: `download:${app.name}`, label: app.name, description: app.protocol, kind: "Download Clients" })),
 ];
 
 const initialThirdPartyApps = thirdPartyOptions.map((app, index) => ({
@@ -100,6 +131,7 @@ const defaultAgentMeta = {
   Radarr: { slug: "radarr", accent: "var(--barracks-state-danger)", role: "Movie automation" },
   Tdarr: { slug: "tdarr", accent: "var(--barracks-action)", role: "Media processing" },
   Lidarr: { slug: "lidarr", accent: "var(--barracks-accent-secondary)", role: "Music automation" },
+  Readarr: { slug: "readarr", accent: "var(--barracks-accent-secondary)", role: "Book automation" },
   Jellyfin: { slug: "jellyfin", accent: "var(--barracks-action)", role: "Media server" },
 };
 
@@ -123,12 +155,22 @@ function normalizeAutomationApps(savedApps) {
 }
 
 function normalizeThirdPartyApps(savedApps, legacyAutomationApps = []) {
-  const savedThirdPartyApps = [
-    ...(Array.isArray(savedApps) ? savedApps : []),
-    ...(Array.isArray(legacyAutomationApps)
+  const byName = new Map();
+  const addUnique = (apps = []) => {
+    apps.forEach((app) => {
+      const name = String(app.name || app.slug || "").trim().toLowerCase();
+      if (name && !byName.has(name)) byName.set(name, app);
+    });
+  };
+
+  addUnique(Array.isArray(savedApps) ? savedApps : []);
+  addUnique(
+    Array.isArray(legacyAutomationApps)
       ? legacyAutomationApps.filter((app) => ["tdarr", "wizarr"].includes(String(app.name || app.slug || "").toLowerCase()))
-      : []),
-  ];
+      : []
+  );
+
+  const savedThirdPartyApps = [...byName.values()];
   if (!savedThirdPartyApps.length) {
     return initialThirdPartyApps;
   }
@@ -162,13 +204,12 @@ function AppIcon({ app }) {
 }
 
 function formatHealthDate(value) {
-  if (!value) return "Never";
-  return new Intl.DateTimeFormat("en-GB", {
+  return formatLocaleDate(value, {
     day: "2-digit",
     month: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(value));
+  }, { fallback: "Never" });
 }
 
 function summarizeHealth(entries = []) {
@@ -200,15 +241,95 @@ function buildHealthTimeline(entries = []) {
     .slice(-24);
 }
 
+function isLiveConnected(app) {
+  if (app?.connected) return true;
+  if (app?.messageType === "error") return false;
+  const message = String(app?.message || "");
+  return Boolean(app?.version) || /connected to/i.test(message);
+}
+
+// Shows where Cleanuparr should send notifications (its Gotify provider) and the token it must use.
+function CleanuparrReceiver({ onCopySecret }) {
+  const [receiver, setReceiver] = useState(null);
+  const [error, setError] = useState("");
+  const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
+  const serverUrl = new URL(`${String(baseUrl || "").replace(/\/+$/, "")}/cleanuparr`, window.location.origin).href;
+
+  useEffect(() => {
+    axios
+      .get("/api/integrations/cleanuparr/webhook", { headers })
+      .then((response) => setReceiver(response.data))
+      .catch(() => setError("Unable to load the notification receiver"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load once
+  }, []);
+
+  async function rotate() {
+    try {
+      const response = await axios.post("/api/integrations/cleanuparr/webhook/rotate", {}, { headers });
+      setReceiver((current) => ({ ...(current || {}), ...response.data }));
+    } catch {
+      setError("Unable to rotate the token");
+    }
+  }
+
+  return (
+    <div className="integration-receiver">
+      <strong>Notifications from Cleanuparr</strong>
+      <small>
+        In Cleanuparr, add a <b>Gotify</b> notification provider with these values and enable Failed Import, Stalled, Slow, Errored
+        Strike, Queue Item Deleted, Download Cleaned and Download Stopped. Failed imports, errored downloads and repeated stalls become
+        alerts here; everything else is shown on the Downloads page.
+      </small>
+      <label>
+        Server URL
+        <span className="integration-secret-field">
+          <input value={serverUrl} readOnly />
+          <button type="button" title="Copy server URL" onClick={() => onCopySecret(serverUrl)}>
+            <RiClipboardLine size={17} />
+          </button>
+        </span>
+      </label>
+      <label>
+        Application token
+        <span className="integration-secret-field">
+          <input value={receiver?.token || ""} readOnly placeholder={error || "Loading..."} />
+          <button type="button" title="Copy token" onClick={() => onCopySecret(receiver?.token || "")} disabled={!receiver?.token}>
+            <RiClipboardLine size={17} />
+          </button>
+        </span>
+      </label>
+      <div className="integration-actions integration-receiver-rotate">
+        <button type="button" onClick={rotate}>
+          New token
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function IntegrationCard({ app, type, onChange, onRemove, onSave, onTest, onCopySecret, removable = false }) {
-  const usesUserPass = type === "download" && app.auth === "userpass";
-  const usesPasswordOnly = type === "download" && app.auth === "password";
-  const secretOptional = Boolean(app.secretOptional) || String(app.name || app.slug || "").toLowerCase().includes("tdarr");
-  const authLabel = usesUserPass || usesPasswordOnly ? "Password" : secretOptional ? "API key (optional)" : "API key";
-  const connected = Boolean(app.connected);
+  const { auth: clientAuth, authHint } = type === "download" ? downloadClientAuth(app) : {};
+  const usesUserPass = clientAuth === "userpass";
+  const usesPasswordOnly = clientAuth === "password";
+  const secretOptional =
+    Boolean(app.secretOptional) ||
+    ["tdarr", "unpackerr", "kometa", "recyclarr"].some((slug) => String(app.name || app.slug || "").toLowerCase().includes(slug));
+  // Saved apps keep only the fields they were created with, so read the label from the catalog too.
+  const secretLabel =
+    app.secretLabel || thirdPartyOptions.find((option) => String(app.slug || app.name || "").toLowerCase().includes(option.slug))?.secretLabel || "API key";
+  const authLabel = usesUserPass || usesPasswordOnly ? "Password" : secretOptional ? `${secretLabel} (optional)` : secretLabel;
+  const connected = isLiveConnected(app);
   const values = app.values || {};
-  const secretPlaceholder = usesPasswordOnly || usesUserPass ? `${app.name} password` : secretOptional ? "Paste API key if auth is enabled" : "Paste API key";
+  const hasStoredSecret = Boolean(values.secret) || connected;
+  const secretPlaceholder = usesPasswordOnly || usesUserPass
+    ? `${app.name} password`
+    : secretOptional
+      ? "Paste API key if auth is enabled"
+      : hasStoredSecret && !values.secret
+        ? "Saved on server — paste to replace"
+        : `Paste ${secretLabel}`;
   const [showSecret, setShowSecret] = useState(false);
+  const isCleanuparr = String(app.slug || app.name || "").toLowerCase().includes("cleanuparr");
 
   return (
     <article className="integration-card" style={{ "--integration-accent": app.accent || "var(--barracks-action)" }}>
@@ -264,7 +385,12 @@ function IntegrationCard({ app, type, onChange, onRemove, onSave, onTest, onCopy
             </button>
           </span>
         </label>
+        {authHint ? <small className="integration-auth-hint">{authHint}</small> : null}
+        {isCleanuparr ? (
+          <small className="integration-auth-hint">Uses the stats API (/api/v2/stats). Include Cleanuparr&apos;s BASE_PATH in the URL if you set one.</small>
+        ) : null}
       </div>
+      {isCleanuparr ? <CleanuparrReceiver onCopySecret={onCopySecret} /> : null}
       {app.message ? <p className={`integration-message ${app.messageType === "error" ? "is-error" : ""}`} role={app.messageType === "error" ? "alert" : "status"}>{app.message}</p> : null}
       <div className="integration-actions">
         <button type="button" onClick={() => onTest(app.instanceId)}>
@@ -283,9 +409,13 @@ function IntegrationCard({ app, type, onChange, onRemove, onSave, onTest, onCopy
   );
 }
 
-export default function Integrations({ embedded = false, firstRun = false, activeTab: controlledActiveTab = "", onTabChange }) {
+export default function Integrations({ embedded = false, firstRun = false, activeTab: controlledActiveTab = "", onTabChange, actions = null }) {
+  // Re-render dates and numbers in the new locale when the language changes.
+  useTranslation();
   const fileInputRef = useRef(null);
-  const [internalActiveTab, setInternalActiveTab] = useState(normalizeIntegrationTabSlug(controlledActiveTab) || "media-server");
+  const firstRunDefaultTab = firstRun ? "automation" : "media-server";
+  const availableTabItems = firstRun ? integrationTabItems.filter(([key]) => key !== "media-server") : integrationTabItems;
+  const [internalActiveTab, setInternalActiveTab] = useState(normalizeIntegrationTabSlug(controlledActiveTab) || firstRunDefaultTab);
   const activeTab = normalizeIntegrationTabSlug(controlledActiveTab) || internalActiveTab;
   const [arrApps, setArrApps] = useState(initialAutomationApps);
   const [clients, setClients] = useState([]);
@@ -298,9 +428,18 @@ export default function Integrations({ embedded = false, firstRun = false, activ
     }
   });
   const [selectedClient, setSelectedClient] = useState(downloadClientOptions[0].name);
+  const [firstRunSelection, setFirstRunSelection] = useState(firstRunIntegrationPickerOptions[0]?.key || "");
+  const [firstRunPickerOpen, setFirstRunPickerOpen] = useState(false);
+  const [firstRunVisibleIds, setFirstRunVisibleIds] = useState([]);
   const [healthHistory, setHealthHistory] = useState([]);
   const [diagnostics, setDiagnostics] = useState([]);
   const [busyAction, setBusyAction] = useState("");
+  const arrAppsRef = useRef(arrApps);
+  const clientsRef = useRef(clients);
+  const thirdPartyRef = useRef(thirdParty);
+  arrAppsRef.current = arrApps;
+  clientsRef.current = clients;
+  thirdPartyRef.current = thirdParty;
   const [notice, setNotice] = useState("");
   const [savedIntegrationsAvailable, setSavedIntegrationsAvailable] = useState(false);
   const [loadedSavedIntegrations, setLoadedSavedIntegrations] = useState(!firstRun);
@@ -310,6 +449,18 @@ export default function Integrations({ embedded = false, firstRun = false, activ
   const primaryAutomationApps = useMemo(() => automationOnlyApps.filter((app) => String(app.name).toLowerCase() !== "sickchill"), [automationOnlyApps]);
   const seerrApps = useMemo(() => arrApps.filter(isSeerrApp), [arrApps]);
   const enabledIntegrations = useMemo(() => [...arrApps, ...clients, ...thirdParty].filter((item) => item.connected), [arrApps, clients, thirdParty]);
+  const selectedFirstRunIntegration = useMemo(
+    () => firstRunIntegrationPickerOptions.find((option) => option.key === firstRunSelection) || firstRunIntegrationPickerOptions[0],
+    [firstRunSelection]
+  );
+  const firstRunConfiguredIntegrations = useMemo(
+    () =>
+      [...arrApps, ...clients, ...thirdParty].filter((item) => {
+        const hasValues = Object.values(item.values || {}).some((value) => String(value || "").trim());
+        return firstRunVisibleIds.includes(item.instanceId) || item.connected || hasValues || item.message;
+      }),
+    [arrApps, clients, thirdParty, firstRunVisibleIds]
+  );
 
   function updateAgentDefault(type, value) {
     setAgentDefaults((current) => {
@@ -335,8 +486,15 @@ export default function Integrations({ embedded = false, firstRun = false, activ
     }
   }, [controlledActiveTab]);
 
+  useEffect(() => {
+    if (firstRun && activeTab === "media-server") {
+      setInternalActiveTab("automation");
+      onTabChange?.("automation");
+    }
+  }, [activeTab, firstRun, onTabChange]);
+
   function selectIntegrationTab(tabKey) {
-    const normalized = normalizeIntegrationTabSlug(tabKey) || "media-server";
+    const normalized = normalizeIntegrationTabSlug(tabKey) || firstRunDefaultTab;
     setInternalActiveTab(normalized);
     onTabChange?.(normalized);
   }
@@ -347,6 +505,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
         setArrApps(initialAutomationApps);
         setClients([]);
         setThirdParty(initialThirdPartyApps);
+        setFirstRunVisibleIds([]);
         setHealthHistory([]);
         setSavedIntegrationsAvailable(true);
         return;
@@ -376,14 +535,29 @@ export default function Integrations({ embedded = false, firstRun = false, activ
         if (Array.isArray(saved.clients)) {
           setClients(saved.clients);
         }
-        setThirdParty(normalizeThirdPartyApps(saved.thirdParty, saved.arrApps));
+        const normalizedThirdParty = normalizeThirdPartyApps(saved.thirdParty, saved.arrApps);
+        setThirdParty(normalizedThirdParty);
+        if (firstRun) {
+          const visibleIds = [...normalizeAutomationApps(saved.arrApps), ...(Array.isArray(saved.clients) ? saved.clients : []), ...normalizedThirdParty]
+            .filter((item) => item.connected || Object.values(item.values || {}).some((value) => String(value || "").trim()))
+            .map((item) => item.instanceId);
+          setFirstRunVisibleIds(visibleIds);
+        }
       } catch {
         const saved = loadSavedIntegrations();
-        setArrApps(normalizeAutomationApps(saved.arrApps));
+        const normalizedArrApps = normalizeAutomationApps(saved.arrApps);
+        setArrApps(normalizedArrApps);
         if (Array.isArray(saved.clients)) {
           setClients(saved.clients);
         }
-        setThirdParty(normalizeThirdPartyApps(saved.thirdParty, saved.arrApps));
+        const normalizedThirdParty = normalizeThirdPartyApps(saved.thirdParty, saved.arrApps);
+        setThirdParty(normalizedThirdParty);
+        if (firstRun) {
+          const visibleIds = [...normalizedArrApps, ...(Array.isArray(saved.clients) ? saved.clients : []), ...normalizedThirdParty]
+            .filter((item) => item.connected || Object.values(item.values || {}).some((value) => String(value || "").trim()))
+            .map((item) => item.instanceId);
+          setFirstRunVisibleIds(visibleIds);
+        }
       }
     }
     loadIntegrations();
@@ -406,18 +580,47 @@ export default function Integrations({ embedded = false, firstRun = false, activ
   function persist(nextArrApps = arrApps, nextClients = clients, nextThirdParty = thirdParty) {
     const payload = { arrApps: nextArrApps, clients: nextClients, thirdParty: nextThirdParty };
     saveSavedIntegrations(payload);
-    window.dispatchEvent(new CustomEvent("barracks-integrations-updated", { detail: payload }));
+    window.dispatchEvent(new CustomEvent("silo-barracks-integrations-updated", { detail: payload }));
     axios
       .post("/api/integrations", payload, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
-      .then(() => window.dispatchEvent(new CustomEvent("barracks-integrations-updated", { detail: payload })))
+      .then(() => window.dispatchEvent(new CustomEvent("silo-barracks-integrations-updated", { detail: payload })))
       .catch((error) => console.log("Unable to save integrations", error));
   }
 
   function loadExistingIntegrations() {
     setLoadedSavedIntegrations(true);
     setNotice("Loaded saved integrations into first-run setup.");
+  }
+
+  function showFirstRunIntegration(instanceId) {
+    setFirstRunVisibleIds((current) => (current.includes(instanceId) ? current : [...current, instanceId]));
+  }
+
+  function removeFirstRunIntegration(instanceId, listName, setList, type) {
+    setFirstRunVisibleIds((current) => current.filter((id) => id !== instanceId));
+    if (type === "download") {
+      removeIntegration(listName, setList, instanceId);
+      return;
+    }
+    setList((current) => {
+      const next = current.map((item) =>
+        item.instanceId === instanceId
+          ? {
+              ...item,
+              connected: false,
+              message: "",
+              messageType: "",
+              values: {},
+            }
+          : item
+      );
+      const nextArrApps = listName === "arrApps" ? next : arrApps;
+      const nextThirdParty = listName === "thirdParty" ? next : thirdParty;
+      persist(nextArrApps, clients, nextThirdParty);
+      return next;
+    });
   }
 
   function exportIntegrations() {
@@ -463,11 +666,40 @@ export default function Integrations({ embedded = false, firstRun = false, activ
   async function copySecret(secret) {
     if (!secret) return;
     await navigator.clipboard.writeText(secret);
-    setNotice("Secret copied.");
+    if (!firstRun) {
+      setNotice("Secret copied.");
+    }
   }
 
   function persistForList(listName, next) {
-    persist(listName === "arrApps" ? next : arrApps, listName === "clients" ? next : clients, listName === "thirdParty" ? next : thirdParty);
+    persist(
+      listName === "arrApps" ? next : arrAppsRef.current,
+      listName === "clients" ? next : clientsRef.current,
+      listName === "thirdParty" ? next : thirdPartyRef.current
+    );
+  }
+
+  function applyTestResults(results = []) {
+    const byId = new Map(results.map((row) => [row.instanceId, row]));
+    const patch = (list) =>
+      list.map((item) => {
+        const row = byId.get(item.instanceId);
+        if (!row) return item;
+        return {
+          ...item,
+          connected: Boolean(row.ok),
+          version: row.version || item.version,
+          message: row.message || item.message,
+          messageType: row.ok ? "success" : "error",
+        };
+      });
+    const nextArrApps = patch(arrAppsRef.current);
+    const nextClients = patch(clientsRef.current);
+    const nextThirdParty = patch(thirdPartyRef.current);
+    setArrApps(nextArrApps);
+    setClients(nextClients);
+    setThirdParty(nextThirdParty);
+    persist(nextArrApps, nextClients, nextThirdParty);
   }
 
   async function testAllIntegrations() {
@@ -483,6 +715,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
       );
       setDiagnostics(response.data.results || []);
       setHealthHistory(response.data.history || []);
+      applyTestResults(response.data.results || []);
       setNotice("Integration diagnostics complete.");
     } catch (error) {
       setNotice(error?.response?.data?.error || "Unable to run integration diagnostics.");
@@ -544,16 +777,19 @@ export default function Integrations({ embedded = false, firstRun = false, activ
     }
 
     const values = selectedIntegration.values || {};
-    const needsUsername = listName === "clients" && selectedIntegration.auth === "userpass";
+    const needsUsername = listName === "clients" && downloadClientAuth(selectedIntegration).auth === "userpass";
     const missingUrl = !values.url?.trim();
     const missingUsername = needsUsername && !values.username?.trim();
-    const secretOptional = listName === "thirdParty" && (selectedIntegration.secretOptional || String(selectedIntegration.name || selectedIntegration.slug || "").toLowerCase().includes("tdarr"));
-    const missingSecret = !secretOptional && !values.secret?.trim();
+    const secretOptional =
+      listName === "thirdParty" &&
+      (selectedIntegration.secretOptional ||
+        ["tdarr", "unpackerr", "kometa", "recyclarr"].some((slug) => String(selectedIntegration.name || selectedIntegration.slug || "").toLowerCase().includes(slug)));
+    const missingSecret = !secretOptional && !values.secret?.trim() && !isLiveConnected(selectedIntegration);
     const invalidUrl = values.url?.trim() && !/^https?:\/\//i.test(values.url.trim());
     const validationError = invalidUrl ? "URL must start with http:// or https://" : "Fill in all required fields before testing";
 
-    setList((current) => {
-      const next = current.map((item) => {
+    setList((current) =>
+      current.map((item) => {
         if (item.instanceId !== instanceId) return item;
 
         if (missingUrl || missingUsername || missingSecret || invalidUrl) {
@@ -567,14 +803,11 @@ export default function Integrations({ embedded = false, firstRun = false, activ
 
         return {
           ...item,
-          connected: false,
           message: "Testing connection...",
           messageType: "success",
         };
-      });
-      persistForList(listName, next);
-      return next;
-    });
+      })
+    );
 
     if (missingUrl || missingUsername || missingSecret || invalidUrl) {
       return;
@@ -644,8 +877,49 @@ export default function Integrations({ embedded = false, firstRun = false, activ
     });
   }
 
+  function addFirstRunIntegration() {
+    const [kind, identifier] = String(firstRunSelection || "").split(":");
+    if (kind === "arr") {
+      const match = arrApps.find((item) => item.slug === identifier);
+      if (match) showFirstRunIntegration(match.instanceId);
+      setFirstRunPickerOpen(false);
+      return;
+    }
+
+    if (kind === "third") {
+      const match = thirdParty.find((item) => item.slug === identifier);
+      if (match) showFirstRunIntegration(match.instanceId);
+      setFirstRunPickerOpen(false);
+      return;
+    }
+
+    if (kind === "download") {
+      const existing = clients.find((item) => item.name === identifier && !firstRunVisibleIds.includes(item.instanceId));
+      if (existing) {
+        showFirstRunIntegration(existing.instanceId);
+        setFirstRunPickerOpen(false);
+        return;
+      }
+      const client = downloadClientOptions.find((item) => item.name === identifier);
+      if (!client) return;
+      setClients((current) => {
+        const nextClient = {
+          ...client,
+          instanceId: `${client.name}-${Date.now()}-${current.length}`,
+          connected: false,
+          values: {},
+        };
+        const next = [...current, nextClient];
+        persist(arrApps, next, thirdParty);
+        setFirstRunVisibleIds((visible) => [...visible, nextClient.instanceId]);
+        return next;
+      });
+    }
+    setFirstRunPickerOpen(false);
+  }
+
   return (
-    <div className={`integrations-page${embedded ? " is-embedded" : ""}`} data-theme-screen="integrations">
+    <div className={`integrations-page${embedded ? " is-embedded" : ""}${firstRun ? " is-first-run" : ""}`} data-theme-screen="integrations">
       <section className="integrations-hero">
         <div>
           <p>Media control</p>
@@ -659,13 +933,130 @@ export default function Integrations({ embedded = false, firstRun = false, activ
         </div>
       </section>
 
+      {firstRun ? (
+        <section className="first-run-integrations-shell">
+          <div className="first-run-integrations-left">
+            <div className="first-run-integrations-toolbar">
+              <div className="first-run-integrations-picker">
+                <span>Add an integration</span>
+                <div className={`first-run-integrations-picker-row${firstRunPickerOpen ? " is-open" : ""}`}>
+                  <div className="first-run-app-picker">
+                    <button
+                      type="button"
+                      className="first-run-app-picker-trigger"
+                      onClick={() => setFirstRunPickerOpen((open) => !open)}
+                      aria-expanded={firstRunPickerOpen}
+                    >
+                      <span className="first-run-app-picker-icon">
+                        <AppIcon app={selectedFirstRunIntegration} />
+                      </span>
+                      <span className="first-run-app-picker-copy">
+                        <strong>{selectedFirstRunIntegration?.label}</strong>
+                        <small>{selectedFirstRunIntegration?.kind} · {selectedFirstRunIntegration?.description}</small>
+                      </span>
+                      <RiArrowDownSLine size={20} />
+                    </button>
+                    {firstRunPickerOpen ? (
+                      <div className="first-run-app-picker-menu">
+                        {firstRunIntegrationPickerOptions.map((option) => (
+                          <button
+                            type="button"
+                            key={option.key}
+                            className={firstRunSelection === option.key ? "is-selected" : ""}
+                            onClick={() => {
+                              setFirstRunSelection(option.key);
+                              setFirstRunPickerOpen(false);
+                            }}
+                          >
+                            <span className="first-run-app-picker-icon">
+                              <AppIcon app={option} />
+                            </span>
+                            <span className="first-run-app-picker-copy">
+                              <strong>{option.label}</strong>
+                              <small>{option.kind} · {option.description}</small>
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                  <button type="button" onClick={addFirstRunIntegration}>
+                    <RiAddLine size={18} />
+                    Add integration
+                  </button>
+                </div>
+              </div>
+
+              <div className="first-run-integrations-utility">
+                {!firstRun || loadedSavedIntegrations ? (
+                  <button type="button" onClick={testAllIntegrations} disabled={busyAction === "test-all"}>
+                    <RiHeartPulseLine size={18} />
+                    {busyAction === "test-all" ? "Testing" : "Test all"}
+                  </button>
+                ) : null}
+                <label>
+                  <RiUploadCloud2Line size={18} />
+                  Import
+                  <input ref={fileInputRef} type="file" accept=".json,application/json" onChange={importIntegrations} />
+                </label>
+              </div>
+            </div>
+
+            {actions ? <div className="first-run-integrations-actions">{actions}</div> : null}
+          </div>
+
+          <section className="integration-section first-run-configured-list">
+            <div className="integration-section-title">
+              <div>
+                <h2>Configured integrations</h2>
+                <span>{firstRunConfiguredIntegrations.length ? `${firstRunConfiguredIntegrations.length} in setup` : "Add the apps you want ready for first sync."}</span>
+              </div>
+            </div>
+            {firstRunConfiguredIntegrations.length ? (
+              <div className="integration-grid">
+                {firstRunConfiguredIntegrations.map((app) => {
+                  const type = clients.some((client) => client.instanceId === app.instanceId)
+                    ? "download"
+                    : thirdParty.some((item) => item.instanceId === app.instanceId)
+                      ? "thirdParty"
+                      : "automation";
+                  const listName = type === "download" ? "clients" : type === "thirdParty" ? "thirdParty" : "arrApps";
+                  const setList = type === "download" ? setClients : type === "thirdParty" ? setThirdParty : setArrApps;
+                  return (
+                    <IntegrationCard
+                      key={app.instanceId}
+                      app={app}
+                      type={type}
+                      onChange={(instanceId, field, value) => updateIntegration(listName, setList, instanceId, field, value)}
+                      onRemove={(instanceId) => removeFirstRunIntegration(instanceId, listName, setList, type)}
+                      onSave={(instanceId) => saveIntegration(listName, setList, instanceId)}
+                      onTest={(instanceId) => testIntegration(listName, setList, instanceId)}
+                      onCopySecret={copySecret}
+                      removable
+                    />
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="first-run-integrations-empty">
+                <strong>No integrations added yet</strong>
+                <span>Choose an app above, add it to the setup list, then fill in its connection details here.</span>
+              </div>
+            )}
+          </section>
+        </section>
+      ) : null}
+
+      {firstRun ? null : (
+
       <nav className="integration-subtabs" aria-label="Integration categories">
-        {integrationTabItems.map(([key, label]) => (
+        {availableTabItems.map(([key, label]) => (
           <button type="button" className={activeTab === key ? "is-active" : ""} onClick={() => selectIntegrationTab(key)} key={key}>
             {label}
           </button>
         ))}
       </nav>
+      )}
 
       {activeTab === "media-server" ? <JellyfinIntegrationSettings compact firstRun={firstRun} /> : null}
 
@@ -714,40 +1105,42 @@ export default function Integrations({ embedded = false, firstRun = false, activ
         </section>
       ) : null}
 
-      {notice ? <div className="integration-notice">{notice}</div> : null}
+      {!firstRun && notice ? <div className="integration-notice">{notice}</div> : null}
 
-      {activeTab === "automation" ? (
+      {!firstRun && activeTab === "automation" ? (
         <section className="integration-section">
           <div className="integration-section-title">
             <div>
               <h2>Arr Apps</h2>
-              <span>Sonarr, Radarr, Lidarr, Prowlarr, and Bazarr</span>
+              <span>Sonarr, Radarr, Lidarr, Readarr, Prowlarr, and Bazarr</span>
             </div>
             <RiSettings3Line />
           </div>
-          <div className="integration-toolbar">
-            {firstRun && !loadedSavedIntegrations && savedIntegrationsAvailable ? (
-              <button type="button" onClick={loadExistingIntegrations}>
+          {!firstRun ? (
+            <div className="integration-toolbar">
+              {firstRun && !loadedSavedIntegrations && savedIntegrationsAvailable ? (
+                <button type="button" onClick={loadExistingIntegrations}>
+                  <RiDownloadCloud2Fill size={18} />
+                  Load saved integrations
+                </button>
+              ) : null}
+              {!firstRun || loadedSavedIntegrations ? (
+                <button type="button" onClick={testAllIntegrations} disabled={busyAction === "test-all"}>
+                  <RiHeartPulseLine size={18} />
+                  {busyAction === "test-all" ? "Testing" : "Test all"}
+                </button>
+              ) : null}
+              <button type="button" onClick={exportIntegrations}>
                 <RiDownloadCloud2Fill size={18} />
-                Load saved integrations
+                Export
               </button>
-            ) : null}
-            {!firstRun || loadedSavedIntegrations ? (
-              <button type="button" onClick={testAllIntegrations} disabled={busyAction === "test-all"}>
-                <RiHeartPulseLine size={18} />
-                {busyAction === "test-all" ? "Testing" : "Test all"}
-              </button>
-            ) : null}
-            <button type="button" onClick={exportIntegrations}>
-              <RiDownloadCloud2Fill size={18} />
-              Export
-            </button>
-            <label>
-              <RiUploadCloud2Line size={18} />
-              Import
-              <input ref={fileInputRef} type="file" accept=".json,application/json" onChange={importIntegrations} />
-            </label>
-          </div>
+              <label>
+                <RiUploadCloud2Line size={18} />
+                Import
+                <input ref={fileInputRef} type="file" accept=".json,application/json" onChange={importIntegrations} />
+              </label>
+            </div>
+          ) : null}
           <div className="integration-grid">
             {primaryAutomationApps.map((app) => (
               <IntegrationCard
@@ -766,7 +1159,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
             <div className="integration-subsection">
               <div className="integration-subsection-title">
                 <strong>TV alternative</strong>
-                <span>SickChill can be used instead of Sonarr for series automation.</span>
+                <span>Connect SickChill for health checks. It does not fill the Barracks release calendar — use Sonarr for that.</span>
               </div>
               <div className="integration-grid integration-grid-single-row">
                 {sickChillApps.map((app) => (
@@ -796,7 +1189,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
         </section>
       ) : null}
 
-      {activeTab === "seerr" ? (
+      {!firstRun && activeTab === "seerr" ? (
         <section className="integration-section">
           <div className="integration-section-title">
             <div>
@@ -805,6 +1198,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
             </div>
             <RiSettings3Line />
           </div>
+          {!firstRun ? (
           <div className="integration-toolbar">
             {firstRun && !loadedSavedIntegrations && savedIntegrationsAvailable ? (
               <button type="button" onClick={loadExistingIntegrations}>
@@ -828,6 +1222,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
               <input ref={fileInputRef} type="file" accept=".json,application/json" onChange={importIntegrations} />
             </label>
           </div>
+          ) : null}
           <div className="integration-grid">
             {seerrApps.map((app) => (
               <IntegrationCard
@@ -845,7 +1240,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
         </section>
       ) : null}
 
-      {activeTab === "downloads" ? (
+      {!firstRun && activeTab === "downloads" ? (
         <section className="integration-section">
           <div className="integration-section-title">
             <div>
@@ -903,15 +1298,16 @@ export default function Integrations({ embedded = false, firstRun = false, activ
         </section>
       ) : null}
 
-      {activeTab === "invites" ? (
+      {!firstRun && activeTab === "invites" ? (
         <section className="integration-section">
           <div className="integration-section-title">
             <div>
-              <h2>Third-party Apps</h2>
-              <span>Wizarr invites and Tdarr active transcode monitoring</span>
+              <h2>3rd party apps</h2>
+              <span>Wizarr, Tdarr, Maintainerr, Audiobookshelf, Unpackerr, and Kometa</span>
             </div>
             <RiUserAddLine />
           </div>
+          {!firstRun ? (
           <div className="integration-toolbar">
             {firstRun && !loadedSavedIntegrations && savedIntegrationsAvailable ? (
               <button type="button" onClick={loadExistingIntegrations}>
@@ -935,6 +1331,7 @@ export default function Integrations({ embedded = false, firstRun = false, activ
               <input ref={fileInputRef} type="file" accept=".json,application/json" onChange={importIntegrations} />
             </label>
           </div>
+          ) : null}
           <div className="integration-grid">
             {thirdParty.map((app) => (
               <IntegrationCard
@@ -952,17 +1349,18 @@ export default function Integrations({ embedded = false, firstRun = false, activ
           <div className="integration-link-panel">
             <div>
               <strong>Open connected tools</strong>
-              <span>Manage Wizarr invitations or monitor Tdarr active, queued, and finished transcodes from Barracks.</span>
+              <span>Manage Wizarr invitations, monitor Tdarr transcodes, and review Maintainerr cleanup activity from Barracks.</span>
             </div>
             <div className="integration-link-actions">
               <Link to="/users?tab=invites">Open Wizarr links</Link>
               <Link to="/active-transcodes">Open Active Transcodes</Link>
+              <Link to="/maintainerr">Open Maintainerr</Link>
             </div>
           </div>
         </section>
       ) : null}
 
-      {activeTab !== "media-server" ? (
+      {!firstRun && activeTab !== "media-server" ? (
         <section className="integration-section integration-health-panel">
           <div className="integration-section-title">
             <div>

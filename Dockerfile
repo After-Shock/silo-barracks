@@ -1,9 +1,17 @@
-FROM node:22-bookworm-slim AS deps
+# amd64 + arm64 use Node 24 LTS; linux/arm/v7 (TARGETARCH=arm) uses Node 22
+# because node:24-bookworm-slim has no arm/v7 variant.
+ARG TARGETARCH
+
+FROM node:26-bookworm-slim@sha256:add5c17c14752c54d2f3d519ec46a3815684d41c33f198bcb09fb998f7dcbf68 AS node-amd64
+FROM node:26-bookworm-slim@sha256:add5c17c14752c54d2f3d519ec46a3815684d41c33f198bcb09fb998f7dcbf68 AS node-arm64
+FROM node:22-bookworm-slim@sha256:5ec23b7c622b00547753bc6ffd78085dd868a68aeb41c8e0a1418f033e13d96d AS node-arm
+
+FROM node-${TARGETARCH} AS deps
 WORKDIR /app
 COPY package*.json ./
 COPY apps/web/package.json apps/web/package.json
 COPY apps/api/package.json apps/api/package.json
-COPY docs/package.json docs/package.json
+COPY packaging/shims packaging/shims
 RUN npm ci
 
 FROM deps AS web-builder
@@ -11,19 +19,22 @@ WORKDIR /app
 COPY apps/web apps/web
 RUN npm run build -w @jellyglance/web
 
-FROM node:22-bookworm-slim AS runtime
+ARG TARGETARCH
+FROM node-${TARGETARCH} AS runtime
+LABEL org.opencontainers.image.licenses="MIT"
 ENV NODE_ENV=production \
   CONFIG_DIR=/app/config \
   BACKUP_DIR=/app/backups
 WORKDIR /app
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends python3 wget \
+  && apt-get install -y --no-install-recommends python3 wget fontconfig fonts-dejavu-core \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /app/config /app/backups
 
 COPY package*.json ./
 COPY apps/api/package.json apps/api/package.json
+COPY packaging/shims packaging/shims
 RUN npm ci --omit=dev --workspace @jellyglance/api --include-workspace-root=false
 
 COPY apps/api apps/api

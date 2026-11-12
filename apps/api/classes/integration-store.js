@@ -23,6 +23,10 @@ const defaultData = {
     items: [],
     syncedAt: null,
   },
+  autobrr: {
+    hits: [],
+    syncedAt: null,
+  },
 };
 
 const maxHealthHistoryEntries = 50;
@@ -134,11 +138,39 @@ async function getIntegrations() {
 }
 
 async function saveIntegrations(integrations) {
+  const settings = await getSettings();
+  const currentIntegrations = {
+    ...defaultIntegrations,
+    ...(settings.Integrations || {}),
+  };
+  const nextIntegrations = {
+    ...defaultIntegrations,
+    ...(integrations || {}),
+  };
+
+  // Settings saves submit all integrations together. Preserve an existing
+  // secret when a form that edits another integration sends it back blank.
+  for (const listName of ["arrApps", "clients", "thirdParty"]) {
+    const currentList = Array.isArray(currentIntegrations[listName]) ? currentIntegrations[listName] : [];
+    nextIntegrations[listName] = (Array.isArray(nextIntegrations[listName]) ? nextIntegrations[listName] : []).map((integration) => {
+      const current = currentList.find(
+        (candidate) => candidate.instanceId === integration.instanceId || candidate.slug === integration.slug
+      );
+      const incomingSecret = integration.values?.secret;
+      if (incomingSecret || !current?.values?.secret) return integration;
+
+      return {
+        ...integration,
+        values: {
+          ...(integration.values || {}),
+          secret: current.values.secret,
+        },
+      };
+    });
+  }
+
   const savedIntegrations = mapIntegrationSecrets(
-    {
-      ...defaultIntegrations,
-      ...(integrations || {}),
-    },
+    nextIntegrations,
     encryptSecret
   );
   await saveSettings({ Integrations: savedIntegrations });
@@ -159,6 +191,17 @@ async function getIntegrationData() {
     invites: {
       ...defaultData.invites,
       ...(settings.IntegrationData?.invites || {}),
+    },
+    autobrr: {
+      hits: [],
+      syncedAt: null,
+      ...(settings.IntegrationData?.autobrr || {}),
+    },
+    cleanuparr: {
+      events: [],
+      handled: {},
+      lastEventAt: null,
+      ...(settings.IntegrationData?.cleanuparr || {}),
     },
   };
 }
@@ -198,4 +241,6 @@ module.exports = {
   saveIntegrationData,
   getIntegrationHealthHistory,
   saveIntegrationHealthResults,
+  encryptSecret,
+  decryptSecret,
 };

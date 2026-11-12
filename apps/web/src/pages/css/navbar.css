@@ -1668,3 +1668,7 @@ html body .navitem:is(:disabled, .disabled) .nav-text {
 html.jg-nav-collapsed {
   --jg-sidebar-width: 4.875rem;
 }
+
+/* upstream 1.4.3 (ported) */
+.install-app-button { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 8px 12px; border: 1px solid rgba(var(--primary-light-rgb, 139, 92, 246), 0.3); border-radius: 10px; background: rgba(var(--primary-rgb, 139, 92, 246), 0.14); color: #e6edf7; font-size: 13px; font-weight: 600; cursor: pointer; }
+.install-app-button:hover { background: rgba(var(--primary-rgb, 139, 92, 246), 0.26); }

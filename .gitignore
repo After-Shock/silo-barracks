@@ -15,6 +15,7 @@ node_modules/
 /config/*
 !/config/.gitkeep
 /postgres-data/
+/compare-runtime/
 .vscode
 .idea
 .env
@@ -45,3 +46,9 @@ yarn-error.log*
 /docs/.vitepress/.temp
 .superpowers/
 .qa-universal-theme/
+
+__pycache__/
+*.pyc
+
+# Local packaging build output
+packaging/dist/

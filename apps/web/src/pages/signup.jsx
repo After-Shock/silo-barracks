@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 
 import axios from "../lib/axios_instance";
 import Config from "../lib/config";
-import CryptoJS from "crypto-js";
 import "./css/setup.css";
 import Loading from "./components/general/loading";
 import { Button } from "@/components/ui/button";
@@ -24,6 +23,23 @@ function Signup() {
   const [authMode, setAuthMode] = useState("local");
   const [quickConnect, setQuickConnect] = useState(null);
   const [quickConnectStatus, setQuickConnectStatus] = useState("");
+  const [serverType, setServerType] = useState("jellyfin");
+  // Emby has no Quick Connect: its option signs in with an Emby admin username and password.
+  const embyLogin = authMode === "quick-connect" && serverType === "emby";
+  const serverName = serverType === "emby" ? "Emby" : "Jellyfin";
+  const quickConnectLabel = serverType === "emby" ? "Emby login" : "Jellyfin Quick Connect";
+
+  useEffect(() => {
+    axios
+      .get("/auth/isConfigured")
+      .then((response) => {
+        if (response.data?.serverType === "emby") {
+          setServerType("emby");
+          setsubmitButtonText("Sign in with Emby");
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   function handleFormChange(event) {
     setFormValues({ ...formValues, [event.target.name]: event.target.value });
@@ -34,13 +50,24 @@ function Signup() {
     setQuickConnect(null);
     setQuickConnectStatus("");
     setsubmitButtonText(
-      nextMode === "quick-connect" ? "Enable Quick Connect" : nextMode === "oidc" ? "Test & Save OIDC" : i18next.t("CREATE_USER")
+      nextMode === "quick-connect"
+        ? serverType === "emby"
+          ? "Sign in with Emby"
+          : "Enable Quick Connect"
+        : nextMode === "oidc"
+          ? "Test & Save OIDC"
+          : i18next.t("CREATE_USER")
     );
   }
 
   async function handleFormSubmit(event) {
     setProcessing(true);
     event.preventDefault();
+
+    if (embyLogin) {
+      finishEmbyLogin();
+      return;
+    }
 
     if (authMode === "quick-connect") {
       if (quickConnect?.secret) {
@@ -51,8 +78,7 @@ function Signup() {
       return;
     }
 
-    let hashedPassword = formValues.JS_PASSWORD ? CryptoJS.SHA3(formValues.JS_PASSWORD).toString() : undefined;
-    saveAuthSetup(hashedPassword);
+    saveAuthSetup(formValues.JS_PASSWORD || undefined);
   }
 
   async function saveAuthSetup(hashedPassword) {
@@ -94,6 +120,25 @@ function Signup() {
         setsubmitButtonText(errorMessage);
         setProcessing(false);
       });
+  }
+
+  async function finishEmbyLogin() {
+    try {
+      setProcessing(true);
+      setQuickConnectStatus("Signing in with Emby...");
+      const response = await axios.post(
+        "/auth/media-server-login",
+        { username: formValues.JS_USERNAME, password: formValues.JS_PASSWORD },
+        { headers: { "Content-Type": "application/json" } }
+      );
+      localStorage.setItem("token", response.data.token);
+      localStorage.removeItem("config");
+      window.dispatchEvent(new Event("silo-barracks-config-updated"));
+      await finishSetupNavigation();
+    } catch (error) {
+      setQuickConnectStatus(error.response?.data?.errorMessage || `Error : ${error.response?.status || "Unknown"}`);
+      setProcessing(false);
+    }
   }
 
   async function finishQuickConnect(secret) {
@@ -151,8 +196,8 @@ function Signup() {
 
     try {
       setQuickConnectStatus("Checking Jellyfin Quick Connect approval...");
-      const response = await axios.get("/auth/jellyfin-quick-connect/status", {
-        params: { secret: quickConnect.secret },
+      const response = await axios.post("/auth/jellyfin-quick-connect/status", {
+        secret: quickConnect.secret,
       });
 
       if (response.data.authenticated) {
@@ -226,8 +271,8 @@ function Signup() {
 
     const interval = window.setInterval(async () => {
       try {
-        const response = await axios.get("/auth/jellyfin-quick-connect/status", {
-          params: { secret: quickConnect.secret },
+        const response = await axios.post("/auth/jellyfin-quick-connect/status", {
+          secret: quickConnect.secret,
         });
 
         if (response.data.authenticated) {
@@ -251,16 +296,19 @@ function Signup() {
       step={2}
       eyebrow="Admin access"
       title="Choose admin authentication"
-      description="Protect Silo Barracks with a local account or your OIDC provider. The Silo administrator API key stays on the backend."
+      description={`Choose how Barracks should protect the dashboard. ${quickConnectLabel} uses ${serverName} accounts, OIDC validates your provider first, or Local creates Barracks credentials.`}
+      minimal
     >
+        <section className="setup-stage-shell">
+          <section className="setup-stage-form-card">
         <div className="setup-auth-options" role="radiogroup" aria-label="Admin authentication method">
           {config?.IS_SILO === false && <button
             type="button"
             className={`setup-auth-option ${authMode === "quick-connect" ? "is-active" : ""}`}
             onClick={() => handleAuthModeChange("quick-connect")}
           >
-            <strong>Jellyfin Quick Connect</strong>
-            <small>No local admin details</small>
+            <strong>{quickConnectLabel}</strong>
+            <small>{serverType === "emby" ? "Your Emby admin account" : "No local admin details"}</small>
           </button>}
           <button
             type="button"
@@ -281,7 +329,31 @@ function Signup() {
         </div>
 
         <form onSubmit={handleFormSubmit} className="setup-form">
-          {authMode === "quick-connect" && (
+          <div className="setup-form-heading-block">
+            <strong>
+              {authMode === "quick-connect"
+                ? quickConnectLabel
+                : authMode === "oidc"
+                  ? "OIDC provider details"
+                  : "Local admin account"}
+            </strong>
+            <span>
+              {embyLogin
+                ? "Sign in with an Emby administrator account. The password is checked by Emby and not stored."
+                : authMode === "quick-connect"
+                  ? "Approve the setup in Jellyfin to continue."
+                  : authMode === "oidc"
+                    ? "Save the provider details Barracks should validate against."
+                    : "Create the Barracks credentials used to access the dashboard."}
+            </span>
+          </div>
+          {embyLogin && quickConnectStatus ? (
+            <div className="setup-auth-summary">
+              <small className="quick-connect-status">{quickConnectStatus}</small>
+            </div>
+          ) : null}
+
+          {authMode === "quick-connect" && !embyLogin && (
             <div className="setup-auth-summary">
               <strong>Jellyfin Quick Connect</strong>
               {quickConnect?.code ? (
@@ -296,7 +368,7 @@ function Signup() {
             </div>
           )}
 
-          {authMode === "local" && (
+          {(authMode === "local" || embyLogin) && (
             <>
               <div className="inputbox">
                 <Label htmlFor="JS_USERNAME" className="setup-field-label">
@@ -308,7 +380,7 @@ function Signup() {
                   value={formValues.JS_USERNAME || ""}
                   onChange={handleFormChange}
                   placeholder=" "
-                  required={authMode === "local"}
+                  required={authMode === "local" || embyLogin}
                 />
               </div>
 
@@ -324,7 +396,7 @@ function Signup() {
                     onChange={handleFormChange}
                     type={showPassword ? "text" : "password"}
                     placeholder=" "
-                    required={authMode === "local"}
+                    required={authMode === "local" || embyLogin}
                   />
                   <Button className="login-show-password" type="button" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <RiEyeFill /> : <RiEyeOffFill />}
@@ -343,7 +415,7 @@ function Signup() {
                   name="OIDC_ISSUER_URL"
                   value={formValues.OIDC_ISSUER_URL || ""}
                   onChange={handleFormChange}
-                  placeholder="https://auth.example.com/application/o/jellyglance/"
+                  placeholder="https://auth.example.com/application/o/barracks/"
                   required={authMode === "oidc"}
                 />
               </div>
@@ -402,6 +474,8 @@ function Signup() {
                   : submitButtonText}
           </Button>
         </form>
+          </section>
+        </section>
     </SetupShell>
   );
 }

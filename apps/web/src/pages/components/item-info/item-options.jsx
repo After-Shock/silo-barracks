@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Trans } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useWatchingLock } from "../general/WatchingLockModal";
 
 
 function ItemOptions(props) {
@@ -24,11 +25,15 @@ function ItemOptions(props) {
   ];
   const [selectedOption, setSelectedOption] = useState(options[0]);
   const navigate = useNavigate();
+  const { guard, modal: watchingModal } = useWatchingLock();
 
 
 
   async function execPurge(withActivity) {
     const url=`/api/item/purge`;
+    setShow(false);
+    const { proceed } = await guard({ itemId: props.itemid, label: props.itemName }, "purge");
+    if (!proceed) return;
 
     return await axios.delete(url,
 
@@ -84,6 +89,7 @@ function ItemOptions(props) {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            {watchingModal}
 
         </div>
 

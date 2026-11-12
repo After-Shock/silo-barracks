@@ -1,6 +1,5 @@
 const { Pool } = require("pg");
 const pgp = require("pg-promise")();
-const { createRefreshThrottle } = require("./classes/refresh-throttle");
 const { update_query: update_query_map } = require("./models/bulk_insert_update_handler");
 
 const _POSTGRES_USER = process.env.POSTGRES_USER;
@@ -106,11 +105,18 @@ async function updateSingleFieldBulk(table_name, data, field_name, new_value, wh
   return { Result: result, message: "" + message };
 }
 
+// Dependency order: stats overview reads latest playback activity.
 const materializedViews = [
   "js_latest_playback_activity",
   "js_library_stats_overview",
   "js_library_items_with_playcount_playtime",
 ];
+
+const DEBOUNCE_MS = Number(process.env.MATERIALIZED_VIEW_REFRESH_DEBOUNCE_MS) || 3000;
+
+let debounceTimer = null;
+let inFlight = null;
+let pendingRefresh = false;
 
 async function refreshMaterializedView(view_name) {
   const client = await pool.connect();
@@ -136,18 +142,49 @@ async function refreshMaterializedView(view_name) {
   return { Result: result, message: "" + message };
 }
 
-// Background refreshes (playback writes, completed sessions) are throttled; each batch runs
-// the views in order because the stats overview reads latest playback activity.
-const scheduleMaterializedViewRefreshes = createRefreshThrottle(
-  async () => {
+async function runRefreshBatch() {
+  if (inFlight) {
+    pendingRefresh = true;
+    return inFlight;
+  }
+
+  pendingRefresh = false;
+  inFlight = (async () => {
     for (const view of materializedViews) {
       const result = await refreshMaterializedView(view);
-      if (result.Result !== "SUCCESS") console.error(result.message);
+      if (result.Result === "ERROR") {
+        console.error(`Failed to refresh materialized view "${view}":`, result.message);
+      }
     }
-  },
-  Number(process.env.MATERIALIZED_VIEW_REFRESH_INTERVAL_MS) || 60000,
-  (error) => console.error("Materialized view refresh batch failed:", error)
-);
+  })();
+
+  try {
+    await inFlight;
+  } finally {
+    inFlight = null;
+    if (pendingRefresh) {
+      await runRefreshBatch();
+    }
+  }
+}
+
+function scheduleMaterializedViewRefreshes() {
+  pendingRefresh = true;
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    debounceTimer = null;
+    runRefreshBatch().catch((error) => {
+      console.error("Materialized view refresh batch failed:", error.message);
+    });
+  }, DEBOUNCE_MS);
+}
+
+async function flushMaterializedViewRefreshes() {
+  clearTimeout(debounceTimer);
+  debounceTimer = null;
+  pendingRefresh = true;
+  await runRefreshBatch();
+}
 
 async function insertBulk(table_name, data, columns) {
   //dedupe data
@@ -204,6 +241,11 @@ async function query(text, params, refreshViews = false) {
 
     if (refreshViews) {
       scheduleMaterializedViewRefreshes();
+    }
+
+    // A multi-statement string (e.g. CREATE TABLE ...; CREATE INDEX ...) resolves to an array of results.
+    if (Array.isArray(result)) {
+      return result;
     }
 
     const skippedColumns = [
@@ -277,6 +319,7 @@ module.exports = {
   querySingle: querySingle,
   refreshMaterializedView: refreshMaterializedView,
   scheduleMaterializedViewRefreshes: scheduleMaterializedViewRefreshes,
+  flushMaterializedViewRefreshes: flushMaterializedViewRefreshes,
   materializedViews: materializedViews,
 
   // initDB: initDB,

@@ -1,9 +1,27 @@
 const db = require("../db");
 const { connectionConfig } = require('./provider');
+const { stripTrailingSlashes } = require("../utils/security");
+const { resolveServerType, setActiveServerType } = require("./server-type");
+
+let cachedConfig = null;
+let cachedConfigAt = 0;
+const CONFIG_CACHE_MS = 8000;
+
+// Saved or env-provided hosts may carry a trailing slash (e.g. "http://h:8096/"),
+// which turns `${JF_HOST}/Users` into "//Users". Strip it on read so existing
+// installs are repaired without a settings re-save.
+function normalizeHost(value) {
+  if (value == null) return value;
+  return stripTrailingSlashes(value);
+}
 
 class Config {
   async getConfig() {
     try {
+      if (cachedConfig && Date.now() - cachedConfigAt < CONFIG_CACHE_MS) {
+        return cachedConfig;
+      }
+
       //Manual overrides
       process.env.POSTGRES_USER = process.env.POSTGRES_USER ?? "postgres";
 
@@ -17,9 +35,13 @@ class Config {
       }
 
       const _config = config[0];
+      const serverType = resolveServerType(_config.settings);
+      setActiveServerType(serverType);
 
-      return {
-        ...connectionConfig(_config),
+      const connection = connectionConfig(_config);
+      const result = {
+        ...connection,
+        JF_HOST: normalizeHost(connection.JF_HOST),
         JF_EXTERNAL_HOST: _config.settings?.EXTERNAL_URL,
         APP_USER: _config.APP_USER,
         APP_PASSWORD: _config.APP_PASSWORD,
@@ -27,11 +49,20 @@ class Config {
         settings: _config.settings,
         api_keys: _config.api_keys,
         state: state,
+        SERVER_TYPE: serverType,
       };
+      cachedConfig = result;
+      cachedConfigAt = Date.now();
+      return result;
     } catch (error) {
       console.log("Error fetching config:", error);
       return { error: "Config Details Not Found" };
     }
+  }
+
+  clearCache() {
+    cachedConfig = null;
+    cachedConfigAt = 0;
   }
 
   async getPreferedAdmin() {
@@ -52,9 +83,13 @@ class Config {
       //state 2 = Jellyfin configured and admin access configured
 
       if (Configured.length > 0) {
-        const key = connectionConfig(Configured[0]).JF_API_KEY;
+        const row = Configured[0];
+        const settings = row.settings || {};
+        const key = connectionConfig(row).JF_API_KEY;
         const hasJellyfinApiKey = typeof key === 'string' && key.trim() !== '';
-        const hasAdminUser = Configured[0].APP_USER !== null && Configured[0].APP_USER !== "";
+        const hasLegacyAdminUser = row.APP_USER !== null && row.APP_USER !== "";
+        const hasLocalUsers = Array.isArray(settings.localUsers) && settings.localUsers.some((user) => user?.username);
+        const hasAdminUser = hasLegacyAdminUser || hasLocalUsers || ["local-auth", "oidc", "jellyfin-quick-connect"].includes(row.APP_USER);
 
         if (hasJellyfinApiKey && hasAdminUser) state = 2;
         else if (hasJellyfinApiKey) state = 1;

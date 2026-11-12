@@ -169,8 +169,8 @@ function libraryToJellyfin(row, serverId) {
 }
 
 function itemType(type) {
-  return ({ movie: 'Movie', series: 'Series', season: 'Season', episode: 'Episode', audiobook: 'Audio', audio: 'Audio', ebook: 'Book' })
-    [String(type || '').toLowerCase()] || titleCase(type);
+  const itemTypes = { movie: 'Movie', series: 'Series', season: 'Season', episode: 'Episode', audiobook: 'Audio', audio: 'Audio', ebook: 'Book' };
+  return itemTypes[String(type || '').toLowerCase()] || titleCase(type);
 }
 
 function itemToJellyfin(row, serverId) {

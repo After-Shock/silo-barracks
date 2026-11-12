@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import axios from "../lib/axios_instance";
 
@@ -15,6 +16,15 @@ import LibraryFilterModal from "./components/library/library-filter-modal";
 import socket from "../socket";
 import SiloActivity from "./silo-activity";
 
+function readActivityPreference(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value == null ? fallback : JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
 function LegacyActivity({ initialConfig }) {
   const [data, setData] = useState();
   const [config, setConfig] = useState(initialConfig);
@@ -23,9 +33,10 @@ function LegacyActivity({ initialConfig }) {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
   const [itemCount, setItemCount] = useState(parseInt(localStorage.getItem("PREF_ACTIVITY_ItemCount") ?? "10"));
   const [libraryFilters, setLibraryFilters] = useState(
-    localStorage.getItem("PREF_ACTIVITY_libraryFilters") != undefined
-      ? JSON.parse(localStorage.getItem("PREF_ACTIVITY_libraryFilters"))
-      : []
+    () => {
+      const stored = readActivityPreference("PREF_ACTIVITY_libraryFilters", []);
+      return Array.isArray(stored) ? stored : [];
+    }
   );
   const [libraries, setLibraries] = useState([]);
   const [showLibraryFilters, setShowLibraryFilters] = useState(false);
@@ -244,14 +255,24 @@ function LegacyActivity({ initialConfig }) {
             "Content-Type": "application/json",
           },
         })
-        .then((data) => {
-          setData(data.data);
+        .then((response) => {
+          const payload = response.data;
+          setData(
+            Array.isArray(payload)
+              ? { results: payload, pages: 1 }
+              : {
+                  ...payload,
+                  results: Array.isArray(payload?.results) ? payload.results : [],
+                  pages: payload?.pages || 1,
+                }
+          );
           setHistoryError("");
           setIsBusy(false);
         })
         .catch((error) => {
           console.log(error);
           setHistoryError(i18next.t("ACTIVITY_STATES.HISTORY_ERROR"));
+          setData({ results: [], pages: 1 });
           setIsBusy(false);
         });
     };
@@ -305,6 +326,9 @@ function LegacyActivity({ initialConfig }) {
     return <div aria-busy="true"><Loading /></div>;
   }
 
+  // The API only returns the signed-in user's own plays unless they can see every user.
+  const showingOwnActivity = data?.scope === "self";
+
   if (!data && historyError) {
     return (
       <div className="Activity" data-theme-screen="activity">
@@ -356,7 +380,10 @@ function LegacyActivity({ initialConfig }) {
           <h1>
             <Trans i18nKey="MENU_TABS.ACTIVITY" />
           </h1>
-          <span>Review watch history, playback method, device, and session details.</span>
+          <span>
+            {showingOwnActivity ? "Showing your activity only. " : ""}Review watch history, playback method, device, and session details.{" "}
+            <Link to="/timeline">Open Timeline view</Link>.
+          </span>
         </div>
 
         {config?.IS_SILO && <p className="activity-notice" role="status">History is read directly from Silo retention, newest first. Barracks does not duplicate or delete these records.</p>}

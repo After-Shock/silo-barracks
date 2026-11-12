@@ -6,12 +6,20 @@ import axios from "../lib/axios_instance";
 import { loadSavedIntegrations } from "../lib/integrations-storage";
 import "./css/integrations.css";
 import "./css/calendar.css";
+import { selfhstIconUrl } from "../lib/selfhst-icons";
 
-const iconUrl = (slug) => `https://cdn.jsdelivr.net/gh/selfhst/icons/svg/${slug}.svg`;
+const iconUrl = (slug) => {
+  const safe = String(slug || "sonarr")
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "");
+  const iconSlug = /^[a-z0-9][a-z0-9-]{0,63}$/.test(safe) ? safe : "sonarr";
+  return selfhstIconUrl(iconSlug);
+};
 const calendarSourceDefaults = [
   { name: "Sonarr", slug: "sonarr", connected: false },
   { name: "Radarr", slug: "radarr", connected: false },
   { name: "Lidarr", slug: "lidarr", connected: false },
+  { name: "Readarr", slug: "readarr", connected: false },
 ];
 
 function appIcon(app) {

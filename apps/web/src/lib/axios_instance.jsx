@@ -1,7 +1,29 @@
 import Axios from "axios";
 import baseUrl from "./baseurl";
+import { clearApiCache } from "./api-cache";
 
 const axios = Axios.create({ baseURL: baseUrl });
+
+function requestUrl(error) {
+  return String(error?.config?.url || error?.config?.baseURL || "");
+}
+
+function isSocketIoRequest(url) {
+  try {
+    const parsed = new URL(url, "https://placeholder.local");
+    return parsed.pathname === "/socket.io" || parsed.pathname.startsWith("/socket.io/");
+  } catch {
+    return false;
+  }
+}
+
+function isBarracksAuthFailure(error) {
+  if (error?.response?.status !== 401) return false;
+  const url = requestUrl(error);
+  if (/\/proxy(\/|$)/i.test(url)) return false;
+  if (isSocketIoRequest(url)) return false;
+  return Boolean(localStorage.getItem("token"));
+}
 
 axios.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
@@ -21,9 +43,10 @@ axios.interceptors.request.use((config) => {
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error?.response?.status === 401 && localStorage.getItem("token")) {
+    if (isBarracksAuthFailure(error)) {
       localStorage.removeItem("token");
       localStorage.removeItem("config");
+      clearApiCache();
       window.dispatchEvent(new Event("silo-barracks-auth-expired"));
     }
 

@@ -1,0 +1,429 @@
+.my-glance-page {
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: var(--jg-page-pad) clamp(0.55rem, 1.2vw, 1rem) 1.1rem;
+  color: #f8fafc;
+}
+
+.my-glance-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(var(--primary-light-rgb), 0.2);
+  border-radius: 0.85rem;
+  background:
+    linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.2), rgba(var(--barracks-accent-secondary-rgb), 0.08)),
+    rgba(9, 12, 19, 0.94);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+}
+
+.my-glance-identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.my-glance-avatar {
+  position: relative;
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  flex: 0 0 auto;
+  place-items: center;
+  overflow: hidden;
+  border: 3px solid rgba(var(--barracks-accent-secondary-rgb), 0.85);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--barracks-text) 6%, transparent);
+  color: var(--primary-light-color);
+}
+
+.my-glance-avatar img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.my-glance-avatar svg {
+  position: absolute;
+}
+
+.my-glance-hero p {
+  margin: 0 0 4px;
+  color: var(--secondary-color);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.my-glance-hero h1 {
+  margin: 0 !important;
+  color: #fff;
+  font-size: var(--jg-type-display);
+  font-weight: 950;
+  line-height: 0.95;
+}
+
+.my-glance-hero span {
+  display: block;
+  margin-top: 8px;
+  color: #a7b4c8;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.my-glance-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.my-glance-hero-actions a {
+  display: inline-flex;
+  min-height: 2.05rem;
+  align-items: center;
+  padding: 0 16px;
+  border: 1px solid rgba(var(--primary-light-rgb), 0.34);
+  border-radius: 12px;
+  background: rgba(var(--barracks-action-rgb), 0.22);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.my-glance-hero-actions a.is-ghost {
+  background: transparent;
+  color: #dbe7f7;
+}
+
+.my-glance-hero-actions a:hover {
+  border-color: rgba(var(--primary-light-rgb), 0.55);
+  color: #fff;
+}
+
+.my-glance-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.my-glance-stats div {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--barracks-text) 8%, transparent);
+  border-radius: 14px;
+  background: rgba(8, 11, 17, 0.88);
+}
+
+.my-glance-stats strong {
+  color: #fff;
+  font-size: var(--jg-type-stat);
+  font-weight: 950;
+  line-height: 1;
+}
+
+.my-glance-stats span {
+  color: #9cabbe;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.my-glance-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.my-glance-toolbar input {
+  height: 2.05rem;
+  min-width: 0;
+  padding: 0 14px;
+  border: 1px solid rgba(var(--primary-light-rgb), 0.28);
+  border-radius: 12px;
+  background: rgba(5, 8, 13, 0.72);
+  color: #fff;
+  font-weight: 850;
+  outline: none;
+}
+
+.my-glance-toolbar em {
+  color: #94a3b8;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 750;
+}
+
+.my-glance-page .user-media-poster {
+  position: relative;
+}
+
+.my-glance-progress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.my-glance-progress i {
+  display: block;
+  height: 100%;
+  background: var(--secondary-color, #00c8ff);
+}
+
+.my-glance-live {
+  padding: 18px 20px;
+  border: 1px solid rgba(var(--barracks-accent-secondary-rgb), 0.28);
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgba(var(--barracks-accent-secondary-rgb), 0.14), rgba(var(--barracks-action-rgb), 0.08)),
+    rgba(8, 11, 17, 0.92);
+}
+
+.my-glance-live-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.my-glance-live.is-idle {
+  color: #9cabbe;
+}
+
+.my-glance-live p,
+.my-glance-taste p {
+  margin: 0 0 6px;
+  color: var(--secondary-color);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.my-glance-live h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 950;
+}
+
+.my-glance-live-link {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 16px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.my-glance-live-poster {
+  overflow: hidden;
+  aspect-ratio: 2 / 3;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--barracks-text) 6%, transparent);
+}
+
+.my-glance-live-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.my-glance-live span {
+  display: block;
+  margin-top: 6px;
+  color: #a7b4c8;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.my-glance-live-time {
+  font-variant-numeric: tabular-nums;
+}
+
+.my-glance-live-bar {
+  position: relative;
+  display: block;
+  margin-top: 12px;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.my-glance-digest {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--barracks-text) 8%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--barracks-text) 3%, transparent);
+}
+
+.my-glance-digest p {
+  margin: 0;
+  color: var(--secondary-color);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.my-glance-digest > span {
+  color: #9cabbe;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.my-glance-digest div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.my-glance-digest strong {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.my-glance-digest button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(var(--primary-light-rgb), 0.32);
+  border-radius: 999px;
+  background: rgba(var(--barracks-action-rgb), 0.16);
+  color: #e9d5ff;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.my-glance-taste,
+.my-glance-pipeline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.my-glance-taste {
+  align-items: center;
+}
+
+.my-glance-taste div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.my-glance-taste span,
+.my-glance-pipeline button {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid color-mix(in srgb, var(--barracks-text) 10%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--barracks-text) 4%, transparent);
+  color: #dbe7f7;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.my-glance-pipeline button {
+  cursor: pointer;
+}
+
+.my-glance-pipeline button.is-active {
+  border-color: rgba(var(--primary-light-rgb), 0.45);
+  background: rgba(var(--barracks-action-rgb), 0.22);
+  color: #fff;
+}
+
+.my-glance-pipeline strong {
+  color: var(--secondary-color);
+  font-weight: 950;
+}
+
+@media (max-width: 900px) {
+  .my-glance-hero,
+  .my-glance-identity {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .my-glance-stats,
+  .my-glance-toolbar {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .my-glance-toolbar em {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .my-glance-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Achievements and goals */
+.achievements { display: grid; gap: 14px; margin: 18px 0; padding: 18px; border: 1px solid rgba(var(--primary-light-rgb, 167, 139, 250), 0.18); border-radius: 18px; background: linear-gradient(135deg, rgba(var(--barracks-action-rgb), 0.12), color-mix(in srgb, var(--barracks-canvas) 75%, transparent)); }
+.achievements-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.achievements-head p { margin: 0 0 2px; font-size: 18px; font-weight: 800; color: #f8fafc; }
+.achievements-head span, .achievements-muted { font-size: 13px; color: rgba(199, 211, 230, 0.7); }
+.achievements-wrapped-link { padding: 7px 14px; border-radius: 10px; background: rgba(var(--barracks-action-rgb), 0.3); border: 1px solid rgba(var(--barracks-action-rgb), 0.5); color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; }
+.achievements-goals { display: grid; gap: 10px; padding: 14px; border-radius: 14px; background: rgba(8, 12, 20, 0.5); }
+.achievements-goals-head { display: flex; justify-content: space-between; align-items: center; }
+.achievements-goals-head strong { font-size: 14px; color: #f8fafc; }
+.achievements button { padding: 6px 12px; border: 1px solid color-mix(in srgb, var(--barracks-text) 14%, transparent); border-radius: 9px; background: color-mix(in srgb, var(--barracks-text) 4%, transparent); color: #e6edf7; font-size: 12px; font-weight: 700; cursor: pointer; }
+.achievements button.is-primary { background: rgba(var(--barracks-action-rgb), 0.45); border-color: rgba(var(--barracks-action-rgb), 0.6); }
+.achievements-goal-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.achievements-goal { display: grid; gap: 6px; }
+.achievements-goal-head { display: flex; justify-content: space-between; font-size: 13px; }
+.achievements-goal-head span { color: rgba(199, 211, 230, 0.75); }
+.achievements-goal-bar { position: relative; height: 10px; border-radius: 99px; background: color-mix(in srgb, var(--barracks-text) 8%, transparent); }
+.achievements-goal-bar span { display: block; height: 100%; border-radius: 99px; background: var(--primary-color, #8b5cf6); }
+.achievements-goal.is-complete .achievements-goal-bar span { background: #22c55e; }
+.achievements-goal.is-behind .achievements-goal-bar span { background: #f59e0b; }
+.achievements-goal-bar i { position: absolute; top: -3px; width: 2px; height: 16px; background: color-mix(in srgb, var(--barracks-text) 70%, transparent); border-radius: 2px; }
+.achievements-goal small { font-size: 12px; color: rgba(199, 211, 230, 0.6); }
+.achievements-goal.is-complete small { color: #86efac; }
+.achievements-goal.is-behind small { color: #fcd34d; }
+.achievements-goal-editor { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; align-items: end; }
+.achievements-goal-editor label { display: grid; gap: 4px; font-size: 12px; color: rgba(199, 211, 230, 0.75); }
+.achievements-goal-editor input { width: 100%; box-sizing: border-box; padding: 7px 10px; border-radius: 9px; border: 1px solid color-mix(in srgb, var(--barracks-text) 14%, transparent); background: rgba(8, 12, 20, 0.85); color: #e6edf7; }
+.achievements-goal-actions { display: flex; gap: 6px; }
+.achievements-goal-editor small, .achievements-goal-editor em { grid-column: 1 / -1; font-size: 12px; color: rgba(199, 211, 230, 0.55); }
+.achievements-goal-editor em { color: #fca5a5; font-style: normal; }
+.achievements-badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.achievements-badge { --medal: #6b7280; display: flex; gap: 12px; padding: 12px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--barracks-text) 7%, transparent); background: rgba(8, 12, 20, 0.5); }
+.achievements-badge.tier-bronze { --medal: #cd7f32; }
+.achievements-badge.tier-silver { --medal: #c0c7d2; }
+.achievements-badge.tier-gold { --medal: #f5c542; }
+.achievements-badge.tier-platinum { --medal: #7dd3fc; }
+.achievements-badge.is-locked { opacity: 0.6; }
+.achievements-badge-medal { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 auto; border-radius: 50%; color: var(--medal); background: radial-gradient(circle, color-mix(in srgb, var(--barracks-text) 8%, transparent), color-mix(in srgb, var(--barracks-text) 2%, transparent)); border: 2px solid var(--medal); }
+.achievements-badge > div { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.achievements-badge strong { font-size: 14px; color: #f8fafc; }
+.achievements-badge small { font-size: 12px; color: rgba(199, 211, 230, 0.6); }
+.achievements-badge em { font-style: normal; font-size: 11px; color: rgba(199, 211, 230, 0.7); }
+.achievements-badge-progress { height: 5px; border-radius: 99px; background: color-mix(in srgb, var(--barracks-text) 8%, transparent); overflow: hidden; }
+.achievements-badge-progress span { display: block; height: 100%; background: var(--medal); }
+.achievements-more { justify-self: center; }

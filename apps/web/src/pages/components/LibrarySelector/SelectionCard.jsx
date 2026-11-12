@@ -2,32 +2,20 @@ import { useState } from "react";
 import axios from "../../../lib/axios_instance";
 import "../../css/library/library-card.css";
 
-import { RiCheckboxMultipleBlankLine, RiFileMusicLine, RiFilmLine, RiTvLine } from "@remixicon/react";
 import { Trans } from "react-i18next";
 import baseUrl from "../../../lib/baseurl";
+import { libraryTypeMeta } from "../../../lib/library-types";
 
 function SelectionCard(props) {
   const [imageLoaded, setImageLoaded] = useState(true);
   const [checked, setChecked] = useState(props.data.Tracked);
-  const SeriesIcon = <RiTvLine size={"50%"} color="var(--barracks-text-overlay)" />;
-  const MovieIcon = <RiFilmLine size={"50%"} color="var(--barracks-text-overlay)" />;
-  const MusicIcon = <RiFileMusicLine size={"50%"} color="var(--barracks-text-overlay)" />;
-  const MixedIcon = <RiCheckboxMultipleBlankLine size={"50%"} color="var(--barracks-text-overlay)" />;
   const token = localStorage.getItem("token");
-
-  const libraryType =
-    props.data.CollectionType === "tvshows" ? (
-      <Trans i18nKey="SERIES" />
-    ) : props.data.CollectionType === "movies" ? (
-      <Trans i18nKey="MOVIES" />
-    ) : props.data.CollectionType === "music" ? (
-      <Trans i18nKey="MUSIC" />
-    ) : (
-      "Mixed"
-    );
+  const libraryMeta = libraryTypeMeta(props.data.CollectionType);
+  const TypeIcon = libraryMeta.icon;
+  const libraryType = libraryMeta.name;
   const default_image = (
     <div className="default_library_image-inv d-flex justify-content-center align-items-center">
-      {props.data.CollectionType === "tvshows" ? SeriesIcon : props.data.CollectionType === "movies" ? MovieIcon : props.data.CollectionType === "music" ? MusicIcon : MixedIcon}{" "}
+      <TypeIcon size={"50%"} color="white" />{" "}
     </div>
   );
 

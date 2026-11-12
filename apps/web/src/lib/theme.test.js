@@ -121,6 +121,8 @@ function createRoot(log = []) {
   const classes = new Set();
   return {
     log,
+    // documentElement API used to sync <meta name="theme-color">.
+    querySelector: () => null,
     classList: {
       classes,
       toggle(name, force) {

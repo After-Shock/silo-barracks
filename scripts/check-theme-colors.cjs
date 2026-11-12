@@ -149,6 +149,15 @@ function isExcluded(relative, explicit = false) {
   if (relative === "apps/web/src/lib/theme.js" || relative === "apps/web/public" || relative.startsWith("apps/web/public/")) {
     return true;
   }
+  // Standalone public status page: styled from the admin-chosen accent in the status
+  // page builder (and its own backgrounds), not from the signed-in user's theme.
+  if (relative === "apps/web/src/pages/public-status.jsx" || relative === "apps/web/src/pages/css/public-status.css") {
+    return true;
+  }
+  // Vendor output: PurgeCSS-trimmed Bootstrap utilities/grid (generated, not hand-edited).
+  if (relative === "apps/web/src/styles/bootstrap-trimmed.css") {
+    return true;
+  }
   return false;
 }
 

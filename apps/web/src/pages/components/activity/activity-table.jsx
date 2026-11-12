@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PHONE, TABLET, useMediaQuery } from "../../../lib/breakpoints";
 
 import { Link } from "react-router-dom";
 import { Trans } from "react-i18next";
@@ -64,6 +65,15 @@ const activityColumnVisibilityKey = "PREF_ACTIVITY_ColumnVisibility";
 const defaultColumnVisibility = {
   RemoteEndPoint: false,
 };
+
+function readActivityTablePreference(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value == null ? fallback : JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
 
 function ActivityPoster({ itemId, title, disabled = false }) {
   const [imageFailed, setImageFailed] = React.useState(false);
@@ -112,17 +122,104 @@ function ActivityUserAvatar({ userId, userName }) {
   );
 }
 
-function getStoredColumnVisibility() {
-  try {
-    return { ...defaultColumnVisibility, ...JSON.parse(localStorage.getItem(activityColumnVisibilityKey) || "{}") };
-  } catch {
-    return defaultColumnVisibility;
+// Tablets keep their own column preference so hiding columns there never changes the desktop table.
+const tabletColumnVisibilityKey = `${activityColumnVisibilityKey}_tablet`;
+const tabletDefaultColumnVisibility = () => ({ RemoteEndPoint: false, DeviceName: false, [i18next.t("TOTAL_PLAYS")]: false });
+
+function getStoredColumnVisibility(tablet = false) {
+  const stored = readActivityTablePreference(tablet ? tabletColumnVisibilityKey : activityColumnVisibilityKey, {});
+  const defaults = tablet ? tabletDefaultColumnVisibility() : defaultColumnVisibility;
+  return { ...defaults, ...(stored && typeof stored === "object" && !Array.isArray(stored) ? stored : {}) };
+}
+
+function activityTitle(row) {
+  return !row.SeriesName ? row.NowPlayingItemName : `${row.SeriesName} : S${row.SeasonNumber}E${row.EpisodeNumber} - ${row.NowPlayingItemName}`;
+}
+
+function relativeTime(value, locale) {
+  const then = new Date(value).getTime();
+  if (!Number.isFinite(then)) return "";
+  const seconds = Math.round((then - Date.now()) / 1000);
+  const units = [
+    ["year", 31536000],
+    ["month", 2592000],
+    ["week", 604800],
+    ["day", 86400],
+    ["hour", 3600],
+    ["minute", 60],
+  ];
+  const format = new Intl.RelativeTimeFormat(locale || undefined, { numeric: "auto", style: "short" });
+  for (const [unit, size] of units) {
+    if (Math.abs(seconds) >= size) return format.format(Math.round(seconds / size), unit);
   }
+  return format.format(0, "minute");
+}
+
+const METHOD_LABEL = { Transcode: "TRANSCODE", DirectPlay: "DIRECT", DirectStream: "DIRECT_STREAM" };
+const METHOD_CLASS = { Transcode: "is-transcode", DirectPlay: "is-direct", DirectStream: "is-stream" };
+
+// Phone layout: one card per play, driven by the same table instance so paging, search and selection carry over.
+function ActivityCardList({ table, locale, onOpenStream }) {
+  const rows = table.getRowModel().rows.filter((row) => row.depth === 0);
+  if (!rows.length) {
+    return <p className="activity-card-empty">{i18next.t("ACTIVITY_TABLE.NO_RESULTS")}</p>;
+  }
+  return (
+    <ul className="activity-card-list">
+      {rows.map((row) => {
+        const item = row.original;
+        const title = activityTitle(item);
+        const plays = Number(item.TotalPlays ?? 1);
+        const subRows = row.subRows || [];
+        return (
+          <li key={row.id} className="activity-card">
+            <Link className="activity-card-poster" to={`/libraries/item/${item.EpisodeId || item.NowPlayingItemId}`} aria-label={title}>
+              <ActivityPoster itemId={item.NowPlayingItemId || item.EpisodeId} title={title} />
+            </Link>
+            <div className="activity-card-body">
+              <div className="activity-card-head">
+                <Link className="activity-card-title" to={`/libraries/item/${item.EpisodeId || item.NowPlayingItemId}`}>
+                  {title}
+                </Link>
+                <time className="activity-card-time" dateTime={item.ActivityDateInserted}>
+                  {relativeTime(item.ActivityDateInserted, locale)}
+                </time>
+              </div>
+              <Link className="activity-card-user" to={`/users/${item.UserId}`}>
+                <ActivityUserAvatar userId={item.UserId} userName={item.UserName} />
+                <span>{item.UserName}</span>
+              </Link>
+              <div className="activity-card-meta">
+                <button type="button" className={`activity-method-pill ${METHOD_CLASS[item.PlayMethod] || "is-empty"}`} onClick={() => onOpenStream(item)}>
+                  {METHOD_LABEL[item.PlayMethod] ? i18next.t(METHOD_LABEL[item.PlayMethod]) : "-"}
+                </button>
+                <span className="activity-card-duration">{formatTotalWatchTime(item.PlaybackDuration)}</span>
+                {plays > 1 || subRows.length ? (
+                  <button type="button" className="activity-card-plays" aria-expanded={row.getIsExpanded()} onClick={() => row.toggleExpanded()}>
+                    ×{Math.max(plays, subRows.length)}
+                  </button>
+                ) : null}
+              </div>
+              {row.getIsExpanded() && subRows.length ? (
+                <ul className="activity-card-subplays">
+                  {subRows.map((sub) => (
+                    <li key={sub.id}>
+                      <span>{relativeTime(sub.original.ActivityDateInserted, locale)}</span>
+                      <span>{formatTotalWatchTime(sub.original.PlaybackDuration)}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
 }
 
 export default function ActivityTable(props) {
-  let twelve_hr = false;
-  try { twelve_hr = JSON.parse(localStorage.getItem("12hr") || "false"); } catch { twelve_hr = false; }
+  const twelve_hr = readActivityTablePreference("12hr", false);
   const localization = localStorage.getItem("i18nextLng");
   const [data, setData] = React.useState(props.data ?? []);
   const pages = props.pageCount || 1;
@@ -136,9 +233,14 @@ export default function ActivityTable(props) {
   const [sorting, setSorting] = React.useState([{ id: "Date", desc: true }]);
 
   const [columnFilters, setColumnFilters] = React.useState([]);
+  const isPhone = useMediaQuery(PHONE);
+  const isTablet = useMediaQuery(TABLET);
   const [columnVisibility, setColumnVisibility] = React.useState(() => props.siloHistory
-    ? { ...getStoredColumnVisibility(), Client: false, DeviceName: false, RemoteEndPoint: false, TotalPlays: false }
-    : getStoredColumnVisibility());
+    ? { ...getStoredColumnVisibility(isTablet), Client: false, DeviceName: false, RemoteEndPoint: false, TotalPlays: false }
+    : getStoredColumnVisibility(isTablet));
+  useEffect(() => {
+    setColumnVisibility(getStoredColumnVisibility(isTablet));
+  }, [isTablet]);
 
   const [modalState, setModalState] = React.useState(false);
   const [modalData, setModalData] = React.useState();
@@ -225,7 +327,7 @@ export default function ActivityTable(props) {
       }`,
       field: "NowPlayingItemName",
       header: i18next.t("TITLE"),
-      minSize: 360,
+      minSize: isTablet ? 240 : 360,
       grow: 1.6,
       cell: ({ row }) => {
         row = row.original;
@@ -442,7 +544,7 @@ export default function ActivityTable(props) {
   const handleColumnVisibilityChange = (updater) => {
     setColumnVisibility((currentVisibility) => {
       const nextVisibility = typeof updater === "function" ? updater(currentVisibility) : updater;
-      localStorage.setItem(activityColumnVisibilityKey, JSON.stringify(nextVisibility));
+      localStorage.setItem(isTablet ? tabletColumnVisibilityKey : activityColumnVisibilityKey, JSON.stringify(nextVisibility));
       return nextVisibility;
     });
   };
@@ -586,19 +688,25 @@ export default function ActivityTable(props) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <DataTable
-        table={table}
-        localization={localizationStrings}
-        className="activity-data-table"
-        headClassName="activity-data-table-head"
-        cellClassName="activity-data-table-cell"
-        topToolbar={toolbar}
-        emptyState={
-          <span style={{ textAlign: "center", fontStyle: "italic", color: "var(--barracks-text-muted-raised)" }} className="d-block py-5">
-            <Trans i18nKey="ERROR_MESSAGES.NO_ACTIVITY" />
-          </span>
-        }
-      />
+      {isPhone ? (
+        <div className="activity-card-shell">
+          <ActivityCardList table={table} locale={localization} onOpenStream={openModal} />
+        </div>
+      ) : (
+        <DataTable
+          table={table}
+          localization={localizationStrings}
+          className="activity-data-table"
+          headClassName="activity-data-table-head"
+          cellClassName="activity-data-table-cell"
+          topToolbar={toolbar}
+          emptyState={
+            <span style={{ textAlign: "center", fontStyle: "italic", color: "var(--barracks-text-muted-raised)" }} className="d-block py-5">
+              <Trans i18nKey="ERROR_MESSAGES.NO_ACTIVITY" />
+            </span>
+          }
+        />
+      )}
       {!props.cursorMode && (
         <DataTablePagination table={table} localization={localizationStrings} className="activity-table-pagination" />
       )}
