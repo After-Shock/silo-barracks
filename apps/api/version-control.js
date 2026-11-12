@@ -7,8 +7,10 @@ const memoizee = require("memoizee");
 const { getConfigDir } = require("./utils/storage-paths");
 const { createContributorsSource, mergeContributors } = require("./utils/github-contributors");
 
-const REPO_OWNER = process.env.JS_REPO_OWNER || "Barracks";
-const REPO_NAME = process.env.JS_REPO_NAME || "Server";
+// Fork repo (public). The upstream merge rewrote this to a nonexistent "Barracks/Server",
+// which made every release/stars check log a GitHub 404.
+const REPO_OWNER = process.env.JS_REPO_OWNER || "After-Shock";
+const REPO_NAME = process.env.JS_REPO_NAME || "silo-barracks";
 const RELEASES_URL = `https://github.com/${REPO_OWNER}/${REPO_NAME}/releases`;
 const RELEASES_ATOM_URL = `${RELEASES_URL}.atom`;
 const RELEASE_CACHE_TTL_MS = Number(process.env.JS_RELEASE_CACHE_TTL_MS || 6 * 60 * 60 * 1000);
