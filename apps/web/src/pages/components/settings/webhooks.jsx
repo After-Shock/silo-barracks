@@ -144,19 +144,19 @@ const eventCards = [
     id: "device_authorized",
     title: "New Jellyfin client",
     text: "When a device appears on Jellyfin that Glance has not seen before.",
-    Icon: UserAddLineIcon,
+    Icon: RiUserAddLine,
   },
     {
     id: "ops_digest",
     title: "Ops digest",
     text: "When failed jobs, stuck downloads, or webhook failures pile up.",
-    Icon: ErrorWarningLineIcon,
+    Icon: RiErrorWarningLine,
   },
   {
     id: "playback_digest",
     title: "Overnight playback digest",
     text: "One summary after quiet hours instead of overnight start/stop pings.",
-    Icon: PlayCircleLineIcon,
+    Icon: RiPlayCircleLine,
   },
 ];
 

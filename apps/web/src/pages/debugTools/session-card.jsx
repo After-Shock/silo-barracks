@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 import { RiAccountCircleFill, RiPauseFill, RiPlayFill } from "@remixicon/react";
+import i18next from "i18next";
 
 import { clientData } from "../../lib/devices";
 import Tooltip from "@mui/material/Tooltip";

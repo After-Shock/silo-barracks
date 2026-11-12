@@ -6,7 +6,7 @@ import globals from "globals";
 
 export default [
   {
-    ignores: ["dist/**", "eslint.config.js"],
+    ignores: ["dist/**", "eslint.config.js", "dev-harness/**"],
   },
   js.configs.recommended,
   react.configs.flat.recommended,
@@ -44,7 +44,9 @@ export default [
       // until those are adopted deliberately.
       "react-hooks/rules-of-hooks": "error",
       "no-extra-semi": "off",
-      "no-undef": "off",
+      // On in the fork: a merge once shipped JSX referencing hook state that was never
+      // returned (every page crashed at runtime while build/tests passed).
+      "no-undef": "error",
       "no-unused-vars": "off",
       "react/no-unknown-property": "off",
       "react/prop-types": "off",
@@ -52,5 +54,15 @@ export default [
       // Route modules export many page components from one file.
       "react-refresh/only-export-components": "off",
     },
+  },
+  {
+    // Node test files and build scripts.
+    files: ["**/*.test.js", "test/**/*.js", "scripts/**/*.{js,mjs}", "vite.config.js"],
+    languageOptions: { globals: { ...globals.node } },
+  },
+  {
+    // Service workers (sw.js also exports helpers to Node tests via `module`).
+    files: ["public/*.js"],
+    languageOptions: { globals: { ...globals.serviceworker, module: "readonly" } },
   },
 ];

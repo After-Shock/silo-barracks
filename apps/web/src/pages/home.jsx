@@ -1516,7 +1516,7 @@ export default function Home({ kioskMode = false }) {
           style={getHomeSectionStyle("maintainerr")}
         >
           <HomeIntegrationWidget
-            icon={Database2LineIcon}
+            icon={RiDatabase2Line}
             title="Maintainerr"
             eyebrow="Cleanup schedule"
             widget={integrationWidgets.maintainerr ? getMaintainerrWidget(integrationWidgets.maintainerr) : null}

@@ -1080,6 +1080,16 @@ function useNavbarState() {
     isJellyfinAdmin,
     effectiveWorkspaceMode,
     handleWorkspaceMode,
+    jellyfinStatus,
+    themeDraft,
+    themeQuery,
+    setThemeQuery,
+    themeGroup,
+    setThemeGroup,
+    visibleThemePresets,
+    hasThemeDraftChanges,
+    handleThemeApply,
+    handleThemeDiscard,
   };
 }
 
@@ -1126,6 +1136,16 @@ export default function Navbar() {
     isJellyfinAdmin,
     effectiveWorkspaceMode,
     handleWorkspaceMode,
+    jellyfinStatus,
+    themeDraft,
+    themeQuery,
+    setThemeQuery,
+    themeGroup,
+    setThemeGroup,
+    visibleThemePresets,
+    hasThemeDraftChanges,
+    handleThemeApply,
+    handleThemeDiscard,
   } = useNavbarState();
 
   const myGlanceFirst = !canOpenHome || (isJellyfinAdmin && workspaceMode === "user");
