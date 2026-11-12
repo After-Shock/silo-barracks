@@ -13,7 +13,6 @@ const triggertype = require("../logging/triggertype");
 
 const { getRolePermissions } = require("../classes/role-permissions");
 const {
-  authRateLimit,
   hashPassword,
   isEmptyPassword,
   isQuickConnectSecret,
@@ -53,7 +52,10 @@ async function upgradeLegacyPasswordLogin(configRow, username, password) {
   }
   return null;
 }
-router.use(authRateLimit);
+// Fork: the auth rate limiter is applied once where this router is mounted
+// (server.js authRateLimitUnlessPublicStatus). Applying it here as well defeated
+// the GET /isConfigured exemption (called on every page load) and counted every
+// other auth request twice against the same limit.
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JS_USER = process.env.JS_USER;
