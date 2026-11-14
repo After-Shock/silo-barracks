@@ -6,7 +6,7 @@
  * token names shadcn components expect onto those vars, so all presets and
  * custom themes apply to new components with no JS changes.
  *
- * Migration-period rules (see docs/superpowers/plans/2026-11-11-shadcn-tailwind-migration.md):
+ * Migration-period rules:
  *  - Preflight is NOT loaded while Bootstrap is still in the bundle.
  *  - Utilities are imported UNLAYERED on purpose: Bootstrap is unlayered, and
  *    unlayered CSS always beats layered CSS, so layered utilities would lose to
