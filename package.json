@@ -36,6 +36,7 @@
   ],
   "scripts": {
     "theme:check": "node scripts/check-theme-colors.cjs",
+    "upstream:css": "node scripts/port-upstream-css.cjs",
     "ui:add": "node scripts/shadcn-add.mjs",
     "branding:check": "node scripts/check-barracks-branding.cjs",
     "dev": "concurrently \"npm run dev -w @jellyglance/api\" \"npm run dev -w @jellyglance/web\"",

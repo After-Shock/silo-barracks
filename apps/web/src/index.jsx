@@ -6,6 +6,7 @@ import App from "./App.jsx";
 import PublicStatusPage from "./pages/public-status.jsx";
 
 import "./pages/css/variables.css";
+import "./styles/upstream-port.css";
 import "./index.css";
 // Trimmed Bootstrap (PurgeCSS over bootstrap.min.css, ~57KB vs 280KB) —
 // legacy markup still relies on Bootstrap utility and component classes.
