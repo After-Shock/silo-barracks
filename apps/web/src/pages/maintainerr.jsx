@@ -1,12 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import DeleteBinLineIcon from "remixicon-react/DeleteBinLineIcon";
-import HistoryLineIcon from "remixicon-react/HistoryLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import ArrowDownLineIcon from "remixicon-react/ArrowDownLineIcon";
-import SearchLineIcon from "remixicon-react/SearchLineIcon";
-import TimerLineIcon from "remixicon-react/TimerLineIcon";
-import ArrowRightLineIcon from "remixicon-react/ArrowRightLineIcon";
-import Database2LineIcon from "remixicon-react/Database2LineIcon";
+import { RiArrowDownLine, RiArrowRightLine, RiDatabase2Line, RiDeleteBinLine, RiHistoryLine, RiRefreshLine, RiSearchLine, RiTimerLine } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import { useTranslation } from "react-i18next";
 import { formatDate as formatLocaleDate, formatNumber as formatLocaleNumber } from "../lib/format-date";
@@ -173,7 +166,7 @@ export default function Maintainerr() {
           <span>Review scheduled cleanup collections, upcoming actions, and manage cleanup runs.</span>
         </div>
         <button type="button" onClick={loadMaintainerr} disabled={loading || Boolean(busyAction)}>
-          <RefreshLineIcon size={18} />
+          <RiRefreshLine size={18} />
           {loading ? "Refreshing" : "Refresh"}
         </button>
       </section>
@@ -221,7 +214,7 @@ export default function Maintainerr() {
             onClick={(event) => runAction(event, "refresh", {})}
             disabled={Boolean(busyAction)}
           >
-            <Database2LineIcon size={17} />
+            <RiDatabase2Line size={17} />
             Refresh collections
           </button>
         </div>
@@ -230,7 +223,7 @@ export default function Maintainerr() {
       <section className="maintainerr-layout-grid">
         <article className="maintainerr-panel">
           <div className="maintainerr-panel-head">
-            <HistoryLineIcon size={17} />
+            <RiHistoryLine size={17} />
             <div>
               <h2>Collections</h2>
               <span>{collections.length} collections detected</span>
@@ -254,7 +247,7 @@ export default function Maintainerr() {
                   disabled={Boolean(busyAction)}
                   onClick={(event) => runAction(event, "refresh", { collectionId: collection.id })}
                 >
-                  <RefreshLineIcon size={15} />
+                  <RiRefreshLine size={15} />
                   Recheck
                 </button>
               </div>
@@ -264,14 +257,14 @@ export default function Maintainerr() {
 
         <article className="maintainerr-panel">
           <div className="maintainerr-panel-head">
-            <TimerLineIcon size={17} />
+            <RiTimerLine size={17} />
             <div>
               <h2>Scheduled items</h2>
               <span>{scheduledItems.length} items in cleanup queue</span>
             </div>
           </div>
           <label className="maintainerr-search">
-            <SearchLineIcon size={16} />
+            <RiSearchLine size={16} />
             <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search title, collection, action" />
           </label>
           <div className="maintainerr-panel-body">
@@ -291,7 +284,7 @@ export default function Maintainerr() {
                     disabled={Boolean(busyAction)}
                     onClick={(event) => runAction(event, "run-item-action", { action: item.action, itemId: item.id, collectionId: item.collectionId, rawAction: item.action })}
                   >
-                    <ArrowRightLineIcon size={14} />
+                    <RiArrowRightLine size={14} />
                     Run
                   </button>
                   <button
@@ -300,7 +293,7 @@ export default function Maintainerr() {
                     disabled={Boolean(busyAction)}
                     onClick={(event) => runAction(event, "postpone-item", { itemId: item.id, collectionId: item.collectionId, postponeHours: 24 })}
                   >
-                    <ArrowDownLineIcon size={14} />
+                    <RiArrowDownLine size={14} />
                     Postpone
                   </button>
                   <button
@@ -310,7 +303,7 @@ export default function Maintainerr() {
                     title="Remove from this list"
                     onClick={(event) => runAction(event, "run", { action: "delete", itemId: item.id, collectionId: item.collectionId })}
                   >
-                    <DeleteBinLineIcon size={14} />
+                    <RiDeleteBinLine size={14} />
                   </button>
                 </div>
               </div>
@@ -320,7 +313,7 @@ export default function Maintainerr() {
 
         <article className="maintainerr-panel">
           <div className="maintainerr-panel-head">
-            <HistoryLineIcon size={17} />
+            <RiHistoryLine size={17} />
             <div>
               <h2>Upcoming (7 days)</h2>
               <span>{upcomingActions.length} upcoming actions</span>
@@ -338,7 +331,7 @@ export default function Maintainerr() {
 
         <article className="maintainerr-panel">
           <div className="maintainerr-panel-head">
-            <HistoryLineIcon size={17} />
+            <RiHistoryLine size={17} />
             <div>
               <h2>Recent actions</h2>
               <span>{recentActions.length} recent events</span>
@@ -347,7 +340,7 @@ export default function Maintainerr() {
           <div className="maintainerr-panel-body">
             {recentActions.length ? recentActions.map((item) => (
               <div key={`${item.id}-recent`} className="maintainerr-item-row">
-                <ArrowRightLineIcon size={14} />
+                <RiArrowRightLine size={14} />
                 <div>
                   <strong>{item.title || item.id || "Action item"}</strong>
                   <small>{item.status || "Completed"} · {formatDate(item.dueAt) }</small>
@@ -360,7 +353,7 @@ export default function Maintainerr() {
 
       <section className="maintainerr-panel integration-section">
         <div className="maintainerr-panel-head">
-          <Database2LineIcon size={18} />
+          <RiDatabase2Line size={18} />
           <div>
             <h2>Storage and health</h2>
             <span>

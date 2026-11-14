@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Spinner } from "@/components/ui/spinner";
-import FileSearchLineIcon from "remixicon-react/FileSearchLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
+import { RiFileSearchLine, RiRefreshLine } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 import ImportJobProgress, { useImportJob } from "./ImportJobProgress";
 import DismissibleAlert from "./dismissible-alert";
@@ -209,11 +208,11 @@ export default function JellyfinSyncImport() {
 
         <div className="legacy-import-actions">
           <Button type="button" variant="outline" onClick={runPreview} disabled={Boolean(busyAction) || jobRunning}>
-            {busyAction === "preview" ? <Spinner className="tw:size-4" /> : <FileSearchLineIcon size={18} />}
+            {busyAction === "preview" ? <Spinner className="tw:size-4" /> : <RiFileSearchLine size={18} />}
             Preview
           </Button>
           <Button type="button" onClick={runSync} disabled={Boolean(busyAction) || jobRunning}>
-            {busyAction === "sync" || jobRunning ? <Spinner className="tw:size-4" /> : <RefreshLineIcon size={18} />}
+            {busyAction === "sync" || jobRunning ? <Spinner className="tw:size-4" /> : <RiRefreshLine size={18} />}
             Sync now
           </Button>
         </div>

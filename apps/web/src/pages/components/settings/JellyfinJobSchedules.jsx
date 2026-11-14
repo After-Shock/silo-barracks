@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import axios from "../../../lib/axios_instance";
-import CalendarLineIcon from "remixicon-react/CalendarLineIcon";
-import PlayCircleLineIcon from "remixicon-react/PlayCircleLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import TimeLineIcon from "remixicon-react/TimeLineIcon";
+import { RiCalendarLine, RiPlayCircleLine, RiRefreshLine, RiTimeLine } from "@remixicon/react";
 import {
   JELLYFIN_TRIGGER_TYPES,
   JELLYFIN_WEEKDAYS,
@@ -205,7 +202,7 @@ export default function JellyfinJobSchedules() {
           <span>Set the times {mediaServerName()} runs library scans, metadata refreshes, subtitle jobs, and other scheduled tasks. These are {mediaServerName()} server jobs, not Barracks sync tasks.</span>
         </div>
         <Button type="button" variant="outline" onClick={() => loadStatus()} disabled={loading}>
-          <RefreshLineIcon size={17} />
+          <RiRefreshLine size={17} />
           Refresh
         </Button>
       </div>
@@ -219,7 +216,7 @@ export default function JellyfinJobSchedules() {
       <section className="jellyfin-admin-section">
         <div className="jellyfin-admin-section-heading">
           <div>
-            <CalendarLineIcon size={20} />
+            <RiCalendarLine size={20} />
             <div>
               <h2>Job schedules</h2>
               <p>
@@ -265,7 +262,7 @@ export default function JellyfinJobSchedules() {
                     <strong>{task.name}</strong>
                     <p>{task.description || formatTaskState(task)}</p>
                     <small>
-                      <TimeLineIcon size={15} />
+                      <RiTimeLine size={15} />
                       {formatLastRun(task)} · {formatJellyfinSchedule(task.triggers)}
                     </small>
                   </div>
@@ -291,7 +288,7 @@ export default function JellyfinJobSchedules() {
                       onClick={() => runTask(task)}
                       disabled={Boolean(busyAction) || task.state === "Running"}
                     >
-                      <PlayCircleLineIcon size={17} />
+                      <RiPlayCircleLine size={17} />
                       Run
                     </Button>
                   </div>

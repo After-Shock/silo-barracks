@@ -3,7 +3,7 @@ import axios from "../../../lib/axios_instance";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import MoonClearLineIcon from "remixicon-react/MoonClearLineIcon";
+import { RiMoonClearLine } from "@remixicon/react";
 
 const DAYS = [
   ["mon", "Mon"],
@@ -91,7 +91,7 @@ export default function QuietHoursPanel({ quiet, onSaved }) {
   return (
     <article className={`server-management-panel quiet-hours-panel${quiet.enabled && quiet.active ? " is-quiet" : ""}`}>
       <div className="server-management-panel-heading">
-        <MoonClearLineIcon size={22} />
+        <RiMoonClearLine size={22} />
         <div>
           <h2>Quiet hours</h2>
           <p>Hold library scans and intro/credits detection while people are watching.</p>

@@ -3,11 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
-import CheckLineIcon from "remixicon-react/CheckLineIcon";
-import ClipboardLineIcon from "remixicon-react/ClipboardLineIcon";
-import Download2LineIcon from "remixicon-react/Download2LineIcon";
-import ExternalLinkLineIcon from "remixicon-react/ExternalLinkLineIcon";
-import SearchLineIcon from "remixicon-react/SearchLineIcon";
+import { RiCheckLine, RiClipboardLine, RiDownload2Line, RiExternalLinkLine, RiSearchLine } from "@remixicon/react";
 import { useTranslation } from "react-i18next";
 import {
   DEFAULT_WIDGET_HOST,
@@ -86,7 +82,7 @@ export default function ApiKeyWidgets({ keys = [], onMessage }) {
           <p>{t("SETTINGS_PAGE.WIDGET_KIT_INTRO")}</p>
         </div>
         <a className="api-key-header-link" href={`${baseUrl}/swagger-ui`} target="_blank" rel="noreferrer">
-          <ExternalLinkLineIcon size={15} />
+          <RiExternalLinkLine size={15} />
           {t("SETTINGS_PAGE.SWAGGER")}
         </a>
       </div>
@@ -115,7 +111,7 @@ export default function ApiKeyWidgets({ keys = [], onMessage }) {
         <div className="api-key-widget-search">
           <Label>{t("SETTINGS_PAGE.WIDGET_KIT_FILTER")}</Label>
           <div className="api-key-widget-search-field">
-            <SearchLineIcon size={15} />
+            <RiSearchLine size={15} />
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -177,14 +173,14 @@ export default function ApiKeyWidgets({ keys = [], onMessage }) {
                             onClick={() => copyText(file.id, file.body)}
                             title={copiedThis ? t("SETTINGS_PAGE.WIDGET_KIT_COPIED") : t("SETTINGS_PAGE.WIDGET_KIT_COPY")}
                           >
-                            {copiedThis ? <CheckLineIcon size={15} /> : <ClipboardLineIcon size={15} />}
+                            {copiedThis ? <RiCheckLine size={15} /> : <RiClipboardLine size={15} />}
                           </Button>
                           <Button
                             variant="outline"
                             onClick={() => downloadTextFile(file.filename, file.body, file.mime)}
                             title={t("SETTINGS_PAGE.WIDGET_KIT_DOWNLOAD")}
                           >
-                            <Download2LineIcon size={15} />
+                            <RiDownload2Line size={15} />
                           </Button>
                         </div>
                       </article>

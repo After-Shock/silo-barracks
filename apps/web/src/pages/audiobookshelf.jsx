@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
-import HeadphoneLineIcon from "remixicon-react/HeadphoneLineIcon";
-import HistoryLineIcon from "remixicon-react/HistoryLineIcon";
-import BookOpenLineIcon from "remixicon-react/BookOpenLineIcon";
+import { RiBookOpenLine, RiHeadphoneLine, RiHistoryLine, RiRefreshLine } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import "./css/maintainerr.css";
 import "./css/integrations.css";
@@ -38,7 +35,7 @@ function Cover({ item, size = 56 }) {
   return (
     <span className="abs-cover" style={{ width: size, height: size }}>
       {failed ? (
-        <BookOpenLineIcon size={Math.round(size * 0.45)} />
+        <RiBookOpenLine size={Math.round(size * 0.45)} />
       ) : (
         <img src={`/proxy/Audiobookshelf/Images/${encodeURIComponent(id)}?width=${size * 2}`} alt="" loading="lazy" onError={() => setFailed(true)} />
       )}
@@ -88,7 +85,7 @@ export default function Audiobookshelf() {
           <span>Who is listening, recent sessions and the newest books across your Audiobookshelf libraries.</span>
         </div>
         <button type="button" onClick={load} disabled={loading}>
-          <RefreshLineIcon size={18} />
+          <RiRefreshLine size={18} />
           {loading ? "Refreshing" : "Refresh"}
         </button>
       </section>
@@ -131,7 +128,7 @@ export default function Audiobookshelf() {
       <section className="maintainerr-layout-grid">
         <article className="maintainerr-panel">
           <div className="maintainerr-panel-head">
-            <HeadphoneLineIcon size={17} />
+            <RiHeadphoneLine size={17} />
             <div>
               <h2>Listening now</h2>
               <span>{listeningNow.length ? `${listeningNow.length} open sessions` : "Nobody is listening"}</span>
@@ -166,7 +163,7 @@ export default function Audiobookshelf() {
 
         <article className="maintainerr-panel">
           <div className="maintainerr-panel-head">
-            <HistoryLineIcon size={17} />
+            <RiHistoryLine size={17} />
             <div>
               <h2>Recent sessions</h2>
               <span>Latest listening across all users</span>
@@ -195,7 +192,7 @@ export default function Audiobookshelf() {
 
         <article className="maintainerr-panel abs-wide">
           <div className="maintainerr-panel-head">
-            <BookOpenLineIcon size={17} />
+            <RiBookOpenLine size={17} />
             <div>
               <h2>Recently added</h2>
               <span>Newest books across {libraries.map((library) => library.name).join(", ") || "your libraries"}</span>

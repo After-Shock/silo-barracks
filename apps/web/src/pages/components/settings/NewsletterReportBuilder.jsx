@@ -5,14 +5,7 @@ import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import AddLineIcon from "remixicon-react/AddLineIcon";
-import ArrowDownLineIcon from "remixicon-react/ArrowDownLineIcon";
-import ArrowUpLineIcon from "remixicon-react/ArrowUpLineIcon";
-import DeleteBinLineIcon from "remixicon-react/DeleteBinLineIcon";
-import ExternalLinkLineIcon from "remixicon-react/ExternalLinkLineIcon";
-import FileCopyLineIcon from "remixicon-react/FileCopyLineIcon";
-import LayoutMasonryLineIcon from "remixicon-react/LayoutMasonryLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
+import { RiAddLine, RiArrowDownLine, RiArrowUpLine, RiDeleteBinLine, RiExternalLinkLine, RiFileCopyLine, RiLayoutMasonryLine, RiRefreshLine } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 
 export const BLOCK_LIBRARY = [
@@ -258,7 +251,7 @@ export default function NewsletterReportBuilder({ report: reportInput, onChange,
       <div className="report-builder-editor">
         <section className="newsletter-panel">
           <div className="newsletter-panel-title">
-            <LayoutMasonryLineIcon size={19} />
+            <RiLayoutMasonryLine size={19} />
             <h3>Report builder</h3>
           </div>
           <label className="form-check form-switch report-builder-toggle">
@@ -340,7 +333,7 @@ export default function NewsletterReportBuilder({ report: reportInput, onChange,
                 ))}
               </NativeSelect>
               <Button type="button" size="sm" onClick={addBlock}>
-                <AddLineIcon size={15} /> Add
+                <RiAddLine size={15} /> Add
               </Button>
             </div>
           </div>
@@ -370,10 +363,10 @@ export default function NewsletterReportBuilder({ report: reportInput, onChange,
                         <span className="visually-hidden">Show block</span>
                       </label>
                       <Button type="button" size="sm" variant="link" title="Move up" disabled={index === 0} onClick={() => moveBlock(index, -1)}>
-                        <ArrowUpLineIcon size={16} />
+                        <RiArrowUpLine size={16} />
                       </Button>
                       <Button type="button" size="sm" variant="link" title="Move down" disabled={index === report.blocks.length - 1} onClick={() => moveBlock(index, 1)}>
-                        <ArrowDownLineIcon size={16} />
+                        <RiArrowDownLine size={16} />
                       </Button>
                       <Button
                         type="button"
@@ -382,10 +375,10 @@ export default function NewsletterReportBuilder({ report: reportInput, onChange,
                         title="Duplicate"
                         onClick={() => updateBlocks([...report.blocks.slice(0, index + 1), newBlock(block.type, { title: block.title, options: block.options }), ...report.blocks.slice(index + 1)])}
                       >
-                        <FileCopyLineIcon size={16} />
+                        <RiFileCopyLine size={16} />
                       </Button>
                       <Button type="button" size="sm" variant="link" className="text-danger" title="Remove" onClick={() => updateBlocks(report.blocks.filter((_, position) => position !== index))}>
-                        <DeleteBinLineIcon size={16} />
+                        <RiDeleteBinLine size={16} />
                       </Button>
                     </div>
                   </header>
@@ -403,10 +396,10 @@ export default function NewsletterReportBuilder({ report: reportInput, onChange,
           <h3>Live preview</h3>
           <div className="newsletter-preview-actions">
             <Button type="button" size="sm" variant="outline" onClick={() => refreshPreview()} disabled={previewing}>
-              {previewing ? <Spinner className="tw:size-4" /> : <RefreshLineIcon size={15} />} Refresh
+              {previewing ? <Spinner className="tw:size-4" /> : <RiRefreshLine size={15} />} Refresh
             </Button>
             <Button type="button" size="sm" variant="outline" onClick={openPreviewTab} disabled={!preview?.html}>
-              <ExternalLinkLineIcon size={15} /> Open in tab
+              <RiExternalLinkLine size={15} /> Open in tab
             </Button>
           </div>
         </div>

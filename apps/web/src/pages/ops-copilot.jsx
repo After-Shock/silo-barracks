@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import TerminalBoxLineIcon from "remixicon-react/TerminalBoxLineIcon";
-import SendPlaneLineIcon from "remixicon-react/SendPlaneLineIcon";
-import CheckLineIcon from "remixicon-react/CheckLineIcon";
-import CloseLineIcon from "remixicon-react/CloseLineIcon";
-import ArrowGoBackLineIcon from "remixicon-react/ArrowGoBackLineIcon";
-import HistoryLineIcon from "remixicon-react/HistoryLineIcon";
+import { RiArrowGoBackLine, RiCheckLine, RiCloseLine, RiHistoryLine, RiSendPlaneLine, RiTerminalBoxLine } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import "./css/ops-copilot.css";
 
@@ -38,15 +33,15 @@ function PlanCard({ plan, onDecide, busy }) {
       <footer>
         {plan.status === "pending" && (
           <>
-            <button type="button" className="ops-btn is-primary" disabled={busy} onClick={() => onDecide(plan, "approve")}><CheckLineIcon /> Approve</button>
-            <button type="button" className="ops-btn" disabled={busy} onClick={() => onDecide(plan, "cancel")}><CloseLineIcon /> Cancel</button>
+            <button type="button" className="ops-btn is-primary" disabled={busy} onClick={() => onDecide(plan, "approve")}><RiCheckLine /> Approve</button>
+            <button type="button" className="ops-btn" disabled={busy} onClick={() => onDecide(plan, "cancel")}><RiCloseLine /> Cancel</button>
           </>
         )}
         {plan.status === "propose-only" && (
-          <button type="button" className="ops-btn" disabled={busy} onClick={() => onDecide(plan, "cancel")}><CloseLineIcon /> Dismiss</button>
+          <button type="button" className="ops-btn" disabled={busy} onClick={() => onDecide(plan, "cancel")}><RiCloseLine /> Dismiss</button>
         )}
         {plan.status === "executed" && plan.steps.some((s) => s.executable && s.action?.type === "download.pause") && (
-          <button type="button" className="ops-btn" disabled={busy} onClick={() => onDecide(plan, "undo")}><ArrowGoBackLineIcon /> Undo</button>
+          <button type="button" className="ops-btn" disabled={busy} onClick={() => onDecide(plan, "undo")}><RiArrowGoBackLine /> Undo</button>
         )}
       </footer>
     </article>
@@ -102,7 +97,7 @@ export default function OpsCopilot() {
   return (
     <div className="ops-copilot">
       <section className="ops-hero">
-        <TerminalBoxLineIcon />
+        <RiTerminalBoxLine />
         <div>
           <h1>Ops Copilot</h1>
           <p>Ask about playback, disk space or downloads. Answers come from your server data. Anything that changes something is shown as a plan first and only runs when you approve it.</p>
@@ -111,7 +106,7 @@ export default function OpsCopilot() {
 
       <form className="ops-ask" onSubmit={(e) => { e.preventDefault(); ask(); }}>
         <input value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="e.g. Why is Dune buffering for Mum?" maxLength={500} />
-        <button type="submit" className="ops-btn is-primary" disabled={busy || !question.trim()}><SendPlaneLineIcon /> Ask</button>
+        <button type="submit" className="ops-btn is-primary" disabled={busy || !question.trim()}><RiSendPlaneLine /> Ask</button>
       </form>
       <div className="ops-examples">
         {examples.map((example) => (
@@ -135,7 +130,7 @@ export default function OpsCopilot() {
           ))}
         </div>
         <aside className="ops-audit">
-          <h2><HistoryLineIcon /> Audit log</h2>
+          <h2><RiHistoryLine /> Audit log</h2>
           {!audit.length && <p className="ops-empty">Nothing logged yet.</p>}
           <ul>
             {audit.map((entry) => (

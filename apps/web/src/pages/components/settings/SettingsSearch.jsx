@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import SearchLineIcon from "remixicon-react/SearchLineIcon";
-import CloseLineIcon from "remixicon-react/CloseLineIcon";
+import { RiCloseLine, RiSearchLine } from "@remixicon/react";
 
 // Every searchable setting. "anchor" is the visible heading or label we scroll to after opening the tab.
 const SETTINGS_INDEX = [
@@ -152,7 +151,7 @@ export default function SettingsSearch({ allowedTabs, tabLabels, onOpen }) {
   return (
     <div className="settings-search" ref={wrapRef}>
       <div className="settings-search-box">
-        <SearchLineIcon size={16} />
+        <RiSearchLine size={16} />
         <input
           ref={inputRef}
           type="search"
@@ -168,7 +167,7 @@ export default function SettingsSearch({ allowedTabs, tabLabels, onOpen }) {
         />
         {query ? (
           <button type="button" aria-label="Clear search" onClick={() => setQuery("")}>
-            <CloseLineIcon size={14} />
+            <RiCloseLine size={14} />
           </button>
         ) : (
           <kbd>/</kbd>

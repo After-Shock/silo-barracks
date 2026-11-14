@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../../../lib/axios_instance";
-import Database2LineIcon from "remixicon-react/Database2LineIcon";
+import { RiDatabase2Line } from "@remixicon/react";
 import "../../css/library/storage-by-library.css";
 
 export function formatBytes(value) {
@@ -36,7 +36,7 @@ export function StorageByLibraryView({ data, defaultOpen = false }) {
   return (
     <section className="storage-library" aria-label="Storage by library">
       <div className="storage-library-head">
-        <Database2LineIcon size={18} />
+        <RiDatabase2Line size={18} />
         <span>Storage by library</span>
         <span className="storage-library-total">{formatBytes(totalBytes)} total</span>
       </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "../../../lib/axios_instance";
-import HardDrive2LineIcon from "remixicon-react/HardDrive2LineIcon";
+import { RiHardDrive2Line } from "@remixicon/react";
 import "../../css/library/disk-forecast.css";
 
 export function formatBytes(value) {
@@ -49,7 +49,7 @@ export function DiskForecastView({ data }) {
   return (
     <section className={`disk-forecast tone-${head.tone}`} aria-label="Disk-fill forecast">
       <div className="disk-forecast-head">
-        <HardDrive2LineIcon size={18} />
+        <RiHardDrive2Line size={18} />
         <span>Disk-fill forecast</span>
         {forecast.confidence ? <span className="disk-forecast-confidence">{forecast.confidence} confidence</span> : null}
       </div>

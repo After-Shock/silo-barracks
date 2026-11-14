@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-import PlayLineIcon from "remixicon-react/PlayLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
+import { RiPlayLine, RiRefreshLine } from "@remixicon/react";
 import { TOKEN_API_ENDPOINTS } from "../../../lib/widgetSnippets";
 import { widgetPathIcon } from "./widgetKitIcons";
 import "../../css/settings/apiKeys.css";
@@ -102,7 +101,7 @@ export default function ApiExplorer({ onMessage, autoLoad = false }) {
           </p>
         </div>
         <Button variant="outline" onClick={() => runRequest()} disabled={loading || (itemRequired && !itemId.trim())}>
-          {loading ? <Spinner className="tw:size-4" /> : <PlayLineIcon size={16} />}
+          {loading ? <Spinner className="tw:size-4" /> : <RiPlayLine size={16} />}
           Try
         </Button>
       </div>
@@ -157,7 +156,7 @@ export default function ApiExplorer({ onMessage, autoLoad = false }) {
           <div className="api-explorer-meta">
             <span>{status ? `HTTP ${status}` : "Ready"}</span>
             <Button variant="outline" size="sm" onClick={() => runRequest()} disabled={loading}>
-              {loading ? <Spinner className="tw:size-4" /> : <RefreshLineIcon size={14} />}
+              {loading ? <Spinner className="tw:size-4" /> : <RiRefreshLine size={14} />}
               Reload
             </Button>
           </div>

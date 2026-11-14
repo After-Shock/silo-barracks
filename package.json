@@ -32,8 +32,7 @@
   "type": "module",
   "workspaces": [
     "apps/*",
-    "packaging/shims/*",
-    "docs"
+    "packaging/shims/*"
   ],
   "scripts": {
     "theme:check": "node scripts/check-theme-colors.cjs",
@@ -51,25 +50,15 @@
     "test": "npm run test -w @jellyglance/api && npm run test -w @jellyglance/web && node --test \"scripts/*.test.cjs\"",
     "bundle:budget": "node scripts/check-bundle-budget.cjs",
     "bundle:budget:update": "npm run build && node scripts/check-bundle-budget.cjs --update",
-    "start": "npm run start -w @jellyglance/api",
-    "build:docs": "npm run build -w @jellyglance/docs",
-    "docs:dev": "npm run dev -w @jellyglance/docs",
-    "release": "semantic-release"
+    "start": "npm run start -w @jellyglance/api"
   },
   "devDependencies": {
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "concurrently": "^10.0.5",
-    "@semantic-release/changelog": "^7.0.0",
-    "@semantic-release/git": "^11.0.1",
-    "@semantic-release/github": "^12.0.9",
-    "@semantic-release/npm": "^13.1.5",
-    "@semantic-release/release-notes-generator": "^14.1.1",
-    "semantic-release": "^25.0.9"
+    "concurrently": "^10.0.5"
   },
   "overrides": {
     "@mui/material": "7.3.11",
-    "@mui/icons-material": "7.3.11",
     "@mui/system": "7.3.11",
     "eslint": {
       ".": "10.14.0",
@@ -78,8 +67,6 @@
     "fast-uri": "4.2.3",
     "js-yaml": "5.5.0",
     "qs": "6.16.1",
-    "vite@5.4.21": "6.4.3",
-    "esbuild@0.21.5": "0.25.12",
     "brace-expansion@1": "1.1.21",
     "engine.io": "6.6.11",
     "brace-expansion@5": "5.0.12",

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import AwardLineIcon from "remixicon-react/AwardLineIcon";
+import { RiAwardLine } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 
 const GOAL_LABELS = { movies: "Movies", episodes: "Episodes", hours: "Hours watched" };
@@ -85,7 +85,7 @@ function Badge({ badge }) {
   return (
     <article className={`achievements-badge ${tierClass}`} title={badge.description}>
       <span className="achievements-badge-medal">
-        <AwardLineIcon size={22} />
+        <RiAwardLine size={22} />
       </span>
       <div>
         <strong>{badge.name}</strong>

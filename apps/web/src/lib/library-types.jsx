@@ -1,26 +1,18 @@
 import i18next from "i18next";
-import BookOpenLineIcon from "remixicon-react/BookOpenLineIcon";
-import CheckboxMultipleBlankLineIcon from "remixicon-react/CheckboxMultipleBlankLineIcon";
-import FileMusicLineIcon from "remixicon-react/FileMusicLineIcon";
-import FilmLineIcon from "remixicon-react/FilmLineIcon";
-import ImageLineIcon from "remixicon-react/ImageLineIcon";
-import MovieLineIcon from "remixicon-react/MovieLineIcon";
-import TvLineIcon from "remixicon-react/TvLineIcon";
-import VideoLineIcon from "remixicon-react/VideoLineIcon";
-import ClapperboardLineIcon from "remixicon-react/ClapperboardLineIcon";
+import { RiBookOpenLine, RiCheckboxMultipleBlankLine, RiClapperboardLine, RiFileMusicLine, RiFilmLine, RiImageLine, RiMovieLine, RiTvLine, RiVideoLine } from "@remixicon/react";
 
 // Library collection types as Jellyfin and Emby report them. Books libraries hold both books and
 // audiobooks. Anything unknown (folders, null) is shown as mixed.
 const LIBRARY_TYPES = {
-  movies: { icon: FilmLineIcon, key: "MOVIES" },
-  tvshows: { icon: TvLineIcon, key: "TVSHOWS" },
-  music: { icon: FileMusicLineIcon, key: "MUSIC" },
-  musicvideos: { icon: VideoLineIcon, key: "MUSICVIDEOS" },
-  homevideos: { icon: MovieLineIcon, key: "HOMEVIDEOS" },
-  books: { icon: BookOpenLineIcon, key: "BOOKS" },
-  photos: { icon: ImageLineIcon, key: "PHOTOS" },
-  trailers: { icon: ClapperboardLineIcon, key: "TRAILERS" },
-  mixed: { icon: CheckboxMultipleBlankLineIcon, key: "MIXED" },
+  movies: { icon: RiFilmLine, key: "MOVIES" },
+  tvshows: { icon: RiTvLine, key: "TVSHOWS" },
+  music: { icon: RiFileMusicLine, key: "MUSIC" },
+  musicvideos: { icon: RiVideoLine, key: "MUSICVIDEOS" },
+  homevideos: { icon: RiMovieLine, key: "HOMEVIDEOS" },
+  books: { icon: RiBookOpenLine, key: "BOOKS" },
+  photos: { icon: RiImageLine, key: "PHOTOS" },
+  trailers: { icon: RiClapperboardLine, key: "TRAILERS" },
+  mixed: { icon: RiCheckboxMultipleBlankLine, key: "MIXED" },
 };
 
 // The original four keep their existing, already translated overview headings.

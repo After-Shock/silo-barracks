@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../../lib/axios_instance";
-import StarFillIcon from "remixicon-react/StarFillIcon";
+import { RiStarFill } from "@remixicon/react";
 
 import { formatDisplayVersion as formatReleaseVersion, isBetaVersion } from "../../../lib/release-channel";
 import "../../css/settings/version.css";
@@ -69,7 +69,7 @@ export default function VersionCard() {
               target="_blank"
               rel="noreferrer"
             >
-              <StarFillIcon size={12} />
+              <RiStarFill size={12} />
               {data.stars.toLocaleString()} {data.stars === 1 ? "star" : "stars"}
             </a>
           ) : null}
