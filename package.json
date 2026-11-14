@@ -59,7 +59,6 @@
   },
   "overrides": {
     "@mui/material": "7.3.11",
-    "@mui/icons-material": "7.3.11",
     "@mui/system": "7.3.11",
     "eslint": {
       ".": "10.14.0",

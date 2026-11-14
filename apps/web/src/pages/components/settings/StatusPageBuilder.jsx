@@ -1,11 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import AddLineIcon from "remixicon-react/AddLineIcon";
-import ArrowDownSLineIcon from "remixicon-react/ArrowDownSLineIcon";
-import ArrowUpSLineIcon from "remixicon-react/ArrowUpSLineIcon";
-import DeleteBinLineIcon from "remixicon-react/DeleteBinLineIcon";
-import EyeLineIcon from "remixicon-react/EyeLineIcon";
-import EyeOffLineIcon from "remixicon-react/EyeOffLineIcon";
-import ExternalLinkLineIcon from "remixicon-react/ExternalLinkLineIcon";
+import { RiAddLine, RiArrowDownSLine, RiArrowUpSLine, RiDeleteBinLine, RiExternalLinkLine, RiEyeLine, RiEyeOffLine } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 import baseUrl from "../../../lib/baseurl";
 import { StatusPageView } from "../../public-status";
@@ -231,13 +225,13 @@ function BlockEditor({ block, services, onChange }) {
                 onChange={(event) => set({ items: block.items.map((row, i) => (i === index ? { ...row, url: event.target.value } : row)) })}
               />
               <button type="button" aria-label="Remove link" onClick={() => set({ items: block.items.filter((_, i) => i !== index) })}>
-                <DeleteBinLineIcon size={15} />
+                <RiDeleteBinLine size={15} />
               </button>
             </div>
           ))}
           {block.items.length < 8 ? (
             <button type="button" className="spb-small-button" onClick={() => set({ items: [...block.items, { label: "", url: "" }] })}>
-              <AddLineIcon size={14} /> Add link
+              <RiAddLine size={14} /> Add link
             </button>
           ) : null}
           <small className="spb-note">Only full http or https links are kept when you save.</small>
@@ -356,7 +350,7 @@ export default function StatusPageBuilder() {
             <div className="spb-link">
               <code>{statusUrl}</code>
               <a href={statusUrl} target="_blank" rel="noreferrer">
-                <ExternalLinkLineIcon size={14} /> Open
+                <RiExternalLinkLine size={14} /> Open
               </a>
             </div>
             <Field label="Title" hint="Leave blank to use your Jellyfin server name.">
@@ -440,20 +434,20 @@ export default function StatusPageBuilder() {
                     </button>
                     <div className="spb-block-tools">
                       <button type="button" aria-label="Move up" disabled={index === 0} onClick={() => moveBlock(index, -1)}>
-                        <ArrowUpSLineIcon size={16} />
+                        <RiArrowUpSLine size={16} />
                       </button>
                       <button type="button" aria-label="Move down" disabled={index === draft.blocks.length - 1} onClick={() => moveBlock(index, 1)}>
-                        <ArrowDownSLineIcon size={16} />
+                        <RiArrowDownSLine size={16} />
                       </button>
                       <button
                         type="button"
                         aria-label={block.enabled ? "Hide block" : "Show block"}
                         onClick={() => setBlocks(draft.blocks.map((row) => (row.id === block.id ? { ...row, enabled: !row.enabled } : row)))}
                       >
-                        {block.enabled ? <EyeLineIcon size={16} /> : <EyeOffLineIcon size={16} />}
+                        {block.enabled ? <RiEyeLine size={16} /> : <RiEyeOffLine size={16} />}
                       </button>
                       <button type="button" aria-label="Remove block" onClick={() => setBlocks(draft.blocks.filter((row) => row.id !== block.id))}>
-                        <DeleteBinLineIcon size={16} />
+                        <RiDeleteBinLine size={16} />
                       </button>
                     </div>
                   </div>
@@ -470,7 +464,7 @@ export default function StatusPageBuilder() {
               <span>Add a block</span>
               {Object.entries(BLOCK_INFO).map(([type, info]) => (
                 <button type="button" key={type} title={info.text} onClick={() => addBlock(type)}>
-                  <AddLineIcon size={14} /> {info.name}
+                  <RiAddLine size={14} /> {info.name}
                 </button>
               ))}
             </div>

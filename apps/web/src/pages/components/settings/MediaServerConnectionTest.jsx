@@ -1,20 +1,15 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import CheckboxCircleFillIcon from "remixicon-react/CheckboxCircleFillIcon";
-import CloseCircleFillIcon from "remixicon-react/CloseCircleFillIcon";
-import ErrorWarningFillIcon from "remixicon-react/ErrorWarningFillIcon";
-import IndeterminateCircleLineIcon from "remixicon-react/IndeterminateCircleLineIcon";
-import Loader4LineIcon from "remixicon-react/Loader4LineIcon";
-import PulseLineIcon from "remixicon-react/PulseLineIcon";
+import { RiCheckboxCircleFill, RiCloseCircleFill, RiErrorWarningFill, RiIndeterminateCircleLine, RiLoader4Line, RiPulseLine } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 
 export const CONNECTION_TEST_PREFIX = "SETTINGS_PAGE.CONNECTION_TEST";
 const PREFIX = CONNECTION_TEST_PREFIX;
 const STATUS_ICON = {
-  pass: CheckboxCircleFillIcon,
-  warn: ErrorWarningFillIcon,
-  fail: CloseCircleFillIcon,
-  skip: IndeterminateCircleLineIcon,
+  pass: RiCheckboxCircleFill,
+  warn: RiErrorWarningFill,
+  fail: RiCloseCircleFill,
+  skip: RiIndeterminateCircleLine,
 };
 
 function normaliseUrl(value) {
@@ -72,7 +67,7 @@ export default function MediaServerConnectionTest({ running, result, error, host
   else if (error) summary = error;
   else if (result) summary = t(`${PREFIX}.OVERALL_${state.toUpperCase()}`, { server: label });
 
-  const SummaryIcon = state === "running" ? Loader4LineIcon : state === "idle" ? PulseLineIcon : STATUS_ICON[state];
+  const SummaryIcon = state === "running" ? RiLoader4Line : state === "idle" ? RiPulseLine : STATUS_ICON[state];
 
   return (
     <div className="jf-connection-results" aria-live="polite" aria-busy={running}>

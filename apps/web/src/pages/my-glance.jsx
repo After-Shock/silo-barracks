@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import AccountCircleFillIcon from "remixicon-react/AccountCircleFillIcon";
+import { RiAccountCircleFill } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import Config from "../lib/config";
 import { fetchActiveSessions, getCachedActiveSessions, subscribeActiveSessions } from "../lib/session-cache";
@@ -529,7 +529,7 @@ export default function MyGlance() {
                 }}
               />
             ) : null}
-            <AccountCircleFillIcon size={42} />
+            <RiAccountCircleFill size={42} />
           </span>
           <div>
             <p>{t("FEATURES.MY_GLANCE.TITLE")}</p>

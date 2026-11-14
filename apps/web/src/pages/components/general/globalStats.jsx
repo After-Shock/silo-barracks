@@ -5,7 +5,7 @@ import "../../css/globalstats.css";
 import WatchTimeStats from "./globalstats/watchtimestats";
 import { Trans } from "react-i18next";
 import { Checkbox, FormControlLabel, IconButton, Menu } from "@mui/material";
-import { GridMoreVertIcon } from "@mui/x-data-grid";
+import { RiMore2Fill } from "@remixicon/react";
 
 function GlobalStats(props) {
   const [dayStats, setDayStats] = useState({});
@@ -125,7 +125,7 @@ function GlobalStats(props) {
       <div className="d-flex flex-row justify-content-between">
         <h1 className="py-3">{props.title}</h1>
         <IconButton aria-label="more" aria-controls="long-menu" aria-haspopup="true" onClick={handleMenuOpen}>
-          <GridMoreVertIcon />
+          <RiMore2Fill />
         </IconButton>
 
         <Menu

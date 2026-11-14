@@ -1,5 +1,5 @@
 import { useState } from "react";
-import SmartphoneLineIcon from "remixicon-react/SmartphoneLineIcon";
+import { RiSmartphoneLine } from "@remixicon/react";
 import { useInstallPrompt } from "../../../lib/pwa-install";
 
 export default function InstallAppButton({ className = "" }) {
@@ -9,7 +9,7 @@ export default function InstallAppButton({ className = "" }) {
   return (
     <div className={`install-app ${className}`}>
       <button type="button" className="install-app-button" onClick={() => (canInstall ? install() : setShowHint((value) => !value))} title="Install Barracks as an app">
-        <SmartphoneLineIcon size={16} />
+        <RiSmartphoneLine size={16} />
         <span>Install app</span>
       </button>
       {showHint ? <p className="install-app-hint">Tap the Share button in Safari, then choose &ldquo;Add to Home Screen&rdquo;.</p> : null}

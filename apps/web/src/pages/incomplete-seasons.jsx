@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import Tv2LineIcon from "remixicon-react/Tv2LineIcon";
-import ExternalLinkLineIcon from "remixicon-react/ExternalLinkLineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
+import { RiExternalLinkLine, RiRefreshLine, RiTv2Line } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import "./css/incomplete-seasons.css";
 
@@ -50,7 +48,7 @@ export default function IncompleteSeasons() {
   return (
     <div className="incomplete-seasons">
       <section className="is-hero">
-        <Tv2LineIcon />
+        <RiTv2Line />
         <div>
           <h1>Incomplete Seasons</h1>
           <p>Series where a season holds fewer episodes than it should. Sonarr&apos;s aired episode counts are used when connected; otherwise gaps in episode numbering are flagged.</p>
@@ -81,7 +79,7 @@ export default function IncompleteSeasons() {
           ))}
           <input className="is-search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Filter series…" aria-label="Filter series" />
         </div>
-        <button type="button" className="is-btn" onClick={load} disabled={loading}><RefreshLineIcon /> Rescan</button>
+        <button type="button" className="is-btn" onClick={load} disabled={loading}><RiRefreshLine /> Rescan</button>
       </div>
 
       {loading ? (
@@ -118,9 +116,9 @@ export default function IncompleteSeasons() {
                 </td>
                 <td><span className="is-missing">{row.missing}</span></td>
                 <td className="is-links">
-                  {row.links.sonarr && <a className="is-btn is-primary" href={row.links.sonarr} target="_blank" rel="noopener noreferrer"><ExternalLinkLineIcon /> Open in {sonarr?.name || "Sonarr"}</a>}
-                  {!row.links.sonarr && row.links.sonarrSearch && <a className="is-btn" href={row.links.sonarrSearch} target="_blank" rel="noopener noreferrer"><ExternalLinkLineIcon /> Add to {sonarr?.name || "Sonarr"}</a>}
-                  {row.links.tvdb && <a className="is-btn" href={row.links.tvdb} target="_blank" rel="noopener noreferrer"><ExternalLinkLineIcon /> TVDB</a>}
+                  {row.links.sonarr && <a className="is-btn is-primary" href={row.links.sonarr} target="_blank" rel="noopener noreferrer"><RiExternalLinkLine /> Open in {sonarr?.name || "Sonarr"}</a>}
+                  {!row.links.sonarr && row.links.sonarrSearch && <a className="is-btn" href={row.links.sonarrSearch} target="_blank" rel="noopener noreferrer"><RiExternalLinkLine /> Add to {sonarr?.name || "Sonarr"}</a>}
+                  {row.links.tvdb && <a className="is-btn" href={row.links.tvdb} target="_blank" rel="noopener noreferrer"><RiExternalLinkLine /> TVDB</a>}
                 </td>
               </tr>
             ))}

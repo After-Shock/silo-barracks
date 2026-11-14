@@ -4,10 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Spinner } from "@/components/ui/spinner";
-import FileSearchLineIcon from "remixicon-react/FileSearchLineIcon";
-import LinkIcon from "remixicon-react/LinkIcon";
-import LinkUnlinkIcon from "remixicon-react/LinkUnlinkIcon";
-import UploadCloud2LineIcon from "remixicon-react/UploadCloud2LineIcon";
+import { RiFileSearchLine, RiLink, RiLinkUnlink, RiUploadCloud2Line } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 import ImportJobProgress, { useImportJob } from "./ImportJobProgress";
 import DismissibleAlert from "./dismissible-alert";
@@ -333,15 +330,15 @@ export default function TraktImport() {
                 </div>
                 <div className="external-import-row-actions">
                   <Button type="button" variant="outline" onClick={() => accountAction(account, "preview")} disabled={Boolean(busyAction)}>
-                    {busyAction === `preview-${account.id}` ? <Spinner className="tw:size-4" /> : <FileSearchLineIcon size={18} />}
+                    {busyAction === `preview-${account.id}` ? <Spinner className="tw:size-4" /> : <RiFileSearchLine size={18} />}
                     Preview
                   </Button>
                   <Button type="button" onClick={() => accountAction(account, "import")} disabled={Boolean(busyAction) || jobRunning}>
-                    {busyAction === `import-${account.id}` ? <Spinner className="tw:size-4" /> : <UploadCloud2LineIcon size={18} />}
+                    {busyAction === `import-${account.id}` ? <Spinner className="tw:size-4" /> : <RiUploadCloud2Line size={18} />}
                     Import
                   </Button>
                   <Button type="button" variant="destructive" onClick={() => disconnect(account)} disabled={Boolean(busyAction)} title="Disconnect">
-                    <LinkUnlinkIcon size={18} />
+                    <RiLinkUnlink size={18} />
                   </Button>
                 </div>
               </article>
@@ -375,7 +372,7 @@ export default function TraktImport() {
               ))}
             </NativeSelect>
             <Button type="button" onClick={startConnect} disabled={!hasCredentials || !connectUser || Boolean(busyAction)}>
-              {busyAction === "connect" ? <Spinner className="tw:size-4" /> : <LinkIcon size={18} />}
+              {busyAction === "connect" ? <Spinner className="tw:size-4" /> : <RiLink size={18} />}
               Connect Trakt
             </Button>
           </div>
@@ -434,7 +431,7 @@ export default function TraktImport() {
             <small>Accepted: watched-history.json, watched-movies.json or watched-shows.json from a Trakt export.</small>
           </div>
           <label className="legacy-import-upload-button">
-            <FileSearchLineIcon size={18} />
+            <RiFileSearchLine size={18} />
             Choose file
             <input
               ref={fileInputRef}
@@ -459,11 +456,11 @@ export default function TraktImport() {
             ))}
           </NativeSelect>
           <Button type="button" variant="outline" onClick={() => sendUpload(false)} disabled={!uploadFile || !uploadUser || Boolean(busyAction)}>
-            {busyAction === "upload-preview" ? <Spinner className="tw:size-4" /> : <FileSearchLineIcon size={18} />}
+            {busyAction === "upload-preview" ? <Spinner className="tw:size-4" /> : <RiFileSearchLine size={18} />}
             Preview
           </Button>
           <Button type="button" onClick={() => sendUpload(true)} disabled={!uploadFile || !uploadUser || Boolean(busyAction)}>
-            {busyAction === "upload-import" ? <Spinner className="tw:size-4" /> : <UploadCloud2LineIcon size={18} />}
+            {busyAction === "upload-import" ? <Spinner className="tw:size-4" /> : <RiUploadCloud2Line size={18} />}
             Import
           </Button>
         </div>

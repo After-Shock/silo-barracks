@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import SendPlaneLineIcon from "remixicon-react/SendPlaneLineIcon";
+import { RiSendPlaneLine } from "@remixicon/react";
 import axios from "../../../lib/axios_instance";
 
 function authHeader() {
@@ -234,7 +234,7 @@ export default function WebhookOutPanel() {
   return (
     <section className="notification-panel threshold-alerts webhook-out">
       <div className="notification-panel-title">
-        <SendPlaneLineIcon size={18} />
+        <RiSendPlaneLine size={18} />
         <h3>Outbound webhook rules</h3>
       </div>
       <p className="threshold-alerts-copy">

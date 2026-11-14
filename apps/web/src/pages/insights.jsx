@@ -2,12 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Bar, BarChart, Line, LineChart, PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Spinner } from "@/components/ui/spinner";
-import CalendarCheckLineIcon from "remixicon-react/CalendarCheckLineIcon";
-import HeartPulseLineIcon from "remixicon-react/HeartPulseLineIcon";
-import PulseLineIcon from "remixicon-react/PulseLineIcon";
-import PlayList2LineIcon from "remixicon-react/PlayList2LineIcon";
-import Compass3LineIcon from "remixicon-react/Compass3LineIcon";
-import DeviceLineIcon from "remixicon-react/DeviceLineIcon";
+import { RiCalendarCheckLine, RiCompass3Line, RiDeviceLine, RiHeartPulseLine, RiPlayList2Line, RiPulseLine } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import { useTranslation } from "react-i18next";
 import { formatDate as formatLocaleDate } from "../lib/format-date";
@@ -905,12 +900,12 @@ function Devices() {
 }
 
 export const INSIGHT_TABS = [
-  { id: "wrapped", label: "Recap", icon: CalendarCheckLineIcon, Component: Wrapped },
-  { id: "tastemap", label: "Taste map", icon: Compass3LineIcon, Component: TasteMap },
-  { id: "upnext", label: "Up next", icon: PlayList2LineIcon, Component: UpNext },
-  { id: "health", label: "Library health", icon: HeartPulseLineIcon, Component: LibraryHealth },
-  { id: "streams", label: "Streams", icon: PulseLineIcon, Component: Streams },
-  { id: "devices", label: "Devices", icon: DeviceLineIcon, Component: Devices },
+  { id: "wrapped", label: "Recap", icon: RiCalendarCheckLine, Component: Wrapped },
+  { id: "tastemap", label: "Taste map", icon: RiCompass3Line, Component: TasteMap },
+  { id: "upnext", label: "Up next", icon: RiPlayList2Line, Component: UpNext },
+  { id: "health", label: "Library health", icon: RiHeartPulseLine, Component: LibraryHealth },
+  { id: "streams", label: "Streams", icon: RiPulseLine, Component: Streams },
+  { id: "devices", label: "Devices", icon: RiDeviceLine, Component: Devices },
 ];
 
 const TABS = INSIGHT_TABS;

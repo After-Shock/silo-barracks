@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NativeSelect } from "@/components/ui/native-select";
-import TimeLineIcon from "remixicon-react/TimeLineIcon";
+import { RiTimeLine } from "@remixicon/react";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
@@ -180,7 +180,7 @@ export default function ActiveTimesModal({
       <DialogContent className="active-times-modal tw:max-w-[800px] tw:sm:max-w-[800px]">
         <DialogHeader>
           <DialogTitle>
-            <TimeLineIcon size={20} />{" "}
+            <RiTimeLine size={20} />{" "}
             {isGlobal
               ? "Global active times"
               : `Active times · ${task?.name || ""}`}

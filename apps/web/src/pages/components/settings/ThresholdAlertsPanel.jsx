@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import AlarmWarningLineIcon from "remixicon-react/AlarmWarningLineIcon";
+import { RiAlarmWarningLine } from "@remixicon/react";
 import { useTranslation } from "react-i18next";
 import axios from "../../../lib/axios_instance";
 
@@ -354,7 +354,7 @@ export default function ThresholdAlertsPanel() {
   return (
     <section className="notification-panel threshold-alerts">
       <div className="notification-panel-title">
-        <AlarmWarningLineIcon size={18} />
+        <RiAlarmWarningLine size={18} />
         <h3>Threshold alerts</h3>
       </div>
       <p className="threshold-alerts-copy">

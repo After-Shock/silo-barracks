@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import ClosedCaptioningLineIcon from "remixicon-react/ClosedCaptioningLineIcon";
-import Search2LineIcon from "remixicon-react/Search2LineIcon";
-import RefreshLineIcon from "remixicon-react/RefreshLineIcon";
+import { RiClosedCaptioningLine, RiRefreshLine, RiSearch2Line } from "@remixicon/react";
 import axios from "../lib/axios_instance";
 import "./css/subtitle-gap.css";
 
@@ -85,7 +83,7 @@ export default function SubtitleGap() {
   return (
     <div className="subtitle-gap">
       <section className="sg-hero">
-        <ClosedCaptioningLineIcon />
+        <RiClosedCaptioningLine />
         <div>
           <h1>Subtitle &amp; Audio Gaps</h1>
           <p>Titles missing your household&apos;s subtitle or audio languages, worked out from the tracks Jellyfin already knows about.</p>
@@ -130,10 +128,10 @@ export default function SubtitleGap() {
           ))}
         </div>
         <div className="sg-actions">
-          <button type="button" className="sg-btn" onClick={load} disabled={loading}><RefreshLineIcon /> Rescan</button>
+          <button type="button" className="sg-btn" onClick={load} disabled={loading}><RiRefreshLine /> Rescan</button>
           {bazarr && (
             <button type="button" className="sg-btn is-primary" disabled={!chosen.length} onClick={() => search(chosen)}>
-              <Search2LineIcon /> Search selected in Bazarr{chosen.length ? ` (${chosen.length})` : ""}
+              <RiSearch2Line /> Search selected in Bazarr{chosen.length ? ` (${chosen.length})` : ""}
             </button>
           )}
         </div>
@@ -182,7 +180,7 @@ export default function SubtitleGap() {
                   <td>{langChips(row.missingAudio, row.files)}</td>
                   <td className="sg-row-action">
                     {bazarr ? (
-                      <button type="button" className="sg-btn" disabled={state?.status === "busy"} onClick={() => search([row])}><Search2LineIcon /> Search in Bazarr</button>
+                      <button type="button" className="sg-btn" disabled={state?.status === "busy"} onClick={() => search([row])}><RiSearch2Line /> Search in Bazarr</button>
                     ) : (
                       <span className="sg-sub">Bazarr not connected</span>
                     )}

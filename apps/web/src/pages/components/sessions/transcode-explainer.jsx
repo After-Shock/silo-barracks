@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ArrowDownSLineIcon from "remixicon-react/ArrowDownSLineIcon";
+import { RiArrowDownSLine } from "@remixicon/react";
 import Tooltip from "@mui/material/Tooltip";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import { explainTranscode, summarizeTranscode } from "../../../lib/transcode-explainer";
@@ -40,7 +40,7 @@ function TranscodeExplainer({ session, compact = false, defaultOpen = false }) {
       title={compact ? undefined : "Why is this transcoding?"}
     >
       <span>{summary}</span>
-      <ArrowDownSLineIcon size={14} aria-hidden="true" />
+      <RiArrowDownSLine size={14} aria-hidden="true" />
     </button>
   );
 

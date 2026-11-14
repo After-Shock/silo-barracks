@@ -5,10 +5,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "../../../lib/axios_instance";
 import { navData } from "../../../lib/navdata";
-import { RiAccountCircleLine, RiArrowLeftSLine, RiArrowRightSLine, RiLogoutBoxLine, RiMagicLine, RiMenuLine, RiShieldUserFill, RiUserStarFill } from "@remixicon/react";
-import ErrorWarningLineIcon from "remixicon-react/ErrorWarningLineIcon";
-import SearchLineIcon from "remixicon-react/SearchLineIcon";
-import Apps2LineIcon from "remixicon-react/Apps2LineIcon";
+import { RiAccountCircleLine, RiApps2Line, RiArrowLeftSLine, RiArrowRightSLine, RiErrorWarningLine, RiLogoutBoxLine, RiMagicLine, RiMenuLine, RiSearchLine, RiShieldUserFill, RiUserStarFill } from "@remixicon/react";
 import logo_dark from "../../../../public/brand/barracks-mark.svg";
 import "../../css/navbar.css";
 import VersionCard from "./version-card";
@@ -1206,7 +1203,7 @@ export default function Navbar() {
           onClick={() => setIsMobileNavOpen((isOpen) => !isOpen)}
         >
           <span className="mobile-tab-ico">
-            <Apps2LineIcon />
+            <RiApps2Line />
           </span>
           <span className="mobile-tab-label">{t("MOBILE_NAV.MORE")}</span>
           {moreHasBadge ? <span className="mobile-tab-dot" aria-label={t("MOBILE_NAV.MORE_HAS_UPDATES")} /> : null}
@@ -1385,7 +1382,7 @@ export default function Navbar() {
             <div className="navbar-version-row">
               {jellyfinStatus && jellyfinStatus.ok === false ? (
                 <Link to="/settings/health" className="navbar-jellyfin-down" title={jellyfinStatus.error || t("FEATURES.OPS.JELLYFIN_DOWN")}>
-                  <ErrorWarningLineIcon size={16} />
+                  <RiErrorWarningLine size={16} />
                   <span>{t("FEATURES.OPS.JELLYFIN_DOWN")}</span>
                 </Link>
               ) : null}
@@ -1530,7 +1527,7 @@ export default function Navbar() {
               {isThemeMenuOpen ? (
                 <div className="profile-theme-select-menu" role="listbox">
                   <label className="profile-theme-search">
-                    <SearchLineIcon size={14} />
+                    <RiSearchLine size={14} />
                     <input
                       type="search"
                       value={themeQuery}
