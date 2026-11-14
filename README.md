@@ -57,6 +57,10 @@ the manual end-to-end verification fixture. Contract tests and a fixture server
 do not establish compatibility with a deployed Silo version; a live-server check
 is required before production use.
 
+Lint, tests and build passing is not enough to ship: an upstream merge once passed all
+three and crashed every page. Before deploying, open every page in a browser against a
+restored copy of the production database and check for page errors.
+
 ## Upstream attribution
 
 Derived from [JellyGlance](https://github.com/Nerdy-Technician/JellyGlance), by
