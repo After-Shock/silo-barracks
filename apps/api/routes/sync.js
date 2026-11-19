@@ -241,7 +241,7 @@ async function archiveLibraryItems(fetchedData) {
 }
 
 async function syncSeasons(seasons) {
-  const shows = seasons.map((season) => season.SeriesId);
+  const shows = [...new Set(seasons.map((season) => season.SeriesId))];
 
   let insertSeasonsCount = 0;
   let updateSeasonsCount = 0;
@@ -279,7 +279,7 @@ async function syncSeasons(seasons) {
   return { insertSeasonsCount: insertSeasonsCount, updateSeasonsCount: updateSeasonsCount };
 }
 async function syncEpisodes(episodes) {
-  const shows = episodes.map((episode) => episode.SeriesId);
+  const shows = [...new Set(episodes.map((episode) => episode.SeriesId))];
 
   let insertEpisodeCount = 0;
   let updateEpisodeCount = 0;
