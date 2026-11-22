@@ -19,10 +19,6 @@ permissions:
   pull-requests: write
   issues: write
 
-concurrency:
-  group: pr-agent-${{ github.event.pull_request.number || github.event.issue.number }}
-  cancel-in-progress: false
-
 jobs:
   pr-agent:
     if: >-
@@ -32,6 +28,11 @@ jobs:
         && startsWith(github.event.comment.body, '/')
         && github.event.comment.author_association == 'OWNER')
     runs-on: [self-hosted, ci-runner]
+    # job-level so only owner-authorized runs enter the queue (a stranger's comment
+    # can't displace a pending owner command)
+    concurrency:
+      group: pr-agent-${{ github.event.pull_request.number || github.event.issue.number }}
+      cancel-in-progress: false
     timeout-minutes: 20
     env:
       GITHUB__USER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
