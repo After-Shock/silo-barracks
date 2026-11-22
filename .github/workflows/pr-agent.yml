@@ -1,0 +1,54 @@
+# AI PR review on the self-hosted ci-runner (no GitHub-hosted minutes).
+# PUBLIC REPO hardening: pull_request_target (workflow always comes from main, a PR
+# can't edit it; PR code is never checked out), owner-authored PRs only (others' PRs
+# must not use our subscriptions), and fork PR workflows need approval (repo setting
+# fork-pr-contributor-approval = all_external_contributors).
+# pr-agent lives in ~/pr-agent on the runner (private fork After-Shock/pr-agent); its
+# .secrets.toml there points at the CLIProxy hub (gpt-6.2-sol, fallback gemini-4-neon-xhigh).
+# Auto: `review` when you open a PR. Manual (repo owner only): comment /review, /improve, /describe or /ask <question>.
+name: PR Agent
+
+on:
+  pull_request_target:
+    types: [opened, reopened, ready_for_review]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: pr-agent-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  pr-agent:
+    if: >-
+      (github.event_name == 'pull_request_target' && !github.event.pull_request.draft
+        && github.event.pull_request.author_association == 'OWNER') ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request
+        && startsWith(github.event.comment.body, '/')
+        && github.event.comment.author_association == 'OWNER')
+    runs-on: [self-hosted, ci-runner]
+    timeout-minutes: 20
+    env:
+      GITHUB__USER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR_URL: ${{ github.event.pull_request.html_url || github.event.issue.html_url }}
+      COMMENT: ${{ github.event.comment.body }}
+    steps:
+      - name: Run pr-agent
+        run: |
+          set -euo pipefail
+          cmd=review; args=()
+          if [ -n "${COMMENT:-}" ]; then
+            first=${COMMENT%%[[:space:]]*}; cmd=${first#/}
+            rest=${COMMENT#"$first"}; rest=${rest#"${rest%%[![:space:]]*}"}
+            case "$cmd" in
+              review|improve|describe) ;;
+              ask) [ -n "$rest" ] || { echo "/ask needs a question"; exit 1; }; args=("$rest") ;;
+              *) echo "ignoring unknown command /$cmd"; exit 0 ;;
+            esac
+          fi
+          "$HOME/pr-agent/.venv/bin/pr-agent" --pr_url="$PR_URL" "$cmd" "${args[@]}"
